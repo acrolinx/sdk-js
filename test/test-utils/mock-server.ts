@@ -6,9 +6,9 @@ import {ServerVersionInfo} from '../../src/index';
 import {AuthorizationType, POLL_MORE_RESULT, SigninLinksResult, SigninPollResult} from '../../src/login';
 
 export const DUMMY_SERVER_INFO: ServerVersionInfo = {
-  buildDate: 'yyy',
+  buildDate: '2018-01-10',
   buildNumber: '1234',
-  version: '1.2.3.4',
+  version: '1.2.3',
 };
 
 export const DUMMY_SIGNIN_LINK_PATH_INTERACTIVE = '/dashboard.html';
