@@ -14,7 +14,7 @@
     "build": "tsc",
     "runExample": "tsc && node dist/examples/get-server-version.js",
     "runExampleSignin": "tsc && node dist/examples/signin.js",
-    "runMockServer": "tsc && node dist/test/test-utils.js",
+    "runMockServer": "tsc && node dist/test/test-utils/mock-server-http.js",
     "test": "jest",
     "testCoverage": "jest --coverage",
     "testUnit": "jest unit",
@@ -53,6 +53,7 @@
     ],
     "coverageDirectory": "tmp/coverage",
     "mapCoverage": true,
+    "coverageReporters": ["cobertura","json", "lcov", "text"],
     "testResultsProcessor": "jest-junit"
   },
   "jest-junit": {
