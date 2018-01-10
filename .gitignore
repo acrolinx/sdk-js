@@ -1,0 +1,9 @@
+.idea
+
+node_modules
+
+.private
+
+tmp
+dist
+npm-debug.log

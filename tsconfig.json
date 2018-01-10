@@ -1,0 +1,28 @@
+{
+  "compilerOptions": {
+    "target": "es5",
+    "lib": [
+      "ES2015.Promise",
+      "ES2015.Iterable",
+      "ES5",
+      "DOM"
+    ],
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "strictNullChecks": true,
+    "noImplicitThis": true,
+    "noUnusedParameters": true,
+    "noUnusedLocals": true,
+    "strictFunctionTypes": true,
+    "sourceMap": true,
+    "declaration": true,
+    "outDir": "dist",
+    "module": "commonjs",
+    "moduleResolution": "classic"
+  },
+  "exclude": [
+    "node_modules",
+    "dist"
+  ]
+}

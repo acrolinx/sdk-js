@@ -1,0 +1,17 @@
+{
+  "extends": ["tslint:recommended"],
+  "rules": {
+    "quotemark": [
+      true,
+      "single",
+      "avoid-escape"
+    ],
+    "variable-name": [true, "ban-keywords", "check-format", "allow-leading-underscore"],
+    "interface-name": false,
+    "arrow-parens": false,
+    "trailing-comma": false,
+    "max-classes-per-file": 10,
+    "no-console": false,
+    "no-consecutive-blank-lines": [true, 2]
+  }
+}

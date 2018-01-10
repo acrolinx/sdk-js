@@ -1,0 +1,61 @@
+{
+  "name": "acrolinx-api",
+  "version": "0.0.1",
+  "description": "",
+  "main": "dist/src/index.js",
+  "types": "dist/src/index.d.ts",
+  "engines": {
+    "node": ">=8.9.4"
+  },
+  "scripts": {
+    "ci": "npm run build && npm run tslint && npm run testUnitCoverage",
+    "clean": "rm -rf dist",
+    "prepublish": "npm run build",
+    "build": "tsc",
+    "runExample": "tsc && node dist/examples/get-server-version.js",
+    "runExampleSignin": "tsc && node dist/examples/signin.js",
+    "runMockServer": "tsc && node dist/test/test-utils.js",
+    "test": "jest",
+    "testCoverage": "jest --coverage",
+    "testUnit": "jest unit",
+    "testUnitCoverage": "jest unit --coverage",
+    "testIntegrationServer": "jest integration-server",
+    "testIntegrationServerCoverage": "jest integration-server --coverage",
+    "tscWatch": "tsc -w",
+    "tslint": "tslint -p tsconfig.json",
+    "tslintFix": "tslint -p tsconfig.json --fix"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/fetch-mock": "^5.12.2",
+    "@types/jest": "^22.0.1",
+    "@types/lodash": "^4.14.92",
+    "fetch-mock": "^6.0.0-beta.7",
+    "jest": "^22.0.4",
+    "jest-junit": "^3.4.1",
+    "lodash": "^4.17.4",
+    "ts-jest": "^22.0.1",
+    "tslint": "^5.8.0",
+    "typescript": "^2.6.2"
+  },
+  "dependencies": {
+    "cross-fetch": "^1.1.1"
+  },
+  "jest": {
+    "transform": {
+      "^.+\\.ts$": "ts-jest"
+    },
+    "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(ts)$",
+    "moduleFileExtensions": [
+      "ts",
+      "js"
+    ],
+    "coverageDirectory": "tmp/coverage",
+    "mapCoverage": true,
+    "testResultsProcessor": "jest-junit"
+  },
+  "jest-junit": {
+    "output": "tmp/junit.xml"
+  }
+}
