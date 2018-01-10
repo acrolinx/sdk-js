@@ -1,2 +1,2 @@
 # acrolinx-api-js
-NPM to talk to Acrolinx
+NPM Module to talk to Acrolinx
