@@ -12,6 +12,7 @@
     "trailing-comma": false,
     "max-classes-per-file": 10,
     "no-console": false,
-    "no-consecutive-blank-lines": [true, 2]
+    "no-consecutive-blank-lines": [true, 2],
+    "no-floating-promises": true
   }
 }

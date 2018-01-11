@@ -9,4 +9,6 @@ const acrolinxEndpoint = new AcrolinxEndpoint({
 
 acrolinxEndpoint.getServerVersion().then((result) => {
   console.log(result);
+}, error => {
+  console.error('Error while trying to get the server versuin', error);
 });

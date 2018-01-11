@@ -34,4 +34,6 @@ async function signInExample() {
   }
 }
 
-signInExample();
+signInExample().catch(error => {
+  console.error(error);
+});
