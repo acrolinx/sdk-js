@@ -1,9 +1,8 @@
-import * as fetchMock from 'fetch-mock';
 import {AcrolinxEndpoint, AcrolinxEndpointProps, isSigninLinksResult, isSigninSuccessResult} from '../../src/index';
 import {SigninLinksResult, SigninSuccessResult} from '../../src/login';
 import {
-  AcrolinxServerMock, DUMMY_AUTH_TOKEN, DUMMY_SIGNIN_LINK_PATH_INTERACTIVE,
-  mockAcrolinxServer
+  AcrolinxServerMock, DUMMY_AUTH_TOKEN, DUMMY_SIGNIN_LINK_PATH_INTERACTIVE, mockAcrolinxServer,
+  restoreOriginalFetch
 } from '../test-utils/mock-server';
 
 const DUMMY_SERVER_URL = 'http://dummy-server';
@@ -18,13 +17,12 @@ describe('login', () => {
   let mockedAcrolinxServer: AcrolinxServerMock;
 
   beforeEach(() => {
-    fetchMock.restore();
     mockedAcrolinxServer = mockAcrolinxServer(DUMMY_SERVER_URL);
     endpoint = new AcrolinxEndpoint(DUMMY_ENDPOINT_PROPS);
   });
 
   afterEach(() => {
-    fetchMock.restore();
+    restoreOriginalFetch();
   });
 
   it('should return the signin links', async () => {
@@ -39,7 +37,7 @@ describe('login', () => {
     const pollResult1 = await endpoint.pollForSignin(signinLinks);
     expect(isSigninSuccessResult(pollResult1)).toBeFalsy();
 
-    mockedAcrolinxServer.isUserSignedIn = true;
+    mockedAcrolinxServer.fakeSignIn();
 
     const signinSuccess = await endpoint.pollForSignin(signinLinks) as SigninSuccessResult;
     expect(isSigninSuccessResult(signinSuccess)).toBeTruthy();

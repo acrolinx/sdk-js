@@ -18,8 +18,10 @@
     "sourceMap": true,
     "declaration": true,
     "outDir": "dist",
-    "module": "commonjs",
-    "moduleResolution": "classic"
+    "baseUrl": ".",
+    "paths": {
+      "fetch-mock": ["node_modules/fetch-mock/es5/client"]
+    }
   },
   "exclude": [
     "node_modules",

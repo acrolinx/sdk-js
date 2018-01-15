@@ -4,7 +4,7 @@ import {wrapError} from './errors';
 import {LoginRequestBody, LoginResult, POLL_MORE_RESULT, SigninLinksResult, SigninPollResult} from './login';
 import {handleExpectedJsonResponse, throwErrorForHttpErrorStatus} from './utils/fetch';
 
-export { isSigninSuccessResult, isSigninLinksResult } from './login';
+export {isSigninSuccessResult, isSigninLinksResult, AuthorizationType} from './login';
 
 export interface ServerVersionInfo {
   version: string;
@@ -55,6 +55,7 @@ export class AcrolinxEndpoint {
   private getCommonHeaders(): HeadersInit {
     const headers: HeadersInit = {
       'Content-Type': 'application/json',
+      'X-Acrolinx-Base-Url': this.props.serverAddress,
     };
     if (this.props.clientLocale) {
       headers['X-Acrolinx-Client-Locale'] = this.props.clientLocale;

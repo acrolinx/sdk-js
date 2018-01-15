@@ -31,7 +31,7 @@
     "@types/fetch-mock": "^5.12.2",
     "@types/jest": "^22.0.1",
     "@types/lodash": "^4.14.92",
-    "fetch-mock": "^6.0.0-beta.7",
+    "fetch-mock": "5.13.1",
     "jest": "^22.0.4",
     "jest-junit": "^3.4.1",
     "lodash": "^4.17.4",
@@ -53,7 +53,12 @@
     ],
     "coverageDirectory": "tmp/coverage",
     "mapCoverage": true,
-    "coverageReporters": ["cobertura","json", "lcov", "text"],
+    "coverageReporters": [
+      "cobertura",
+      "json",
+      "lcov",
+      "text"
+    ],
     "testResultsProcessor": "jest-junit"
   },
   "jest-junit": {
