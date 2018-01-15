@@ -10,7 +10,7 @@
   "scripts": {
     "ci": "npm run build && npm run tslint && npm run testUnitCoverage",
     "clean": "rm -rf dist",
-    "prepublish": "npm run build",
+    "prepublish": "tsc -p tsconfig-github-install.json",
     "build": "tsc",
     "runExample": "tsc && node dist/examples/get-server-version.js",
     "runExampleSignin": "tsc && node dist/examples/signin.js",
