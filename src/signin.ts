@@ -1,14 +1,11 @@
 export interface PollMoreResult {
   _type: 'PollMoreResult';
+  retryAfterSeconds: number;
 }
-
-export const POLL_MORE_RESULT: PollMoreResult = {
-  _type: 'PollMoreResult'
-};
 
 export type SigninPollResult = SigninSuccessResult | PollMoreResult;
 
-export function isSigninLinksResult(signinResult: LoginResult): signinResult is SigninLinksResult {
+export function isSigninLinksResult(signinResult: SigninResult): signinResult is SigninLinksResult {
   return !!((signinResult as SigninLinksResult).links.interactive);
 }
 
@@ -18,14 +15,14 @@ export function isSigninSuccessResult(signinResult: SigninSuccessResult
   return !!(signinResult && (signinResult as SigninSuccessResult).authToken);
 }
 
-export interface LoginRequestBody {
-  authToken?: string;
+export interface SigninRequestBody {
   clientName: string;
 }
 
-export type LoginResult = SigninLinksResult | SigninSuccessResult;
+export type SigninResult = SigninLinksResult | SigninSuccessResult;
 
 export interface SigninLinksResult {
+  interactiveLinkTimeout: number;
   links: {
     interactive: string;
     poll: string;

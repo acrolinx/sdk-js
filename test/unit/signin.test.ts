@@ -1,7 +1,12 @@
-import {AcrolinxEndpoint, AcrolinxEndpointProps, isSigninLinksResult, isSigninSuccessResult} from '../../src/index';
-import {SigninLinksResult, SigninSuccessResult} from '../../src/login';
 import {
-  AcrolinxServerMock, DUMMY_AUTH_TOKEN, DUMMY_SIGNIN_LINK_PATH_INTERACTIVE, mockAcrolinxServer,
+  AcrolinxEndpoint, AcrolinxEndpointProps, isSigninLinksResult, isSigninSuccessResult,
+  PollMoreResult
+} from '../../src/index';
+import {SigninLinksResult, SigninSuccessResult} from '../../src/signin';
+import {
+  AcrolinxServerMock, DUMMY_AUTH_TOKEN, DUMMY_INTERACTIVE_LINK_TIMEOUT, DUMMY_RETRY_AFTER,
+  DUMMY_SIGNIN_LINK_PATH_INTERACTIVE,
+  mockAcrolinxServer,
   restoreOriginalFetch
 } from '../test-utils/mock-server';
 
@@ -12,7 +17,7 @@ const DUMMY_ENDPOINT_PROPS: AcrolinxEndpointProps = {
   serverAddress: DUMMY_SERVER_URL
 };
 
-describe('login', () => {
+describe('signin', () => {
   let endpoint: AcrolinxEndpoint;
   let mockedAcrolinxServer: AcrolinxServerMock;
 
@@ -26,16 +31,18 @@ describe('login', () => {
   });
 
   it('should return the signin links', async () => {
-    const result = await endpoint.login() as SigninLinksResult;
+    const result = await endpoint.signin() as SigninLinksResult;
     expect(isSigninLinksResult(result)).toBeTruthy();
     expect(result.links.interactive).toEqual(DUMMY_SERVER_URL + DUMMY_SIGNIN_LINK_PATH_INTERACTIVE);
+    expect(result.interactiveLinkTimeout).toEqual(DUMMY_INTERACTIVE_LINK_TIMEOUT);
   });
 
   it('polling should return authtoken after signin', async () => {
-    const signinLinks = await endpoint.login() as SigninLinksResult;
+    const signinLinks = await endpoint.signin() as SigninLinksResult;
 
-    const pollResult1 = await endpoint.pollForSignin(signinLinks);
+    const pollResult1 = await endpoint.pollForSignin(signinLinks) as PollMoreResult;
     expect(isSigninSuccessResult(pollResult1)).toBeFalsy();
+    expect(pollResult1.retryAfterSeconds).toEqual(DUMMY_RETRY_AFTER);
 
     mockedAcrolinxServer.fakeSignIn();
 

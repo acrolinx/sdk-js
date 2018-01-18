@@ -1,8 +1,12 @@
+import 'cross-fetch/polyfill';
 import {ErrorType} from '../../src/errors';
-import {AcrolinxEndpoint, isSigninSuccessResult} from '../../src/index';
-import {SigninLinksResult} from '../../src/login';
+import {AcrolinxEndpoint, isSigninSuccessResult, SigninSuccessResult} from '../../src/index';
+import {SigninLinksResult} from '../../src/signin';
+import {testIf} from '../test-utils/utils';
 
 const TEST_SERVER_URL = 'https://test-latest-ssl.acrolinx.com';
+const SSO_USER_ID = process.env.SSO_USER_ID;
+const SSO_PASSWORD = process.env.SSO_PASSWORD;
 
 function createEndpoint(serverAddress: string) {
   return new AcrolinxEndpoint({clientName: 'TestClient', serverAddress});
@@ -52,13 +56,22 @@ describe('e2e - AcrolinxEndpoint', () => {
     });
 
     it('should return the signin links', async () => {
-      const result = await api.login() as SigninLinksResult;
+      const result = await api.signin() as SigninLinksResult;
       expect(result.links.interactive).toContain(TEST_SERVER_URL);
+    });
+
+    testIf(!!(SSO_USER_ID || SSO_PASSWORD), 'signin with sso', async () => {
+      const result = await api.signin({
+          password: SSO_PASSWORD,
+          userId: SSO_USER_ID,
+        }
+      ) as SigninSuccessResult;
+      expect(result.userId).toContain(SSO_USER_ID);
     });
 
     // skipped because of long polling
     it.skip('poll for signin', async () => {
-      const result = await api.login() as SigninLinksResult;
+      const result = await api.signin() as SigninLinksResult;
       const pollResult = await api.pollForSignin(result);
       expect(isSigninSuccessResult(pollResult)).toBeFalsy();
     });

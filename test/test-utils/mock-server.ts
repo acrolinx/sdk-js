@@ -2,7 +2,12 @@ import * as fetchMock from 'fetch-mock';
 import {MockResponseObject} from 'fetch-mock';
 import * as _ from 'lodash';
 import {ServerVersionInfo} from '../../src/index';
-import {AuthorizationType, LoginResult, POLL_MORE_RESULT, SigninPollResult, SigninSuccessResult} from '../../src/login';
+import {
+  AuthorizationType,
+  SigninPollResult,
+  SigninResult,
+  SigninSuccessResult
+} from '../../src/signin';
 
 export const DUMMY_SERVER_INFO: ServerVersionInfo = {
   buildDate: '2018-01-10',
@@ -11,9 +16,11 @@ export const DUMMY_SERVER_INFO: ServerVersionInfo = {
 };
 
 export const DUMMY_SIGNIN_LINK_PATH_INTERACTIVE = '/dashboard.html';
-export const DUMMY_SIGNIN_LINK_PATH_POLL = '/iq/services/v1/rest/login/6c081ee6-f816-4881-a548-87f9c1372163';
+export const DUMMY_SIGNIN_LINK_PATH_POLL = '/api/v1/auth/sign-ins/6c081ee6-f816-4881-a548-87f9c1372163';
 export const DUMMY_AUTH_TOKEN = 'dummyAuthToken';
 export const DUMMY_USER_ID = 'dummyUserId';
+export const DUMMY_RETRY_AFTER = 1;
+export const DUMMY_INTERACTIVE_LINK_TIMEOUT = 900;
 
 interface MockResponseObjectOf<T> extends MockResponseObject {
   body: T;
@@ -26,7 +33,9 @@ export interface LoggedRequest {
   };
 }
 
-export interface StringMap { [key: string]: string; }
+export interface StringMap {
+  [key: string]: string;
+}
 
 
 export class AcrolinxServerMock {
@@ -48,7 +57,7 @@ export class AcrolinxServerMock {
     });
     if (_.endsWith(url, 'serverVersion')) {
       return this.returnResponse(this.getServerVersion());
-    } else if (_.endsWith(url, 'login') && opts.method === 'POST') {
+    } else if (_.endsWith(url, 'sign-ins') && opts.method === 'POST') {
       return this.returnResponse(this.login(opts));
     } else if (_.endsWith(url, DUMMY_SIGNIN_LINK_PATH_POLL) && (!opts || !opts.method || opts.method === 'GET')) {
       return this.pollForSignin(opts);
@@ -65,11 +74,12 @@ export class AcrolinxServerMock {
     return DUMMY_SERVER_INFO;
   }
 
-  private login(_opts: RequestInit): LoginResult {
+  private login(_opts: RequestInit): SigninResult {
     if (this._isUserSignedIn) {
       return this.createLoginSuccessResult();
     }
     return {
+      interactiveLinkTimeout: DUMMY_INTERACTIVE_LINK_TIMEOUT,
       links: {
         interactive: this.url + DUMMY_SIGNIN_LINK_PATH_INTERACTIVE,
         poll: this.url + DUMMY_SIGNIN_LINK_PATH_POLL,
@@ -84,7 +94,11 @@ export class AcrolinxServerMock {
         status: 200,
       };
     } else {
-      return {status: 202, body: POLL_MORE_RESULT};
+      return {
+        body: {_type: 'PollMoreResult', retryAfterSeconds: 1},
+        headers: {'retry-after': '' + DUMMY_RETRY_AFTER},
+        status: 202,
+      };
     }
   }
 

@@ -1,10 +1,20 @@
-import 'cross-fetch/polyfill';
 import {wrapError} from './errors';
 
-import {LoginRequestBody, LoginResult, POLL_MORE_RESULT, SigninLinksResult, SigninPollResult} from './login';
+import {
+  isSigninLinksResult,
+  PollMoreResult,
+  SigninLinksResult,
+  SigninPollResult,
+  SigninRequestBody,
+  SigninResult,
+  SigninSuccessResult
+} from './signin';
 import {handleExpectedJsonResponse, throwErrorForHttpErrorStatus} from './utils/fetch';
+import {waitMs} from './utils/mixed-utils';
 
-export {isSigninSuccessResult, isSigninLinksResult, AuthorizationType} from './login';
+export {isSigninSuccessResult, AuthorizationType} from './signin';
+
+export {SigninSuccessResult, isSigninLinksResult, PollMoreResult, SigninResult, SigninLinksResult};
 
 export interface ServerVersionInfo {
   version: string;
@@ -18,13 +28,33 @@ export interface AcrolinxEndpointProps {
   clientName: string;
 }
 
-export interface LoginOptions {
-  authToken?: string;
+export interface HasAuthToken {
+  authToken: string;
 }
 
-export class AcrolinxEndpoint {
-  private authToken: string;
+export function hasAuthToken(signinOptions: SigninOptions): signinOptions is HasAuthToken {
+  return !!((signinOptions as HasAuthToken).authToken);
+}
 
+export function isSsoSigninOption(signinOptions: SigninOptions): signinOptions is SsoSigninOption {
+  const potentialSsoOptions = signinOptions as SsoSigninOption;
+  return !!(potentialSsoOptions.password && potentialSsoOptions.userId);
+}
+
+export interface SsoSigninOption {
+  usernameKey?: string;
+  passwordKey?: string;
+  userId: string;
+  password: string;
+}
+
+export interface StringMap {
+  [index: string]: string;
+}
+
+export type SigninOptions = HasAuthToken | SsoSigninOption | {};
+
+export class AcrolinxEndpoint {
   constructor(private readonly props: AcrolinxEndpointProps) {
   }
 
@@ -32,36 +62,59 @@ export class AcrolinxEndpoint {
     return this.get<ServerVersionInfo>('/iq/services/v3/rest/core/serverVersion');
   }
 
-  public async login(options: LoginOptions = {}): Promise<LoginResult> {
-    const loginRequestBody: LoginRequestBody = {authToken: options.authToken, clientName: this.props.clientName};
-    if (options.authToken) {
-      this.authToken = options.authToken;
+  public async signin(options: SigninOptions = {}): Promise<SigninResult> {
+    const signinRequestBody: SigninRequestBody = {clientName: this.props.clientName};
+    const result = await this.post<SigninResult>('/api/v1/auth/sign-ins', signinRequestBody,
+      this.getSigninRequestHeaders(options));
+
+    // temporary workaround for not implemented in server
+    if (isSigninLinksResult(result) && !result.interactiveLinkTimeout) {
+      result.interactiveLinkTimeout = 900;
     }
-    return this.post<LoginResult>('/iq/services/v1/rest/login', loginRequestBody);
+
+    return result;
   }
 
-  public async pollForSignin(signinLinks: SigninLinksResult): Promise<SigninPollResult> {
+  public async pollForSignin(signinLinks: SigninLinksResult,
+                             lastPollResult?: PollMoreResult): Promise<SigninPollResult> {
+    if (lastPollResult && lastPollResult.retryAfterSeconds) {
+      console.log('Waiting before retry', lastPollResult.retryAfterSeconds);
+      await waitMs(lastPollResult.retryAfterSeconds * 1000);
+    }
     const res = await fetch(signinLinks.links.poll);
     switch (res.status) {
       case 200:
         return handleExpectedJsonResponse(res);
       case 202:
-        return POLL_MORE_RESULT;
+        return {
+          _type: 'PollMoreResult',
+          retryAfterSeconds: parseInt(res.headers.get('retry-after')!, 10)
+        };
       default:
         throw throwErrorForHttpErrorStatus(res);
     }
   }
 
-  private getCommonHeaders(): HeadersInit {
-    const headers: HeadersInit = {
+  private getSigninRequestHeaders(options: SigninOptions = {}) {
+    if (hasAuthToken(options)) {
+      return {'X-Acrolinx-Auth': options.authToken};
+    } else if (isSsoSigninOption(options)) {
+      return {
+        [options.passwordKey || 'username']: options.userId,
+        [options.passwordKey || 'password']: options.password,
+      };
+    } else {
+      return {};
+    }
+  }
+
+  private getCommonHeaders(): StringMap {
+    const headers: StringMap = {
       'Content-Type': 'application/json',
       'X-Acrolinx-Base-Url': this.props.serverAddress,
     };
     if (this.props.clientLocale) {
       headers['X-Acrolinx-Client-Locale'] = this.props.clientLocale;
-    }
-    if (this.authToken) {
-      headers['X-Acrolinx-Auth'] = this.authToken;
     }
     return headers;
   }
@@ -72,10 +125,11 @@ export class AcrolinxEndpoint {
     }).then(res => handleExpectedJsonResponse<T>(res), wrapError);
   }
 
-  private async post<T>(path: string, body: {}): Promise<T> {
+  private async post<T>(path: string, body: {}, headers: StringMap = {}): Promise<T> {
+    // console.log('post', this.props.serverAddress, path, body, headers);
     return fetch(this.props.serverAddress + path, {
       body: JSON.stringify(body),
-      headers: this.getCommonHeaders(),
+      headers: {...this.getCommonHeaders(), ...headers},
       method: 'POST',
     }).then(res => handleExpectedJsonResponse<T>(res), wrapError);
   }

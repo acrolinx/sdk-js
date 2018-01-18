@@ -1,5 +1,5 @@
 /* tslint:disable:no-console */
-
+import 'cross-fetch/polyfill';
 import {AcrolinxEndpoint} from '../src/index';
 
 const acrolinxEndpoint = new AcrolinxEndpoint({
@@ -10,5 +10,5 @@ const acrolinxEndpoint = new AcrolinxEndpoint({
 acrolinxEndpoint.getServerVersion().then((result) => {
   console.log(result);
 }, error => {
-  console.error('Error while trying to get the server versuin', error);
+  console.error('Error while trying to get the server version', error);
 });

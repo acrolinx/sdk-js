@@ -1,6 +1,7 @@
 /* tslint:disable:no-console */
+import 'cross-fetch/polyfill';
 import {AcrolinxEndpoint, isSigninSuccessResult} from '../src/index';
-import {isSigninLinksResult} from '../src/login';
+import {isSigninLinksResult} from '../src/signin';
 
 async function signInExample() {
   const authToken = process.argv[2];
@@ -10,19 +11,20 @@ async function signInExample() {
     serverAddress: 'https://test-latest-ssl.acrolinx.com',
   });
 
-  const loginResult = await acrolinxEndpoint.login({authToken});
+  const loginResult = await acrolinxEndpoint.signin({authToken});
 
   if (isSigninLinksResult(loginResult)) {
     if (authToken) {
       console.log('Authtoken was invalid');
     }
 
-    console.log(`Please signin at "${loginResult.links.interactive}"!`);
+    console.log(`Please signin at "${loginResult.links.interactive}"
+     within ${loginResult.interactiveLinkTimeout} seconds!`);
     let pollResult = await acrolinxEndpoint.pollForSignin(loginResult);
 
     while (!isSigninSuccessResult(pollResult)) {
-      console.log('Polling...');
-      pollResult = await acrolinxEndpoint.pollForSignin(loginResult);
+      console.log('Polling...', pollResult.retryAfterSeconds);
+      pollResult = await acrolinxEndpoint.pollForSignin(loginResult, pollResult);
     }
 
     console.log('Success:', pollResult);

@@ -37,10 +37,10 @@
     "lodash": "^4.17.4",
     "ts-jest": "^22.0.1",
     "tslint": "^5.8.0",
-    "typescript": "^2.6.2"
+    "typescript": "^2.6.2",
+    "cross-fetch": "^1.1.1"
   },
   "dependencies": {
-    "cross-fetch": "^1.1.1"
   },
   "jest": {
     "transform": {
