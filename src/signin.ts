@@ -10,7 +10,7 @@ export function isSigninLinksResult(signinResult: SigninResult): signinResult is
 }
 
 export function isSigninSuccessResult(signinResult: SigninSuccessResult
-  | PollMoreResult
+  | PollMoreResult | SigninLinksResult
   | undefined): signinResult is SigninSuccessResult {
   return !!(signinResult && (signinResult as SigninSuccessResult).authToken);
 }
