@@ -1,4 +1,5 @@
 import {wrapError} from './errors';
+import * as logging from './utils/logging';
 
 import {
   isSigninLinksResult,
@@ -13,6 +14,8 @@ import {handleExpectedJsonResponse, throwErrorForHttpErrorStatus} from './utils/
 import {waitMs} from './utils/mixed-utils';
 
 export {isSigninSuccessResult, AuthorizationType} from './signin';
+export {setLoggingEnabled} from './utils/logging';
+
 
 export {SigninSuccessResult, isSigninLinksResult, PollMoreResult, SigninResult, SigninLinksResult};
 
@@ -64,21 +67,14 @@ export class AcrolinxEndpoint {
 
   public async signin(options: SigninOptions = {}): Promise<SigninResult> {
     const signinRequestBody: SigninRequestBody = {clientName: this.props.clientName};
-    const result = await this.post<SigninResult>('/api/v1/auth/sign-ins', signinRequestBody,
+    return this.post<SigninResult>('/api/v1/auth/sign-ins', signinRequestBody,
       this.getSigninRequestHeaders(options));
-
-    // temporary workaround for not implemented in server
-    if (isSigninLinksResult(result) && !result.interactiveLinkTimeout) {
-      result.interactiveLinkTimeout = 900;
-    }
-
-    return result;
   }
 
   public async pollForSignin(signinLinks: SigninLinksResult,
                              lastPollResult?: PollMoreResult): Promise<SigninPollResult> {
     if (lastPollResult && lastPollResult.retryAfterSeconds) {
-      console.log('Waiting before retry', lastPollResult.retryAfterSeconds);
+      logging.log('Waiting before retry', lastPollResult.retryAfterSeconds);
       await waitMs(lastPollResult.retryAfterSeconds * 1000);
     }
     const res = await fetch(signinLinks.links.poll);
@@ -88,7 +84,7 @@ export class AcrolinxEndpoint {
       case 202:
         return {
           _type: 'PollMoreResult',
-          retryAfterSeconds: parseInt(res.headers.get('retry-after')!, 10)
+          retryAfterSeconds: parseInt(res.headers.get('retry-after') || '1', 10)
         };
       default:
         throw throwErrorForHttpErrorStatus(res);

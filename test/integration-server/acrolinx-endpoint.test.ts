@@ -58,6 +58,7 @@ describe('e2e - AcrolinxEndpoint', () => {
     it('should return the signin links', async () => {
       const result = await api.signin() as SigninLinksResult;
       expect(result.links.interactive).toContain(TEST_SERVER_URL);
+      expect(result.interactiveLinkTimeout).toBeGreaterThan(100);
     });
 
     testIf(!!(SSO_USER_ID || SSO_PASSWORD), 'signin with sso', async () => {

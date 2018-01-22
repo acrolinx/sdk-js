@@ -1,3 +1,4 @@
+/* tslint:disable:no-console */
 import * as fetchMock from 'fetch-mock';
 import {MockResponseObject} from 'fetch-mock';
 import * as _ from 'lodash';

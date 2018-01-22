@@ -1,3 +1,4 @@
+/* tslint:disable:no-console */
 import * as http from 'http';
 import {AcrolinxServerMock} from './mock-server';
 
