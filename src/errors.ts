@@ -25,3 +25,8 @@ export function wrapError(error: Error): Promise<any> {
   throw new AcrolinxError({message: error.message, type: ErrorType.unknownError});
 }
 
+export interface AcrolinxApiError {
+  type: string;
+  title: string;
+  detail: string;
+}

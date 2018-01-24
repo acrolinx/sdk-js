@@ -2,13 +2,9 @@
 import * as fetchMock from 'fetch-mock';
 import {MockResponseObject} from 'fetch-mock';
 import * as _ from 'lodash';
+import {AcrolinxApiError} from '../../src/errors';
 import {ServerVersionInfo} from '../../src/index';
-import {
-  AuthorizationType,
-  SigninPollResult,
-  SigninResult,
-  SigninSuccessResult
-} from '../../src/signin';
+import {AuthorizationType, SigninPollResult, SigninResult, SigninSuccessResult} from '../../src/signin';
 
 export const DUMMY_SERVER_INFO: ServerVersionInfo = {
   buildDate: '2018-01-10',
@@ -17,7 +13,7 @@ export const DUMMY_SERVER_INFO: ServerVersionInfo = {
 };
 
 export const DUMMY_SIGNIN_LINK_PATH_INTERACTIVE = '/dashboard.html';
-export const DUMMY_SIGNIN_LINK_PATH_POLL = '/api/v1/auth/sign-ins/6c081ee6-f816-4881-a548-87f9c1372163';
+const DUMMY_SIGNIN_LINK_PATH_POLL = '/api/v1/auth/sign-ins/';
 export const DUMMY_AUTH_TOKEN = 'dummyAuthToken';
 export const DUMMY_USER_ID = 'dummyUserId';
 export const DUMMY_RETRY_AFTER = 1;
@@ -39,30 +35,75 @@ export interface StringMap {
 }
 
 
+interface Route {
+  path: RegExp;
+  method: string;
+  handler: (args: string[], requestOpts: RequestInit) => MockResponseObject | {};
+}
+
+function isMockResponseObject(o: MockResponseObject | {}): o is MockResponseObject {
+  return !!((o as MockResponseObject).status);
+}
+
+interface SigninState {
+  signedIn: boolean;
+}
+
 export class AcrolinxServerMock {
   public requests: LoggedRequest[] = [];
   private _isUserSignedIn?: AuthorizationType;
+  private routes: Route[];
+  private signinIds: { [id: string]: SigninState } = {};
 
   constructor(public readonly url: string) {
+    this.routes = [
+      {
+        handler: () => this.getServerVersion(),
+        method: 'GET',
+        path: /serverVersion$/,
+      },
+      {
+        handler: (_args, opts) => this.login(opts),
+        method: 'POST',
+        path: /sign-ins$/,
+      },
+      {
+        handler: (args, opts) => this.pollForSignin(args[1], opts),
+        method: 'GET',
+        path: /sign-ins\/(.*)$/,
+      }
+    ];
   }
+
 
   public fakeSignIn(value = AuthorizationType.ACROLINX_SIGN_IN) {
     this._isUserSignedIn = value;
   }
 
 
-  public handleFetchRequest = (url: string, opts: RequestInit = {}): MockResponseObject => {
+  public handleFetchRequest = (url: string, optsArg: RequestInit = {}): MockResponseObject => {
+    const opts = {method: 'GET', ...optsArg};
+
     this.requests.push({
       opts: {headers: (opts.headers || {}) as StringMap},
       url,
     });
-    if (_.endsWith(url, 'serverVersion')) {
-      return this.returnResponse(this.getServerVersion());
-    } else if (_.endsWith(url, 'sign-ins') && opts.method === 'POST') {
-      return this.returnResponse(this.login(opts));
-    } else if (_.endsWith(url, DUMMY_SIGNIN_LINK_PATH_POLL) && (!opts || !opts.method || opts.method === 'GET')) {
-      return this.pollForSignin(opts);
+
+    // console.log('try to match url', url);
+    for (const route of this.routes) {
+      console.log('try rout', route);
+      const matches = url.match(route.path);
+      if (matches && opts.method === route.method) {
+        // console.log('Found match!', matches);
+        const handlerResult = route.handler(matches!, opts);
+        if (isMockResponseObject(handlerResult)) {
+          return handlerResult;
+        } else {
+          return this.returnResponse(handlerResult);
+        }
+      }
     }
+
     console.log(`FakeServer can not handle url "${url}"`, opts);
     return {status: 404};
   }
@@ -79,16 +120,31 @@ export class AcrolinxServerMock {
     if (this._isUserSignedIn) {
       return this.createLoginSuccessResult();
     }
+    const id = _.uniqueId('signin-id-');
+    this.signinIds[id] = {signedIn: true};
     return {
       interactiveLinkTimeout: DUMMY_INTERACTIVE_LINK_TIMEOUT,
       links: {
         interactive: this.url + DUMMY_SIGNIN_LINK_PATH_INTERACTIVE,
-        poll: this.url + DUMMY_SIGNIN_LINK_PATH_POLL,
+        poll: this.url + DUMMY_SIGNIN_LINK_PATH_POLL + id,
       }
     };
   }
 
-  private pollForSignin(_opts: RequestInit): MockResponseObjectOf<SigninPollResult> {
+  private pollForSignin(signinId: string,
+                        _opts: RequestInit): MockResponseObjectOf<SigninPollResult | AcrolinxApiError> {
+    const signinState = this.signinIds[signinId];
+    if (!signinState) {
+      return {
+        body: {
+          detail: 'The sign-in URL is does not exists or is expired. Please start a new sign-in process.',
+          title: 'Sign-in URL is not available.',
+          type: 'https://acrolinx.com/apispec/v1/errors/sign_in_not_available',
+        },
+        status: 404
+      };
+    }
+
     if (this._isUserSignedIn) {
       return {
         body: this.createLoginSuccessResult(),

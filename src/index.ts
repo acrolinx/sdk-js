@@ -29,6 +29,7 @@ export interface AcrolinxEndpointProps {
   serverAddress: string;
   clientLocale?: string;
   clientName: string;
+  enableHttpLogging?: boolean;
 }
 
 export interface HasAuthToken {
@@ -77,7 +78,7 @@ export class AcrolinxEndpoint {
       logging.log('Waiting before retry', lastPollResult.retryAfterSeconds);
       await waitMs(lastPollResult.retryAfterSeconds * 1000);
     }
-    const res = await fetch(signinLinks.links.poll);
+    const res = await this.fetch(signinLinks.links.poll);
     switch (res.status) {
       case 200:
         return handleExpectedJsonResponse(res);
@@ -116,17 +117,37 @@ export class AcrolinxEndpoint {
   }
 
   private async get<T>(path: string): Promise<T> {
-    return fetch(this.props.serverAddress + path, {
+    return this.fetch(this.props.serverAddress + path, {
       headers: this.getCommonHeaders()
     }).then(res => handleExpectedJsonResponse<T>(res), wrapError);
   }
 
   private async post<T>(path: string, body: {}, headers: StringMap = {}): Promise<T> {
     // console.log('post', this.props.serverAddress, path, body, headers);
-    return fetch(this.props.serverAddress + path, {
+    return this.fetch(this.props.serverAddress + path, {
       body: JSON.stringify(body),
       headers: {...this.getCommonHeaders(), ...headers},
       method: 'POST',
     }).then(res => handleExpectedJsonResponse<T>(res), wrapError);
   }
+
+
+  /* tslint:disable:no-console */
+  private async fetch(input: RequestInfo, init?: RequestInit): Promise<Response> {
+    if (this.props.enableHttpLogging) {
+      try {
+        console.log('Fetch', input, init);
+        const result = await fetch(input, init);
+        console.log('Fetched Result', result.status);
+        return result;
+      } catch (error) {
+        console.error('Fetch Error', error);
+        throw error;
+      }
+    } else {
+      return fetch(input, init);
+    }
+  }
+  /* tslint:enable:no-console */
+
 }

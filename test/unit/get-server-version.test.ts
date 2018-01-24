@@ -11,7 +11,7 @@ const BROKEN_JSON_SERVER = 'http://broken-json-server';
 const DUMMY_ENDPOINT_PROPS: AcrolinxEndpointProps = {
   clientLocale: 'en',
   clientName: 'TestClient',
-  serverAddress: DUMMY_SERVER_URL,
+  serverAddress: DUMMY_SERVER_URL
 };
 
 describe('getServerVersion', () => {
@@ -32,12 +32,13 @@ describe('getServerVersion', () => {
 
   describe('errors', () => {
     it('should return an failing promise for broken json', async () => {
-      const api = new AcrolinxEndpoint(DUMMY_ENDPOINT_PROPS);
+      const api = new AcrolinxEndpoint({...DUMMY_ENDPOINT_PROPS, serverAddress: BROKEN_JSON_SERVER});
       try {
         await api.getServerVersion();
       } catch (e) {
         expect(e.type).toEqual(ErrorType.invalidJson);
       }
+      expect.hasAssertions();
     });
 
   });
