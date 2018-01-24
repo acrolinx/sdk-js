@@ -1,4 +1,5 @@
 import 'cross-fetch/polyfill';
+import {DEVELOPMENT_SIGNATURE} from '../../src';
 import {ErrorType} from '../../src/errors';
 import {AcrolinxEndpoint, isSigninSuccessResult, SigninSuccessResult} from '../../src/index';
 import {SigninLinksResult} from '../../src/signin';
@@ -9,7 +10,13 @@ const SSO_USER_ID = process.env.SSO_USER_ID;
 const SSO_PASSWORD = process.env.SSO_PASSWORD;
 
 function createEndpoint(serverAddress: string) {
-  return new AcrolinxEndpoint({clientName: 'TestClient', serverAddress});
+  return new AcrolinxEndpoint({
+    client: {
+      name: 'TestClient',
+      signature: DEVELOPMENT_SIGNATURE,
+      version: '1.2.3.666'
+    }, serverAddress
+  });
 }
 
 describe('e2e - AcrolinxEndpoint', () => {

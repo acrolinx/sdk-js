@@ -1,9 +1,13 @@
 /* tslint:disable:no-console */
 import 'cross-fetch/polyfill';
-import {AcrolinxEndpoint} from '../src/index';
+import {AcrolinxEndpoint, DEVELOPMENT_SIGNATURE} from '../src/index';
 
 const acrolinxEndpoint = new AcrolinxEndpoint({
-  clientName: 'TestClient',
+  client: {
+    name: 'TestClient',
+    signature: DEVELOPMENT_SIGNATURE,
+    version: '1.2.3.666'
+  },
   serverAddress: 'https://test-latest-ssl.acrolinx.com',
 });
 

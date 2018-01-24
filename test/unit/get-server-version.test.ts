@@ -1,3 +1,4 @@
+import {DEVELOPMENT_SIGNATURE} from '../../src';
 import {ErrorType} from '../../src/errors';
 import {AcrolinxEndpoint, AcrolinxEndpointProps} from '../../src/index';
 import {
@@ -9,8 +10,12 @@ const DUMMY_SERVER_URL = 'http://dummy-server';
 const BROKEN_JSON_SERVER = 'http://broken-json-server';
 
 const DUMMY_ENDPOINT_PROPS: AcrolinxEndpointProps = {
+  client: {
+    name: 'TestClient',
+    signature: DEVELOPMENT_SIGNATURE,
+    version: '1.2.3.666'
+  },
   clientLocale: 'en',
-  clientName: 'TestClient',
   serverAddress: DUMMY_SERVER_URL
 };
 

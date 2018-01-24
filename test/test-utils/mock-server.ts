@@ -3,6 +3,7 @@ import * as fetchMock from 'fetch-mock';
 import {MockResponseObject} from 'fetch-mock';
 import * as _ from 'lodash';
 import {AcrolinxApiError} from '../../src/errors';
+import {HEADER_X_ACROLINX_CLIENT} from '../../src/headers';
 import {ServerVersionInfo} from '../../src/index';
 import {AuthorizationType, SigninPollResult, SigninResult, SigninSuccessResult} from '../../src/signin';
 
@@ -80,9 +81,18 @@ export class AcrolinxServerMock {
     this._isUserSignedIn = value;
   }
 
-
   public handleFetchRequest = (url: string, optsArg: RequestInit = {}): MockResponseObject => {
     const opts = {method: 'GET', ...optsArg};
+
+    const acrolinxClientHeader = getHeader(optsArg, HEADER_X_ACROLINX_CLIENT);
+    if (acrolinxClientHeader) {
+      const [signature, version] = acrolinxClientHeader.split(';').map(_.trim);
+      if (!signature || !version) {
+        return this.createAcrolinxApiErrorResponse({type: 'BrokenClientSignature'});
+      }
+    } else {
+      return this.createAcrolinxApiErrorResponse({type: 'MissingClientSignature'});
+    }
 
     this.requests.push({
       opts: {headers: (opts.headers || {}) as StringMap},
@@ -135,14 +145,12 @@ export class AcrolinxServerMock {
                         _opts: RequestInit): MockResponseObjectOf<SigninPollResult | AcrolinxApiError> {
     const signinState = this.signinIds[signinId];
     if (!signinState) {
-      return {
-        body: {
-          detail: 'The sign-in URL is does not exists or is expired. Please start a new sign-in process.',
-          title: 'Sign-in URL is not available.',
-          type: 'https://acrolinx.com/apispec/v1/errors/sign_in_not_available',
-        },
-        status: 404
-      };
+      return this.createAcrolinxApiErrorResponse({
+        detail: 'The sign-in URL is does not exists or is expired. Please start a new sign-in process.',
+        status: 404,
+        title: 'Sign-in URL is not available.',
+        type: 'https://acrolinx.com/apispec/v1/errors/sign_in_not_available',
+      });
     }
 
     if (this._isUserSignedIn) {
@@ -159,6 +167,20 @@ export class AcrolinxServerMock {
     }
   }
 
+  private createAcrolinxApiErrorResponse(apiError: Partial<AcrolinxApiError>): MockResponseObjectOf<AcrolinxApiError> {
+    const fullApiError = {
+      detail: 'DummyErrorDetail',
+      status: 400,
+      title: 'DummyErrorTitle',
+      type: 'DummyErrorType',
+      ...apiError
+    };
+    return {
+      body: fullApiError,
+      status: fullApiError.status
+    };
+  }
+
   private createLoginSuccessResult(): SigninSuccessResult {
     return {
       authToken: DUMMY_AUTH_TOKEN,
@@ -169,6 +191,13 @@ export class AcrolinxServerMock {
     };
   }
 
+}
+
+function getHeader(requestOpts: RequestInit, headerKey: string) {
+  if (!requestOpts.headers) {
+    return undefined;
+  }
+  return (requestOpts.headers as StringMap)[headerKey];
 }
 
 export function mockAcrolinxServer(url: string): AcrolinxServerMock {

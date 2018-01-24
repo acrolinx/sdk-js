@@ -1,3 +1,4 @@
+import {DEVELOPMENT_SIGNATURE} from '../../src';
 import {
   AcrolinxEndpoint, AcrolinxEndpointProps, isSigninLinksResult, isSigninSuccessResult,
   PollMoreResult
@@ -13,7 +14,11 @@ import {
 const DUMMY_SERVER_URL = 'http://dummy-server';
 
 const DUMMY_ENDPOINT_PROPS: AcrolinxEndpointProps = {
-  clientName: 'TestClient',
+  client: {
+    name: 'TestClient',
+    signature: DEVELOPMENT_SIGNATURE,
+    version: '1.2.3.666'
+  },
   serverAddress: DUMMY_SERVER_URL
 };
 

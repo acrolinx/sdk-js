@@ -29,4 +29,5 @@ export interface AcrolinxApiError {
   type: string;
   title: string;
   detail: string;
+  status: number;
 }

@@ -1,5 +1,6 @@
 /* tslint:disable:no-console */
 import 'cross-fetch/polyfill';
+import {DEVELOPMENT_SIGNATURE} from '../src';
 import {AcrolinxEndpoint, isSigninSuccessResult} from '../src/index';
 import {isSigninLinksResult} from '../src/signin';
 
@@ -7,7 +8,11 @@ async function signInExample() {
   const authToken = process.argv[2];
 
   const acrolinxEndpoint = new AcrolinxEndpoint({
-    clientName: 'TestClient',
+    client: {
+      name: 'TestClient',
+      signature: DEVELOPMENT_SIGNATURE,
+      version: '1.2.3.666'
+    },
     serverAddress: 'https://test-latest-ssl.acrolinx.com',
   });
 

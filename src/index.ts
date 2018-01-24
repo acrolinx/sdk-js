@@ -1,5 +1,5 @@
 import {wrapError} from './errors';
-import * as logging from './utils/logging';
+import {HEADER_X_ACROLINX_CLIENT} from './headers';
 
 import {
   isSigninLinksResult,
@@ -11,11 +11,15 @@ import {
   SigninSuccessResult
 } from './signin';
 import {handleExpectedJsonResponse, throwErrorForHttpErrorStatus} from './utils/fetch';
+import * as logging from './utils/logging';
 import {waitMs} from './utils/mixed-utils';
 
 export {isSigninSuccessResult, AuthorizationType} from './signin';
 export {setLoggingEnabled} from './utils/logging';
 
+// You'll get the clientSignature for your integration after a successful certification meeting.
+// See: https://support.acrolinx.com/hc/en-us/articles/205687652-Getting-Started-with-Custom-Integrations
+export const DEVELOPMENT_SIGNATURE = 'SW50ZWdyYXRpb25EZXZlbG9wbWVudERlbW9Pbmx5';
 
 export {SigninSuccessResult, isSigninLinksResult, PollMoreResult, SigninResult, SigninLinksResult};
 
@@ -27,9 +31,20 @@ export interface ServerVersionInfo {
 
 export interface AcrolinxEndpointProps {
   serverAddress: string;
+  client: ClientInformation;
   clientLocale?: string;
-  clientName: string;
   enableHttpLogging?: boolean;
+}
+
+export interface ClientInformation {
+  name: string;
+  signature: string;
+  /**
+   * The version of the client.
+   * @format: ${major}.${minor}.${patch}.${buildNumber}
+   * @example: '1.2.3.574'
+   */
+  version: string;
 }
 
 export interface HasAuthToken {
@@ -67,7 +82,7 @@ export class AcrolinxEndpoint {
   }
 
   public async signin(options: SigninOptions = {}): Promise<SigninResult> {
-    const signinRequestBody: SigninRequestBody = {clientName: this.props.clientName};
+    const signinRequestBody: SigninRequestBody = {clientName: this.props.client.name};
     return this.post<SigninResult>('/api/v1/auth/sign-ins', signinRequestBody,
       this.getSigninRequestHeaders(options));
   }
@@ -78,7 +93,7 @@ export class AcrolinxEndpoint {
       logging.log('Waiting before retry', lastPollResult.retryAfterSeconds);
       await waitMs(lastPollResult.retryAfterSeconds * 1000);
     }
-    const res = await this.fetch(signinLinks.links.poll);
+    const res = await this.fetch(signinLinks.links.poll, {headers: this.getCommonHeaders()});
     switch (res.status) {
       case 200:
         return handleExpectedJsonResponse(res);
@@ -109,6 +124,7 @@ export class AcrolinxEndpoint {
     const headers: StringMap = {
       'Content-Type': 'application/json',
       'X-Acrolinx-Base-Url': this.props.serverAddress,
+      [HEADER_X_ACROLINX_CLIENT]: this.props.client.signature + '; ' + this.props.client.version,
     };
     if (this.props.clientLocale) {
       headers['X-Acrolinx-Client-Locale'] = this.props.clientLocale;
