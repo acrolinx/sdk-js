@@ -3,7 +3,7 @@ import * as fetchMock from 'fetch-mock';
 import {MockResponseObject} from 'fetch-mock';
 import * as _ from 'lodash';
 import {AcrolinxApiError} from '../../src/errors';
-import {HEADER_X_ACROLINX_CLIENT} from '../../src/headers';
+import {HEADER_X_ACROLINX_AUTH, HEADER_X_ACROLINX_BASE_URL, HEADER_X_ACROLINX_CLIENT} from '../../src/headers';
 import {ServerVersionInfo} from '../../src/index';
 import {AuthorizationType, SigninPollResult, SigninResult, SigninSuccessResult} from '../../src/signin';
 
@@ -13,7 +13,7 @@ export const DUMMY_SERVER_INFO: ServerVersionInfo = {
   version: '1.2.3',
 };
 
-export const DUMMY_SIGNIN_LINK_PATH_INTERACTIVE = '/dashboard.html';
+export const DUMMY_SIGNIN_LINK_PATH_INTERACTIVE = '/signin-ui/';
 const DUMMY_SIGNIN_LINK_PATH_POLL = '/api/v1/auth/sign-ins/';
 export const DUMMY_AUTH_TOKEN = 'dummyAuthToken';
 export const DUMMY_USER_ID = 'dummyUserId';
@@ -43,42 +43,69 @@ interface Route {
 }
 
 function isMockResponseObject(o: MockResponseObject | {}): o is MockResponseObject {
-  return !!((o as MockResponseObject).status);
+  return !!((o as MockResponseObject).body);
 }
 
 interface SigninState {
-  signedIn: boolean;
+  authorizationType?: AuthorizationType;
 }
 
 export class AcrolinxServerMock {
   public requests: LoggedRequest[] = [];
-  private _isUserSignedIn?: AuthorizationType;
   private routes: Route[];
   private signinIds: { [id: string]: SigninState } = {};
+  private ssoEnabled: boolean = false;
 
   constructor(public readonly url: string) {
     this.routes = [
       {
         handler: () => this.getServerVersion(),
         method: 'GET',
-        path: /serverVersion$/,
+        path: new RegExp('/iq/services/v3/rest/core/serverVersion$'),
       },
       {
-        handler: (_args, opts) => this.login(opts),
+        handler: (_args, opts) => this.signin(opts),
         method: 'POST',
-        path: /sign-ins$/,
+        path: /api\/v1\/auth\/sign-ins$/,
       },
       {
         handler: (args, opts) => this.pollForSignin(args[1], opts),
         method: 'GET',
-        path: /sign-ins\/(.*)$/,
-      }
+        path: /api\/v1\/auth\/sign-ins\/(.*)$/,
+      },
+      {
+        handler: (args, opts) => this.returnFakeSigninPage(args[1], opts),
+        method: 'GET',
+        path: /signin-ui\/(.*)$/,
+      },
+      {
+        handler: (args, opts) => this.returnConfirmSigninPage(args[1], opts),
+        method: 'POST',
+        path: /signin-ui\/(.*)\/confirm$/,
+      },
+      {
+        handler: (args, opts) => this.returnSigninDeletedPage(args[1], opts),
+        method: 'POST',
+        path: /signin-ui\/(.*)\/delete/,
+      },
     ];
+
+    this.signinIds.dummy = {};
   }
 
+  public fakeSignIn(authorizationType = AuthorizationType.ACROLINX_SIGN_IN, signinId?: string) {
+    if (signinId) {
+      this.signinIds[signinId].authorizationType = authorizationType;
+    } else {
+      _.forEach(this.signinIds, (signinState) => {
+        console.log('Fake it for', signinState);
+        signinState.authorizationType = authorizationType;
+      });
+    }
+  }
 
-  public fakeSignIn(value = AuthorizationType.ACROLINX_SIGN_IN) {
-    this._isUserSignedIn = value;
+  public enableSSO() {
+    this.ssoEnabled = true;
   }
 
   public handleFetchRequest = (url: string, optsArg: RequestInit = {}): MockResponseObject => {
@@ -90,7 +117,7 @@ export class AcrolinxServerMock {
       if (!signature || !version) {
         return this.createAcrolinxApiErrorResponse({type: 'BrokenClientSignature'});
       }
-    } else {
+    } else if (_.includes(url, 'api')) {
       return this.createAcrolinxApiErrorResponse({type: 'MissingClientSignature'});
     }
 
@@ -101,11 +128,12 @@ export class AcrolinxServerMock {
 
     // console.log('try to match url', url);
     for (const route of this.routes) {
-      console.log('try rout', route);
+      // console.log('try rout', route);
       const matches = url.match(route.path);
       if (matches && opts.method === route.method) {
         // console.log('Found match!', matches);
         const handlerResult = route.handler(matches!, opts);
+        console.log(`Handler for URL ${url} returned`, handlerResult);
         if (isMockResponseObject(handlerResult)) {
           return handlerResult;
         } else {
@@ -126,17 +154,21 @@ export class AcrolinxServerMock {
     return DUMMY_SERVER_INFO;
   }
 
-  private login(_opts: RequestInit): SigninResult {
-    if (this._isUserSignedIn) {
-      return this.createLoginSuccessResult();
+  private signin(opts: RequestInit): SigninResult {
+    if (this.ssoEnabled) {
+      return this.createLoginSuccessResult(AuthorizationType.ACROLINX_SSO);
     }
+    if (getHeader(opts, HEADER_X_ACROLINX_AUTH) === DUMMY_AUTH_TOKEN) {
+      return this.createLoginSuccessResult(AuthorizationType.ACROLINX_TOKEN);
+    }
+    const baseUrl = getHeader(opts, HEADER_X_ACROLINX_BASE_URL) || this.url;
     const id = _.uniqueId('signin-id-');
-    this.signinIds[id] = {signedIn: true};
+    this.signinIds[id] = {};
     return {
       interactiveLinkTimeout: DUMMY_INTERACTIVE_LINK_TIMEOUT,
       links: {
-        interactive: this.url + DUMMY_SIGNIN_LINK_PATH_INTERACTIVE,
-        poll: this.url + DUMMY_SIGNIN_LINK_PATH_POLL + id,
+        interactive: baseUrl + DUMMY_SIGNIN_LINK_PATH_INTERACTIVE + id,
+        poll: baseUrl + DUMMY_SIGNIN_LINK_PATH_POLL + id,
       }
     };
   }
@@ -153,9 +185,9 @@ export class AcrolinxServerMock {
       });
     }
 
-    if (this._isUserSignedIn) {
+    if (signinState.authorizationType) {
       return {
-        body: this.createLoginSuccessResult(),
+        body: this.createLoginSuccessResult(AuthorizationType.ACROLINX_SIGN_IN),
         status: 200,
       };
     } else {
@@ -181,23 +213,59 @@ export class AcrolinxServerMock {
     };
   }
 
-  private createLoginSuccessResult(): SigninSuccessResult {
+  private createLoginSuccessResult(authorizedUsing: AuthorizationType): SigninSuccessResult {
     return {
       authToken: DUMMY_AUTH_TOKEN,
-      authorizedUsing: this._isUserSignedIn!,
+      authorizedUsing,
       links: {},
       privileges: [],
       userId: DUMMY_USER_ID,
     };
   }
 
+  private returnFakeSigninPage(signinId: string, opts: RequestInit) {
+    const signinState = this.signinIds[signinId];
+    return {
+      body: `
+      <html>
+        <head><title>Signin UI</title></head>
+        <body>
+          <h1>Interactive Signin</h1>
+          <p>SigninID: ${signinId}</p>
+          <p>SigninState: ${(signinState && (signinState.authorizationType || 'Signed out')) || 'Unknown'}</p>
+          <form action="${signinId}/confirm" method="post"><button>Confirm Signin</button></form>
+          <form action="${signinId}/delete" method="post"><button>Delete Signin</button></form>
+          <pre>
+          ${JSON.stringify(opts, null, 2)}
+          </pre>
+        </body>
+      </html>
+      `,
+      headers: {
+        'Content-Type': 'text/html'
+      }
+    };
+  }
+
+  private returnConfirmSigninPage(signinId: string, opts: RequestInit) {
+    if (!this.signinIds[signinId]) {
+      return {status: 404, body: {message: 'Unknown signinId ' + signinId}};
+    }
+    this.fakeSignIn(AuthorizationType.ACROLINX_SIGN_IN, signinId);
+    return this.pollForSignin(signinId, opts);
+  }
+
+  private returnSigninDeletedPage(signinId: string, _opts: RequestInit) {
+    delete this.signinIds[signinId];
+    return {message: `${signinId} is deleted`};
+  }
 }
 
-function getHeader(requestOpts: RequestInit, headerKey: string) {
+function getHeader(requestOpts: RequestInit, headerKey: string): string | undefined {
   if (!requestOpts.headers) {
     return undefined;
   }
-  return (requestOpts.headers as StringMap)[headerKey];
+  return _.find(requestOpts.headers, (_val, key) => key.toLowerCase() === headerKey.toLowerCase());
 }
 
 export function mockAcrolinxServer(url: string): AcrolinxServerMock {

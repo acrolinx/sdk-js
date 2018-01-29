@@ -1,3 +1,4 @@
+import * as _ from 'lodash';
 import {DEVELOPMENT_SIGNATURE} from '../../src';
 import {
   AcrolinxEndpoint, AcrolinxEndpointProps, isSigninLinksResult, isSigninSuccessResult,
@@ -38,8 +39,17 @@ describe('signin', () => {
   it('should return the signin links', async () => {
     const result = await endpoint.signin() as SigninLinksResult;
     expect(isSigninLinksResult(result)).toBeTruthy();
-    expect(result.links.interactive).toEqual(DUMMY_SERVER_URL + DUMMY_SIGNIN_LINK_PATH_INTERACTIVE);
+    expect(_.startsWith(result.links.interactive, DUMMY_SERVER_URL + DUMMY_SIGNIN_LINK_PATH_INTERACTIVE)).toBeTruthy();
     expect(result.interactiveLinkTimeout).toEqual(DUMMY_INTERACTIVE_LINK_TIMEOUT);
+  });
+
+  it('should return the provided auth token if valid', async () => {
+    const result = await endpoint.signin({authToken: DUMMY_AUTH_TOKEN}) as SigninLinksResult;
+    if (isSigninSuccessResult(result)) {
+      expect(result.authToken).toEqual(DUMMY_AUTH_TOKEN);
+    } else {
+      expect(isSigninSuccessResult(result)).toBeTruthy();
+    }
   });
 
   it('polling should return authtoken after signin', async () => {

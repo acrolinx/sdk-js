@@ -1,5 +1,8 @@
 import {wrapError} from './errors';
-import {HEADER_X_ACROLINX_CLIENT} from './headers';
+import {
+  HEADER_X_ACROLINX_AUTH, HEADER_X_ACROLINX_BASE_URL, HEADER_X_ACROLINX_CLIENT,
+  HEADER_X_ACROLINX_CLIENT_LOCALE
+} from './headers';
 
 import {
   isSigninLinksResult,
@@ -109,7 +112,7 @@ export class AcrolinxEndpoint {
 
   private getSigninRequestHeaders(options: SigninOptions = {}) {
     if (hasAuthToken(options)) {
-      return {'X-Acrolinx-Auth': options.authToken};
+      return {[HEADER_X_ACROLINX_AUTH]: options.authToken};
     } else if (isSsoSigninOption(options)) {
       return {
         [options.passwordKey || 'username']: options.userId,
@@ -123,11 +126,11 @@ export class AcrolinxEndpoint {
   private getCommonHeaders(): StringMap {
     const headers: StringMap = {
       'Content-Type': 'application/json',
-      'X-Acrolinx-Base-Url': this.props.serverAddress,
+      [HEADER_X_ACROLINX_BASE_URL]: this.props.serverAddress,
       [HEADER_X_ACROLINX_CLIENT]: this.props.client.signature + '; ' + this.props.client.version,
     };
     if (this.props.clientLocale) {
-      headers['X-Acrolinx-Client-Locale'] = this.props.clientLocale;
+      headers[HEADER_X_ACROLINX_CLIENT_LOCALE] = this.props.clientLocale;
     }
     return headers;
   }
