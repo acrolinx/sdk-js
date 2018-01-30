@@ -20,6 +20,13 @@ export const DUMMY_USER_ID = 'dummyUserId';
 export const DUMMY_RETRY_AFTER = 1;
 export const DUMMY_INTERACTIVE_LINK_TIMEOUT = 900;
 
+export const SIGNIN_URL_EXPIRED_ERROR = {
+  detail: 'The sign-in URL is does not exists or is expired. Please start a new sign-in process.',
+  status: 404,
+  title: 'Sign-in URL is not available.',
+  type: ErrorType.client,
+};
+
 interface MockResponseObjectOf<T> extends MockResponseObject {
   body: T;
 }
@@ -146,6 +153,16 @@ export class AcrolinxServerMock {
     return this.createAcrolinxApiErrorResponse({status: 404});
   }
 
+  public deleteSigninPollUrl(url: string) {
+    const signinId = url.substr(url.lastIndexOf('/') + 1);
+    // console.warn('deleteSigninPollUrl', signinId);
+    this.deleteSignin(signinId);
+  }
+
+  private deleteSignin(signinId: string) {
+    delete this.signinIds[signinId];
+  }
+
   private returnResponse(body: {}) {
     return {body};
   }
@@ -176,13 +193,9 @@ export class AcrolinxServerMock {
   private pollForSignin(signinId: string,
                         _opts: RequestInit): MockResponseObjectOf<SigninPollResult | AcrolinxApiError> {
     const signinState = this.signinIds[signinId];
+    // console.log('pollForSignin', signinId, signinState);
     if (!signinState) {
-      return this.createAcrolinxApiErrorResponse({
-        detail: 'The sign-in URL is does not exists or is expired. Please start a new sign-in process.',
-        status: 404,
-        title: 'Sign-in URL is not available.',
-        type: ErrorType.client,
-      });
+      return this.createAcrolinxApiErrorResponse(SIGNIN_URL_EXPIRED_ERROR);
     }
 
     if (signinState.authorizationType) {
@@ -256,7 +269,7 @@ export class AcrolinxServerMock {
   }
 
   private returnSigninDeletedPage(signinId: string, _opts: RequestInit) {
-    delete this.signinIds[signinId];
+    this.deleteSignin(signinId);
     return {message: `${signinId} is deleted`};
   }
 }
