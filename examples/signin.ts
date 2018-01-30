@@ -28,7 +28,7 @@ async function signInExample() {
     let pollResult = await acrolinxEndpoint.pollForSignin(loginResult);
 
     while (!isSigninSuccessResult(pollResult)) {
-      console.log('Polling...', pollResult.retryAfterSeconds);
+      console.log('Polling...', pollResult.retryAfter);
       pollResult = await acrolinxEndpoint.pollForSignin(loginResult, pollResult);
     }
 

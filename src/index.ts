@@ -1,4 +1,4 @@
-import {wrapError} from './errors';
+import {wrapUnknownError} from './errors';
 import {
   HEADER_X_ACROLINX_AUTH, HEADER_X_ACROLINX_BASE_URL, HEADER_X_ACROLINX_CLIENT,
   HEADER_X_ACROLINX_CLIENT_LOCALE
@@ -13,7 +13,7 @@ import {
   SigninResult,
   SigninSuccessResult
 } from './signin';
-import {handleExpectedJsonResponse, throwErrorForHttpErrorStatus} from './utils/fetch';
+import {handleExpectedJsonResponse} from './utils/fetch';
 import * as logging from './utils/logging';
 import {waitMs} from './utils/mixed-utils';
 
@@ -92,22 +92,11 @@ export class AcrolinxEndpoint {
 
   public async pollForSignin(signinLinks: SigninLinksResult,
                              lastPollResult?: PollMoreResult): Promise<SigninPollResult> {
-    if (lastPollResult && lastPollResult.retryAfterSeconds) {
-      logging.log('Waiting before retry', lastPollResult.retryAfterSeconds);
-      await waitMs(lastPollResult.retryAfterSeconds * 1000);
+    if (lastPollResult && lastPollResult.retryAfter) {
+      logging.log('Waiting before retry', lastPollResult.retryAfter);
+      await waitMs(lastPollResult.retryAfter * 1000);
     }
-    const res = await this.fetch(signinLinks.links.poll, {headers: this.getCommonHeaders()});
-    switch (res.status) {
-      case 200:
-        return handleExpectedJsonResponse(res);
-      case 202:
-        return {
-          _type: 'PollMoreResult',
-          retryAfterSeconds: parseInt(res.headers.get('retry-after') || '1', 10)
-        };
-      default:
-        throw throwErrorForHttpErrorStatus(res);
-    }
+    return this.getUrl<SigninPollResult>(signinLinks.links.poll);
   }
 
   private getSigninRequestHeaders(options: SigninOptions = {}) {
@@ -136,9 +125,13 @@ export class AcrolinxEndpoint {
   }
 
   private async get<T>(path: string): Promise<T> {
-    return this.fetch(this.props.serverAddress + path, {
+    return this.getUrl<T>(this.props.serverAddress + path);
+  }
+
+  private async getUrl<T>(url: string): Promise<T> {
+    return this.fetch(url, {
       headers: this.getCommonHeaders()
-    }).then(res => handleExpectedJsonResponse<T>(res), wrapError);
+    }).then(res => handleExpectedJsonResponse<T>(res), wrapUnknownError);
   }
 
   private async post<T>(path: string, body: {}, headers: StringMap = {}): Promise<T> {
@@ -147,7 +140,7 @@ export class AcrolinxEndpoint {
       body: JSON.stringify(body),
       headers: {...this.getCommonHeaders(), ...headers},
       method: 'POST',
-    }).then(res => handleExpectedJsonResponse<T>(res), wrapError);
+    }).then(res => handleExpectedJsonResponse<T>(res), wrapUnknownError);
   }
 
 

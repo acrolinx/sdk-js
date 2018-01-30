@@ -25,6 +25,7 @@ http.createServer((req, res) => {
     const headers = mockResponse.headers;
     const contentType = (headers && headers['Content-Type']) || 'application/json';
 
+    // TODO: Headers, retryAfter
     res.setHeader('Content-Type', contentType);
 
     if (contentType === 'application/json') {

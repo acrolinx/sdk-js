@@ -2,7 +2,7 @@
 import * as fetchMock from 'fetch-mock';
 import {MockResponseObject} from 'fetch-mock';
 import * as _ from 'lodash';
-import {AcrolinxApiError} from '../../src/errors';
+import {AcrolinxApiError, ErrorType} from '../../src/errors';
 import {HEADER_X_ACROLINX_AUTH, HEADER_X_ACROLINX_BASE_URL, HEADER_X_ACROLINX_CLIENT} from '../../src/headers';
 import {ServerVersionInfo} from '../../src/index';
 import {AuthorizationType, SigninPollResult, SigninResult, SigninSuccessResult} from '../../src/signin';
@@ -98,7 +98,7 @@ export class AcrolinxServerMock {
       this.signinIds[signinId].authorizationType = authorizationType;
     } else {
       _.forEach(this.signinIds, (signinState) => {
-        console.log('Fake it for', signinState);
+        // console.log('Fake it for', signinState);
         signinState.authorizationType = authorizationType;
       });
     }
@@ -133,7 +133,7 @@ export class AcrolinxServerMock {
       if (matches && opts.method === route.method) {
         // console.log('Found match!', matches);
         const handlerResult = route.handler(matches!, opts);
-        console.log(`Handler for URL ${url} returned`, handlerResult);
+        // console.log(`Handler for URL ${url} returned`, handlerResult);
         if (isMockResponseObject(handlerResult)) {
           return handlerResult;
         } else {
@@ -143,7 +143,7 @@ export class AcrolinxServerMock {
     }
 
     console.log(`FakeServer can not handle url "${url}"`, opts);
-    return {status: 404};
+    return this.createAcrolinxApiErrorResponse({status: 404});
   }
 
   private returnResponse(body: {}) {
@@ -181,7 +181,7 @@ export class AcrolinxServerMock {
         detail: 'The sign-in URL is does not exists or is expired. Please start a new sign-in process.',
         status: 404,
         title: 'Sign-in URL is not available.',
-        type: 'https://acrolinx.com/apispec/v1/errors/sign_in_not_available',
+        type: ErrorType.client,
       });
     }
 
@@ -192,7 +192,7 @@ export class AcrolinxServerMock {
       };
     } else {
       return {
-        body: {_type: 'PollMoreResult', retryAfterSeconds: 1},
+        body: {retryAfter: 1},
         headers: {'retry-after': '' + DUMMY_RETRY_AFTER},
         status: 202,
       };

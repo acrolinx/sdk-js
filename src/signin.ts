@@ -1,6 +1,5 @@
 export interface PollMoreResult {
-  _type: 'PollMoreResult';
-  retryAfterSeconds: number;
+  retryAfter: number;
 }
 
 export type SigninPollResult = SigninSuccessResult | PollMoreResult;

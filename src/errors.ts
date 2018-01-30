@@ -1,33 +1,41 @@
 export enum ErrorType {
-  httpError = 'httpError',
-  unknownError = 'unknownError',
-  invalidJson = 'invalidJson'
+  httpError = 'https://acrolinx.com/apispec/v1/errors/http-error',
+  unknownError = 'https://acrolinx.com/apispec/v1/errors/unknown-error',
+  invalidJson = 'https://acrolinx.com/apispec/v1/errors/invalid-json',
+  client = 'https://acrolinx.com/apispec/v1/errors/client'
 }
 
 export interface AcrolinxErrorProps {
-  httpStatus?: number;
-  message: string;
-  type: ErrorType;
-}
-
-export class AcrolinxError extends Error {
-  public readonly httpStatus?: number;
-  public readonly type: ErrorType;
-
-  public constructor(props: AcrolinxErrorProps) {
-    super(props.message);
-    this.httpStatus = props.httpStatus;
-    this.type = props.type;
-  }
-}
-
-export function wrapError(error: Error): Promise<any> {
-  throw new AcrolinxError({message: error.message, type: ErrorType.unknownError});
-}
-
-export interface AcrolinxApiError {
   type: string;
   title: string;
   detail: string;
+  status?: number;
+}
+
+export interface AcrolinxApiError extends AcrolinxErrorProps {
   status: number;
 }
+
+export class AcrolinxError extends Error implements AcrolinxErrorProps {
+  public readonly type: string;
+  public readonly title: string;
+  public readonly detail: string;
+  public readonly status?: number;
+
+  public constructor(props: AcrolinxErrorProps) {
+    super(props.title);
+    this.type = props.type;
+    this.status = props.status;
+    this.title = props.title;
+    this.detail = props.detail;
+  }
+}
+
+export function wrapUnknownError(error: Error): Promise<any> {
+  throw new AcrolinxError({
+    detail: error.message,
+    title: 'Unknown Error',
+    type: ErrorType.unknownError,
+  });
+}
+

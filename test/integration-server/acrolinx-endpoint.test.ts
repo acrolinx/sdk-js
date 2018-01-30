@@ -27,8 +27,9 @@ describe('e2e - AcrolinxEndpoint', () => {
         await api.getServerVersion();
       } catch (e) {
         expect(e.type).toEqual(ErrorType.httpError);
-        expect(e.httpStatus).toEqual(404);
+        expect(e.status).toEqual(404);
       }
+      expect.hasAssertions();
     });
 
     it('should return an failing promise for non existing server', async () => {
@@ -38,6 +39,7 @@ describe('e2e - AcrolinxEndpoint', () => {
       } catch (e) {
         expect(e.type).toEqual(ErrorType.unknownError);
       }
+      expect.hasAssertions();
     });
 
     it('should return an failing promise for invalid URLS', async () => {
@@ -47,6 +49,7 @@ describe('e2e - AcrolinxEndpoint', () => {
       } catch (e) {
         expect(e.type).toEqual(ErrorType.unknownError);
       }
+      expect.hasAssertions();
     });
   });
 
@@ -66,6 +69,21 @@ describe('e2e - AcrolinxEndpoint', () => {
       const result = await api.signin() as SigninLinksResult;
       expect(result.links.interactive).toContain(TEST_SERVER_URL);
       expect(result.interactiveLinkTimeout).toBeGreaterThan(100);
+    });
+
+    it('should return an api error for invalid signin poll address', async () => {
+      try {
+        await api.pollForSignin({
+          interactiveLinkTimeout: 0,
+          links: {
+            interactive: 'dummy',
+            poll: TEST_SERVER_URL + '/api/v1/auth/sign-ins/0ddece9c-464a-442b-8a5d-d2f242d54c81'
+          }
+        });
+      } catch (e) {
+        expect(e.type).toEqual(ErrorType.client);
+      }
+      expect.hasAssertions();
     });
 
     testIf(!!(SSO_USER_ID || SSO_PASSWORD), 'signin with sso', async () => {
