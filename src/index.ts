@@ -27,16 +27,16 @@ export const DEVELOPMENT_SIGNATURE = 'SW50ZWdyYXRpb25EZXZlbG9wbWVudERlbW9Pbmx5';
 export {SigninSuccessResult, isSigninLinksResult, PollMoreResult, SigninResult, SigninLinksResult};
 
 export interface ServerVersionInfo {
-  version: string;
-  buildNumber: string;
   buildDate: string;
+  buildNumber: string;
+  version: string;
 }
 
 export interface AcrolinxEndpointProps {
-  serverAddress: string;
   client: ClientInformation;
   clientLocale?: string;
   enableHttpLogging?: boolean;
+  serverAddress: string;
 }
 
 export interface ClientInformation {

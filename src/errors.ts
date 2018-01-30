@@ -6,10 +6,10 @@ export enum ErrorType {
 }
 
 export interface AcrolinxErrorProps {
-  type: string;
-  title: string;
   detail: string;
   status?: number;
+  title: string;
+  type: string;
 }
 
 export interface AcrolinxApiError extends AcrolinxErrorProps {

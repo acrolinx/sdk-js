@@ -1,4 +1,4 @@
-/* tslint:disable:no-console */
+/* tslint:disable:no-console object-literal-sort-keys */
 import * as fetchMock from 'fetch-mock';
 import {MockResponseObject} from 'fetch-mock';
 import * as _ from 'lodash';
@@ -32,10 +32,10 @@ interface MockResponseObjectOf<T> extends MockResponseObject {
 }
 
 export interface LoggedRequest {
-  url: string;
   opts: {
     headers: StringMap
   };
+  url: string;
 }
 
 export interface StringMap {
@@ -44,9 +44,9 @@ export interface StringMap {
 
 
 interface Route {
-  path: RegExp;
-  method: string;
   handler: (args: string[], requestOpts: RequestInit) => MockResponseObject | {};
+  method: string;
+  path: RegExp;
 }
 
 function isMockResponseObject(o: MockResponseObject | {}): o is MockResponseObject {
