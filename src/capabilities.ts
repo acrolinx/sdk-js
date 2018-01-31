@@ -36,7 +36,7 @@ export interface TermSet {
 }
 
 export interface ContentFormat {
-  id: ContentFormatId;
+  id: ContentFormatId | string;
   displayName: string;
   extensions: string[];
 }

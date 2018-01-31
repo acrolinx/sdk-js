@@ -1,4 +1,13 @@
-import {AudienceId, CheckType, ContentEncoding, Goal, GoalId, ReportType, TermSetId} from './capabilities';
+import {
+  AudienceId,
+  CheckType,
+  ContentEncoding,
+  ContentFormatId,
+  Goal,
+  GoalId,
+  ReportType,
+  TermSetId
+} from './capabilities';
 import {URL} from './common-types';
 
 export interface CheckRange {
@@ -23,6 +32,7 @@ export interface CheckOptions {
   reportTypes?: ReportType[];
   checkType?: CheckType;
   partialCheckRanges?: CheckRange[];
+  contentFormat: ContentFormatId;
 }
 
 export interface Document {
@@ -31,14 +41,17 @@ export interface Document {
   author?: string;
   mimeType?: string;
   contentType?: string;
-  metaData?: MetaData;
+  metadata?: MetaData[];
   displayInfo?: {
     reference?: string;
   };
 }
 
 export interface MetaData {
-  whatTheLuck?: any;
+  displayName: string;
+  key: string;
+  value: string;
+  required: boolean;
 }
 
 export type CheckId = string;
@@ -78,6 +91,42 @@ export interface CheckResult {
   };
   goals: GoalWithIssueCount[];
   issues: Issue[];
+  keywords: KeywordsSection;
+  extraInfos: ExtraInfo[];
+  actions: Action[];
+  links: {
+    termContribution: URL
+    deleteScorecard: URL
+  };
+  reports: Array<{
+    reportType: ReportType | string
+    link: URL
+  }>;
+}
+
+export interface KeywordsSection {
+  links: {
+    getTargetKeywords: URL;
+    putTargetKeywords: URL;
+  };
+  discovered: KeywordInfo[];
+  target: KeywordInfo[];
+}
+
+export interface ExtraInfo {
+  id: string;
+  title: string;
+  iconClass: string;
+  iconUrl: URL;
+  url: URL;
+}
+
+export interface KeywordInfo {
+  keyword: string;
+  sortKey: string;
+  density: number;
+  count: number;
+  prominence: number;
 }
 
 export interface Match {
@@ -92,6 +141,7 @@ export interface Match {
 export interface Suggestion {
   surface: string;
   groupId: string;
+  icon?: string; // URL or enum?
   replacements: { [matchIndex: string]: string }; // Objects would be easier to extend
 }
 
@@ -100,7 +150,7 @@ export interface Action {
   url: URL;
   displayName: string;
   icon: ActionIcon | string;
-  replacedBy: LinkId;
+  replacedBy?: LinkId;
 }
 
 export type LinkId = string;
@@ -126,18 +176,26 @@ export interface Issue {
       issue: string;
       environment: string;
       index: string;
-    }
+    };
+    matches: Match[];
   };
-  matches: Match[];
   readonly: boolean;
-  issueLocations: {
+  issueLocations: Array<{
     locationId: string;
     displayName: string;
     values: { [id: string]: string };
-  };
+  }>;
   suggestions: Suggestion[];
-  actions: Action[];
-  links: { [linkId: string]: URL };
+  actions?: Action[];
+  links?: IssueLinks;
+  subIssues?: Issue[];
+  debug?: any;
+}
+
+export interface IssueLinks {
+  termContribution: URL;
+  addToDictionary: URL;
+  [linkId: string]: URL;
 }
 
 

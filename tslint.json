@@ -13,6 +13,6 @@
     "max-classes-per-file": 10,
     "no-consecutive-blank-lines": [true, 2],
     "no-floating-promises": true,
-    "object-literal-sort-keys": [true, "ignore-case", "match-declaration-order"]
+    "object-literal-sort-keys": false
   }
 }

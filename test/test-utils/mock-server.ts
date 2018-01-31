@@ -6,7 +6,8 @@ import {AcrolinxApiError} from '../../src/errors';
 import {HEADER_X_ACROLINX_AUTH, HEADER_X_ACROLINX_BASE_URL, HEADER_X_ACROLINX_CLIENT} from '../../src/headers';
 import {ServerVersionInfo} from '../../src/index';
 import {AuthorizationType, SigninPollResult, SigninResult, SigninSuccessResult} from '../../src/signin';
-import {DUMMY_CAPABILITIES} from './mock-server-checking';
+import {Route} from './common-mocking';
+import {CheckServiceMock} from './mock-server-checking';
 import {AUTH_TOKEN_MISSING, CLIENT_SIGNATURE_MISSING, SIGNIN_URL_EXPIRED_ERROR} from './mocked-errors';
 
 export const DUMMY_SERVER_INFO: ServerVersionInfo = {
@@ -37,13 +38,6 @@ export interface StringMap {
   [key: string]: string;
 }
 
-
-interface Route {
-  handler: (args: string[], requestOpts: RequestInit) => MockResponseObject | {};
-  method: string;
-  path: RegExp;
-}
-
 function isMockResponseObject(o: MockResponseObject | {}): o is MockResponseObject {
   return !!((o as MockResponseObject).body);
 }
@@ -53,12 +47,14 @@ interface SigninState {
 }
 
 export class AcrolinxServerMock {
+  public readonly checkService: CheckServiceMock;
   public requests: LoggedRequest[] = [];
   private routes: Route[];
   private signinIds: { [id: string]: SigninState } = {};
   private ssoEnabled: boolean = false;
 
   constructor(public readonly url: string) {
+    this.checkService = new CheckServiceMock();
     this.routes = [
       {
         handler: () => this.getServerVersion(),
@@ -76,11 +72,6 @@ export class AcrolinxServerMock {
         path: /api\/v1\/auth\/sign-ins\/(.*)$/,
       },
       {
-        handler: () => this.getCheckingCapabilities(),
-        method: 'GET',
-        path: /api\/v1\/checking\/capabilities$/,
-      },
-      {
         handler: (args, opts) => this.returnFakeSigninPage(args[1], opts),
         method: 'GET',
         path: /signin-ui\/(.*)$/,
@@ -95,6 +86,7 @@ export class AcrolinxServerMock {
         method: 'POST',
         path: /signin-ui\/(.*)\/delete/,
       },
+      ...this.checkService.getRoutes()
     ];
 
     this.signinIds.dummy = {};
@@ -272,10 +264,6 @@ export class AcrolinxServerMock {
   private returnSigninDeletedPage(signinId: string, _opts: RequestInit) {
     this.deleteSignin(signinId);
     return {message: `${signinId} is deleted`};
-  }
-
-  private getCheckingCapabilities() {
-    return DUMMY_CAPABILITIES;
   }
 }
 
