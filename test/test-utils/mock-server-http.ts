@@ -1,11 +1,12 @@
 /* tslint:disable:no-console */
+import * as parse from 'co-body';
 import * as http from 'http';
 import {AcrolinxServerMock, StringMap} from './mock-server';
 
-const serverMock = new AcrolinxServerMock('http://0.0.0.0');
 const PORT = 3000;
+const serverMock = new AcrolinxServerMock('http://0.0.0.0:' + PORT);
 
-http.createServer((req, res) => {
+http.createServer(async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
   const allowedHeaders = req.headers['access-control-request-headers'] || '';
@@ -17,7 +18,13 @@ http.createServer((req, res) => {
     return;
   }
 
-  const mockResponse = serverMock.handleFetchRequest(req.url!, {method: req.method, headers: req.headers as StringMap});
+  const body = await parse.json(req);
+
+  const mockResponse = serverMock.handleFetchRequest(req.url!, {
+    method: req.method,
+    headers: req.headers as StringMap,
+    body: JSON.stringify(body)
+  });
 
   res.statusCode = mockResponse.status || 200;
 

@@ -6,7 +6,7 @@ import {AcrolinxApiError} from '../../src/errors';
 import {HEADER_X_ACROLINX_AUTH, HEADER_X_ACROLINX_BASE_URL, HEADER_X_ACROLINX_CLIENT} from '../../src/headers';
 import {ServerVersionInfo} from '../../src/index';
 import {AuthorizationType, SigninPollResult, SigninResult, SigninSuccessResult} from '../../src/signin';
-import {Route} from './common-mocking';
+import {MockResponseObjectOf, Route} from './common-mocking';
 import {CheckServiceMock} from './mock-server-checking';
 import {AUTH_TOKEN_MISSING, CLIENT_SIGNATURE_MISSING, SIGNIN_URL_EXPIRED_ERROR} from './mocked-errors';
 
@@ -16,16 +16,14 @@ export const DUMMY_SERVER_INFO: ServerVersionInfo = {
   version: '1.2.3',
 };
 
+export {SIGNIN_URL_EXPIRED_ERROR};
+
 export const DUMMY_SIGNIN_LINK_PATH_INTERACTIVE = '/signin-ui/';
 const DUMMY_SIGNIN_LINK_PATH_POLL = '/api/v1/auth/sign-ins/';
 export const DUMMY_AUTH_TOKEN = 'dummyAuthToken';
 export const DUMMY_USER_ID = 'dummyUserId';
 export const DUMMY_RETRY_AFTER = 1;
 export const DUMMY_INTERACTIVE_LINK_TIMEOUT = 900;
-
-interface MockResponseObjectOf<T> extends MockResponseObject {
-  body: T;
-}
 
 export interface LoggedRequest {
   opts: {
@@ -42,6 +40,11 @@ function isMockResponseObject(o: MockResponseObject | {}): o is MockResponseObje
   return !!((o as MockResponseObject).body);
 }
 
+function isAcrolinxApiError(o: AcrolinxApiError | {}): o is AcrolinxApiError {
+  const potentialAcroApiError = o as AcrolinxApiError;
+  return !!(potentialAcroApiError.status && potentialAcroApiError.type && potentialAcroApiError.title);
+}
+
 interface SigninState {
   authorizationType?: AuthorizationType;
 }
@@ -53,8 +56,8 @@ export class AcrolinxServerMock {
   private signinIds: { [id: string]: SigninState } = {};
   private ssoEnabled: boolean = false;
 
-  constructor(public readonly url: string) {
-    this.checkService = new CheckServiceMock();
+  constructor(public readonly serverAddress: string) {
+    this.checkService = new CheckServiceMock(serverAddress);
     this.routes = [
       {
         handler: () => this.getServerVersion(),
@@ -136,6 +139,8 @@ export class AcrolinxServerMock {
         // console.log(`Handler for URL ${url} returned`, handlerResult);
         if (isMockResponseObject(handlerResult)) {
           return handlerResult;
+        } else if (isAcrolinxApiError(handlerResult)) {
+          return {body: handlerResult, status: handlerResult.status};
         } else {
           return this.returnResponse(handlerResult);
         }
@@ -171,7 +176,7 @@ export class AcrolinxServerMock {
     if (getHeader(opts, HEADER_X_ACROLINX_AUTH) === DUMMY_AUTH_TOKEN) {
       return this.createLoginSuccessResult(AuthorizationType.ACROLINX_TOKEN);
     }
-    const baseUrl = getHeader(opts, HEADER_X_ACROLINX_BASE_URL) || this.url;
+    const baseUrl = getHeader(opts, HEADER_X_ACROLINX_BASE_URL) || this.serverAddress;
     const id = _.uniqueId('signin-id-');
     this.signinIds[id] = {};
     return {

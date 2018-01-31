@@ -1,4 +1,5 @@
 import {CheckingCapabilities} from './capabilities';
+import {CheckingStatus, CheckRequest, CheckResponse, CheckResult} from './check';
 import {AuthToken} from './common-types';
 import {wrapUnknownError} from './errors';
 import {
@@ -99,11 +100,23 @@ export class AcrolinxEndpoint {
       logging.log('Waiting before retry', lastPollResult.retryAfter);
       await waitMs(lastPollResult.retryAfter * 1000);
     }
-    return this.getUrl<SigninPollResult>(signinLinks.links.poll);
+    return this.getJsonFromUrl<SigninPollResult>(signinLinks.links.poll);
   }
 
   public async getCheckingCapabilities(authToken: AuthToken): Promise<CheckingCapabilities> {
     return this.getJsonFromPath<CheckingCapabilities>('/api/v1/checking/capabilities', authToken);
+  }
+
+  public async check(authToken: AuthToken, req: CheckRequest): Promise<CheckResponse> {
+    return this.post<CheckResponse>('/api/v1/checking/submit', req, {}, authToken);
+  }
+
+  public async getCheckingStatus(authToken: AuthToken, check: CheckResponse): Promise<CheckingStatus> {
+    return this.getJsonFromUrl<CheckingStatus>(check.links.status, authToken);
+  }
+
+  public async getCheckResult(authToken: AuthToken, check: CheckResponse): Promise<CheckResult> {
+    return this.getJsonFromPath<CheckResult>(`/api/v1/checking/${check.id}/result`, authToken);
   }
 
   private getSigninRequestHeaders(options: SigninOptions = {}) {
@@ -135,20 +148,20 @@ export class AcrolinxEndpoint {
   }
 
   private async getJsonFromPath<T>(path: string, authToken?: AuthToken): Promise<T> {
-    return this.getUrl<T>(this.props.serverAddress + path, authToken);
+    return this.getJsonFromUrl<T>(this.props.serverAddress + path, authToken);
   }
 
-  private async getUrl<T>(url: string, authToken?: AuthToken): Promise<T> {
+  private async getJsonFromUrl<T>(url: string, authToken?: AuthToken): Promise<T> {
     return this.fetch(url, {
       headers: this.getCommonHeaders(authToken),
     }).then(res => handleExpectedJsonResponse<T>(res), wrapUnknownError);
   }
 
-  private async post<T>(path: string, body: {}, headers: StringMap = {}): Promise<T> {
+  private async post<T>(path: string, body: {}, headers: StringMap = {}, authToken?: AuthToken): Promise<T> {
     // console.log('post', this.props.serverAddress, path, body, headers);
     return this.fetch(this.props.serverAddress + path, {
       body: JSON.stringify(body),
-      headers: {...this.getCommonHeaders(), ...headers},
+      headers: {...this.getCommonHeaders(authToken), ...headers},
       method: 'POST',
     }).then(res => handleExpectedJsonResponse<T>(res), wrapUnknownError);
   }
@@ -170,6 +183,7 @@ export class AcrolinxEndpoint {
       return fetch(input, init);
     }
   }
+
   /* tslint:enable:no-console */
 
 }

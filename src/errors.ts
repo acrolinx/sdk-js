@@ -4,7 +4,8 @@ export enum ErrorType {
   invalidJson = 'https://acrolinx.com/apispec/v1/errors/invalid-json',
   client = 'https://acrolinx.com/apispec/v1/errors/client',
   client_signature_missing = 'https://acrolinx.com/apispec/v1/errors/client_signature_missing',
-  auth_token_missing = 'https://acrolinx.com/apispec/v1/errors/auth_token_missing'
+  auth_token_missing = 'https://acrolinx.com/apispec/v1/errors/auth_token_missing',
+  not_found = 'https://acrolinx.com/apispec/v1/errors/not_found'
 }
 
 export interface AcrolinxErrorProps {
