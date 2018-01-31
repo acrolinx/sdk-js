@@ -1,3 +1,5 @@
+import {AuthToken} from './common-types';
+
 export interface PollMoreResult {
   retryAfter: number;
 }
@@ -35,7 +37,7 @@ export enum AuthorizationType {
 }
 
 export interface SigninSuccessResult {
-  authToken: string;
+  authToken: AuthToken;
   userId: string;
   privileges: string[];
   authorizedUsing: AuthorizationType;

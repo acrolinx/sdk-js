@@ -1,6 +1,6 @@
-import {AudienceStatus, Capabilities, CheckType, ContentEncoding, ReportType} from '../../src/capabilities';
+import {AudienceStatus, CheckingCapabilities, CheckType, ContentEncoding, ReportType} from '../../src/capabilities';
 
-export const DUMMY_CAPABILITIES: Capabilities = {
+export const DUMMY_CAPABILITIES: CheckingCapabilities = {
   audiences: [
     {
       id: 'aud-1',

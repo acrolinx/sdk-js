@@ -2,10 +2,12 @@
 import * as fetchMock from 'fetch-mock';
 import {MockResponseObject} from 'fetch-mock';
 import * as _ from 'lodash';
-import {AcrolinxApiError, ErrorType} from '../../src/errors';
+import {AcrolinxApiError} from '../../src/errors';
 import {HEADER_X_ACROLINX_AUTH, HEADER_X_ACROLINX_BASE_URL, HEADER_X_ACROLINX_CLIENT} from '../../src/headers';
 import {ServerVersionInfo} from '../../src/index';
 import {AuthorizationType, SigninPollResult, SigninResult, SigninSuccessResult} from '../../src/signin';
+import {DUMMY_CAPABILITIES} from './mock-server-checking';
+import {AUTH_TOKEN_MISSING, CLIENT_SIGNATURE_MISSING, SIGNIN_URL_EXPIRED_ERROR} from './mocked-errors';
 
 export const DUMMY_SERVER_INFO: ServerVersionInfo = {
   buildDate: '2018-01-10',
@@ -19,13 +21,6 @@ export const DUMMY_AUTH_TOKEN = 'dummyAuthToken';
 export const DUMMY_USER_ID = 'dummyUserId';
 export const DUMMY_RETRY_AFTER = 1;
 export const DUMMY_INTERACTIVE_LINK_TIMEOUT = 900;
-
-export const SIGNIN_URL_EXPIRED_ERROR = {
-  detail: 'The sign-in URL is does not exists or is expired. Please start a new sign-in process.',
-  status: 404,
-  title: 'Sign-in URL is not available.',
-  type: ErrorType.client,
-};
 
 interface MockResponseObjectOf<T> extends MockResponseObject {
   body: T;
@@ -81,6 +76,11 @@ export class AcrolinxServerMock {
         path: /api\/v1\/auth\/sign-ins\/(.*)$/,
       },
       {
+        handler: () => this.getCheckingCapabilities(),
+        method: 'GET',
+        path: /api\/v1\/checking\/capabilities$/,
+      },
+      {
         handler: (args, opts) => this.returnFakeSigninPage(args[1], opts),
         method: 'GET',
         path: /signin-ui\/(.*)$/,
@@ -116,22 +116,23 @@ export class AcrolinxServerMock {
   }
 
   public handleFetchRequest = (url: string, optsArg: RequestInit = {}): MockResponseObject => {
-    const opts = {method: 'GET', ...optsArg};
+    const opts = {method: 'GET', ...optsArg, headers: ((optsArg.headers || {}) as StringMap)};
+
+    this.requests.push({opts, url});
 
     const acrolinxClientHeader = getHeader(optsArg, HEADER_X_ACROLINX_CLIENT);
     if (acrolinxClientHeader) {
       const [signature, version] = acrolinxClientHeader.split(';').map(_.trim);
       if (!signature || !version) {
-        return this.createAcrolinxApiErrorResponse({type: 'BrokenClientSignature'});
+        return this.createAcrolinxApiErrorResponse(CLIENT_SIGNATURE_MISSING);
       }
     } else if (_.includes(url, 'api')) {
-      return this.createAcrolinxApiErrorResponse({type: 'MissingClientSignature'});
+      return this.createAcrolinxApiErrorResponse(CLIENT_SIGNATURE_MISSING);
     }
 
-    this.requests.push({
-      opts: {headers: (opts.headers || {}) as StringMap},
-      url,
-    });
+    if (!getHeader(opts, HEADER_X_ACROLINX_AUTH) && _.includes(url, '/api/') && !_.includes(url, '/auth/')) {
+      return this.createAcrolinxApiErrorResponse(AUTH_TOKEN_MISSING);
+    }
 
     // console.log('try to match url', url);
     for (const route of this.routes) {
@@ -271,6 +272,10 @@ export class AcrolinxServerMock {
   private returnSigninDeletedPage(signinId: string, _opts: RequestInit) {
     this.deleteSignin(signinId);
     return {message: `${signinId} is deleted`};
+  }
+
+  private getCheckingCapabilities() {
+    return DUMMY_CAPABILITIES;
   }
 }
 

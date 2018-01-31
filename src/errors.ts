@@ -2,7 +2,9 @@ export enum ErrorType {
   httpError = 'https://acrolinx.com/apispec/v1/errors/http-error',
   unknownError = 'https://acrolinx.com/apispec/v1/errors/unknown-error',
   invalidJson = 'https://acrolinx.com/apispec/v1/errors/invalid-json',
-  client = 'https://acrolinx.com/apispec/v1/errors/client'
+  client = 'https://acrolinx.com/apispec/v1/errors/client',
+  client_signature_missing = 'https://acrolinx.com/apispec/v1/errors/client_signature_missing',
+  auth_token_missing = 'https://acrolinx.com/apispec/v1/errors/auth_token_missing'
 }
 
 export interface AcrolinxErrorProps {

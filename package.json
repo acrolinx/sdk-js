@@ -14,6 +14,7 @@
     "build": "tsc",
     "runExample": "tsc && node dist/examples/get-server-version.js",
     "runExampleSignin": "tsc && node dist/examples/signin.js",
+    "runExampleGetCheckingCapabilitites": "tsc && node dist/examples/get-checking-capabilities.js dummyToken",
     "runMockServer": "tsc && node dist/test/test-utils/mock-server-http.js",
     "test": "jest",
     "testCoverage": "jest --coverage",

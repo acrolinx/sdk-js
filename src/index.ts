@@ -1,3 +1,5 @@
+import {CheckingCapabilities} from './capabilities';
+import {AuthToken} from './common-types';
 import {wrapUnknownError} from './errors';
 import {
   HEADER_X_ACROLINX_AUTH, HEADER_X_ACROLINX_BASE_URL, HEADER_X_ACROLINX_CLIENT,
@@ -25,6 +27,7 @@ export {setLoggingEnabled} from './utils/logging';
 export const DEVELOPMENT_SIGNATURE = 'SW50ZWdyYXRpb25EZXZlbG9wbWVudERlbW9Pbmx5';
 
 export {SigninSuccessResult, isSigninLinksResult, PollMoreResult, SigninResult, SigninLinksResult};
+export {AuthToken, CheckingCapabilities};
 
 export interface ServerVersionInfo {
   buildDate: string;
@@ -81,7 +84,7 @@ export class AcrolinxEndpoint {
   }
 
   public async getServerVersion(): Promise<ServerVersionInfo> {
-    return this.get<ServerVersionInfo>('/iq/services/v3/rest/core/serverVersion');
+    return this.getJsonFromPath<ServerVersionInfo>('/iq/services/v3/rest/core/serverVersion');
   }
 
   public async signin(options: SigninOptions = {}): Promise<SigninResult> {
@@ -99,6 +102,10 @@ export class AcrolinxEndpoint {
     return this.getUrl<SigninPollResult>(signinLinks.links.poll);
   }
 
+  public async getCheckingCapabilities(authToken: AuthToken): Promise<CheckingCapabilities> {
+    return this.getJsonFromPath<CheckingCapabilities>('/api/v1/checking/capabilities', authToken);
+  }
+
   private getSigninRequestHeaders(options: SigninOptions = {}) {
     if (hasAuthToken(options)) {
       return {[HEADER_X_ACROLINX_AUTH]: options.authToken};
@@ -112,7 +119,7 @@ export class AcrolinxEndpoint {
     }
   }
 
-  private getCommonHeaders(): StringMap {
+  private getCommonHeaders(authToken?: AuthToken): StringMap {
     const headers: StringMap = {
       'Content-Type': 'application/json',
       [HEADER_X_ACROLINX_BASE_URL]: this.props.serverAddress,
@@ -121,16 +128,19 @@ export class AcrolinxEndpoint {
     if (this.props.clientLocale) {
       headers[HEADER_X_ACROLINX_CLIENT_LOCALE] = this.props.clientLocale;
     }
+    if (authToken) {
+      headers[HEADER_X_ACROLINX_AUTH] = authToken;
+    }
     return headers;
   }
 
-  private async get<T>(path: string): Promise<T> {
-    return this.getUrl<T>(this.props.serverAddress + path);
+  private async getJsonFromPath<T>(path: string, authToken?: AuthToken): Promise<T> {
+    return this.getUrl<T>(this.props.serverAddress + path, authToken);
   }
 
-  private async getUrl<T>(url: string): Promise<T> {
+  private async getUrl<T>(url: string, authToken?: AuthToken): Promise<T> {
     return this.fetch(url, {
-      headers: this.getCommonHeaders()
+      headers: this.getCommonHeaders(authToken),
     }).then(res => handleExpectedJsonResponse<T>(res), wrapUnknownError);
   }
 

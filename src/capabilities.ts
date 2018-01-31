@@ -60,7 +60,7 @@ export enum ReportType {
   termharvesting = 'termharvesting',
 }
 
-export interface Capabilities {
+export interface CheckingCapabilities {
   audiences: Audience[];
   languages: Language[];
   goals: Goal[];
