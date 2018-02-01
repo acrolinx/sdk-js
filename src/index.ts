@@ -1,7 +1,7 @@
 import {CheckingCapabilities} from './capabilities';
 import {CheckingStatus, CheckRequest, CheckResponse, CheckResult} from './check';
 import {AuthToken} from './common-types';
-import {wrapUnknownError} from './errors';
+import {ErrorType, wrapUnknownError} from './errors';
 import {
   HEADER_X_ACROLINX_AUTH, HEADER_X_ACROLINX_BASE_URL, HEADER_X_ACROLINX_CLIENT,
   HEADER_X_ACROLINX_CLIENT_LOCALE
@@ -21,6 +21,7 @@ import * as logging from './utils/logging';
 import {waitMs} from './utils/mixed-utils';
 
 export {isSigninSuccessResult, AuthorizationType} from './signin';
+export {AcrolinxApiError} from './errors';
 export {setLoggingEnabled} from './utils/logging';
 
 // You'll get the clientSignature for your integration after a successful certification meeting.
@@ -28,7 +29,7 @@ export {setLoggingEnabled} from './utils/logging';
 export const DEVELOPMENT_SIGNATURE = 'SW50ZWdyYXRpb25EZXZlbG9wbWVudERlbW9Pbmx5';
 
 export {SigninSuccessResult, isSigninLinksResult, PollMoreResult, SigninResult, SigninLinksResult};
-export {AuthToken, CheckingCapabilities};
+export {AuthToken, CheckingCapabilities, ErrorType};
 
 export interface ServerVersionInfo {
   buildDate: string;
