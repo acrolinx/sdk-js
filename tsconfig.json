@@ -15,6 +15,7 @@
     "noUnusedParameters": true,
     "noUnusedLocals": true,
     "strictFunctionTypes": true,
+    "strictPropertyInitialization": true,
     "sourceMap": true,
     "declaration": true,
     "outDir": "dist",
