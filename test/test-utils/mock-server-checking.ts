@@ -91,7 +91,7 @@ export class CheckServiceMock {
   }
 
   private submitCheck(opts: RequestInit): CheckResponse {
-    const check = new Check(JSON.parse(opts.body));
+    const check = new Check(JSON.parse(opts.body as string));
     this.checks.push(check);
     return {
       id: check.id,
