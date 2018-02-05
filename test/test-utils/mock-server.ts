@@ -30,8 +30,6 @@ export const DUMMY_USER_ID = 'dummyUserId';
 export const DUMMY_RETRY_AFTER = 1;
 export const DUMMY_INTERACTIVE_LINK_TIMEOUT = 900;
 
-
-
 export const ALLOWED_CLIENT_SIGNATURES = ['dummyClientSignature', DEVELOPMENT_SIGNATURE];
 
 export interface LoggedRequest {
