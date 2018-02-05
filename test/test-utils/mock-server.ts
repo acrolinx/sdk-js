@@ -4,11 +4,16 @@ import {MockResponseObject} from 'fetch-mock';
 import * as _ from 'lodash';
 import {AcrolinxApiError} from '../../src/errors';
 import {HEADER_X_ACROLINX_AUTH, HEADER_X_ACROLINX_BASE_URL, HEADER_X_ACROLINX_CLIENT} from '../../src/headers';
-import {ServerVersionInfo} from '../../src/index';
+import {DEVELOPMENT_SIGNATURE, ServerVersionInfo} from '../../src/index';
 import {AuthorizationType, SigninPollResult, SigninResult, SigninSuccessResult} from '../../src/signin';
 import {MockResponseObjectOf, Route} from './common-mocking';
 import {CheckServiceMock} from './mock-server-checking';
-import {AUTH_TOKEN_MISSING, CLIENT_SIGNATURE_MISSING, SIGNIN_URL_EXPIRED_ERROR} from './mocked-errors';
+import {
+  AUTH_TOKEN_MISSING,
+  CLIENT_SIGNATURE_INVALID,
+  CLIENT_SIGNATURE_MISSING,
+  SIGNIN_URL_EXPIRED_ERROR
+} from './mocked-errors';
 
 export const DUMMY_SERVER_INFO: ServerVersionInfo = {
   buildDate: '2018-01-10',
@@ -24,6 +29,10 @@ export const DUMMY_AUTH_TOKEN = 'dummyAuthToken';
 export const DUMMY_USER_ID = 'dummyUserId';
 export const DUMMY_RETRY_AFTER = 1;
 export const DUMMY_INTERACTIVE_LINK_TIMEOUT = 900;
+
+
+
+export const ALLOWED_CLIENT_SIGNATURES = ['dummyClientSignature', DEVELOPMENT_SIGNATURE];
 
 export interface LoggedRequest {
   opts: {
@@ -120,6 +129,9 @@ export class AcrolinxServerMock {
       const [signature, version] = acrolinxClientHeader.split(';').map(_.trim);
       if (!signature || !version) {
         return this.createAcrolinxApiErrorResponse(CLIENT_SIGNATURE_MISSING);
+      }
+      if (!_.includes(ALLOWED_CLIENT_SIGNATURES, signature)) {
+        return this.createAcrolinxApiErrorResponse({...CLIENT_SIGNATURE_INVALID, title: signature});
       }
     } else if (_.includes(url, 'api')) {
       return this.createAcrolinxApiErrorResponse(CLIENT_SIGNATURE_MISSING);

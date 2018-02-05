@@ -15,6 +15,13 @@ export const CLIENT_SIGNATURE_MISSING = {
   type: ErrorType.client_signature_missing,
 };
 
+export const CLIENT_SIGNATURE_INVALID = {
+  detail: 'Your client signature is invalid',
+  status: 400,
+  title: 'Client signature invalid',
+  type: ErrorType.client_signature_invalid,
+};
+
 export const AUTH_TOKEN_MISSING = {
   detail: 'Where is my lovely AuthToken?',
   status: 401,
