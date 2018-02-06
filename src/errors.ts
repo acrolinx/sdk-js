@@ -1,19 +1,24 @@
 export enum ErrorType {
-  httpError = 'https://acrolinx.com/apispec/v1/errors/http-error',
-  unknownError = 'https://acrolinx.com/apispec/v1/errors/unknown-error',
-  invalidJson = 'https://acrolinx.com/apispec/v1/errors/invalid-json',
-  client = 'https://acrolinx.com/apispec/v1/errors/client',
-  client_signature_missing = 'https://acrolinx.com/apispec/v1/errors/client_signature_missing',
-  client_signature_invalid = 'https://acrolinx.com/apispec/v1/errors/client_signature_invalid',
-  auth_token_missing = 'https://acrolinx.com/apispec/v1/errors/auth_token_missing',
-  not_found = 'https://acrolinx.com/apispec/v1/errors/not_found'
+  HttpErrorStatus = 'http_error_status',
+  HttpConnectionProblem = 'http_connection_problem',
+  Unknown = 'unknown_error',
+  InvalidJson = 'invalid_json',
+
+  // https://github.com/acrolinx/server-api-spec/blob/master/apiary.apib
+  Client = 'https://acrolinx.com/apispec/v1/errors/client',
+  Server = 'https://acrolinx.com/apispec/v1/errors/server',
+  ClientSignatureMissing = 'https://acrolinx.com/apispec/v1/errors/client_signature_missing',
+  ClientSignatureRejected = 'https://acrolinx.com/apispec/v1/errors/client_signature_rejected',
+  Auth = 'https://acrolinx.com/apispec/v1/errors/auth',
+  NotFound = 'https://acrolinx.com/apispec/v1/errors/not_found'
 }
 
 export interface AcrolinxErrorProps {
-  detail: string;
-  status?: number;
   title: string;
+  detail: string;
   type: string;
+  status?: number;
+  reference?: string;
 }
 
 export interface AcrolinxApiError extends AcrolinxErrorProps {
@@ -25,6 +30,7 @@ export class AcrolinxError extends Error implements AcrolinxErrorProps {
   public readonly title: string;
   public readonly detail: string;
   public readonly status?: number;
+  public readonly reference?: string;
 
   public constructor(props: AcrolinxErrorProps) {
     super(props.title);
@@ -32,14 +38,23 @@ export class AcrolinxError extends Error implements AcrolinxErrorProps {
     this.status = props.status;
     this.title = props.title;
     this.detail = props.detail;
+    this.reference = props.reference;
   }
 }
 
 export function wrapUnknownError(error: Error): Promise<any> {
-  throw new AcrolinxError({
-    detail: error.message,
-    title: 'Unknown Error',
-    type: ErrorType.unknownError,
-  });
+  if (error.name === 'FetchError') {
+    throw new AcrolinxError({
+      detail: error.message,
+      title: 'FetchError',
+      type: ErrorType.HttpConnectionProblem,
+    });
+  } else {
+    throw new AcrolinxError({
+      detail: error.message,
+      title: 'Unknown Error',
+      type: ErrorType.Unknown,
+    });
+  }
 }
 

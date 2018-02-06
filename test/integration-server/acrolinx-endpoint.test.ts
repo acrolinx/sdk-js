@@ -21,12 +21,14 @@ function createEndpoint(serverAddress: string) {
 
 describe('e2e - AcrolinxEndpoint', () => {
   describe('errors by bad server address', () => {
+    const LONG_TIME_OUT_MS = 10000;
+
     it('should return an failing promise for 404', async () => {
       const api = createEndpoint(TEST_SERVER_URL + '/not-there');
       try {
         await api.getServerVersion();
       } catch (e) {
-        expect(e.type).toEqual(ErrorType.httpError);
+        expect(e.type).toEqual(ErrorType.HttpErrorStatus);
         expect(e.status).toEqual(404);
       }
       expect.hasAssertions();
@@ -37,7 +39,7 @@ describe('e2e - AcrolinxEndpoint', () => {
       try {
         await api.getServerVersion();
       } catch (e) {
-        expect(e.type).toEqual(ErrorType.unknownError);
+        expect(e.type).toEqual(ErrorType.HttpConnectionProblem);
       }
       expect.hasAssertions();
     });
@@ -47,10 +49,10 @@ describe('e2e - AcrolinxEndpoint', () => {
       try {
         await api.getServerVersion();
       } catch (e) {
-        expect(e.type).toEqual(ErrorType.unknownError);
+        expect(e.type).toEqual(ErrorType.HttpConnectionProblem);
       }
       expect.hasAssertions();
-    });
+    }, LONG_TIME_OUT_MS);
   });
 
   describe('test-latest', () => {
@@ -81,7 +83,7 @@ describe('e2e - AcrolinxEndpoint', () => {
           }
         });
       } catch (e) {
-        expect(e.type).toEqual(ErrorType.client);
+        expect(e.type).toEqual(ErrorType.Client);
       }
       expect.hasAssertions();
     });

@@ -24,7 +24,7 @@ describe('errors', () => {
     try {
       await api.getServerVersion();
     } catch (e) {
-      expect(e.type).toEqual(ErrorType.invalidJson);
+      expect(e.type).toEqual(ErrorType.InvalidJson);
     }
     expect.hasAssertions();
   });
@@ -40,7 +40,7 @@ describe('errors', () => {
         }
       });
     } catch (e) {
-      expect(e.type).toEqual(ErrorType.client);
+      expect(e.type).toEqual(ErrorType.Client);
     }
     expect.hasAssertions();
   });

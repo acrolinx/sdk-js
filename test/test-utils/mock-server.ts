@@ -9,6 +9,7 @@ import {AuthorizationType, SigninPollResult, SigninResult, SigninSuccessResult} 
 import {MockResponseObjectOf, Route} from './common-mocking';
 import {CheckServiceMock} from './mock-server-checking';
 import {
+  AUTH_TOKEN_INVALID,
   AUTH_TOKEN_MISSING,
   CLIENT_SIGNATURE_INVALID,
   CLIENT_SIGNATURE_MISSING,
@@ -135,8 +136,16 @@ export class AcrolinxServerMock {
       return this.createAcrolinxApiErrorResponse(CLIENT_SIGNATURE_MISSING);
     }
 
-    if (!getHeader(opts, HEADER_X_ACROLINX_AUTH) && _.includes(url, '/api/') && !_.includes(url, '/auth/')) {
-      return this.createAcrolinxApiErrorResponse(AUTH_TOKEN_MISSING);
+
+    if (_.includes(url, '/api/') && !_.includes(url, '/auth/')) {
+      const token = getHeader(opts, HEADER_X_ACROLINX_AUTH);
+      if (!token) {
+        console.error('Missing Token', token);
+        return this.createAcrolinxApiErrorResponse(AUTH_TOKEN_MISSING);
+      } else if (token !== DUMMY_AUTH_TOKEN) {
+        console.error('Invalid Token', token);
+        return this.createAcrolinxApiErrorResponse(AUTH_TOKEN_INVALID);
+      }
     }
 
     // console.log('try to match url', url);

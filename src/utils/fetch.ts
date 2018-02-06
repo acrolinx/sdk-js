@@ -20,7 +20,7 @@ export function toJson<T>(res: Response): T | Promise<T> {
     throw new AcrolinxError({
       detail: e.message,
       title: 'Invalid Json',
-      type: ErrorType.invalidJson,
+      type: ErrorType.InvalidJson,
     });
   });
 }
@@ -38,7 +38,7 @@ function createError(res: Response, jsonBody: any | AcrolinxApiError): AcrolinxE
       detail: res.statusText,
       status: res.status,
       title: 'Unknown HTTP Error',
-      type: ErrorType.httpError,
+      type: ErrorType.HttpErrorStatus,
     });
   }
 }
