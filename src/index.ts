@@ -1,7 +1,7 @@
 import {CheckingCapabilities} from './capabilities';
 import {CheckingStatus, CheckRequest, CheckResponse, CheckResult} from './check';
 import {AuthToken} from './common-types';
-import {ErrorType, wrapUnknownError} from './errors';
+import {ErrorType, wrapFetchError} from './errors';
 import {
   HEADER_X_ACROLINX_AUTH, HEADER_X_ACROLINX_BASE_URL, HEADER_X_ACROLINX_CLIENT,
   HEADER_X_ACROLINX_CLIENT_LOCALE
@@ -155,7 +155,7 @@ export class AcrolinxEndpoint {
   private async getJsonFromUrl<T>(url: string, authToken?: AuthToken): Promise<T> {
     return this.fetch(url, {
       headers: this.getCommonHeaders(authToken),
-    }).then(res => handleExpectedJsonResponse<T>(res), wrapUnknownError);
+    }).then(res => handleExpectedJsonResponse<T>(res), wrapFetchError);
   }
 
   private async post<T>(path: string, body: {}, headers: StringMap = {}, authToken?: AuthToken): Promise<T> {
@@ -164,7 +164,7 @@ export class AcrolinxEndpoint {
       body: JSON.stringify(body),
       headers: {...this.getCommonHeaders(authToken), ...headers},
       method: 'POST',
-    }).then(res => handleExpectedJsonResponse<T>(res), wrapUnknownError);
+    }).then(res => handleExpectedJsonResponse<T>(res), wrapFetchError);
   }
 
 

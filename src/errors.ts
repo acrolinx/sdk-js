@@ -42,19 +42,11 @@ export class AcrolinxError extends Error implements AcrolinxErrorProps {
   }
 }
 
-export function wrapUnknownError(error: Error): Promise<any> {
-  if (error.name === 'FetchError') {
-    throw new AcrolinxError({
-      detail: error.message,
-      title: 'FetchError',
-      type: ErrorType.HttpConnectionProblem,
-    });
-  } else {
-    throw new AcrolinxError({
-      detail: error.message,
-      title: 'Unknown Error',
-      type: ErrorType.Unknown,
-    });
-  }
+export function wrapFetchError(error: Error): Promise<any> {
+  throw new AcrolinxError({
+    detail: error.message,
+    title: 'Http Connection Problem',
+    type: ErrorType.HttpConnectionProblem,
+  });
 }
 
