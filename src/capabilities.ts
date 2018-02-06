@@ -1,15 +1,13 @@
 export type GoalId = string;
-export type TermSetId = string;
 export type AudienceId = string;
-export type LanguageId = string;
 export type ContentFormatId = string;
 
 export interface Audience {
   id: AudienceId;
   displayName: string;
-  language: LanguageId;
-  goals: GoalId[];
-  termSets: TermSetId[];
+  language: Language;
+  goals: Goal[];
+  termSets: TermSet[];
   status: AudienceStatus;
 }
 
@@ -20,7 +18,6 @@ export enum AudienceStatus {
 }
 
 export interface Language {
-  id: LanguageId;
   displayName: string;
 }
 
@@ -31,7 +28,6 @@ export interface Goal {
 }
 
 export interface TermSet {
-  id: TermSetId;
   displayName: string;
 }
 
@@ -62,9 +58,6 @@ export enum ReportType {
 
 export interface CheckingCapabilities {
   audiences: Audience[];
-  languages: Language[];
-  goals: Goal[];
-  termSets: TermSet[];
   contentFormats: ContentFormat[];
   contentEncodings: ContentEncoding[];
   checkTypes: CheckType[];

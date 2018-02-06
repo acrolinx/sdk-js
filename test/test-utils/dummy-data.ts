@@ -6,60 +6,54 @@ export const DUMMY_CAPABILITIES: CheckingCapabilities = {
     {
       id: 'aud-1',
       displayName: 'Tom the Technical Type',
-      language: 'en_GB',
-      goals: ['spelling', 'voice.readability', 'term.unsuitable', 'term.admitted'],
-      termSets: ['c58f3889-9466-4fb4-82c7-973a0b4644d9', 'e57bf41b-c706-495c-8664-1020fac9cffb'],
+      language: {
+        displayName: 'English (Great Britain)'
+      },
+      goals:  [
+        {
+          id: 'spelling',
+          displayName: 'Spelling',
+          color: '#f21'
+        },
+        {
+          id: 'voice.readability',
+          displayName: 'Clarity',
+          color: '#f22'
+        },
+        {
+          id: 'term.unsuitable',
+          displayName: 'Unsuitable Term',
+          color: '#f23'
+        },
+        {
+          id: 'term.admitted',
+          displayName: 'Use with caution',
+          color: '#f24'
+        }
+      ],
+      termSets: [
+        {
+          displayName: 'Switches'
+        },
+        {
+          displayName: 'Acrolinx'
+        }
+      ],
       status: AudienceStatus.ready
     },
     {
       id: 'aud-2',
       displayName: 'Randolf Redakteur',
-      language: 'de',
-      goals: ['spelling'],
+      language: {
+        displayName: 'German'
+      },
+      goals: [{
+        id: 'spelling',
+        displayName: 'Spelling',
+        color: '#f21'
+      }],
       termSets: [],
       status: AudienceStatus.loading
-    }
-  ],
-  languages: [
-    {
-      id: 'en_GB',
-      displayName: 'English (Great Britain)'
-    },
-    {
-      id: 'de',
-      displayName: 'German'
-    }
-  ],
-  goals: [
-    {
-      id: 'spelling',
-      displayName: 'Spelling',
-      color: '#f21'
-    },
-    {
-      id: 'voice.readability',
-      displayName: 'Clarity',
-      color: '#f22'
-    },
-    {
-      id: 'term.unsuitable',
-      displayName: 'Unsuitable Term',
-      color: '#f23'
-    },
-    {
-      id: 'term.admitted',
-      displayName: 'Use with caution',
-      color: '#f24'
-    }
-  ],
-  termSets: [
-    {
-      id: 'c58f3889-9466-4fb4-82c7-973a0b4644d9',   // actually the T+ term filter UUID
-      displayName: 'Switches'
-    },
-    {
-      id: 'e57bf41b-c706-495c-8664-1020fac9cffb',
-      displayName: 'Acrolinx'
     }
   ],
   contentFormats: [
@@ -99,9 +93,6 @@ export const DUMMY_CHECK_RESULT: CheckResult = {
   id: '153',
   checkOptions: {
     audienceId: 'aud_1',
-    termSetIds: [
-      'c58f3889-9466-4fb4-82c7-973a0b4644d9'
-    ],
     reportTypes: [
       ReportType.debug,
       ReportType.termharvesting

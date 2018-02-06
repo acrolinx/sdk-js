@@ -6,7 +6,6 @@ import {
   Goal,
   GoalId,
   ReportType,
-  TermSetId
 } from './capabilities';
 import {URL} from './common-types';
 
@@ -28,7 +27,6 @@ export interface CheckRequest {
 
 export interface CheckOptions {
   audienceId?: AudienceId;
-  termSetIds?: TermSetId[];
   reportTypes?: ReportType[];
   checkType?: CheckType;
   partialCheckRanges?: CheckRange[];
