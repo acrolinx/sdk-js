@@ -1,13 +1,14 @@
 import 'cross-fetch/polyfill';
-import {DEVELOPMENT_SIGNATURE} from '../../src';
+import {DEVELOPMENT_SIGNATURE, PollMoreResult} from '../../src';
 import {ErrorType} from '../../src/errors';
 import {AcrolinxEndpoint, isSigninSuccessResult, SigninSuccessResult} from '../../src/index';
 import {SigninLinksResult} from '../../src/signin';
-import {testIf} from '../test-utils/utils';
+import {describeIf, testIf} from '../test-utils/utils';
 
 const TEST_SERVER_URL = 'https://test-latest-ssl.acrolinx.com';
 const SSO_USER_ID = process.env.SSO_USER_ID;
 const SSO_PASSWORD = process.env.SSO_PASSWORD;
+const ACROLINX_API_TOKEN = process.env.ACROLINX_API_TOKEN || '';
 
 function createEndpoint(serverAddress: string) {
   return new AcrolinxEndpoint({
@@ -55,7 +56,7 @@ describe('e2e - AcrolinxEndpoint', () => {
     }, LONG_TIME_OUT_MS);
   });
 
-  describe('test-latest', () => {
+  describe('signin', () => {
     let api: AcrolinxEndpoint;
 
     beforeEach(() => {
@@ -73,6 +74,11 @@ describe('e2e - AcrolinxEndpoint', () => {
       expect(result.interactiveLinkTimeout).toBeGreaterThan(100);
     });
 
+    testIf(ACROLINX_API_TOKEN, 'should return the provided API-Token', async () => {
+      const result = await api.signin({authToken: ACROLINX_API_TOKEN}) as SigninSuccessResult;
+      expect(result.authToken).toBe(ACROLINX_API_TOKEN);
+    });
+
     it('should return an api error for invalid signin poll address', async () => {
       try {
         await api.pollForSignin({
@@ -88,7 +94,7 @@ describe('e2e - AcrolinxEndpoint', () => {
       expect.hasAssertions();
     });
 
-    testIf(!!(SSO_USER_ID || SSO_PASSWORD), 'signin with sso', async () => {
+    testIf(SSO_USER_ID || SSO_PASSWORD, 'signin with sso', async () => {
       const result = await api.signin({
           password: SSO_PASSWORD,
           userId: SSO_USER_ID,
@@ -97,12 +103,24 @@ describe('e2e - AcrolinxEndpoint', () => {
       expect(result.userId).toContain(SSO_USER_ID);
     });
 
-    // skipped because of long polling
-    it.skip('poll for signin', async () => {
+    it('poll for signin', async () => {
       const result = await api.signin() as SigninLinksResult;
       const pollResult = await api.pollForSignin(result);
       expect(isSigninSuccessResult(pollResult)).toBeFalsy();
+      expect((pollResult as PollMoreResult).retryAfter).toBeGreaterThan(0);
     });
   });
 
+  describeIf(ACROLINX_API_TOKEN, 'test-latest with API token', async () => {
+    let api: AcrolinxEndpoint;
+
+    beforeEach(() => {
+      api = createEndpoint(TEST_SERVER_URL);
+    });
+
+    it('should return the checking capabilities', async () => {
+      const result = await api.getCheckingCapabilities(ACROLINX_API_TOKEN);
+      expect(result.audiences.length).toBeGreaterThan(0);
+    });
+  });
 });

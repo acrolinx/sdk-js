@@ -8,7 +8,7 @@
     "node": ">=8.9.4"
   },
   "scripts": {
-    "ci": "npm run build && npm run tslint && npm run testUnitCoverage",
+    "ci": "npm run build && npm run tslint && npm run testUnitCoverage && npm run testIntegrationServer",
     "clean": "rm -rf dist",
     "prepublish": "tsc",
     "build": "tsc",
