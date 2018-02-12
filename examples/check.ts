@@ -1,5 +1,6 @@
 /* tslint:disable:no-console */
 import 'cross-fetch/polyfill';
+import {CheckingStatusState} from '../src/check';
 import {AcrolinxEndpoint} from '../src/index';
 import {EXAMPLE_ACROLINX_ENDPOINT_PROPS} from './common';
 
@@ -17,17 +18,27 @@ async function checkExample() {
 
   const acrolinxEndpoint = new AcrolinxEndpoint({
     ...EXAMPLE_ACROLINX_ENDPOINT_PROPS,
-    serverAddress: 'http://localhost:3000'
   });
 
-  const check = await acrolinxEndpoint.check(authToken, {content: 'Testt Textt'});
+  const capabilities = await acrolinxEndpoint.getCheckingCapabilities(authToken);
+  // console.log(capabilities);
+
+  const check = await acrolinxEndpoint.check(authToken, {
+    checkOptions: {
+      audienceId: capabilities.audiences[0].id,
+    },
+    document: {
+      reference: 'filename.txt'
+    },
+    content: 'Testt Textt'
+  });
 
   let checkingStatus;
   do {
     await waitMs(1000);
     checkingStatus = await acrolinxEndpoint.getCheckingStatus(authToken, check);
     console.log('checkingStatus:', JSON.stringify(checkingStatus, null, 2));
-  } while (checkingStatus.state !== 'done');
+  } while (checkingStatus.state !== CheckingStatusState.success);
 
   const checkResult = await acrolinxEndpoint.getCheckResult(authToken, check);
 

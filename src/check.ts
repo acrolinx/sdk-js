@@ -30,7 +30,7 @@ export interface CheckOptions {
   reportTypes?: ReportType[];
   checkType?: CheckType;
   partialCheckRanges?: CheckRange[];
-  contentFormat: ContentFormatId;
+  contentFormat?: ContentFormatId;
 }
 
 export interface Document {
@@ -66,12 +66,17 @@ export interface CheckResponse {
 export interface CheckingStatus {
   id: CheckId;
   documentId: DocumentId;
-  state: 'done' | '???';
+  state: CheckingStatusState;
   percent: number;
   message: string;
   links: {
     result: URL
   };
+}
+
+export enum CheckingStatusState {
+  success = 'success',
+  started = 'started' // TODO: ????
 }
 
 export interface CheckResult {

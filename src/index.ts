@@ -1,5 +1,5 @@
 import {Audience, CheckingCapabilities, CheckType, ContentEncoding, ContentFormat, ReportType} from './capabilities';
-import {CheckingStatus, CheckRequest, CheckResponse, CheckResult} from './check';
+import {CheckingStatus, CheckingStatusState, CheckRequest, CheckResponse, CheckResult} from './check';
 import {AuthToken} from './common-types';
 import {ErrorType, wrapFetchError} from './errors';
 import {
@@ -32,6 +32,7 @@ export const DEVELOPMENT_SIGNATURE = 'SW50ZWdyYXRpb25EZXZlbG9wbWVudERlbW9Pbmx5';
 
 export {SigninSuccessResult, isSigninLinksResult, PollMoreResult, SigninResult, SigninLinksResult};
 export {AuthToken, CheckingCapabilities, Audience, ErrorType, ContentEncoding, ContentFormat, CheckType, ReportType};
+export {CheckingStatus, CheckingStatusState};
 
 export interface ServerVersionInfo {
   buildDate: string;
@@ -111,7 +112,7 @@ export class AcrolinxEndpoint {
   }
 
   public async check(authToken: AuthToken, req: CheckRequest): Promise<CheckResponse> {
-    return this.post<CheckResponse>('/api/v1/checking/submit', req, {}, authToken);
+    return this.post<CheckResponse>('/api/v1/checking/checks', req, {}, authToken);
   }
 
   public async getCheckingStatus(authToken: AuthToken, check: CheckResponse): Promise<CheckingStatus> {
@@ -119,7 +120,7 @@ export class AcrolinxEndpoint {
   }
 
   public async getCheckResult(authToken: AuthToken, check: CheckResponse): Promise<CheckResult> {
-    return this.getJsonFromPath<CheckResult>(`/api/v1/checking/${check.id}/result`, authToken);
+    return this.getJsonFromPath<CheckResult>(`/api/v1/checking/checks/${check.id}/result`, authToken);
   }
 
   private getSigninRequestHeaders(options: SigninOptions = {}) {

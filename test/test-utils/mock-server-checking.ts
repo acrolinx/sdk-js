@@ -1,6 +1,6 @@
 import * as _ from 'lodash';
 import {CheckingCapabilities} from '../../src';
-import {CheckId, CheckingStatus, CheckRequest, CheckResponse, CheckResult} from '../../src/check';
+import {CheckId, CheckingStatus, CheckingStatusState, CheckRequest, CheckResponse, CheckResult} from '../../src/check';
 import {URL} from '../../src/common-types';
 import {AcrolinxApiError} from '../../src/errors';
 import {Route} from './common-mocking';
@@ -18,16 +18,16 @@ export class Check {
 
   public getCheckingStatus(serverAddress: URL): CheckingStatus {
     const elapsedTimeMs = Date.now() - this.startTime;
-    const state = elapsedTimeMs >= CHECK_TIME_MS ? 'done' : '???';
+    const state = elapsedTimeMs >= CHECK_TIME_MS ? CheckingStatusState.success : CheckingStatusState.started;
     const percent = Math.min(elapsedTimeMs / CHECK_TIME_MS * 100, 100);
     return {
       id: this.id,
       documentId: 'dummyDocumentId',
       state,
       percent,
-      message: state === 'done' ? 'Yeahh Done' : `Still working ${percent}%`,
+      message: state === CheckingStatusState.success ? 'Yeahh Done' : `Still working ${percent}%`,
       links: {
-        result: serverAddress + '/api/v1/checking/' + this.id + '/result'
+        result: serverAddress + '/api/v1/checking/checks/' + this.id + '/result'
       }
     };
   }
@@ -50,17 +50,17 @@ export class CheckServiceMock {
       {
         handler: (_args, opts) => this.submitCheck(opts),
         method: 'POST',
-        path: /api\/v1\/checking\/submit$/,
+        path: /api\/v1\/checking\/checks$/,
       },
       {
         handler: (args) => this.getCheckingStatus(args[1]),
         method: 'GET',
-        path: /api\/v1\/checking\/(.*)\/status$/,
+        path: /api\/v1\/checking\/checks\/(.*)\/status$/,
       },
       {
         handler: (args) => this.getCheckResult(args[1]),
         method: 'GET',
-        path: /api\/v1\/checking\/(.*)\/result/,
+        path: /api\/v1\/checking\/checks\/(.*)\/result/,
       },
     ];
   }
@@ -84,7 +84,7 @@ export class CheckServiceMock {
       return NOT_FOUND_CHECK_ID;
     }
     const status =  check.getCheckingStatus(this.serverAddress);
-    if (status.state !== 'done') {
+    if (status.state !== CheckingStatusState.success) {
         return NOT_FINISHED;
     }
     return {...DUMMY_CHECK_RESULT, id: check.id};
@@ -96,8 +96,8 @@ export class CheckServiceMock {
     return {
       id: check.id,
       links: {
-        status: this.serverAddress + `/api/v1/checking/${check.id}/status`,
-        cancel: this.serverAddress + `/api/v1/checking/${check.id}`
+        status: this.serverAddress + `/api/v1/checking/checks/${check.id}/status`,
+        cancel: this.serverAddress + `/api/v1/checking/checks/${check.id}`
       }
     };
   }
