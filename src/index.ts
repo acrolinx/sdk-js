@@ -1,4 +1,4 @@
-import {Audience, CheckingCapabilities} from './capabilities';
+import {Audience, CheckingCapabilities, ContentFormat, ContentEncoding, ReportType, CheckType} from './capabilities';
 import {CheckingStatus, CheckRequest, CheckResponse, CheckResult} from './check';
 import {AuthToken} from './common-types';
 import {ErrorType, wrapFetchError} from './errors';
@@ -31,7 +31,7 @@ export {setLoggingEnabled} from './utils/logging';
 export const DEVELOPMENT_SIGNATURE = 'SW50ZWdyYXRpb25EZXZlbG9wbWVudERlbW9Pbmx5';
 
 export {SigninSuccessResult, isSigninLinksResult, PollMoreResult, SigninResult, SigninLinksResult};
-export {AuthToken, CheckingCapabilities, Audience, ErrorType};
+export {AuthToken, CheckingCapabilities, Audience, ErrorType, ContentEncoding, ContentFormat, CheckType, ReportType};
 
 export interface ServerVersionInfo {
   buildDate: string;
