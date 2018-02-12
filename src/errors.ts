@@ -19,6 +19,7 @@ export interface AcrolinxErrorProps {
   type: string;
   status?: number;
   reference?: string;
+  cause?: Error;
 }
 
 export interface AcrolinxApiError extends AcrolinxErrorProps {
@@ -31,6 +32,8 @@ export class AcrolinxError extends Error implements AcrolinxErrorProps {
   public readonly detail: string;
   public readonly status?: number;
   public readonly reference?: string;
+  public readonly cause?: Error;
+
 
   public constructor(props: AcrolinxErrorProps) {
     super(props.title);
@@ -39,14 +42,16 @@ export class AcrolinxError extends Error implements AcrolinxErrorProps {
     this.title = props.title;
     this.detail = props.detail;
     this.reference = props.reference;
+    this.cause = props.cause;
   }
 }
 
 export function wrapFetchError(error: Error): Promise<any> {
   throw new AcrolinxError({
-    detail: error.message,
+    detail: `${error.message} (${error.name})`,
     title: 'Http Connection Problem',
     type: ErrorType.HttpConnectionProblem,
+    cause: error
   });
 }
 
