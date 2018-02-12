@@ -1,4 +1,4 @@
-import {Audience, CheckingCapabilities, ContentFormat, ContentEncoding, ReportType, CheckType} from './capabilities';
+import {Audience, CheckingCapabilities, CheckType, ContentEncoding, ContentFormat, ReportType} from './capabilities';
 import {CheckingStatus, CheckRequest, CheckResponse, CheckResult} from './check';
 import {AuthToken} from './common-types';
 import {ErrorType, wrapFetchError} from './errors';
