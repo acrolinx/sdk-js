@@ -76,7 +76,8 @@ export interface CheckingStatus {
 
 export enum CheckingStatusState {
   success = 'success',
-  started = 'started' // TODO: ????
+  started = 'started', // TODO: ????
+  failure = 'failure'
 }
 
 export interface CheckResult {
