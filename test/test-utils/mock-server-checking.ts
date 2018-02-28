@@ -1,11 +1,11 @@
 import * as _ from 'lodash';
 import {CheckingCapabilities} from '../../src';
-import {CheckId, CheckingStatus, CheckingStatusState, CheckRequest, CheckResponse, CheckResult} from '../../src/check';
-import {URL} from '../../src/common-types';
+import {CheckId, CheckRequest, CheckResponse, CheckResultResponse} from '../../src/check';
+import {ProgressResponse, SuccessResponse, URL} from '../../src/common-types';
 import {AcrolinxApiError} from '../../src/errors';
 import {Route} from './common-mocking';
 import {DUMMY_CAPABILITIES, DUMMY_CHECK_RESULT} from './dummy-data';
-import {NOT_FINISHED, NOT_FOUND_CHECK_ID} from './mocked-errors';
+import {NOT_FOUND_CHECK_ID} from './mocked-errors';
 
 const CHECK_TIME_MS = 10 * 1000;
 
@@ -16,22 +16,27 @@ export class Check {
   constructor(public request: CheckRequest) {
   }
 
-  public getCheckingStatus(serverAddress: URL): CheckingStatus {
+  public getCheckingResult(serverAddress: URL): CheckResultResponse {
     const elapsedTimeMs = Date.now() - this.startTime;
-    const state = elapsedTimeMs >= CHECK_TIME_MS ? CheckingStatusState.success : CheckingStatusState.started;
-    const percent = Math.min(elapsedTimeMs / CHECK_TIME_MS * 100, 100);
-    return {
-      id: this.id,
-      documentId: 'dummyDocumentId',
-      state,
-      percent,
-      message: state === CheckingStatusState.success ? 'Yeahh Done' : `Still working ${percent}%`,
-      links: {
-        result: serverAddress + '/api/v1/checking/checks/' + this.id + '/result'
-      }
-    };
-  }
+    if (elapsedTimeMs < CHECK_TIME_MS) {
+      const percent = Math.min(elapsedTimeMs / CHECK_TIME_MS * 100, 100);
+      const progressResponse: ProgressResponse = {
+        progress: {
+          percent,
+          message: `Still working ${percent}%`,
+          retryAfter: 1
+        },
+        links: {
+          poll: serverAddress + '/api/v1/checking/checks/' + this.id
 
+        }
+      };
+      return progressResponse;
+    } else {
+      return {data: {...DUMMY_CHECK_RESULT, id: this.id}, links: {}};
+
+    }
+  }
 }
 
 export class CheckServiceMock {
@@ -53,50 +58,32 @@ export class CheckServiceMock {
         path: /api\/v1\/checking\/checks$/,
       },
       {
-        handler: (args) => this.getCheckingStatus(args[1]),
-        method: 'GET',
-        path: /api\/v1\/checking\/checks\/(.*)\/status$/,
-      },
-      {
         handler: (args) => this.getCheckResult(args[1]),
         method: 'GET',
-        path: /api\/v1\/checking\/checks\/(.*)\/result/,
+        path: /api\/v1\/checking\/checks\/(.*)/,
       },
     ];
   }
 
-  public getCheckingCapabilities(): CheckingCapabilities {
-    return DUMMY_CAPABILITIES;
+  public getCheckingCapabilities(): SuccessResponse<CheckingCapabilities> {
+    return {data: DUMMY_CAPABILITIES, links: {}};
   }
 
-  public getCheckingStatus(checkId: CheckId): CheckingStatus | AcrolinxApiError {
-    const check = _.find(this.checks, {id: checkId});
-    if (check) {
-      return check.getCheckingStatus(this.serverAddress);
-    } else {
-      return NOT_FOUND_CHECK_ID;
-    }
-  }
-
-  public getCheckResult(checkId: CheckId): CheckResult | AcrolinxApiError {
+  public getCheckResult(checkId: CheckId): CheckResultResponse | AcrolinxApiError {
     const check = _.find(this.checks, {id: checkId});
     if (!check) {
       return NOT_FOUND_CHECK_ID;
     }
-    const status =  check.getCheckingStatus(this.serverAddress);
-    if (status.state !== CheckingStatusState.success) {
-        return NOT_FINISHED;
-    }
-    return {...DUMMY_CHECK_RESULT, id: check.id};
+    return check.getCheckingResult(this.serverAddress);
   }
 
   private submitCheck(opts: RequestInit): CheckResponse {
     const check = new Check(JSON.parse(opts.body as string));
     this.checks.push(check);
     return {
-      id: check.id,
+      data: {id: check.id},
       links: {
-        status: this.serverAddress + `/api/v1/checking/checks/${check.id}/status`,
+        result: this.serverAddress + `/api/v1/checking/checks/${check.id}`,
         cancel: this.serverAddress + `/api/v1/checking/checks/${check.id}`
       }
     };

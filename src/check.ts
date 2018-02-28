@@ -7,7 +7,7 @@ import {
   GoalId,
   ReportType,
 } from './capabilities';
-import {URL} from './common-types';
+import {AsyncApiResponse, SuccessResponse, URL} from './common-types';
 
 export interface CheckRange {
   begin: number;
@@ -54,31 +54,19 @@ export interface MetaData {
 
 export type CheckId = string;
 
-export interface CheckResponse {
+export interface CheckResponseData {
   id: CheckId;
+}
+
+export interface CheckResponse extends SuccessResponse<CheckResponseData> {
   links: {
-    status: URL;
+    result: URL;
     cancel: URL;
   };
   // Lots of stuff that looks similar to CheckRequest
 }
 
-export interface CheckingStatus {
-  id: CheckId;
-  documentId: DocumentId;
-  state: CheckingStatusState;
-  percent: number;
-  message: string;
-  links: {
-    result: URL
-  };
-}
-
-export enum CheckingStatusState {
-  success = 'success',
-  started = 'started', // TODO: ????
-  failure = 'failure'
-}
+export type CheckResultResponse  = AsyncApiResponse<CheckResult>;
 
 export interface CheckResult {
   id: CheckId;

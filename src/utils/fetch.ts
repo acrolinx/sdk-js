@@ -1,13 +1,23 @@
 import {AcrolinxApiError, AcrolinxError, ErrorType} from '../errors';
 
+
+// TODO: Simplify as soon as all API Urls wraps the error
 export async function handleExpectedJsonResponse<T>(res: Response): Promise<T> {
   if (200 <= res.status && res.status < 300) {
-    return toJson<T>(res);
+    const jsonResult = await toJson<any>(res);
+    if (jsonResult.error) {
+      throw createError(res, jsonResult.error);
+    }
+    return jsonResult;
   } else {
     let error;
     try {
-      const jsonError = await toJson<AcrolinxApiError>(res);
-      error = createError(res, jsonError);
+      const jsonError = await toJson<any>(res);
+      if (jsonError.error) {
+        error = createError(res, jsonError.error);
+      } else {
+        error = createError(res, jsonError);
+      }
     } catch {
       error = createError(res, {});
     }
@@ -35,7 +45,7 @@ function createError(res: Response, jsonBody: any | AcrolinxApiError): AcrolinxE
     });
   } else {
     return new AcrolinxError({
-      detail: res.statusText,
+      detail: res.statusText + ':' + JSON.stringify(jsonBody),
       status: res.status,
       title: 'Unknown HTTP Error',
       type: ErrorType.HttpErrorStatus,

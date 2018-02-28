@@ -5,12 +5,13 @@ export enum ErrorType {
   InvalidJson = 'invalid_json',
 
   // https://github.com/acrolinx/server-api-spec/blob/master/apiary.apib
-  Client = 'https://acrolinx.com/apispec/v1/errors/client',
-  Server = 'https://acrolinx.com/apispec/v1/errors/server',
-  ClientSignatureMissing = 'https://acrolinx.com/apispec/v1/errors/client_signature_missing',
-  ClientSignatureRejected = 'https://acrolinx.com/apispec/v1/errors/client_signature_rejected',
-  Auth = 'https://acrolinx.com/apispec/v1/errors/auth',
-  NotFound = 'https://acrolinx.com/apispec/v1/errors/not_found'
+  Client = 'client',
+  Server = 'server',
+  ClientSignatureMissing = 'client_signature_missing',
+  ClientSignatureRejected = 'client_signature_rejected',
+  Auth = 'auth',
+  SSO = 'sso',
+  NotFound = 'not_found'
 }
 
 export interface AcrolinxErrorProps {

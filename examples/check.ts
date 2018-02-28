@@ -1,6 +1,6 @@
 /* tslint:disable:no-console */
 import 'cross-fetch/polyfill';
-import {CheckingStatusState} from '../src/check';
+import {CheckResultResponse} from '../src/check';
 import {AcrolinxEndpoint} from '../src/index';
 import {EXAMPLE_ACROLINX_ENDPOINT_PROPS} from './common';
 
@@ -10,7 +10,8 @@ export function waitMs(ms: number) {
 
 
 async function checkExample() {
-  const authToken = process.argv[2];
+  const acrolinxAddress = process.argv[2];
+  const authToken = process.argv[3];
 
   if (!authToken) {
     console.error('Missing AuthToken');
@@ -18,10 +19,12 @@ async function checkExample() {
 
   const acrolinxEndpoint = new AcrolinxEndpoint({
     ...EXAMPLE_ACROLINX_ENDPOINT_PROPS,
+    serverAddress: acrolinxAddress,
+    // enableHttpLogging: true,
   });
 
   const capabilities = await acrolinxEndpoint.getCheckingCapabilities(authToken);
-  // console.log(capabilities);
+  console.log(capabilities);
 
   const check = await acrolinxEndpoint.check(authToken, {
     checkOptions: {
@@ -32,17 +35,16 @@ async function checkExample() {
     },
     content: 'Testt Textt'
   });
+  console.log('check', check);
 
-  let checkingStatus;
+  let checkResultOrProgress: CheckResultResponse;
   do {
     await waitMs(1000);
-    checkingStatus = await acrolinxEndpoint.getCheckingStatus(authToken, check);
-    console.log('checkingStatus:', JSON.stringify(checkingStatus, null, 2));
-  } while (checkingStatus.state !== CheckingStatusState.success);
+    checkResultOrProgress = await acrolinxEndpoint.pollForCheckResult(authToken, check);
+    console.log('checkResultOrProgress:', JSON.stringify(checkResultOrProgress, null, 2));
+  } while ('progress' in checkResultOrProgress);
 
-  const checkResult = await acrolinxEndpoint.getCheckResult(authToken, check);
-
-  console.log('checkResult:', JSON.stringify(checkResult, null, 2));
+  console.log('checkResult:', JSON.stringify(checkResultOrProgress, null, 2));
 
 }
 

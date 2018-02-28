@@ -1,6 +1,6 @@
 import {Audience, CheckingCapabilities, CheckType, ContentEncoding, ContentFormat, ReportType} from './capabilities';
-import {CheckingStatus, CheckingStatusState, CheckRequest, CheckResponse, CheckResult} from './check';
-import {AuthToken} from './common-types';
+import {CheckRequest, CheckResponse, CheckResultResponse} from './check';
+import {AuthToken, SuccessResponse} from './common-types';
 import {ErrorType, wrapFetchError} from './errors';
 import {
   HEADER_X_ACROLINX_AUTH,
@@ -32,7 +32,6 @@ export const DEVELOPMENT_SIGNATURE = 'SW50ZWdyYXRpb25EZXZlbG9wbWVudERlbW9Pbmx5';
 
 export {SigninSuccessResult, isSigninLinksResult, PollMoreResult, SigninResult, SigninLinksResult};
 export {AuthToken, CheckingCapabilities, Audience, ErrorType, ContentEncoding, ContentFormat, CheckType, ReportType};
-export {CheckingStatus, CheckingStatusState};
 
 export interface ServerVersionInfo {
   buildDate: string;
@@ -108,19 +107,17 @@ export class AcrolinxEndpoint {
   }
 
   public async getCheckingCapabilities(authToken: AuthToken): Promise<CheckingCapabilities> {
-    return this.getJsonFromPath<CheckingCapabilities>('/api/v1/checking/capabilities', authToken);
+    const result = await this.getJsonFromPath<SuccessResponse<CheckingCapabilities>>(
+      '/api/v1/checking/capabilities', authToken);
+    return result.data;
   }
 
   public async check(authToken: AuthToken, req: CheckRequest): Promise<CheckResponse> {
     return this.post<CheckResponse>('/api/v1/checking/checks', req, {}, authToken);
   }
 
-  public async getCheckingStatus(authToken: AuthToken, check: CheckResponse): Promise<CheckingStatus> {
-    return this.getJsonFromUrl<CheckingStatus>(check.links.status, authToken);
-  }
-
-  public async getCheckResult(authToken: AuthToken, check: CheckResponse): Promise<CheckResult> {
-    return this.getJsonFromPath<CheckResult>(`/api/v1/checking/checks/${check.id}/result`, authToken);
+  public async pollForCheckResult(authToken: AuthToken, check: CheckResponse): Promise<CheckResultResponse> {
+    return this.getJsonFromUrl<CheckResultResponse>(check.links.result, authToken);
   }
 
   private getSigninRequestHeaders(options: SigninOptions = {}) {

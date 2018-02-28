@@ -15,7 +15,7 @@
     "runExample": "tsc && node dist/examples/get-server-version.js",
     "runExampleSignin": "tsc && node dist/examples/signin.js",
     "runExampleGetCheckingCapabilitites": "tsc && node dist/examples/get-checking-capabilities.js dummyToken",
-    "runExampleCheck": "tsc && node dist/examples/check.js dummyToken",
+    "runExampleCheckMocked": "tsc && node dist/examples/check.js http://localhost:3000 dummyAuthToken",
     "runMockServer": "tsc && node dist/test/test-utils/mock-server-http.js",
     "test": "jest",
     "testCoverage": "jest --coverage",
@@ -43,7 +43,7 @@
     "lodash": "^4.17.4",
     "ts-jest": "^22.0.1",
     "tslint": "5.9.1",
-    "typescript": "2.7.1"
+    "typescript": "2.7.2"
   },
   "dependencies": {},
   "jest": {

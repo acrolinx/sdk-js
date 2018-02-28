@@ -42,11 +42,3 @@ export const NOT_FOUND_CHECK_ID = {
   title: 'Not found CheckId',
   type: ErrorType.NotFound,
 };
-
-export const NOT_FINISHED = {
-  detail: 'Not finished',
-  status: 404,
-  title: 'Not finished',
-  type: ErrorType.Client,
-};
-
