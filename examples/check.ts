@@ -39,9 +39,11 @@ async function checkExample() {
 
   let checkResultOrProgress: CheckResultResponse;
   do {
-    await waitMs(1000);
     checkResultOrProgress = await acrolinxEndpoint.pollForCheckResult(authToken, check);
     console.log('checkResultOrProgress:', JSON.stringify(checkResultOrProgress, null, 2));
+    if ('progress' in checkResultOrProgress) {
+      await waitMs(checkResultOrProgress.progress.retryAfter * 1000);
+    }
   } while ('progress' in checkResultOrProgress);
 
   console.log('checkResult:', JSON.stringify(checkResultOrProgress, null, 2));
