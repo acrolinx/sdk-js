@@ -3,6 +3,7 @@ import {DEVELOPMENT_SIGNATURE, PollMoreResult} from '../../src';
 import {ErrorType} from '../../src/errors';
 import {AcrolinxEndpoint, isSigninSuccessResult, SigninSuccessResult} from '../../src/index';
 import {SigninLinksResult} from '../../src/signin';
+import {resetUserMetaData} from '../test-utils/meta-data';
 import {describeIf, testIf} from '../test-utils/utils';
 
 const TEST_SERVER_URL = 'https://test-latest-ssl.acrolinx.com';
@@ -114,6 +115,12 @@ describe('e2e - AcrolinxEndpoint', () => {
   describeIf(ACROLINX_API_TOKEN, 'test-latest with API token', async () => {
     let api: AcrolinxEndpoint;
 
+    beforeAll(async () => {
+      if (ACROLINX_API_TOKEN) {
+        return resetUserMetaData(createEndpoint(TEST_SERVER_URL), ACROLINX_API_TOKEN);
+      }
+    });
+
     beforeEach(() => {
       api = createEndpoint(TEST_SERVER_URL);
     });
@@ -121,6 +128,32 @@ describe('e2e - AcrolinxEndpoint', () => {
     it('should return the checking capabilities', async () => {
       const result = await api.getCheckingCapabilities(ACROLINX_API_TOKEN);
       expect(result.audiences.length).toBeGreaterThan(0);
+    });
+
+    it('can check', async () => {
+      const capabilities = await api.getCheckingCapabilities(ACROLINX_API_TOKEN);
+
+      const check = await api.check(ACROLINX_API_TOKEN, {
+        checkOptions: {
+          audienceId: capabilities.audiences[0].id,
+        },
+        document: {
+          reference: 'filename.txt'
+        },
+        content: 'Testt Textt'
+      });
+
+      let checkResultOrProgress;
+      do {
+        checkResultOrProgress = await api.pollForCheckResult(ACROLINX_API_TOKEN, check);
+        if ('progress' in checkResultOrProgress) {
+          expect(checkResultOrProgress.progress.percent).toBeGreaterThanOrEqual(0);
+          expect(checkResultOrProgress.progress.percent).toBeLessThanOrEqual(100);
+          // We could wait for checkResultOrProgress.progress.retryAfter but this would slow down the test.
+        }
+      } while ('progress' in checkResultOrProgress);
+
+      expect(checkResultOrProgress.data.goals.length).toBeGreaterThan(0);
     });
   });
 });

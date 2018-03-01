@@ -3,11 +3,12 @@ import {CheckRequest, CheckResponse, CheckResultResponse} from './check';
 import {AuthToken, SuccessResponse} from './common-types';
 import {ErrorType, wrapFetchError} from './errors';
 import {
-  HEADER_X_ACROLINX_AUTH,
+  HEADER_X_ACROLINX_AUTH, HEADER_X_ACROLINX_AUTH_OLD,
   HEADER_X_ACROLINX_BASE_URL,
   HEADER_X_ACROLINX_CLIENT,
   HEADER_X_ACROLINX_CLIENT_LOCALE
 } from './headers';
+import {MetaDataResponse, MetaDataValueMap} from './meta-data';
 
 import {
   isSigninLinksResult,
@@ -87,10 +88,6 @@ export class AcrolinxEndpoint {
   constructor(private readonly props: AcrolinxEndpointProps) {
   }
 
-  public async getServerVersion(): Promise<ServerVersionInfo> {
-    return this.getJsonFromPath<ServerVersionInfo>('/iq/services/v3/rest/core/serverVersion');
-  }
-
   public async signin(options: SigninOptions = {}): Promise<SigninResult> {
     const signinRequestBody: SigninRequestBody = {clientName: this.props.client.name};
     return this.post<SigninResult>('/api/v1/auth/sign-ins', signinRequestBody,
@@ -120,6 +117,29 @@ export class AcrolinxEndpoint {
     return this.getJsonFromUrl<CheckResultResponse>(check.links.result, authToken);
   }
 
+  // Here begin some calls to the old API
+  // TODO: Remove when no old API calls are needed anymore
+
+  public async getServerVersion(): Promise<ServerVersionInfo> {
+    return this.getJsonFromPath<ServerVersionInfo>('/iq/services/v3/rest/core/serverVersion');
+  }
+
+  public async getUserMetaData(authToken: AuthToken, username: string): Promise<MetaDataResponse> {
+    return this.getJsonFromPath<MetaDataResponse>('/iq/services/v2/rest/metadata/user/' + username, authToken);
+  }
+
+  public async saveUserMetaData(authToken: AuthToken, username: string, valueMap: MetaDataValueMap): Promise<void> {
+    try {
+      await this.post('/iq/services/v2/rest/metadata/user/update/' + username, {metaData: valueMap}, {}, authToken);
+    } catch (error) {
+      if (error.type !== ErrorType.InvalidJson) {
+        throw error;
+      }
+    }
+  }
+
+  // Here end some calls to the old API
+
   private getSigninRequestHeaders(options: SigninOptions = {}) {
     if (hasAuthToken(options)) {
       return {[HEADER_X_ACROLINX_AUTH]: options.authToken};
@@ -144,6 +164,8 @@ export class AcrolinxEndpoint {
     }
     if (authToken) {
       headers[HEADER_X_ACROLINX_AUTH] = authToken;
+      // TODO: Remove when no old API calls are needed anymore
+      headers[HEADER_X_ACROLINX_AUTH_OLD] = authToken;
     }
     return headers;
   }
