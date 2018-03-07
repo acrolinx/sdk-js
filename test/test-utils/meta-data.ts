@@ -6,12 +6,12 @@ export async function resetUserMetaData(acrolinxEndpoint: AcrolinxEndpoint, toke
     throw new Error('Invalid token ' + token);
   }
 
-  const userMetaData = await acrolinxEndpoint.getUserMetaData(token, signinResult.userId);
+  const userMetaData = await acrolinxEndpoint.getUserMetaData(token, signinResult.data.userId);
 
   const metaDataValueMap: {[index: string]: string} = {};
   for (const field of userMetaData.fieldDefinitions) {
     metaDataValueMap[field.id] = (field.type === 'selection') ? field.options[0] : 'Text';
   }
 
-  await acrolinxEndpoint.saveUserMetaData(token, signinResult.userId, metaDataValueMap);
+  await acrolinxEndpoint.saveUserMetaData(token, signinResult.data.userId, metaDataValueMap);
 }

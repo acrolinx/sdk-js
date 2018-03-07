@@ -199,7 +199,7 @@ export class AcrolinxServerMock {
     const id = _.uniqueId('signin-id-');
     this.signinIds[id] = {};
     return {
-      interactiveLinkTimeout: DUMMY_INTERACTIVE_LINK_TIMEOUT,
+      data: {interactiveLinkTimeout: DUMMY_INTERACTIVE_LINK_TIMEOUT},
       links: {
         interactive: baseUrl + DUMMY_SIGNIN_LINK_PATH_INTERACTIVE + id,
         poll: baseUrl + DUMMY_SIGNIN_LINK_PATH_POLL + id,
@@ -222,7 +222,7 @@ export class AcrolinxServerMock {
       };
     } else {
       return {
-        body: {retryAfter: 1},
+        body: {progress: {percent: 0, message: 'bla', retryAfter: 1}, links: {poll: 'dummmy'}},
         headers: {'retry-after': '' + DUMMY_RETRY_AFTER},
         status: 202,
       };
@@ -245,11 +245,14 @@ export class AcrolinxServerMock {
 
   private createLoginSuccessResult(authorizedUsing: AuthorizationType): SigninSuccessResult {
     return {
-      authToken: DUMMY_AUTH_TOKEN,
-      authorizedUsing,
-      links: {},
-      privileges: [],
-      userId: DUMMY_USER_ID,
+      data: {
+        authToken: DUMMY_AUTH_TOKEN,
+        authorizedUsing,
+        links: {},
+        privileges: [],
+        userId: DUMMY_USER_ID,
+      },
+      links: {}
     };
   }
 

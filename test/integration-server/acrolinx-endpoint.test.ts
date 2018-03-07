@@ -13,6 +13,7 @@ const ACROLINX_API_TOKEN = process.env.ACROLINX_API_TOKEN || '';
 
 function createEndpoint(serverAddress: string) {
   return new AcrolinxEndpoint({
+    enableHttpLogging: true,
     client: {
       name: 'TestClient',
       signature: DEVELOPMENT_SIGNATURE,
@@ -72,18 +73,18 @@ describe('e2e - AcrolinxEndpoint', () => {
     it('should return the signin links', async () => {
       const result = await api.signin() as SigninLinksResult;
       expect(result.links.interactive).toContain(TEST_SERVER_URL);
-      expect(result.interactiveLinkTimeout).toBeGreaterThan(100);
+      expect(result.data.interactiveLinkTimeout).toBeGreaterThan(100);
     });
 
     testIf(ACROLINX_API_TOKEN, 'should return the provided API-Token', async () => {
       const result = await api.signin({authToken: ACROLINX_API_TOKEN}) as SigninSuccessResult;
-      expect(result.authToken).toBe(ACROLINX_API_TOKEN);
+      expect(result.data.authToken).toBe(ACROLINX_API_TOKEN);
     });
 
     it('should return an api error for invalid signin poll address', async () => {
       try {
         await api.pollForSignin({
-          interactiveLinkTimeout: 0,
+          data: {interactiveLinkTimeout: 0},
           links: {
             interactive: 'dummy',
             poll: TEST_SERVER_URL + '/api/v1/auth/sign-ins/0ddece9c-464a-442b-8a5d-d2f242d54c81'
@@ -101,14 +102,14 @@ describe('e2e - AcrolinxEndpoint', () => {
           userId: SSO_USER_ID,
         }
       ) as SigninSuccessResult;
-      expect(result.userId).toContain(SSO_USER_ID);
+      expect(result.data.userId).toContain(SSO_USER_ID);
     });
 
     it('poll for signin', async () => {
       const result = await api.signin() as SigninLinksResult;
       const pollResult = await api.pollForSignin(result);
       expect(isSigninSuccessResult(pollResult)).toBeFalsy();
-      expect((pollResult as PollMoreResult).retryAfter).toBeGreaterThan(0);
+      expect((pollResult as PollMoreResult).progress.retryAfter).toBeGreaterThan(0);
     });
   });
 

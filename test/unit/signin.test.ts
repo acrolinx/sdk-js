@@ -29,13 +29,13 @@ describe('signin', () => {
     const result = await endpoint.signin() as SigninLinksResult;
     expect(isSigninLinksResult(result)).toBeTruthy();
     expect(_.startsWith(result.links.interactive, DUMMY_SERVER_URL + DUMMY_SIGNIN_LINK_PATH_INTERACTIVE)).toBeTruthy();
-    expect(result.interactiveLinkTimeout).toEqual(DUMMY_INTERACTIVE_LINK_TIMEOUT);
+    expect(result.data.interactiveLinkTimeout).toEqual(DUMMY_INTERACTIVE_LINK_TIMEOUT);
   });
 
   it('should return the provided auth token if valid', async () => {
     const result = await endpoint.signin({authToken: DUMMY_AUTH_TOKEN}) as SigninLinksResult;
     if (isSigninSuccessResult(result)) {
-      expect(result.authToken).toEqual(DUMMY_AUTH_TOKEN);
+      expect(result.data.authToken).toEqual(DUMMY_AUTH_TOKEN);
     } else {
       expect(isSigninSuccessResult(result)).toBeTruthy();
     }
@@ -46,13 +46,13 @@ describe('signin', () => {
 
     const pollResult1 = await endpoint.pollForSignin(signinLinks) as PollMoreResult;
     expect(isSigninSuccessResult(pollResult1)).toBeFalsy();
-    expect(pollResult1.retryAfter).toEqual(DUMMY_RETRY_AFTER);
+    expect(pollResult1.progress.retryAfter).toEqual(DUMMY_RETRY_AFTER);
 
     mockedAcrolinxServer.fakeSignIn();
 
     const signinSuccess = await endpoint.pollForSignin(signinLinks) as SigninSuccessResult;
     expect(isSigninSuccessResult(signinSuccess)).toBeTruthy();
-    expect(signinSuccess.authToken).toEqual(DUMMY_AUTH_TOKEN);
+    expect(signinSuccess.data.authToken).toEqual(DUMMY_AUTH_TOKEN);
   });
 
 });

@@ -22,7 +22,8 @@ async function metaDataExample() {
     throw new Error('Invalid token ' + accessToken);
   }
 
-  const userMetaData = await acrolinxEndpoint.getUserMetaData(accessToken, signinResult.userId);
+  const username = signinResult.data.userId;
+  const userMetaData = await acrolinxEndpoint.getUserMetaData(accessToken, username);
   console.log(userMetaData);
 
   const metaDataValueMap: {[index: string]: string} = {};
@@ -30,9 +31,9 @@ async function metaDataExample() {
     metaDataValueMap[field.id] = (field.type === 'selection') ? field.options[0] : 'Text';
   }
 
-  await acrolinxEndpoint.saveUserMetaData(accessToken, signinResult.userId, metaDataValueMap);
+  await acrolinxEndpoint.saveUserMetaData(accessToken, username, metaDataValueMap);
 
-  const newUserMetaData = await acrolinxEndpoint.getUserMetaData(accessToken, signinResult.userId);
+  const newUserMetaData = await acrolinxEndpoint.getUserMetaData(accessToken, username);
   console.log(newUserMetaData);
 }
 

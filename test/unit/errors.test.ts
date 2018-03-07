@@ -33,7 +33,7 @@ describe('errors', () => {
     const api = new AcrolinxEndpoint(DUMMY_ENDPOINT_PROPS);
     try {
       await api.pollForSignin({
-        interactiveLinkTimeout: 0,
+        data: {interactiveLinkTimeout: 0},
         links: {
           interactive: 'dummy',
           poll: DUMMY_ENDPOINT_PROPS.serverAddress + '/api/v1/auth/sign-ins/0ddece9c-464a-442b-8a5d-d2f242d54c81'

@@ -17,20 +17,20 @@ async function signInExample() {
     }
 
     console.log(`Please signin at "${loginResult.links.interactive}"
-     within ${loginResult.interactiveLinkTimeout} seconds!`);
+     within ${loginResult.data.interactiveLinkTimeout} seconds!`);
     let pollResult = await acrolinxEndpoint.pollForSignin(loginResult);
 
     while (!isSigninSuccessResult(pollResult)) {
-      console.log('Polling...', pollResult.retryAfter);
+      console.log('Polling...', pollResult.progress.retryAfter);
       pollResult = await acrolinxEndpoint.pollForSignin(loginResult, pollResult);
     }
 
     console.log('Success:', pollResult);
-    console.log('authToken:', pollResult.authToken);
-    console.log('User:', pollResult.userId);
+    console.log('authToken:', pollResult.data.authToken);
+    console.log('User:', pollResult.data.userId);
   } else {
     console.log('loginResult', loginResult);
-    console.log(`Your are already signed as "${loginResult.userId}"`);
+    console.log(`Your are already signed as "${loginResult.data.userId}"`);
   }
 }
 

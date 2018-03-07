@@ -1,10 +1,8 @@
-import {AuthToken} from './common-types';
+import {ApiResponse, AsyncApiResponse, AuthToken, ProgressResponse} from './common-types';
 
-export interface PollMoreResult {
-  retryAfter: number;
-}
+export type PollMoreResult = ProgressResponse;
 
-export type SigninPollResult = SigninSuccessResult | PollMoreResult;
+export type SigninPollResult = AsyncApiResponse<SigninSuccessData>;
 
 export function isSigninLinksResult(signinResult: SigninResult): signinResult is SigninLinksResult {
   return !!((signinResult as SigninLinksResult).links.interactive);
@@ -13,7 +11,8 @@ export function isSigninLinksResult(signinResult: SigninResult): signinResult is
 export function isSigninSuccessResult(signinResult: SigninSuccessResult
   | PollMoreResult | SigninLinksResult
   | undefined): signinResult is SigninSuccessResult {
-  return !!(signinResult && (signinResult as SigninSuccessResult).authToken);
+  const asSigninSuccessResult = signinResult as SigninSuccessResult;
+  return !!(asSigninSuccessResult && asSigninSuccessResult.data && asSigninSuccessResult.data.authToken);
 }
 
 export interface SigninRequestBody {
@@ -22,13 +21,13 @@ export interface SigninRequestBody {
 
 export type SigninResult = SigninLinksResult | SigninSuccessResult;
 
-export interface SigninLinksResult {
-  interactiveLinkTimeout: number;
+export interface SigninLinksResult extends ApiResponse<{ interactiveLinkTimeout: number }> {
   links: {
     interactive: string;
     poll: string;
   };
 }
+
 
 export enum AuthorizationType {
   ACROLINX_SSO = 'ACROLINX_SSO',
@@ -36,7 +35,10 @@ export enum AuthorizationType {
   ACROLINX_TOKEN = 'ACROLINX_TOKEN'
 }
 
-export interface SigninSuccessResult {
+export interface SigninSuccessResult extends ApiResponse<SigninSuccessData> {
+}
+
+export interface SigninSuccessData {
   authToken: AuthToken;
   userId: string;
   privileges: string[];

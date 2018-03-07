@@ -96,9 +96,9 @@ export class AcrolinxEndpoint {
 
   public async pollForSignin(signinLinks: SigninLinksResult,
                              lastPollResult?: PollMoreResult): Promise<SigninPollResult> {
-    if (lastPollResult && lastPollResult.retryAfter) {
-      logging.log('Waiting before retry', lastPollResult.retryAfter);
-      await waitMs(lastPollResult.retryAfter * 1000);
+    if (lastPollResult && lastPollResult.progress.retryAfter) {
+      logging.log('Waiting before retry', lastPollResult.progress.retryAfter);
+      await waitMs(lastPollResult.progress.retryAfter * 1000);
     }
     return this.getJsonFromUrl<SigninPollResult>(signinLinks.links.poll);
   }
