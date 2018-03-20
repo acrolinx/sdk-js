@@ -444,16 +444,11 @@ export const DUMMY_CHECK_RESULT: CheckResult = {
       url: 'https://kis.example.com/info?projectId=52351235'
     }
   ],
-  reports: [
+  reports:
     {
-      reportType: 'scorecard.html',
-      link: 'https://tenant.acrolinx.cloud/output/en/abcdef_1_report.html'
+      scorecard_html: 'https://tenant.acrolinx.cloud/output/en/abcdef_1_report.html',
+      scorecard_xml: 'https://tenant.acrolinx.cloud/output/en/abcdef_1_report.xml'
     },
-    {
-      reportType: 'scorecard.xml',
-      link: 'https://tenant.acrolinx.cloud/output/en/abcdef_1_report.xml'
-    }
-  ],
   actions: [
     {
       id: 'termContributionForm',

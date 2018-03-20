@@ -90,10 +90,11 @@ export interface CheckResult {
     termContribution: URL
     deleteScorecard: URL
   };
-  reports: Array<{
-    reportType: ReportType | string
-    link: URL
-  }>;
+  reports:
+    {
+      scorecard_html?: URL;
+      scorecard_xml?:URL;
+    }
 }
 
 export interface KeywordsSection {
