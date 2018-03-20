@@ -92,9 +92,9 @@ export interface CheckResult {
   };
   reports:
     {
-      scorecard_html?: URL;
-      scorecard_xml?:URL;
-    }
+      scorecard_html?: URL
+      scorecard_xml?: URL
+    };
 }
 
 export interface KeywordsSection {
