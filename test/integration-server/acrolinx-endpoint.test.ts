@@ -91,7 +91,7 @@ describe('e2e - AcrolinxEndpoint', () => {
           }
         });
       } catch (e) {
-        expect(e.type).toEqual(ErrorType.Client);
+        expect(e.type).toEqual(ErrorType.SigninTimedOut);
       }
       expect.hasAssertions();
     });

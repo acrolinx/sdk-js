@@ -11,7 +11,8 @@ export enum ErrorType {
   ClientSignatureRejected = 'client_signature_rejected',
   Auth = 'auth',
   SSO = 'sso',
-  NotFound = 'not_found'
+  NotFound = 'not_found',
+  SigninTimedOut = 'interactive_sign_in_timed_out'
 }
 
 export interface AcrolinxErrorProps {
