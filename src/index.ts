@@ -117,6 +117,11 @@ export class AcrolinxEndpoint {
     return this.getJsonFromUrl<CheckResultResponse>(check.links.result, authToken);
   }
 
+  // TODO (fp) Type Result
+  public async getLinkToAggregatedReport(authToken: AuthToken, batchId: string): Promise<any>{
+    return this.getJsonFromPath<any>('/api/v1/checking/aggregation/' + batchId, authToken);
+  }
+
   // Here begin some calls to the old API
   // TODO: Remove when no old API calls are needed anymore
 
