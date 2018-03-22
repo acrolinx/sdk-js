@@ -1,5 +1,5 @@
 import {Audience, CheckingCapabilities, CheckType, ContentEncoding, ContentFormat, ReportType} from './capabilities';
-import {CheckRequest, CheckResponse, CheckResultResponse} from './check';
+import {AggregatedReportLinkResult, CheckRequest, CheckResponse, CheckResultResponse} from './check';
 import {AuthToken, SuccessResponse} from './common-types';
 import {ErrorType, wrapFetchError} from './errors';
 import {
@@ -117,9 +117,8 @@ export class AcrolinxEndpoint {
     return this.getJsonFromUrl<CheckResultResponse>(check.links.result, authToken);
   }
 
-  // TODO (fp) Type Result
-  public async getLinkToAggregatedReport(authToken: AuthToken, batchId: string): Promise<any> {
-    return this.getJsonFromPath<any>('/api/v1/checking/aggregation/' + batchId, authToken);
+  public async getLinkToAggregatedReport(authToken: AuthToken, batchId: string): Promise<AggregatedReportLinkResult> {
+    return this.getJsonFromPath<AggregatedReportLinkResult>('/api/v1/checking/aggregation/' + batchId, authToken);
   }
 
   // Here begin some calls to the old API

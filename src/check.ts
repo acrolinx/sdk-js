@@ -97,6 +97,13 @@ export interface CheckResult {
     };
 }
 
+export interface AggregatedReportLinkResult {
+  reports: Array<{
+      reportType: string
+      link: URL
+  }>
+}
+
 export interface KeywordsSection {
   links: {
     getTargetKeywords: URL;
