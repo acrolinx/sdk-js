@@ -1,5 +1,5 @@
 import {Audience, CheckingCapabilities, CheckType, ContentEncoding, ContentFormat, ReportType} from './capabilities';
-import {AggregatedReportLinkResult, CheckRequest, CheckResponse, CheckResultResponse} from './check';
+import {AggregatedReportLinkResult, CheckRequest, CheckResponse, CheckResultResponse, CheckResult} from './check';
 import {AuthToken, SuccessResponse} from './common-types';
 import {ErrorType, wrapFetchError} from './errors';
 import {
@@ -34,7 +34,7 @@ export const DEVELOPMENT_SIGNATURE = 'SW50ZWdyYXRpb25EZXZlbG9wbWVudERlbW9Pbmx5';
 export {SigninSuccessResult, isSigninLinksResult, PollMoreResult, SigninResult, SigninLinksResult};
 export {
   AuthToken, CheckingCapabilities, Audience, ErrorType, ContentEncoding, ContentFormat, CheckType, ReportType,
-  CheckResultResponse
+  SuccessResponse, CheckResult
 };
 
 export interface ServerVersionInfo {
