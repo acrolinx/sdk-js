@@ -1,9 +1,10 @@
 import {Audience, CheckingCapabilities, CheckType, ContentEncoding, ContentFormat, ReportType} from './capabilities';
-import {AggregatedReportLinkResult, CheckRequest, CheckResponse, CheckResultResponse, CheckResult} from './check';
+import {AggregatedReportLinkResult, CheckRequest, CheckResponse, CheckResult, CheckResultResponse} from './check';
 import {AuthToken, SuccessResponse} from './common-types';
 import {ErrorType, wrapFetchError} from './errors';
 import {
-  HEADER_X_ACROLINX_AUTH, HEADER_X_ACROLINX_AUTH_OLD,
+  HEADER_X_ACROLINX_AUTH,
+  HEADER_X_ACROLINX_AUTH_OLD,
   HEADER_X_ACROLINX_BASE_URL,
   HEADER_X_ACROLINX_CLIENT,
   HEADER_X_ACROLINX_CLIENT_LOCALE
