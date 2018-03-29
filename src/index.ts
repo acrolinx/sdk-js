@@ -35,7 +35,7 @@ export const DEVELOPMENT_SIGNATURE = 'SW50ZWdyYXRpb25EZXZlbG9wbWVudERlbW9Pbmx5';
 export {SigninSuccessResult, isSigninLinksResult, PollMoreResult, SigninResult, SigninLinksResult};
 export {
   AuthToken, CheckingCapabilities, Audience, ErrorType, ContentEncoding, ContentFormat, CheckType, ReportType,
-  SuccessResponse, CheckResult
+  SuccessResponse, CheckResult, CheckResultResponse
 };
 
 export interface ServerVersionInfo {
