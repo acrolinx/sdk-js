@@ -95,7 +95,7 @@ export interface CheckResult {
     {
       scorecard: Report
     };
-  embed?: KeyValuePair[]
+  embed?: KeyValuePair[];
 }
 
 export interface Report {
@@ -176,7 +176,7 @@ export enum ActionIcon {
 }
 
 export interface Issue {
-  issueId: string, // TODO: https://3.basecamp.com/3815263/buckets/5979286/todos/923856228
+  issueId: string; // TODO: https://3.basecamp.com/3815263/buckets/5979286/todos/923856228
   goalId: GoalId;
   internalName: string; // Why?
   displayName: string;
@@ -187,7 +187,7 @@ export interface Issue {
     matches: Match[];
   };
   readonly: boolean;
-  issueLocations: Array<IssueLocation>;
+  issueLocations: IssueLocation[];
   suggestions: Suggestion[];
   actions?: Action[];
   links?: IssueLinks;
