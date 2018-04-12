@@ -160,6 +160,7 @@ export const DUMMY_CHECK_RESULT: CheckResult = {
   ],
   issues: [
     {
+      issueId: '1',
       goalId: 'spelling',
       internalName: 'title_case_chicago',
       displayName: 'Use Chicago style for the title case?',
@@ -247,6 +248,7 @@ export const DUMMY_CHECK_RESULT: CheckResult = {
       }
     },
     {
+      issueId: '2',
       goalId: 'term.unsuitable',
       internalName: 'term_flag',
       displayName: '<b>Illegal sublanguage variant</b> of preferred term',
@@ -307,6 +309,7 @@ export const DUMMY_CHECK_RESULT: CheckResult = {
       }
     },
     {
+      issueId: '3-sub-1',
       goalId: 'voice.readability',
       internalName: 'en-clarity-medium',
       displayName: 'Too complex? Your readers need a medium level of clarity. ',
@@ -345,6 +348,7 @@ export const DUMMY_CHECK_RESULT: CheckResult = {
       },
       subIssues: [
         {
+          issueId: '3-1',
           goalId: 'voice.readability',
           internalName: 'phenomenon_embedded_or_complex_sentence',
           displayName: 'Try to split up this sentence.',
@@ -384,6 +388,7 @@ export const DUMMY_CHECK_RESULT: CheckResult = {
           }
         },
         {
+          issueId: '3-2',
           goalId: 'voice.readability',
           internalName: 'phenomenon_passive',
           displayName: 'The active voice is usually clearer.',
@@ -446,8 +451,7 @@ export const DUMMY_CHECK_RESULT: CheckResult = {
   ],
   reports:
     {
-      scorecard_html: 'https://tenant.acrolinx.cloud/output/en/abcdef_1_report.html',
-      scorecard_xml: 'https://tenant.acrolinx.cloud/output/en/abcdef_1_report.xml'
+      scorecard: {linkAuthenticated: 'https://tenant.acrolinx.cloud/output/en/abcdef_1_report.html'},
     },
   actions: [
     {

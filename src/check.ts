@@ -31,6 +31,7 @@ export interface CheckOptions {
   checkType?: CheckType;
   partialCheckRanges?: CheckRange[];
   contentFormat?: ContentFormatId;
+  languageId?: string;
 }
 
 export interface Document {
@@ -92,9 +93,18 @@ export interface CheckResult {
   };
   reports:
     {
-      scorecard_html?: URL
-      scorecard_xml?: URL
+      scorecard: Report
     };
+  embed?: KeyValuePair[]
+}
+
+export interface Report {
+  linkAuthenticated: URL;
+}
+
+export interface KeyValuePair {
+  key: string;
+  value: string;
 }
 
 export interface AggregatedReportLinkResult {
@@ -166,30 +176,35 @@ export enum ActionIcon {
 }
 
 export interface Issue {
+  issueId: string, // TODO: https://3.basecamp.com/3815263/buckets/5979286/todos/923856228
   goalId: GoalId;
   internalName: string; // Why?
   displayName: string;
   guidance: Html;
   extractedSurface: string;
   positionalInformation: {
-    hashes: {
-      issue: string;
-      environment: string;
-      index: string;
-    };
+    hashes: IssueHashes;
     matches: Match[];
   };
   readonly: boolean;
-  issueLocations: Array<{
-    locationId: string;
-    displayName: string;
-    values: { [id: string]: string };
-  }>;
+  issueLocations: Array<IssueLocation>;
   suggestions: Suggestion[];
   actions?: Action[];
   links?: IssueLinks;
   subIssues?: Issue[];
   debug?: any;
+}
+
+export interface IssueHashes {
+  issue: string;
+  environment: string;
+  index: string;
+}
+
+export interface IssueLocation {
+  locationId: string;
+  displayName: string;
+  values: { [id: string]: string };
 }
 
 export interface IssueLinks {
