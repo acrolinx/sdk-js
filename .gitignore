@@ -3,6 +3,7 @@
 node_modules
 
 .private
+.passwords
 
 tmp
 dist

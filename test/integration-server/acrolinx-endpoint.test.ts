@@ -6,7 +6,7 @@ import {SigninLinksResult} from '../../src/signin';
 import {resetUserMetaData} from '../test-utils/meta-data';
 import {describeIf, testIf} from '../test-utils/utils';
 
-const TEST_SERVER_URL = 'https://test-latest-ssl.acrolinx.com';
+const TEST_SERVER_URL = 'https://test-next-ssl.acrolinx.com';
 const SSO_USER_ID = process.env.SSO_USER_ID;
 const SSO_PASSWORD = process.env.SSO_PASSWORD;
 const ACROLINX_API_TOKEN = process.env.ACROLINX_API_TOKEN || '';
