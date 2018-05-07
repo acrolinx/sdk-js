@@ -152,7 +152,7 @@ export interface Suggestion {
   surface: string;
   groupId: string;
   icon?: string; // URL or enum?
-  replacements: { [matchIndex: string]: string }; // Objects would be easier to extend
+  replacements: Array<string | null>;
 }
 
 export interface Action {

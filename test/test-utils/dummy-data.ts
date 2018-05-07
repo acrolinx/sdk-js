@@ -220,10 +220,7 @@ export const DUMMY_CHECK_RESULT: CheckResult = {
         {
           surface: 'sentence',
           groupId: 'sentence',
-          replacements: {
-            0: 'sen',
-            2: 'nce'
-          }
+          replacements: ['sen', null, 'nce']
         }
       ],
       actions: [
@@ -281,9 +278,7 @@ export const DUMMY_CHECK_RESULT: CheckResult = {
           icon: 'https://tenant.acrolinx.cloud/tng/icons/preferred.svg',
           // TODO: icon class+url?
           groupId: '2653',
-          replacements: {
-            0: 'blablub'
-          }
+          replacements: ['blablub']
         }
       ],
       actions: [
