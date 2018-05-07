@@ -447,6 +447,7 @@ export const DUMMY_CHECK_RESULT: CheckResult = {
   reports:
     {
       scorecard: {linkAuthenticated: 'https://tenant.acrolinx.cloud/output/en/abcdef_1_report.html'},
+      legacyJson: {linkAuthenticated: 'https://tenant.acrolinx.cloud/output/en/abcdef_1_report.json'},
     },
   actions: [
     {

@@ -93,6 +93,7 @@ export interface CheckResult {
   };
   reports:
     {
+      legacyJson: Report;
       scorecard: Report
     };
   embed?: KeyValuePair[];
