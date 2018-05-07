@@ -45,7 +45,7 @@ describe('e2e - AcrolinxEndpoint', () => {
         expect(e.type).toEqual(ErrorType.HttpConnectionProblem);
       }
       expect.hasAssertions();
-    });
+    }, LONG_TIME_OUT_MS);
 
     it('should return an failing promise for invalid URLS', async () => {
       const api = createEndpoint('http://non-ext!::?isting-server');
