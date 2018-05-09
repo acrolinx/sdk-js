@@ -54,6 +54,8 @@ export enum ReportType {
   scorecard_html = 'scorecard.html',
   debug = 'debug',
   termharvesting = 'termharvesting',
+  legacyJson = 'legacyJson',
+  scorecard = 'scorecard',
 }
 
 export interface CheckingCapabilities {
