@@ -9,7 +9,7 @@ export const DUMMY_CAPABILITIES: CheckingCapabilities = {
       language: {
         displayName: 'English (Great Britain)'
       },
-      goals:  [
+      goals: [
         {
           id: 'spelling',
           displayName: 'Spelling',
@@ -446,8 +446,14 @@ export const DUMMY_CHECK_RESULT: CheckResult = {
   ],
   reports:
     {
-      scorecard: {linkAuthenticated: 'https://tenant.acrolinx.cloud/output/en/abcdef_1_report.html'},
-      legacyJson: {linkAuthenticated: 'https://tenant.acrolinx.cloud/output/en/abcdef_1_report.json'},
+      scorecard: {
+        linkAuthenticated: 'https://tenant.acrolinx.cloud/output/en/abcdef_1_report.html',
+        link: 'https://tenant.acrolinx.cloud/output/en/abcdef_1_report.html'
+      },
+      legacyJson: {
+        linkAuthenticated: 'https://tenant.acrolinx.cloud/output/en/abcdef_1_report.json',
+        link: 'https://tenant.acrolinx.cloud/output/en/abcdef_1_report.json'
+      },
     },
   actions: [
     {
