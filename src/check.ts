@@ -101,6 +101,7 @@ export interface CheckResult {
 
 export interface Report {
   linkAuthenticated: URL;
+  link: URL;
 }
 
 export interface KeyValuePair {
