@@ -1,6 +1,7 @@
 export type GoalId = string;
 export type AudienceId = string;
 export type ContentFormatId = string;
+export type AnalysisType = string;
 
 export interface Audience {
   id: AudienceId;
@@ -58,11 +59,21 @@ export enum ReportType {
   scorecard = 'scorecard',
 }
 
+export interface PlatformExtension {
+  id: string;
+  title: string;
+  iconUrl: string;
+  initialHtml: string;
+  analysisButtonText: string;
+  analysisType: AnalysisType;
+}
+
 export interface CheckingCapabilities {
   audiences: Audience[];
   contentFormats: ContentFormat[];
   contentEncodings: ContentEncoding[];
   checkTypes: CheckType[];
   reportTypes: ReportType[];
+  platformExtensions: PlatformExtension[];
 }
 

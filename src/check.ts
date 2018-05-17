@@ -1,4 +1,5 @@
 import {
+  AnalysisType,
   AudienceId,
   CheckType,
   ContentEncoding,
@@ -29,6 +30,7 @@ export interface CheckOptions {
   audienceId?: AudienceId;
   reportTypes?: ReportType[];
   checkType?: CheckType;
+  analysisTypes?: AnalysisType[];
   partialCheckRanges?: CheckRange[];
   contentFormat?: ContentFormatId;
   languageId?: string;
@@ -97,6 +99,15 @@ export interface CheckResult {
       scorecard: Report
     };
   embed?: KeyValuePair[];
+  analysisResults: AnalysisResultMap;
+}
+
+export interface AnalysisResult {
+  reportContentHtml: string;
+}
+
+export interface AnalysisResultMap {
+  [analysisType: string]: AnalysisResult;
 }
 
 export interface Report {

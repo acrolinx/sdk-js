@@ -85,7 +85,8 @@ export const DUMMY_CAPABILITIES: CheckingCapabilities = {
   ],
   contentEncodings: ['none', 'zip,base64', 'base64'] as ContentEncoding[],
   checkTypes: ['batch', 'partial', 'interactive'] as CheckType[],
-  reportTypes: ['scorecard.xml', 'scorecard.html', 'debug', 'termharvesting'] as ReportType[]
+  reportTypes: ['scorecard.xml', 'scorecard.html', 'debug', 'termharvesting'] as ReportType[],
+  platformExtensions: []
 };
 
 
@@ -464,6 +465,7 @@ export const DUMMY_CHECK_RESULT: CheckResult = {
       replacedBy: 'termContribution'
     }
   ],
+  analysisResults: {},
   links: {
     termContribution: 'https://tenant.acrolinx.cloud/terminology/rest/v7/contribute',
     deleteScorecard: 'https://tenant.acrolinx.cloud/api/v1/checking/153/result'
