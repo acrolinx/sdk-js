@@ -21,7 +21,6 @@ export interface CheckRequest {
   content: string;
   contentEncoding?: ContentEncoding;
   checkOptions?: CheckOptions;
-  batchId?: string;
   document?: Document;
   // clientInfo ???
 }
@@ -34,6 +33,7 @@ export interface CheckOptions {
   partialCheckRanges?: CheckRange[];
   contentFormat?: ContentFormatId;
   languageId?: string;
+  batchId?: string;
 }
 
 export interface Document {
