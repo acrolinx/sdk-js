@@ -95,6 +95,7 @@ export interface CheckResult {
   };
   reports:
     {
+      [key:string]: Report;
       legacyJson: Report;
       scorecard: Report
     };
