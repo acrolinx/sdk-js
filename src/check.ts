@@ -95,9 +95,9 @@ export interface CheckResult {
   };
   reports:
     {
-      [key:string]: Report;
+      [key: string]: Report;
       legacyJson: Report;
-      scorecard: Report
+      scorecard: Report;
     };
   embed?: KeyValuePair[];
   analysisResults: AnalysisResultMap;
