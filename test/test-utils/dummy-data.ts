@@ -99,7 +99,7 @@ export const DUMMY_CHECK_RESULT: CheckResult = {
       ReportType.termharvesting
     ],
     contentFormat: 'word_xml',
-    checkType: CheckType.partial,
+    checkType: CheckType.interactive,
     partialCheckRanges: [
       {
         begin: 10,

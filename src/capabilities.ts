@@ -40,7 +40,6 @@ export interface ContentFormat {
 
 export enum CheckType {
   batch = 'batch',
-  partial = 'partial',
   interactive = 'interactive'
 }
 
