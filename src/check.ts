@@ -34,6 +34,7 @@ export interface CheckOptions {
   contentFormat?: ContentFormatId;
   languageId?: string;
   batchId?: string;
+  disableCustomFieldValidation?: boolean;
 }
 
 export interface Document {
