@@ -52,6 +52,7 @@ export {
   SuccessResponse,
   CheckResult,
   CheckResultResponse,
+  CheckResponse,
   Report
 };
 
