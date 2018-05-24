@@ -12,7 +12,8 @@ export enum ErrorType {
   Auth = 'auth',
   SSO = 'sso',
   NotFound = 'not_found',
-  SigninTimedOut = 'interactive_sign_in_timed_out'
+  SigninTimedOut = 'interactive_sign_in_timed_out',
+  CheckCancelled = 'check_cancelled',
 }
 
 export interface AcrolinxErrorProps {

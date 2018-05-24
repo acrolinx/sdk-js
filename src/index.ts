@@ -134,6 +134,10 @@ export class AcrolinxEndpoint {
     return this.post<CheckResponse>('/api/v1/checking/checks', req, {}, authToken);
   }
 
+  public async cancelCheck(authToken: AuthToken, check: CheckResponse): Promise<void> {
+    await this.deleteUrl(check.links.cancel, authToken);
+  }
+
   public async pollForCheckResult(authToken: AuthToken, check: CheckResponse): Promise<CheckResultResponse> {
     return this.getJsonFromUrl<CheckResultResponse>(check.links.result, authToken);
   }
@@ -214,6 +218,12 @@ export class AcrolinxEndpoint {
     }).then(res => handleExpectedJsonResponse<T>(res), wrapFetchError);
   }
 
+  private async deleteUrl<T>(url: string, authToken: AuthToken): Promise<T> {
+    return this.fetch(url, {
+      headers: this.getCommonHeaders(authToken),
+      method: 'DELETE',
+    }).then(res => res, wrapFetchError);
+  }
 
   /* tslint:disable:no-console */
   private async fetch(input: RequestInfo, init?: RequestInit): Promise<Response> {
