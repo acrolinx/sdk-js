@@ -4,7 +4,7 @@ import {CheckResultResponse} from '../src/check';
 import {AcrolinxEndpoint} from '../src/index';
 import {EXAMPLE_ACROLINX_ENDPOINT_PROPS} from './common';
 
-export function waitMs(ms: number) {
+function waitMs(ms: number) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
