@@ -32,12 +32,14 @@
   "license": "ISC",
   "devDependencies": {
     "@types/co-body": "0.0.3",
+    "@types/dotenv": "^4.0.3",
     "@types/fetch-mock": "^5.12.2",
     "@types/jest": "^22.0.1",
     "@types/lodash": "^4.14.92",
     "@types/node": "^9.3.0",
     "co-body": "^5.1.1",
     "cross-fetch": "^1.1.1",
+    "dotenv": "^5.0.1",
     "fetch-mock": "5.13.1",
     "jest": "^22.0.4",
     "jest-junit": "^3.4.1",
@@ -46,7 +48,6 @@
     "tslint": "5.9.1",
     "typescript": "2.7.2"
   },
-  "dependencies": {},
   "jest": {
     "transform": {
       "^.+\\.ts$": "ts-jest"
@@ -57,7 +58,6 @@
       "js"
     ],
     "coverageDirectory": "tmp/coverage",
-    "mapCoverage": true,
     "coverageReporters": [
       "cobertura",
       "json",

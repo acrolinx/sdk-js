@@ -1,10 +1,13 @@
 import 'cross-fetch/polyfill';
+import * as dotenv from 'dotenv';
 import {DEVELOPMENT_SIGNATURE, PollMoreResult} from '../../src';
 import {ErrorType} from '../../src/errors';
 import {AcrolinxEndpoint, isSigninSuccessResult, SigninSuccessResult} from '../../src/index';
 import {SigninLinksResult} from '../../src/signin';
 import {resetUserMetaData} from '../test-utils/meta-data';
 import {describeIf, testIf} from '../test-utils/utils';
+
+dotenv.config();
 
 const TEST_SERVER_URL = 'https://test-next-ssl.acrolinx.com';
 const SSO_USER_ID = process.env.SSO_USER_ID;
