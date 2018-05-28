@@ -166,7 +166,7 @@ describe('e2e - AcrolinxEndpoint', () => {
         expect(checkResultOrProgress.data.goals.length).toBeGreaterThan(0);
       });
 
-      it.only('can cancel check', async () => {
+      it('can cancel check', async () => {
         expect.assertions(2);
 
         const check = await createDummyCheck();
