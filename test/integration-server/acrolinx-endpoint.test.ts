@@ -4,6 +4,7 @@ import {DEVELOPMENT_SIGNATURE, PollMoreResult} from '../../src';
 import {ErrorType} from '../../src/errors';
 import {AcrolinxEndpoint, isSigninSuccessResult, SigninSuccessResult} from '../../src/index';
 import {SigninLinksResult} from '../../src/signin';
+import {waitMs} from '../../src/utils/mixed-utils';
 import {resetUserMetaData} from '../test-utils/meta-data';
 import {describeIf, testIf} from '../test-utils/utils';
 
@@ -134,30 +135,68 @@ describe('e2e - AcrolinxEndpoint', () => {
       expect(result.audiences.length).toBeGreaterThan(0);
     });
 
-    it('can check', async () => {
-      const capabilities = await api.getCheckingCapabilities(ACROLINX_API_TOKEN);
+    describe('check', () => {
+      async function createDummyCheck() {
+        const capabilities = await api.getCheckingCapabilities(ACROLINX_API_TOKEN);
 
-      const check = await api.check(ACROLINX_API_TOKEN, {
-        checkOptions: {
-          audienceId: capabilities.audiences[0].id,
-        },
-        document: {
-          reference: 'filename.txt'
-        },
-        content: 'Testt Textt'
+        return await api.check(ACROLINX_API_TOKEN, {
+          checkOptions: {
+            audienceId: capabilities.audiences[0].id,
+          },
+          document: {
+            reference: 'filename.txt'
+          },
+          content: 'Testt Textt'
+        });
+      }
+
+      it('can check', async () => {
+        const check = await createDummyCheck();
+
+        let checkResultOrProgress;
+        do {
+          checkResultOrProgress = await api.pollForCheckResult(ACROLINX_API_TOKEN, check);
+          if ('progress' in checkResultOrProgress) {
+            expect(checkResultOrProgress.progress.percent).toBeGreaterThanOrEqual(0);
+            expect(checkResultOrProgress.progress.percent).toBeLessThanOrEqual(100);
+            // We could wait for checkResultOrProgress.progress.retryAfter but this would slow down the test.
+          }
+        } while ('progress' in checkResultOrProgress);
+
+        expect(checkResultOrProgress.data.goals.length).toBeGreaterThan(0);
       });
 
-      let checkResultOrProgress;
-      do {
-        checkResultOrProgress = await api.pollForCheckResult(ACROLINX_API_TOKEN, check);
-        if ('progress' in checkResultOrProgress) {
-          expect(checkResultOrProgress.progress.percent).toBeGreaterThanOrEqual(0);
-          expect(checkResultOrProgress.progress.percent).toBeLessThanOrEqual(100);
-          // We could wait for checkResultOrProgress.progress.retryAfter but this would slow down the test.
-        }
-      } while ('progress' in checkResultOrProgress);
+      it.only('can cancel check', async () => {
+        expect.assertions(2);
 
-      expect(checkResultOrProgress.data.goals.length).toBeGreaterThan(0);
+        const check = await createDummyCheck();
+
+        const cancelResponse = await api.cancelCheck(ACROLINX_API_TOKEN, check);
+        expect(cancelResponse.data.id).toBe(check.data.id);
+
+        // TODO: This is just a workaround for DEV-17377
+        await waitMs(2000);
+
+        try {
+          await api.pollForCheckResult(ACROLINX_API_TOKEN, check);
+        } catch (e) {
+          expect(e.type).toEqual(ErrorType.CheckCancelled);
+        }
+      });
+
+      it('cancel needs correct auth token', async () => {
+        expect.assertions(1);
+
+        const check = await createDummyCheck();
+
+        try {
+          await api.cancelCheck('invalid token', check);
+        } catch (e) {
+          expect(e.type).toEqual(ErrorType.Auth);
+        }
+      });
+
+
     });
   });
 });

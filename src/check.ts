@@ -238,3 +238,9 @@ export interface GoalWithIssueCount extends Goal {
 export enum DocumentQualityStatus {
   red = 'red'
 }
+
+export interface CancelCheckResponseData {
+  id: CheckId;
+}
+
+export type CancelCheckResponse = SuccessResponse<CancelCheckResponseData>;

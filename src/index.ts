@@ -1,6 +1,7 @@
 import {Audience, CheckingCapabilities, CheckType, ContentEncoding, ContentFormat, ReportType} from './capabilities';
 import {
   AggregatedReportLinkResult,
+  CancelCheckResponse,
   CheckRequest,
   CheckResponse,
   CheckResult,
@@ -135,8 +136,8 @@ export class AcrolinxEndpoint {
     return this.post<CheckResponse>('/api/v1/checking/checks', req, {}, authToken);
   }
 
-  public async cancelCheck(authToken: AuthToken, check: CheckResponse): Promise<void> {
-    await this.deleteUrl(check.links.cancel, authToken);
+  public async cancelCheck(authToken: AuthToken, check: CheckResponse): Promise<CancelCheckResponse> {
+    return this.deleteUrl<CancelCheckResponse>(check.links.cancel, authToken);
   }
 
   public async pollForCheckResult(authToken: AuthToken, check: CheckResponse): Promise<CheckResultResponse> {
@@ -223,7 +224,7 @@ export class AcrolinxEndpoint {
     return this.fetch(url, {
       headers: this.getCommonHeaders(authToken),
       method: 'DELETE',
-    }).then(res => res, wrapFetchError);
+    }).then(res => handleExpectedJsonResponse<T>(res), wrapFetchError);
   }
 
   /* tslint:disable:no-console */
