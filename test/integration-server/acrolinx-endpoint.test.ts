@@ -1,12 +1,13 @@
 import 'cross-fetch/polyfill';
 import * as dotenv from 'dotenv';
 import {DEVELOPMENT_SIGNATURE, PollMoreResult} from '../../src';
+import {CheckOptions} from '../../src/check';
 import {ErrorType} from '../../src/errors';
 import {AcrolinxEndpoint, isSigninSuccessResult, SigninSuccessResult} from '../../src/index';
 import {SigninLinksResult} from '../../src/signin';
 import {waitMs} from '../../src/utils/mixed-utils';
 import {resetUserMetaData} from '../test-utils/meta-data';
-import {describeIf, testIf} from '../test-utils/utils';
+import {describeIf, expectFailingPromise, testIf} from '../test-utils/utils';
 
 dotenv.config();
 
@@ -43,22 +44,12 @@ describe('e2e - AcrolinxEndpoint', () => {
 
     it('should return an failing promise for non existing server', async () => {
       const api = createEndpoint('http://non-extisting-server');
-      try {
-        await api.getServerVersion();
-      } catch (e) {
-        expect(e.type).toEqual(ErrorType.HttpConnectionProblem);
-      }
-      expect.hasAssertions();
+      await expectFailingPromise(api.getServerVersion(), ErrorType.HttpConnectionProblem);
     }, LONG_TIME_OUT_MS);
 
     it('should return an failing promise for invalid URLS', async () => {
       const api = createEndpoint('http://non-ext!::?isting-server');
-      try {
-        await api.getServerVersion();
-      } catch (e) {
-        expect(e.type).toEqual(ErrorType.HttpConnectionProblem);
-      }
-      expect.hasAssertions();
+      await expectFailingPromise(api.getServerVersion(), ErrorType.HttpConnectionProblem);
     }, LONG_TIME_OUT_MS);
   });
 
@@ -86,18 +77,14 @@ describe('e2e - AcrolinxEndpoint', () => {
     });
 
     it('should return an api error for invalid signin poll address', async () => {
-      try {
-        await api.pollForSignin({
-          data: {interactiveLinkTimeout: 0},
-          links: {
-            interactive: 'dummy',
-            poll: TEST_SERVER_URL + '/api/v1/auth/sign-ins/0ddece9c-464a-442b-8a5d-d2f242d54c81'
-          }
-        });
-      } catch (e) {
-        expect(e.type).toEqual(ErrorType.SigninTimedOut);
-      }
-      expect.hasAssertions();
+      const signinPollResultPromise = api.pollForSignin({
+        data: {interactiveLinkTimeout: 0},
+        links: {
+          interactive: 'dummy',
+          poll: TEST_SERVER_URL + '/api/v1/auth/sign-ins/0ddece9c-464a-442b-8a5d-d2f242d54c81'
+        }
+      });
+      await expectFailingPromise(signinPollResultPromise, ErrorType.SigninTimedOut);
     });
 
     testIf(SSO_USER_ID || SSO_PASSWORD, 'signin with sso', async () => {
@@ -136,12 +123,13 @@ describe('e2e - AcrolinxEndpoint', () => {
     });
 
     describe('check', () => {
-      async function createDummyCheck() {
+      async function createDummyCheck(checkOptions: CheckOptions = {}) {
         const capabilities = await api.getCheckingCapabilities(ACROLINX_API_TOKEN);
 
         return await api.check(ACROLINX_API_TOKEN, {
           checkOptions: {
             audienceId: capabilities.audiences[0].id,
+            ...checkOptions
           },
           document: {
             reference: 'filename.txt'
@@ -174,28 +162,20 @@ describe('e2e - AcrolinxEndpoint', () => {
         const cancelResponse = await api.cancelCheck(ACROLINX_API_TOKEN, check);
         expect(cancelResponse.data.id).toBe(check.data.id);
 
-        // TODO: This is just a workaround for DEV-17377
-        await waitMs(2000);
+        // According to Heiko, cancelling may need some time. (See also DEV-17377)
+        await waitMs(1000);
 
-        try {
-          await api.pollForCheckResult(ACROLINX_API_TOKEN, check);
-        } catch (e) {
-          expect(e.type).toEqual(ErrorType.CheckCancelled);
-        }
+        await expectFailingPromise(api.pollForCheckResult(ACROLINX_API_TOKEN, check), ErrorType.CheckCancelled);
       });
 
       it('cancel needs correct auth token', async () => {
-        expect.assertions(1);
-
         const check = await createDummyCheck();
-
-        try {
-          await api.cancelCheck('invalid token', check);
-        } catch (e) {
-          expect(e.type).toEqual(ErrorType.Auth);
-        }
+        await expectFailingPromise(api.cancelCheck('invalid token', check), ErrorType.Auth);
       });
 
+      it('exception if partialCheckRanges are invalid', async () => {
+        await expectFailingPromise(createDummyCheck({partialCheckRanges: [{begin: 0, end: 1e9}]}), ErrorType.Client);
+      });
 
     });
   });
