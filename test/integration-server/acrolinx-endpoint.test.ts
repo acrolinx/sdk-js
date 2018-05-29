@@ -155,8 +155,6 @@ describe('e2e - AcrolinxEndpoint', () => {
       });
 
       it('can cancel check', async () => {
-        expect.assertions(2);
-
         const check = await createDummyCheck();
 
         const cancelResponse = await api.cancelCheck(ACROLINX_API_TOKEN, check);
