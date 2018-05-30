@@ -18,6 +18,7 @@ import {
   HEADER_X_ACROLINX_CLIENT_LOCALE
 } from './headers';
 import {MetaDataResponse, MetaDataValueMap} from './meta-data';
+import {ServerNotificationResponse} from './notifications';
 
 import {
   isSigninLinksResult,
@@ -146,6 +147,11 @@ export class AcrolinxEndpoint {
 
   public async getLinkToAggregatedReport(authToken: AuthToken, batchId: string): Promise<AggregatedReportLinkResult> {
     return this.getJsonFromPath<AggregatedReportLinkResult>('/api/v1/checking/aggregation/' + batchId, authToken);
+  }
+
+  public async getServerNotifications(authToken: AuthToken,
+                                      sinceTimeStamp: number): Promise<ServerNotificationResponse> {
+    return this.getJsonFromPath<any>('/api/v1/broadcasts/server-messages/' + sinceTimeStamp, authToken);
   }
 
   // Here begin some calls to the old API

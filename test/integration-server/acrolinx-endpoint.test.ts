@@ -11,7 +11,7 @@ import {describeIf, expectFailingPromise, testIf} from '../test-utils/utils';
 
 dotenv.config();
 
-const TEST_SERVER_URL = 'https://test-next-ssl.acrolinx.com';
+const TEST_SERVER_URL = process.env.TEST_SERVER_URL || 'https://test-next-ssl.acrolinx.com';
 const SSO_USER_ID = process.env.SSO_USER_ID;
 const SSO_PASSWORD = process.env.SSO_PASSWORD;
 const ACROLINX_API_TOKEN = process.env.ACROLINX_API_TOKEN || '';
@@ -104,7 +104,7 @@ describe('e2e - AcrolinxEndpoint', () => {
     });
   });
 
-  describeIf(ACROLINX_API_TOKEN, 'test-latest with API token', async () => {
+  describeIf(ACROLINX_API_TOKEN, 'with API token', async () => {
     let api: AcrolinxEndpoint;
 
     beforeAll(async () => {
@@ -120,6 +120,14 @@ describe('e2e - AcrolinxEndpoint', () => {
     it('should return the checking capabilities', async () => {
       const result = await api.getCheckingCapabilities(ACROLINX_API_TOKEN);
       expect(result.audiences.length).toBeGreaterThan(0);
+    });
+
+    describe('server notifications', () => {
+      it('should return something', async () => {
+        const serverMessages = await api.getServerNotifications(ACROLINX_API_TOKEN, 0);
+        expect(serverMessages.data.serverMessages).toBeDefined();
+        expect(serverMessages.data.requestTimeInMilliseconds).toBeGreaterThan(0);
+      });
     });
 
     describe('check', () => {
@@ -152,7 +160,7 @@ describe('e2e - AcrolinxEndpoint', () => {
         } while ('progress' in checkResultOrProgress);
 
         expect(checkResultOrProgress.data.goals.length).toBeGreaterThan(0);
-      });
+      }, 10000);
 
       it('can cancel check', async () => {
         const check = await createDummyCheck();
