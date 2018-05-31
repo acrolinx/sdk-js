@@ -151,7 +151,7 @@ export class AcrolinxEndpoint {
 
   public async getServerNotifications(authToken: AuthToken,
                                       sinceTimeStamp: number): Promise<ServerNotificationResponse> {
-    return this.getJsonFromPath<any>('/api/v1/broadcasts/server-messages/' + sinceTimeStamp, authToken);
+    return this.getJsonFromPath<any>('/api/v1/broadcasts/platform-notifications/' + sinceTimeStamp, authToken);
   }
 
   // Here begin some calls to the old API
