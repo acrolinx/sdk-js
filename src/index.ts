@@ -146,7 +146,8 @@ export class AcrolinxEndpoint {
   }
 
   public async getLinkToAggregatedReport(authToken: AuthToken, batchId: string): Promise<AggregatedReportLinkResult> {
-    return this.getJsonFromPath<AggregatedReportLinkResult>('/api/v1/checking/aggregation/' + encodeURIComponent(batchId), authToken);
+    return this.getJsonFromPath<AggregatedReportLinkResult>('/api/v1/checking/aggregation/'
+      + encodeURIComponent(batchId), authToken);
   }
 
   public async getServerNotifications(authToken: AuthToken,
