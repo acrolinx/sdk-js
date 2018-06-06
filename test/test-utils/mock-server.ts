@@ -2,9 +2,11 @@
 import * as fetchMock from 'fetch-mock';
 import {MockResponseObject} from 'fetch-mock';
 import * as _ from 'lodash';
+import {SuccessResponse} from '../../src/common-types';
 import {AcrolinxApiError} from '../../src/errors';
 import {HEADER_X_ACROLINX_AUTH, HEADER_X_ACROLINX_BASE_URL, HEADER_X_ACROLINX_CLIENT} from '../../src/headers';
 import {DEVELOPMENT_SIGNATURE, ServerVersionInfo} from '../../src/index';
+import {ServerNotificationResponseData} from '../../src/notifications';
 import {AuthorizationType, SigninPollResult, SigninResult, SigninSuccessResult} from '../../src/signin';
 import {MockResponseObjectOf, Route} from './common-mocking';
 import {CheckServiceMock} from './mock-server-checking';
@@ -97,6 +99,11 @@ export class AcrolinxServerMock {
         method: 'POST',
         path: /signin-ui\/(.*)\/delete/,
       },
+      {
+        handler: (args, opts) => this.getPlatformNotifications(args[1], opts),
+        method: 'GET',
+        path: /api\/v1\/broadcasts\/platform-notifications\/(.*)$/,
+      },
       ...this.checkService.getRoutes()
     ];
 
@@ -186,6 +193,11 @@ export class AcrolinxServerMock {
 
   private getServerVersion(): ServerVersionInfo {
     return DUMMY_SERVER_INFO;
+  }
+
+  private getPlatformNotifications(_sinceTimeStamp: string,
+                                   _opts: RequestInit): SuccessResponse<ServerNotificationResponseData> {
+    return {data: {platformNotifications: [], requestTimeInMilliseconds: Date.now()}, links: {}};
   }
 
   private signin(opts: RequestInit): SigninResult {
