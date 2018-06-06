@@ -14,6 +14,7 @@ export enum ErrorType {
   NotFound = 'not_found',
   SigninTimedOut = 'interactive_sign_in_timed_out',
   CheckCancelled = 'check_cancelled',
+  CustomFieldsIncomplete = 'custom_fields_incomplete',
 }
 
 export interface AcrolinxErrorProps {
