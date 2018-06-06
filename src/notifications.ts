@@ -13,7 +13,7 @@ export interface ServerNotification {
 
 export interface ServerNotificationResponseData {
   requestTimeInMilliseconds: number;
-  serverMessages: ServerNotification[];
+  platformNotifications: ServerNotification[];
 }
 
 export type ServerNotificationResponse = SuccessResponse<ServerNotificationResponseData>;

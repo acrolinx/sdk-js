@@ -125,7 +125,7 @@ describe('e2e - AcrolinxEndpoint', () => {
     describe('server notifications', () => {
       it('should return something', async () => {
         const serverMessages = await api.getServerNotifications(ACROLINX_API_TOKEN, 0);
-        expect(serverMessages.data.serverMessages).toBeDefined();
+        expect(Array.isArray(serverMessages.data.platformNotifications)).toBe(true);
         expect(serverMessages.data.requestTimeInMilliseconds).toBeGreaterThan(0);
       });
     });
