@@ -162,14 +162,14 @@ describe('e2e - AcrolinxEndpoint', () => {
         expect(checkResultOrProgress.data.goals.length).toBeGreaterThan(0);
       }, 10000);
 
-      it('can cancel check', async () => {
+      it.only('can cancel check', async () => {
         const check = await createDummyCheck();
 
         const cancelResponse = await api.cancelCheck(ACROLINX_API_TOKEN, check);
         expect(cancelResponse.data.id).toBe(check.data.id);
 
         // According to Heiko, cancelling may need some time. (See also DEV-17377)
-        await waitMs(1000);
+        await waitMs(2000);
 
         await expectFailingPromise(api.pollForCheckResult(ACROLINX_API_TOKEN, check), ErrorType.CheckCancelled);
       });
