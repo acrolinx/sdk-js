@@ -64,7 +64,8 @@
       "lcov",
       "text"
     ],
-    "testResultsProcessor": "jest-junit"
+    "testResultsProcessor": "jest-junit",
+    "testURL": "http://localhost/"
   },
   "jest-junit": {
     "output": "tmp/junit.xml"
