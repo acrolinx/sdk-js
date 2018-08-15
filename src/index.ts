@@ -2,6 +2,7 @@ import {Audience, CheckingCapabilities, CheckType, ContentEncoding, ContentForma
 import {
   AggregatedReportLinkResult,
   CancelCheckResponse,
+  CheckOptions,
   CheckRequest,
   CheckResponse,
   CheckResult,
@@ -49,6 +50,7 @@ export {
   ErrorType,
   ContentEncoding,
   ContentFormat,
+  CheckOptions,
   CheckType,
   ReportType,
   SuccessResponse,
