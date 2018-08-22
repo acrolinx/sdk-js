@@ -16,4 +16,19 @@ export interface ServerNotificationResponseData {
   platformNotifications: ServerNotification[];
 }
 
+// TODO (marco) Review
+export interface ServerNotificationPostResponseData {
+  id: string;
+}
+
+// TODO (marco) Review
+export interface ServerNotificationPost {
+  title: string;
+  body: string;
+  importance?: ServerNotificationImportance;
+  start: number;
+  end: number;
+}
+
 export type ServerNotificationResponse = SuccessResponse<ServerNotificationResponseData>;
+export type ServerNotificationPostResponse = SuccessResponse<ServerNotificationPostResponseData>;

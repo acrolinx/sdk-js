@@ -19,7 +19,7 @@ import {
   HEADER_X_ACROLINX_CLIENT_LOCALE
 } from './headers';
 import {MetaDataResponse, MetaDataValueMap} from './meta-data';
-import {ServerNotificationResponse} from './notifications';
+import {ServerNotificationPost, ServerNotificationResponse} from './notifications';
 
 import {
   isSigninLinksResult,
@@ -156,6 +156,13 @@ export class AcrolinxEndpoint {
   public async getServerNotifications(authToken: AuthToken,
                                       sinceTimeStamp: number): Promise<ServerNotificationResponse> {
     return this.getJsonFromPath<any>('/api/v1/broadcasts/platform-notifications/' + sinceTimeStamp, authToken);
+  }
+
+  // TODO (marco) Review! Added this method to test DEV-17460
+  public async postServerNotifications(authToken: AuthToken,
+                                       notification: ServerNotificationPost): Promise<ServerNotificationResponse> {
+    return this.post<ServerNotificationResponse>('/api/v1/broadcasts/platform-notifications/',
+      notification, {}, authToken);
   }
 
   // Here begin some calls to the old API
