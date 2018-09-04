@@ -62,7 +62,7 @@ describe('e2e - AcrolinxEndpoint', () => {
 
     it('should return the server version', async () => {
       const result = await api.getServerVersion();
-      expect(result.version).toBe('5.6.0');
+      expect(result.version).toBe('5.7.0');
     });
 
     it('should return the signin links', async () => {
