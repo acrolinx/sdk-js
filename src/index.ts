@@ -114,7 +114,13 @@ export interface StringMap {
 export type SigninOptions = HasAuthToken | SsoSigninOption | {};
 
 export class AcrolinxEndpoint {
-  constructor(private readonly props: AcrolinxEndpointProps) {
+  public readonly props: AcrolinxEndpointProps;
+
+  constructor(props: AcrolinxEndpointProps) {
+    this.props = {
+      ...props,
+      serverAddress: props.serverAddress.trim().replace(/\/$/, '')
+    };
   }
 
   public async signin(options: SigninOptions = {}): Promise<SigninResult> {
