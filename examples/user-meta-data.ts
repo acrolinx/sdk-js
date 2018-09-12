@@ -22,7 +22,7 @@ async function metaDataExample() {
     throw new Error('Invalid token ' + accessToken);
   }
 
-  const username = signinResult.data.userId;
+  const username = signinResult.data.user.id;
   const userMetaData = await acrolinxEndpoint.getUserMetaData(accessToken, username);
   console.log(userMetaData);
 
