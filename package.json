@@ -9,6 +9,7 @@
   },
   "scripts": {
     "ci": "npm run build && npm run tslint && npm run testCoverage",
+    "ciWithoutIntegrationServerTest": "npm run build && npm run tslint && npm run testUnitCoverage",
     "clean": "rm -rf dist",
     "prepublish": "tsc",
     "build": "tsc",
