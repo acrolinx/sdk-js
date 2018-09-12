@@ -261,8 +261,9 @@ export class AcrolinxServerMock {
         authToken: DUMMY_AUTH_TOKEN,
         authorizedUsing,
         links: {},
-        privileges: [],
-        userId: DUMMY_USER_ID,
+        user: {
+          id: DUMMY_USER_ID,
+        }
       },
       links: {}
     };

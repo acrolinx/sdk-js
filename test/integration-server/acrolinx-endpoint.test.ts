@@ -93,7 +93,7 @@ describe('e2e - AcrolinxEndpoint', () => {
           userId: SSO_USER_ID,
         }
       ) as SigninSuccessResult;
-      expect(result.data.userId).toContain(SSO_USER_ID);
+      expect(result.data.user.id).toContain(SSO_USER_ID);
     });
 
     it('poll for signin', async () => {

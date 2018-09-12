@@ -27,10 +27,10 @@ async function signInExample() {
 
     console.log('Success:', pollResult);
     console.log('authToken:', pollResult.data.authToken);
-    console.log('User:', pollResult.data.userId);
+    console.log('User:', pollResult.data.user.id);
   } else {
     console.log('loginResult', loginResult);
-    console.log(`Your are already signed as "${loginResult.data.userId}"`);
+    console.log(`Your are already signed as "${loginResult.data.user.id}"`);
   }
 }
 

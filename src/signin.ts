@@ -40,8 +40,9 @@ export interface SigninSuccessResult extends ApiResponse<SigninSuccessData> {
 
 export interface SigninSuccessData {
   authToken: AuthToken;
-  userId: string;
-  privileges: string[];
+  user: {
+    id: string;
+  };
   authorizedUsing: AuthorizationType;
   links: {};
 }
