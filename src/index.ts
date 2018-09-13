@@ -10,6 +10,7 @@ import {
   Report
 } from './check';
 import {AuthToken, SuccessResponse} from './common-types';
+import {AddToDictionaryRequest, AddToDictionaryResponse, DictionaryCapabilities} from './dictionary';
 import {ErrorType, wrapFetchError} from './errors';
 import {
   HEADER_X_ACROLINX_AUTH,
@@ -20,7 +21,6 @@ import {
 } from './headers';
 import {MetaDataResponse, MetaDataValueMap} from './meta-data';
 import {ServerNotificationPost, ServerNotificationResponse} from './notifications';
-
 import {
   isSigninLinksResult,
   PollMoreResult,
@@ -34,14 +34,10 @@ import {handleExpectedJsonResponse} from './utils/fetch';
 import * as logging from './utils/logging';
 import {waitMs} from './utils/mixed-utils';
 
+export * from './dictionary';
 export {isSigninSuccessResult, AuthorizationType} from './signin';
 export {AcrolinxApiError} from './errors';
 export {setLoggingEnabled} from './utils/logging';
-
-// You'll get the clientSignature for your integration after a successful certification meeting.
-// See: https://support.acrolinx.com/hc/en-us/articles/205687652-Getting-Started-with-Custom-Integrations
-export const DEVELOPMENT_SIGNATURE = 'SW50ZWdyYXRpb25EZXZlbG9wbWVudERlbW9Pbmx5';
-
 export {SigninSuccessResult, isSigninLinksResult, PollMoreResult, SigninResult, SigninLinksResult};
 export {
   AuthToken,
@@ -61,6 +57,10 @@ export {
   CheckResponse,
   Report
 };
+
+// You'll get the clientSignature for your integration after a successful certification meeting.
+// See: https://support.acrolinx.com/hc/en-us/articles/205687652-Getting-Started-with-Custom-Integrations
+export const DEVELOPMENT_SIGNATURE = 'SW50ZWdyYXRpb25EZXZlbG9wbWVudERlbW9Pbmx5';
 
 export interface ServerVersionInfo {
   buildDate: string;
@@ -138,10 +138,8 @@ export class AcrolinxEndpoint {
     return this.getJsonFromUrl<SigninPollResult>(signinLinks.links.poll);
   }
 
-  public async getCheckingCapabilities(authToken: AuthToken): Promise<CheckingCapabilities> {
-    const result = await this.getJsonFromPath<SuccessResponse<CheckingCapabilities>>(
-      '/api/v1/checking/capabilities', authToken);
-    return result.data;
+  public getCheckingCapabilities(authToken: AuthToken): Promise<CheckingCapabilities> {
+    return getData(this.getJsonFromPath('/api/v1/checking/capabilities', authToken));
   }
 
   public async check(authToken: AuthToken, req: CheckRequest): Promise<CheckResponse> {
@@ -171,6 +169,14 @@ export class AcrolinxEndpoint {
                                        notification: ServerNotificationPost): Promise<ServerNotificationResponse> {
     return this.post<ServerNotificationResponse>('/api/v1/broadcasts/platform-notifications/',
       notification, {}, authToken);
+  }
+
+  public getDictionaryCapabilities(authToken: AuthToken): Promise<DictionaryCapabilities> {
+    return getData(this.getJsonFromPath('/api/v1/dictionary/capabilities', authToken));
+  }
+
+  public addToDictionary(authToken: AuthToken, req: AddToDictionaryRequest): Promise<AddToDictionaryResponse> {
+    return getData(this.post('/api/v1/dictionary/submit', req, {}, authToken));
   }
 
   // Here begin some calls to the old API
@@ -271,4 +277,8 @@ export class AcrolinxEndpoint {
 
   /* tslint:enable:no-console */
 
+}
+
+function getData<T>(promise: Promise<SuccessResponse<T>>): Promise<T> {
+  return promise.then(r => r.data);
 }

@@ -8,7 +8,7 @@ import {
   GoalId,
   ReportType,
 } from './capabilities';
-import {AsyncApiResponse, SuccessResponse, URL} from './common-types';
+import {AsyncApiResponse, LanguageId, SuccessResponse, URL} from './common-types';
 
 export interface CheckRange {
   begin: number;
@@ -32,7 +32,7 @@ export interface CheckOptions {
   analysisTypes?: AnalysisType[];
   partialCheckRanges?: CheckRange[];
   contentFormat?: ContentFormatId;
-  languageId?: string;
+  languageId?: LanguageId;
   batchId?: string;
   disableCustomFieldValidation?: boolean;
 }

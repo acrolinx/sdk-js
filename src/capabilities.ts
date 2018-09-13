@@ -1,3 +1,5 @@
+import {LanguageId} from './common-types';
+
 export type GoalId = string;
 export type AudienceId = string;
 export type ContentFormatId = string;
@@ -19,6 +21,7 @@ export enum AudienceStatus {
 }
 
 export interface Language {
+  id: LanguageId;
   displayName: string;
 }
 

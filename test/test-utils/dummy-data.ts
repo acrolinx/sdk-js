@@ -7,7 +7,8 @@ export const DUMMY_CAPABILITIES: CheckingCapabilities = {
       id: 'aud-1',
       displayName: 'Tom the Technical Type',
       language: {
-        displayName: 'English (Great Britain)'
+        displayName: 'English (Great Britain)',
+        id: 'en',
       },
       goals: [
         {
@@ -45,7 +46,8 @@ export const DUMMY_CAPABILITIES: CheckingCapabilities = {
       id: 'aud-2',
       displayName: 'Randolf Redakteur',
       language: {
-        displayName: 'German'
+        displayName: 'German',
+        id: 'en',
       },
       goals: [{
         id: 'spelling',

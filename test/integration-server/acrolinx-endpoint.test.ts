@@ -1,6 +1,6 @@
 import 'cross-fetch/polyfill';
 import * as dotenv from 'dotenv';
-import {DEVELOPMENT_SIGNATURE, PollMoreResult} from '../../src';
+import {DEVELOPMENT_SIGNATURE, DictionaryScope, PollMoreResult} from '../../src';
 import {CheckOptions} from '../../src/check';
 import {ErrorType} from '../../src/errors';
 import {AcrolinxEndpoint, isSigninSuccessResult, SigninSuccessResult} from '../../src/index';
@@ -182,7 +182,45 @@ describe('e2e - AcrolinxEndpoint', () => {
       it('exception if partialCheckRanges are invalid', async () => {
         await expectFailingPromise(createDummyCheck({partialCheckRanges: [{begin: 0, end: 1e9}]}), ErrorType.Client);
       });
+    });
 
+    describe('dictionary', () => {
+      it('getDictionaryCapabilities', async () => {
+        const dictionaryCapabilities = await api.getDictionaryCapabilities(ACROLINX_API_TOKEN);
+
+        const expectedScopes = [DictionaryScope.language, DictionaryScope.audience,
+          DictionaryScope.document];
+        expect(dictionaryCapabilities.scopes).toEqual(expectedScopes);
+      });
+
+      describe('addToDictionary', () => {
+        it('language', async () => {
+          const result = await api.addToDictionary(ACROLINX_API_TOKEN, {
+            surface: 'TestSurface',
+            scope: DictionaryScope.language,
+            languageId: 'en'
+          });
+
+          expect(result.surface).toEqual('TestSurface');
+          expect(result.scope).toEqual(DictionaryScope.language);
+          expect(result.languageId).toEqual('en');
+        });
+
+        it('audience', async () => {
+          const audience = (await api.getCheckingCapabilities(ACROLINX_API_TOKEN)).audiences[0];
+
+          const result = await api.addToDictionary(ACROLINX_API_TOKEN, {
+            surface: 'TestSurface',
+            scope: DictionaryScope.audience,
+            audienceId: audience.id
+          });
+
+          expect(result.surface).toEqual('TestSurface');
+          expect(result.scope).toEqual(DictionaryScope.audience);
+          expect(result.audienceId).toEqual(audience.id);
+          expect(result.languageId).toEqual(audience.language.id);
+        });
+      });
     });
   });
 });
