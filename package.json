@@ -65,7 +65,7 @@
       "lcov",
       "text"
     ],
-    "testResultsProcessor": "jest-junit",
+    "reporters": ["default", "jest-junit"],
     "testURL": "http://localhost/"
   },
   "jest-junit": {
