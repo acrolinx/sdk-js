@@ -8,5 +8,4 @@ node_modules
 tmp
 dist
 npm-debug.log
-package-lock.json
 **/.env
