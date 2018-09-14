@@ -35,19 +35,19 @@
     "@types/co-body": "^0.0.3",
     "@types/dotenv": "^4.0.3",
     "@types/fetch-mock": "^6.0.3",
-    "@types/jest": "^23.3.0",
-    "@types/lodash": "^4.14.92",
-    "@types/node": "^10.5.2",
+    "@types/jest": "^23.3.2",
+    "@types/lodash": "^4.14.116",
+    "@types/node": "^10.9.4",
     "co-body": "^6.0.0",
     "cross-fetch": "^2.2.2",
     "dotenv": "^6.0.0",
-    "fetch-mock": "^6.5.1",
-    "jest": "^23.4.1",
+    "fetch-mock": "^6.5.2",
+    "jest": "^23.6.0",
     "jest-junit": "^5.1.0",
-    "lodash": "^4.17.4",
-    "ts-jest": "^23.0.1",
+    "lodash": "^4.17.11",
+    "ts-jest": "^23.1.4",
     "tslint": "^5.11.0",
-    "typescript": "^2.9.2"
+    "typescript": "^3.0.3"
   },
   "jest": {
     "transform": {
@@ -65,7 +65,10 @@
       "lcov",
       "text"
     ],
-    "reporters": ["default", "jest-junit"],
+    "reporters": [
+      "default",
+      "jest-junit"
+    ],
     "testURL": "http://localhost/"
   },
   "jest-junit": {

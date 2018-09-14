@@ -311,7 +311,9 @@ function getHeader(requestOpts: RequestInit, headerKey: string): string | undefi
   if (!requestOpts.headers) {
     return undefined;
   }
-  return _.find(requestOpts.headers, (_val, key) => key.toLowerCase() === headerKey.toLowerCase());
+  return _.find(requestOpts.headers as Record<string, string>,
+    (_val, key) => key.toLowerCase() === headerKey.toLowerCase()
+  );
 }
 
 export function mockAcrolinxServer(url: string): AcrolinxServerMock {
