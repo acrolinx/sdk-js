@@ -15,6 +15,8 @@ const TEST_SERVER_URL = process.env.TEST_SERVER_URL || 'https://test-next-ssl.ac
 const SSO_USER_ID = process.env.SSO_USER_ID;
 const SSO_PASSWORD = process.env.SSO_PASSWORD;
 const ACROLINX_API_TOKEN = process.env.ACROLINX_API_TOKEN || '';
+const ACROLINX_API_USER_ID = 'api-js-test-user';
+
 
 function createEndpoint(serverAddress: string) {
   return new AcrolinxEndpoint({
@@ -74,6 +76,7 @@ describe('e2e - AcrolinxEndpoint', () => {
     testIf(ACROLINX_API_TOKEN, 'should return the provided API-Token', async () => {
       const result = await api.signin({authToken: ACROLINX_API_TOKEN}) as SigninSuccessResult;
       expect(result.data.authToken).toBe(ACROLINX_API_TOKEN);
+      expect(result.data.user.id).toBe(ACROLINX_API_USER_ID);
     });
 
     it('should return an api error for invalid signin poll address', async () => {
