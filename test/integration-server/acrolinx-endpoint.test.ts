@@ -165,7 +165,7 @@ describe('e2e - AcrolinxEndpoint', () => {
         expect(checkResultOrProgress.data.goals.length).toBeGreaterThan(0);
       }, 10000);
 
-      it.skip('can cancel check', async () => {
+      it('can cancel check', async () => {
         const check = await createDummyCheck();
 
         const cancelResponse = await api.cancelCheck(ACROLINX_API_TOKEN, check);
