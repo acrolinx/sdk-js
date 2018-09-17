@@ -15,7 +15,7 @@ const TEST_SERVER_URL = process.env.TEST_SERVER_URL || 'https://test-next-ssl.ac
 const SSO_USER_ID = process.env.SSO_USER_ID;
 const SSO_PASSWORD = process.env.SSO_PASSWORD;
 const ACROLINX_API_TOKEN = process.env.ACROLINX_API_TOKEN || '';
-const ACROLINX_API_USER_ID = 'api-js-test-user';
+const ACROLINX_API_USER_ID = process.env.ACROLINX_API_USER_ID || 'jenkins-api-js';
 
 
 function createEndpoint(serverAddress: string) {
