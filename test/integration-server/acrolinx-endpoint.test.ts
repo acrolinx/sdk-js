@@ -224,7 +224,8 @@ describe('e2e - AcrolinxEndpoint', () => {
           expect(result.languageId).toEqual(audience.language.id);
         });
 
-        it('validation error', async () => {
+        // Skipped because it will change soon (https://acrolinx.atlassian.net/browse/DEV-18462)
+        it.skip('validation error', async () => {
           const error = await expectFailingPromise<AcrolinxError>(api.addToDictionary(ACROLINX_API_TOKEN, {
             surface: 'TestSurface',
             scope: DictionaryScope.language,
