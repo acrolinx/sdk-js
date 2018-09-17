@@ -15,6 +15,7 @@ export enum ErrorType {
   SigninTimedOut = 'interactive_sign_in_timed_out',
   CheckCancelled = 'check_cancelled',
   CustomFieldsIncomplete = 'custom_fields_incomplete',
+  Validation = 'validation'
 }
 
 export interface AcrolinxErrorProps {
@@ -23,7 +24,16 @@ export interface AcrolinxErrorProps {
   type: string;
   status?: number;
   reference?: string;
+  validation_details?: ValidationDetail[];
   cause?: Error;
+}
+
+interface ValidationDetail  {
+  title: string;
+  constraint: string;
+  attributePath: string;
+  detail: string;
+  invalidValue: string;
 }
 
 export interface AcrolinxApiError extends AcrolinxErrorProps {
@@ -37,6 +47,7 @@ export class AcrolinxError extends Error implements AcrolinxErrorProps {
   public readonly status?: number;
   public readonly reference?: string;
   public readonly cause?: Error;
+  public readonly validationDetails?: ValidationDetail[];
 
 
   public constructor(props: AcrolinxErrorProps) {
@@ -46,6 +57,7 @@ export class AcrolinxError extends Error implements AcrolinxErrorProps {
     this.title = props.title;
     this.detail = props.detail;
     this.reference = props.reference;
+    this.validationDetails = props.validation_details;
     this.cause = props.cause;
   }
 }

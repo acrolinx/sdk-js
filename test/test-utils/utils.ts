@@ -16,14 +16,14 @@ export function describeIf(condition: boolean | string | undefined, testName: st
   }
 }
 
-export async function expectFailingPromise(promise: Promise<any>, expectedErrorType: ErrorType) {
+export async function expectFailingPromise<E = any>(promise: Promise<any>, expectedErrorType: ErrorType): Promise<E> {
   let unexpectedSuccessfulResult: any;
   try {
     unexpectedSuccessfulResult = await promise;
   } catch (e) {
     expect(e.type).toEqual(expectedErrorType);
+    return e;
   }
-  if (unexpectedSuccessfulResult) {
-    throw(new Error('Unexpected success ' + JSON.stringify(unexpectedSuccessfulResult)));
-  }
+
+  throw(new Error('Unexpected success ' + JSON.stringify(unexpectedSuccessfulResult)));
 }

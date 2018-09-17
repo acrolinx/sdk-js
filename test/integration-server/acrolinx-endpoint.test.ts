@@ -1,8 +1,8 @@
 import 'cross-fetch/polyfill';
 import * as dotenv from 'dotenv';
-import {DEVELOPMENT_SIGNATURE, DictionaryScope, PollMoreResult} from '../../src';
+import {DEVELOPMENT_SIGNATURE, DictionaryScope, ErrorType, PollMoreResult} from '../../src';
 import {CheckOptions} from '../../src/check';
-import {ErrorType} from '../../src/errors';
+import {AcrolinxError} from '../../src/errors';
 import {AcrolinxEndpoint, isSigninSuccessResult, SigninSuccessResult} from '../../src/index';
 import {SigninLinksResult} from '../../src/signin';
 import {waitMs} from '../../src/utils/mixed-utils';
@@ -219,6 +219,24 @@ describe('e2e - AcrolinxEndpoint', () => {
           expect(result.scope).toEqual(DictionaryScope.audience);
           expect(result.audienceId).toEqual(audience.id);
           expect(result.languageId).toEqual(audience.language.id);
+        });
+
+        it('validation error', async () => {
+          const error = await expectFailingPromise<AcrolinxError>(api.addToDictionary(ACROLINX_API_TOKEN, {
+            surface: 'TestSurface',
+            scope: DictionaryScope.language,
+            languageId: '',
+          }), ErrorType.Validation);
+
+          expect(error.validationDetails).not.toBeUndefined();
+          expect(error.validationDetails!.length).toEqual(1);
+
+          const validationDetail = error.validationDetails![0];
+          expect(validationDetail.attributePath).toEqual('submit.arg1.languageId&audienceId');
+          expect(typeof validationDetail.constraint).toBe('string');
+          expect(typeof validationDetail.title).toBe('string');
+          expect(typeof validationDetail.invalidValue).toBe('string');
+          expect(typeof validationDetail.detail).toBe('string');
         });
       });
     });
