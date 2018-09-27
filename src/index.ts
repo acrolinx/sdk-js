@@ -74,6 +74,7 @@ export interface AcrolinxEndpointProps {
   enableHttpLogging?: boolean;
   serverAddress: string;
   additionalFetchProperties?: any;
+  fetch?: typeof fetch;
 }
 
 export interface ClientInformation {
@@ -260,10 +261,11 @@ export class AcrolinxEndpoint {
 
   /* tslint:disable:no-console */
   private async fetch(input: RequestInfo, init: RequestInit = {}): Promise<Response> {
+    const fetchFunction = this.props.fetch || fetch;
     if (this.props.enableHttpLogging) {
       try {
         console.log('Fetch', input, init, this.props.additionalFetchProperties);
-        const result = await fetch(input, {...init, ...(this.props.additionalFetchProperties || {})});
+        const result = await fetchFunction(input, {...init, ...(this.props.additionalFetchProperties || {})});
         console.log('Fetched Result', result.status);
         return result;
       } catch (error) {
@@ -271,7 +273,7 @@ export class AcrolinxEndpoint {
         throw error;
       }
     } else {
-      return fetch(input, {...init, ...(this.props.additionalFetchProperties || {})});
+      return fetchFunction(input, {...init, ...(this.props.additionalFetchProperties || {})});
     }
   }
 
