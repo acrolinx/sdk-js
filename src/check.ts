@@ -9,6 +9,7 @@ import {
   ReportType,
 } from './capabilities';
 import {AsyncApiResponse, LanguageId, SuccessResponse, URL} from './common-types';
+import {DictionaryScope} from './dictionary';
 
 export interface CheckRange {
   begin: number;
@@ -75,6 +76,7 @@ export type CheckResultResponse  = AsyncApiResponse<CheckResult>;
 export interface CheckResult {
   id: CheckId;
   checkOptions: CheckOptions;
+  dictionaryScopes: DictionaryScope[];
   document: Document;
   quality: {
     score: number;

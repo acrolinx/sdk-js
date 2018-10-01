@@ -163,6 +163,8 @@ describe('e2e - AcrolinxEndpoint', () => {
         } while ('progress' in checkResultOrProgress);
 
         expect(checkResultOrProgress.data.goals.length).toBeGreaterThan(0);
+        expect(checkResultOrProgress.data.dictionaryScopes).toEqual([
+          DictionaryScope.language, DictionaryScope.audience, DictionaryScope.document]);
       }, 10000);
 
       it('can cancel check', async () => {

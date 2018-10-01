@@ -1,3 +1,4 @@
+import {DictionaryScope} from '../../src';
 import {AudienceStatus, CheckingCapabilities, CheckType, ContentEncoding, ReportType} from '../../src/capabilities';
 import {CheckResult, DocumentQualityStatus} from '../../src/check';
 
@@ -94,6 +95,7 @@ export const DUMMY_CAPABILITIES: CheckingCapabilities = {
 
 export const DUMMY_CHECK_RESULT: CheckResult = {
   id: '153',
+  dictionaryScopes: [DictionaryScope.language, DictionaryScope.audience, DictionaryScope.document],
   checkOptions: {
     audienceId: 'aud_1',
     reportTypes: [
