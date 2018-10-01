@@ -258,7 +258,7 @@ export class AcrolinxServerMock {
   private createLoginSuccessResult(authorizedUsing: AuthorizationType): SigninSuccessResult {
     return {
       data: {
-        authToken: DUMMY_AUTH_TOKEN,
+        accessToken: DUMMY_AUTH_TOKEN,
         authorizedUsing,
         links: {},
         user: {

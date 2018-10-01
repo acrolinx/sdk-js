@@ -12,7 +12,7 @@ export function isSigninSuccessResult(signinResult: SigninSuccessResult
   | PollMoreResult | SigninLinksResult
   | undefined): signinResult is SigninSuccessResult {
   const asSigninSuccessResult = signinResult as SigninSuccessResult;
-  return !!(asSigninSuccessResult && asSigninSuccessResult.data && asSigninSuccessResult.data.authToken);
+  return !!(asSigninSuccessResult && asSigninSuccessResult.data && asSigninSuccessResult.data.accessToken);
 }
 
 export interface SigninRequestBody {
@@ -39,7 +39,7 @@ export interface SigninSuccessResult extends ApiResponse<SigninSuccessData> {
 }
 
 export interface SigninSuccessData {
-  authToken: AuthToken;
+  accessToken: AuthToken;
   user: {
     id: UserId;
   };

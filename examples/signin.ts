@@ -26,7 +26,7 @@ async function signInExample() {
     }
 
     console.log('Success:', pollResult);
-    console.log('authToken:', pollResult.data.authToken);
+    console.log('authToken:', pollResult.data.accessToken);
     console.log('User:', pollResult.data.user.id);
   } else {
     console.log('loginResult', loginResult);

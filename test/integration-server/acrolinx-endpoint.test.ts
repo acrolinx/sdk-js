@@ -75,7 +75,7 @@ describe('e2e - AcrolinxEndpoint', () => {
 
     testIf(ACROLINX_API_TOKEN, 'should return the provided API-Token', async () => {
       const result = await api.signin({authToken: ACROLINX_API_TOKEN}) as SigninSuccessResult;
-      expect(result.data.authToken).toBe(ACROLINX_API_TOKEN);
+      expect(result.data.accessToken).toBe(ACROLINX_API_TOKEN);
       expect(result.data.user.id).toBe(ACROLINX_API_USER_ID);
     });
 
