@@ -116,7 +116,7 @@ export type SigninOptions = HasAuthToken | SsoSigninOption | {};
 
 // FIX for Typescipt error in esnext compiled project...
 // https://stackoverflow.com/questions/44987899/typescript-cannot-find-name-fetch-universal-library?rq=1
-export declare var fetch: any;
+// export declare var fetch: any;
 
 export class AcrolinxEndpoint {
   public readonly props: AcrolinxEndpointProps;
