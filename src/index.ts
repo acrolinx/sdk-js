@@ -30,6 +30,7 @@ import {
   SigninResult,
   SigninSuccessResult
 } from './signin';
+import {User} from './user';
 import {handleExpectedJsonResponse} from './utils/fetch';
 import * as logging from './utils/logging';
 import {waitMs} from './utils/mixed-utils';
@@ -57,6 +58,8 @@ export {
   CheckResponse,
   Report
 };
+
+export * from './user';
 
 // You'll get the clientSignature for your integration after a successful certification meeting.
 // See: https://support.acrolinx.com/hc/en-us/articles/205687652-Getting-Started-with-Custom-Integrations
@@ -184,6 +187,10 @@ export class AcrolinxEndpoint {
     return getData(this.post('/api/v1/dictionary/submit', req, {}, authToken));
   }
 
+  public async getUserData(authToken: AuthToken, id: string): Promise<User> {
+    return getData(this.getJsonFromPath('/api/v1/user/' + id, authToken));
+  }
+
   // Here begin some calls to the old API
   // TODO: Remove when no old API calls are needed anymore
 
@@ -191,10 +198,21 @@ export class AcrolinxEndpoint {
     return this.getJsonFromPath<ServerVersionInfo>('/iq/services/v3/rest/core/serverVersion');
   }
 
+  /**
+   * @deprecated since new API implementation
+   * @param authToken
+   * @param username
+   */
   public async getUserMetaData(authToken: AuthToken, username: string): Promise<MetaDataResponse> {
     return this.getJsonFromPath<MetaDataResponse>('/iq/services/v2/rest/metadata/user/' + username, authToken);
   }
 
+  /**
+   * @deprecated since new API implementation
+   * @param authToken
+   * @param username
+   * @param valueMap
+   */
   public async saveUserMetaData(authToken: AuthToken, username: string, valueMap: MetaDataValueMap): Promise<void> {
     try {
       await this.post('/iq/services/v2/rest/metadata/user/update/' + username, {metaData: valueMap}, {}, authToken);

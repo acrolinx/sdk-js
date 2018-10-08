@@ -79,6 +79,12 @@ describe('e2e - AcrolinxEndpoint', () => {
       expect(result.data.user.id).toBe(ACROLINX_API_USER_ID);
     });
 
+    testIf(ACROLINX_API_TOKEN, 'should return user data', async () => {
+      const result = await api.signin({authToken: ACROLINX_API_TOKEN}) as SigninSuccessResult;
+      const user = await api.getUserData(ACROLINX_API_TOKEN, result.data.user.id);
+      expect(user.signIn).toBeDefined();
+    });
+
     it('should return an api error for invalid signin poll address', async () => {
       const signinPollResultPromise = api.pollForSignin({
         data: {interactiveLinkTimeout: 0},

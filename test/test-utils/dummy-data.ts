@@ -6,7 +6,7 @@ export const DUMMY_CAPABILITIES: CheckingCapabilities = {
   audiences: [
     {
       id: 'aud-1',
-      displayName: 'Tom the Technical Type',
+      displayName: 'Tom the Technical CustomFieldType',
       language: {
         displayName: 'English (Great Britain)',
         id: 'en',
