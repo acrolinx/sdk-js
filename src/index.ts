@@ -187,7 +187,7 @@ export class AcrolinxEndpoint {
     return getData(this.post('/api/v1/dictionary/submit', req, {}, authToken));
   }
 
-  public async getUserData(authToken: AuthToken, id: string): Promise<User> {
+  public getUserData(authToken: AuthToken, id: string): Promise<User> {
     return getData(this.getJsonFromPath('/api/v1/user/' + id, authToken));
   }
 
