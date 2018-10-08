@@ -21,7 +21,14 @@ export interface SigninRequestBody {
 
 export type SigninResult = SigninLinksResult | SigninSuccessResult;
 
-export interface SigninLinksResult extends ApiResponse<{ interactiveLinkTimeout: number }> {
+export interface SigninLinksData {
+  /**
+   * Duration in seconds
+   */
+  interactiveLinkTimeout: number;
+}
+
+export interface SigninLinksResult extends ApiResponse<SigninLinksData> {
   links: {
     interactive: string;
     poll: string;

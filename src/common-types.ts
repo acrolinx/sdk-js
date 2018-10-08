@@ -6,8 +6,12 @@ export type UserId = string;
 export type AuthToken = string;
 
 export interface Progress {
-  percent: number;
-  message: string;
+  percent: number;  // TODO: optional?
+  message: string;  // TODO: optional?
+
+  /**
+   * Duration in seconds
+   */
   retryAfter: number;
 }
 
@@ -23,7 +27,7 @@ export interface ErrorResponse {
 export interface ProgressResponse {
   progress: Progress;
   links: {
-    poll: URL;
+    poll: URL;  // TODO: optional? empty?
   };
 }
 
