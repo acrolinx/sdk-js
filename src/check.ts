@@ -238,7 +238,9 @@ export interface GoalWithIssueCount extends Goal {
 }
 
 export enum DocumentQualityStatus {
-  red = 'red'
+  red = 'red',
+  yellow = 'yellow',
+  green = 'green'
 }
 
 export interface CancelCheckResponseData {
