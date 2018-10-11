@@ -166,10 +166,11 @@ export const DUMMY_CHECK_RESULT: CheckResult = {
   issues: [
     {
       issueId: '1',
+      canAddToDictionary: true,
       goalId: 'spelling',
       internalName: 'title_case_chicago',
-      displayName: 'Use Chicago style for the title case?',
-      guidance: '<div class="shortHelp" lang="en" xml:lang="en">\n<p>According to' +
+      displayNameHtml: 'Use Chicago style for the title case?',
+      guidanceHtml: '<div class="shortHelp" lang="en" xml:lang="en">\n<p>According to' +
       " the <q>Chicago Manual of Style</q>, here's how you write titles:</p>\n<ul>\n" +
       '<li>Capitalize the first word and the last word.</li>\n<li>Capitalize all "main" words.</li>\n' +
       "<li>Don't capitalize articles and conjunctions (example: <q>a</q>, <q>and</q>).</li>\n" +
@@ -251,10 +252,11 @@ export const DUMMY_CHECK_RESULT: CheckResult = {
     },
     {
       issueId: '2',
+      canAddToDictionary: true,
       goalId: 'term.unsuitable',
       internalName: 'term_flag',
-      displayName: '<b>Illegal sublanguage variant</b> of preferred term',
-      guidance: '<div class="guidance term">\n\t<b>Domains</b>\n\t\t\t<br/><i>Switches</i>\n\t\t\t\t\t<br/>\n' +
+      displayNameHtml: '<b>Illegal sublanguage variant</b> of preferred term',
+      guidanceHtml: '<div class="guidance term">\n\t<b>Domains</b>\n\t\t\t<br/><i>Switches</i>\n\t\t\t\t\t<br/>\n' +
       '\t\t<b>Note</b>\n\t\t<br/>\n\t\tUse &#39;please&#39; in presale materials only. Do NOT use &#39;please&#39; ' +
       'in postsale material.\n\t</div>\n',
       extractedSurface: 'Please',
@@ -310,10 +312,11 @@ export const DUMMY_CHECK_RESULT: CheckResult = {
     },
     {
       issueId: '3-sub-1',
+      canAddToDictionary: true,
       goalId: 'voice.readability',
       internalName: 'en-clarity-medium',
-      displayName: 'Too complex? Your readers need a medium level of clarity. ',
-      guidance: '',
+      displayNameHtml: 'Too complex? Your readers need a medium level of clarity. ',
+      guidanceHtml: '',
       extractedSurface: 'Reports ... length',
       positionalInformation: {
         hashes: {
@@ -349,10 +352,11 @@ export const DUMMY_CHECK_RESULT: CheckResult = {
       subIssues: [
         {
           issueId: '3-1',
+          canAddToDictionary: true,
           goalId: 'voice.readability',
           internalName: 'phenomenon_embedded_or_complex_sentence',
-          displayName: 'Try to split up this sentence.',
-          guidance: "<p>This sentence doesn't seem to flow smoothly. We found a few embedded phrases in there " +
+          displayNameHtml: 'Try to split up this sentence.',
+          guidanceHtml: "<p>This sentence doesn't seem to flow smoothly. We found a few embedded phrases in there " +
           'that could be messing with your flow somehow.</p>',
           extractedSurface: 'Reports ... length',
           positionalInformation: {
@@ -389,10 +393,11 @@ export const DUMMY_CHECK_RESULT: CheckResult = {
         },
         {
           issueId: '3-2',
+          canAddToDictionary: true,
           goalId: 'voice.readability',
           internalName: 'phenomenon_passive',
-          displayName: 'The active voice is usually clearer.',
-          guidance: "<p>This one could do with a bit of pep. It's probably because it feels kind of passive. " +
+          displayNameHtml: 'The active voice is usually clearer.',
+          guidanceHtml: "<p>This one could do with a bit of pep. It's probably because it feels kind of passive. " +
           "We love it when you're assertive.</p>",
           extractedSurface: 'was first seen',
           positionalInformation: {

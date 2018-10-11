@@ -192,12 +192,11 @@ export enum ActionIcon {
   termContribute = 'term-contribute'
 }
 
-export interface Issue {
+export interface CommonIssue {
   issueId: string; // TODO: https://3.basecamp.com/3815263/buckets/5979286/todos/923856228
-  goalId: GoalId;
   internalName: string; // Why?
-  displayName: string;
-  guidance: Html;
+  displayNameHtml: Html;
+  guidanceHtml: Html;
   extractedSurface: string;
   positionalInformation: {
     hashes: IssueHashes;
@@ -208,8 +207,18 @@ export interface Issue {
   suggestions: Suggestion[];
   actions?: Action[];
   links?: IssueLinks;
-  subIssues?: Issue[];
   debug?: any;
+  canAddToDictionary: boolean;
+  subIssues?: SubIssue[];
+  goalId?: GoalId;
+}
+
+export interface Issue extends CommonIssue {
+  goalId: GoalId;
+}
+
+// tslint:disable-next-line no-empty-interface
+export interface SubIssue extends CommonIssue {
 }
 
 export interface IssueHashes {

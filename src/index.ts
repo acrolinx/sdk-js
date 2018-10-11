@@ -59,6 +59,8 @@ export {
   Report
 };
 
+export * from './check';
+export * from './capabilities';
 export * from './user';
 
 // You'll get the clientSignature for your integration after a successful certification meeting.
