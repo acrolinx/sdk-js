@@ -47,7 +47,7 @@
     "lodash": "^4.17.11",
     "ts-jest": "^23.1.4",
     "tslint": "^5.11.0",
-    "typescript": "^3.0.3"
+    "typescript": "^3.1.2"
   },
   "jest": {
     "transform": {
