@@ -173,6 +173,10 @@ describe('e2e - AcrolinxEndpoint', () => {
         expect(_.sortBy(checkResultOrProgress.data.dictionaryScopes)).toEqual([
           DictionaryScope.audience, DictionaryScope.document, DictionaryScope.language
         ]);
+
+        const spellingIssue = _.find(checkResultOrProgress.data.issues, issue => issue.goalId === 'SPELLING')!;
+        expect(spellingIssue).toBeDefined();
+        expect(spellingIssue.canAddToDictionary).toBe(true);
       }, 10000);
 
       it.skip('can cancel check', async () => {
