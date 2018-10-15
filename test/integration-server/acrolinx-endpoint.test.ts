@@ -239,20 +239,25 @@ describe('e2e - AcrolinxEndpoint', () => {
         });
 
         it('validation error', async () => {
+          const invalidLanguageId = 'thl';
           const error = await expectFailingPromise<AcrolinxError>(api.addToDictionary(ACROLINX_API_TOKEN, {
             surface: 'TestSurface',
             scope: DictionaryScope.language,
-            languageId: '',
+            languageId: invalidLanguageId,
           }), ErrorType.Validation);
 
-          expect(error.validationDetails).not.toBeUndefined();
-          expect(error.validationDetails!.length).toEqual(3);
+          const validationDetails = error.validationDetails!;
 
-          const validationDetail = _.find(error.validationDetails!, vd => vd.attributePath === 'languageId')!;
+          expect(error.validationDetails).not.toBeUndefined();
+          expect(validationDetails.length).toEqual(1);
+
+          const validationDetail = validationDetails[0]!;
           expect(typeof validationDetail.constraint).toBe('string');
           expect(typeof validationDetail.title).toBe('string');
           expect(typeof validationDetail.invalidValue).toBe('string');
           expect(typeof validationDetail.detail).toBe('string');
+          expect(Array.isArray(validationDetail.possibleValues)).toBeTruthy();
+          expect(validationDetail.possibleValues!.length).toBeGreaterThan(2);
         });
       });
     });

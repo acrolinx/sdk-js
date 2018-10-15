@@ -33,7 +33,8 @@ interface ValidationDetail  {
   constraint: string;
   attributePath: string;
   detail: string;
-  invalidValue: string;
+  invalidValue: unknown;
+  possibleValues?: Array<unknown>;
 }
 
 export interface AcrolinxApiError extends AcrolinxErrorProps {
