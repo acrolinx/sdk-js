@@ -24,7 +24,7 @@ export interface AcrolinxErrorProps {
   type: string;
   status?: number;
   reference?: string;
-  validation_details?: ValidationDetail[];
+  validationDetails?: ValidationDetail[];
   cause?: Error;
 }
 
@@ -57,7 +57,7 @@ export class AcrolinxError extends Error implements AcrolinxErrorProps {
     this.title = props.title;
     this.detail = props.detail;
     this.reference = props.reference;
-    this.validationDetails = props.validation_details;
+    this.validationDetails = props.validationDetails;
     this.cause = props.cause;
   }
 }

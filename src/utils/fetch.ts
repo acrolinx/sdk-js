@@ -41,7 +41,7 @@ function createError(res: Response, jsonBody: any | AcrolinxApiError): AcrolinxE
       detail: jsonBody.detail || 'Unknown HTTP Error',
       status: jsonBody.status || res.status,
       title: jsonBody.title || res.statusText,
-      validation_details: jsonBody.validation_details,
+      validationDetails: jsonBody.validationDetails,
       type: jsonBody.type,
     });
   } else {
