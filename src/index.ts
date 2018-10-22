@@ -6,10 +6,10 @@ import {
   CheckRequest,
   CheckResponse,
   CheckResult,
-  CheckResultResponse,
+  CheckResultResponse, DocumentDescriptor, DocumentId, KeyValuePair,
   Report
 } from './check';
-import {AuthToken, SuccessResponse} from './common-types';
+import {AuthToken, SuccessResponse, UserId} from './common-types';
 import {AddToDictionaryRequest, AddToDictionaryResponse, DictionaryCapabilities} from './dictionary';
 import {ErrorType, wrapFetchError} from './errors';
 import {
@@ -62,6 +62,7 @@ export {
 export * from './check';
 export * from './capabilities';
 export * from './user';
+export * from './custom-fields';
 
 // You'll get the clientSignature for your integration after a successful certification meeting.
 // See: https://support.acrolinx.com/hc/en-us/articles/205687652-Getting-Started-with-Custom-Integrations
@@ -189,8 +190,24 @@ export class AcrolinxEndpoint {
     return getData(this.post('/api/v1/dictionary/submit', req, {}, authToken));
   }
 
-  public getUserData(authToken: AuthToken, id: string): Promise<User> {
+  public getUserData(authToken: AuthToken, id: UserId): Promise<User> {
     return getData(this.getJsonFromPath('/api/v1/user/' + id, authToken));
+  }
+
+  public setUserCustomFields(authToken: AuthToken, id: UserId, customFieldValues: KeyValuePair[]): Promise<User> {
+    const requestBody = {id, customFields: customFieldValues};
+    return getData(this.put('/api/v1/user/' + id, requestBody, {}, authToken));
+  }
+
+  public getDocumentDescriptor(authToken: AuthToken, id: DocumentId): Promise<DocumentDescriptor> {
+    return getData(this.getJsonFromPath('/api/v1/document/' + id, authToken));
+  }
+
+  public setDocumentCustomFields(authToken: AuthToken,
+                                 documentId: DocumentId,
+                                 customFieldValues: KeyValuePair[]): Promise<DocumentDescriptor> {
+    const requestBody = {id: documentId, customFields: customFieldValues};
+    return getData(this.put('/api/v1/document/' + documentId, requestBody, {}, authToken));
   }
 
   // Here begin some calls to the old API
@@ -268,11 +285,23 @@ export class AcrolinxEndpoint {
   }
 
   private async post<T>(path: string, body: {}, headers: StringMap = {}, authToken?: AuthToken): Promise<T> {
+    return this.send<T>('POST', path, body, headers, authToken);
+  }
+
+  private async put<T>(path: string, body: {}, headers: StringMap = {}, authToken?: AuthToken): Promise<T> {
+    return this.send<T>('PUT', path, body, headers, authToken);
+  }
+
+  private async send<T>(method: 'POST' | 'PUT',
+                        path: string,
+                        body: {},
+                        headers: StringMap = {},
+                        authToken?: AuthToken): Promise<T> {
     // console.log('post', this.props.serverAddress, path, body, headers);
     return this.fetch(this.props.serverAddress + path, {
       body: JSON.stringify(body),
       headers: {...this.getCommonHeaders(authToken), ...headers},
-      method: 'POST',
+      method,
     }).then(res => handleExpectedJsonResponse<T>(res), wrapFetchError);
   }
 

@@ -9,6 +9,7 @@ import {
   ReportType,
 } from './capabilities';
 import {AsyncApiResponse, LanguageId, SuccessResponse, URL} from './common-types';
+import {CustomField} from './custom-fields';
 import {DictionaryScope} from './dictionary';
 
 export interface CheckRange {
@@ -22,7 +23,7 @@ export interface CheckRequest {
   content: string;
   contentEncoding?: ContentEncoding;
   checkOptions?: CheckOptions;
-  document?: Document;
+  document?: Partial<DocumentDescriptor>;
   // clientInfo ???
 }
 
@@ -38,16 +39,17 @@ export interface CheckOptions {
   disableCustomFieldValidation?: boolean;
 }
 
-export interface Document {
-  id?: DocumentId;
-  reference?: string;
-  author?: string;
-  mimeType?: string;
-  contentType?: string;
-  metadata?: MetaData[];
-  displayInfo?: {
+export interface DocumentDescriptor {
+  id: DocumentId;
+  reference: string;
+  author: string;
+  mimeType: string;
+  contentType: string;
+  metadata: MetaData[];
+  displayInfo: {
     reference?: string;
   };
+  customFields: CustomField[];
 }
 
 export interface MetaData {
@@ -77,7 +79,7 @@ export interface CheckResult {
   id: CheckId;
   checkOptions: CheckOptions;
   dictionaryScopes: DictionaryScope[];
-  document: Document;
+  document: DocumentDescriptor;
   quality: {
     score: number;
     status: DocumentQualityStatus;

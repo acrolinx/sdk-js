@@ -131,7 +131,8 @@ export const DUMMY_CHECK_RESULT: CheckResult = {
     ],
     displayInfo: {
       reference: 'abc.docx'
-    }
+    },
+    customFields: []
   },
   quality: {
     score: 57,

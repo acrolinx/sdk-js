@@ -1,10 +1,17 @@
 import 'cross-fetch/polyfill';
 import * as dotenv from 'dotenv';
 import * as _ from 'lodash';
-import {DEVELOPMENT_SIGNATURE, DictionaryScope, ErrorType, PollMoreResult} from '../../src';
+import {
+  CheckResult,
+  CustomFieldType,
+  DEVELOPMENT_SIGNATURE,
+  DictionaryScope,
+  ErrorType,
+  PollMoreResult, User
+} from '../../src';
 import {CheckOptions} from '../../src/check';
 import {AcrolinxError} from '../../src/errors';
-import {AcrolinxEndpoint, isSigninSuccessResult, SigninSuccessResult} from '../../src/index';
+import {AcrolinxEndpoint, DocumentDescriptor, isSigninSuccessResult, SigninSuccessResult} from '../../src/index';
 import {SigninLinksResult} from '../../src/signin';
 import {waitMs} from '../../src/utils/mixed-utils';
 import {resetUserMetaData} from '../test-utils/meta-data';
@@ -29,6 +36,7 @@ function createEndpoint(serverAddress: string) {
     }, serverAddress
   });
 }
+
 
 describe('e2e - AcrolinxEndpoint', () => {
   describe('errors by bad server address', () => {
@@ -80,12 +88,6 @@ describe('e2e - AcrolinxEndpoint', () => {
       expect(result.data.user.id).toBe(ACROLINX_API_USER_ID);
     });
 
-    testIf(ACROLINX_API_TOKEN, 'should return user data', async () => {
-      const result = await api.signin({authToken: ACROLINX_API_TOKEN}) as SigninSuccessResult;
-      const user = await api.getUserData(ACROLINX_API_TOKEN, result.data.user.id);
-      expect(user.signIn).toBeDefined();
-    });
-
     it('should return an api error for invalid signin poll address', async () => {
       const signinPollResultPromise = api.pollForSignin({
         data: {interactiveLinkTimeout: 0},
@@ -127,6 +129,64 @@ describe('e2e - AcrolinxEndpoint', () => {
       api = createEndpoint(TEST_SERVER_URL);
     });
 
+    async function createDummyCheck(checkOptions: CheckOptions = {}) {
+      const capabilities = await api.getCheckingCapabilities(ACROLINX_API_TOKEN);
+      const audience = _.find(capabilities.audiences!, a => _.startsWith(a.language.id, 'en'));
+      expect(audience).toBeDefined();
+
+      return await api.check(ACROLINX_API_TOKEN, {
+        checkOptions: {
+          audienceId: audience!.id,
+          ...checkOptions
+        },
+        document: {
+          reference: 'filename.txt'
+        },
+        content: 'Testt Textt'
+      });
+    }
+
+    async function checkAndWaitUntilFinished(): Promise<CheckResult> {
+      const check = await createDummyCheck();
+
+      let checkResultOrProgress;
+      do {
+        checkResultOrProgress = await api.pollForCheckResult(ACROLINX_API_TOKEN, check);
+      } while ('progress' in checkResultOrProgress);
+
+      return checkResultOrProgress.data;
+    }
+
+    /**
+     * This test requires to setup a document custom field 'Department'
+     * with the at least one possible value 'Example Department'.
+     */
+    describe('user data', () => {
+      let user: User;
+      const DEPARTMENT_KEY = 'Department';
+
+      beforeEach(async () => {
+        const result = await api.signin({authToken: ACROLINX_API_TOKEN}) as SigninSuccessResult;
+        user = await api.getUserData(ACROLINX_API_TOKEN, result.data.user.id);
+      });
+
+      test('should return user data with custom fields', async () => {
+        expect(user.signIn).toBeDefined();
+        const departmentCustomField = _.find(user.customFields, cf => cf.key === DEPARTMENT_KEY);
+        expect(departmentCustomField).toBeDefined();
+        expect(departmentCustomField!.type).toEqual(CustomFieldType.TYPE_LIST);
+      });
+
+      test('should set user custom fields', async () => {
+        const updatedUser = await api.setUserCustomFields(ACROLINX_API_TOKEN, user.id, [{
+          key: DEPARTMENT_KEY,
+          value: 'Example Department'
+        }]);
+
+        expect(updatedUser).toBeDefined();
+      });
+    });
+
     it('should return the checking capabilities', async () => {
       const result = await api.getCheckingCapabilities(ACROLINX_API_TOKEN);
       expect(result.audiences.length).toBeGreaterThan(0);
@@ -141,21 +201,6 @@ describe('e2e - AcrolinxEndpoint', () => {
     });
 
     describe('check', () => {
-      async function createDummyCheck(checkOptions: CheckOptions = {}) {
-        const capabilities = await api.getCheckingCapabilities(ACROLINX_API_TOKEN);
-
-        return await api.check(ACROLINX_API_TOKEN, {
-          checkOptions: {
-            audienceId: capabilities.audiences[0].id,
-            ...checkOptions
-          },
-          document: {
-            reference: 'filename.txt'
-          },
-          content: 'Testt Textt'
-        });
-      }
-
       it('can check', async () => {
         const check = await createDummyCheck();
 
@@ -201,6 +246,37 @@ describe('e2e - AcrolinxEndpoint', () => {
       });
     });
 
+    describe('after check ', () => {
+      let checkResult: CheckResult;
+      let document: DocumentDescriptor;
+
+      beforeEach(async () => {
+        checkResult = await checkAndWaitUntilFinished();
+        expect(checkResult.document.id).toBeDefined();
+        document = await api.getDocumentDescriptor(ACROLINX_API_TOKEN, checkResult.document.id!);
+      });
+
+      it('should get custom fields', async () => {
+        expect(document.id).toBeTruthy();
+        expect(Array.isArray(document.customFields)).toEqual(true);
+      });
+
+      /**
+       * This test requires to setup a document custom field 'List Field'
+       * with the at least one possible 'List Item 2'.
+       */
+      it('can write custom field values', async () => {
+        const documentInfo2 = await api.setDocumentCustomFields(ACROLINX_API_TOKEN, document.id, [
+          {
+            key: 'List Field',
+            value: 'List Item 2'
+          } as any
+        ]);
+
+        expect(documentInfo2.id).toEqual(document.id);
+      });
+    });
+
     describe('dictionary', () => {
       it('getDictionaryCapabilities', async () => {
         const dictionaryCapabilities = await api.getDictionaryCapabilities(ACROLINX_API_TOKEN);
@@ -238,7 +314,7 @@ describe('e2e - AcrolinxEndpoint', () => {
           expect(result.languageId).toEqual(audience.language.id);
         });
 
-        it('validation error', async () => {
+        it('validation error for invalid klingon language code', async () => {
           const invalidLanguageId = 'thl';
           const error = await expectFailingPromise<AcrolinxError>(api.addToDictionary(ACROLINX_API_TOKEN, {
             surface: 'TestSurface',
@@ -258,6 +334,25 @@ describe('e2e - AcrolinxEndpoint', () => {
           expect(typeof validationDetail.detail).toBe('string');
           expect(Array.isArray(validationDetail.possibleValues)).toBeTruthy();
           expect(validationDetail.possibleValues!.length).toBeGreaterThan(2);
+        });
+
+        it('validation error for invalid audience id', async () => {
+          const error = await expectFailingPromise<AcrolinxError>(api.addToDictionary(ACROLINX_API_TOKEN, {
+            surface: 'TestSurface',
+            scope: DictionaryScope.audience,
+            audienceId: 'thisAudienceDoesReallyNotExist',
+          }), ErrorType.Validation);
+
+          const validationDetails = error.validationDetails!;
+
+          expect(error.validationDetails).not.toBeUndefined();
+          expect(validationDetails.length).toEqual(1);
+
+          const validationDetail = validationDetails[0]!;
+          expect(typeof validationDetail.constraint).toBe('string');
+          expect(typeof validationDetail.title).toBe('string');
+          expect(typeof validationDetail.invalidValue).toBe('string');
+          expect(typeof validationDetail.detail).toBe('string');
         });
       });
     });

@@ -14,7 +14,7 @@ export enum ErrorType {
   NotFound = 'not_found',
   SigninTimedOut = 'interactive_sign_in_timed_out',
   CheckCancelled = 'check_cancelled',
-  CustomFieldsIncomplete = 'custom_fields_incomplete',
+  CustomFieldsIncorrect = 'custom_fields_incorrect',
   Validation = 'validation'
 }
 
@@ -33,8 +33,8 @@ interface ValidationDetail  {
   constraint: string;
   attributePath: string;
   detail: string;
-  invalidValue: unknown;
-  possibleValues?: Array<unknown>;
+  invalidValue: any;
+  possibleValues?: any[];
 }
 
 export interface AcrolinxApiError extends AcrolinxErrorProps {
