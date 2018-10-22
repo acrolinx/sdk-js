@@ -1,3 +1,5 @@
+import {DocumentId} from './check';
+
 export enum ErrorType {
   HttpErrorStatus = 'http_error_status',
   HttpConnectionProblem = 'http_connection_problem',
@@ -26,6 +28,11 @@ export interface AcrolinxErrorProps {
   reference?: string;
   validationDetails?: ValidationDetail[];
   cause?: Error;
+
+  /**
+   * Returned if {@link CustomFieldsIncorrect.CustomFieldsIncorrect} happens while checking.
+   */
+  documentId?: DocumentId;
 }
 
 interface ValidationDetail  {
@@ -49,6 +56,7 @@ export class AcrolinxError extends Error implements AcrolinxErrorProps {
   public readonly reference?: string;
   public readonly cause?: Error;
   public readonly validationDetails?: ValidationDetail[];
+  public readonly documentId?: DocumentId;
 
 
   public constructor(props: AcrolinxErrorProps) {
@@ -60,8 +68,30 @@ export class AcrolinxError extends Error implements AcrolinxErrorProps {
     this.reference = props.reference;
     this.validationDetails = props.validationDetails;
     this.cause = props.cause;
+    this.documentId = props.documentId;
   }
 }
+
+export function createErrorFromFetchResponse(res: Response, jsonBody: any | AcrolinxApiError): AcrolinxError {
+  if (jsonBody.type) {
+    return new AcrolinxError({
+      detail: jsonBody.detail || 'Unknown HTTP Error',
+      status: jsonBody.status || res.status,
+      title: jsonBody.title || res.statusText,
+      validationDetails: jsonBody.validationDetails,
+      type: jsonBody.type,
+      documentId: jsonBody.documentId,
+    });
+  } else {
+    return new AcrolinxError({
+      detail: res.statusText + ':' + JSON.stringify(jsonBody),
+      status: res.status,
+      title: 'Unknown HTTP Error',
+      type: ErrorType.HttpErrorStatus,
+    });
+  }
+}
+
 
 export function wrapFetchError(error: Error): Promise<any> {
   throw new AcrolinxError({
