@@ -35,7 +35,7 @@ export interface AcrolinxErrorProps {
   documentId?: DocumentId;
 }
 
-interface ValidationDetail  {
+export interface ValidationDetail  {
   title: string;
   constraint: string;
   attributePath: string;

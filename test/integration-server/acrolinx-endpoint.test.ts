@@ -7,10 +7,11 @@ import {
   DEVELOPMENT_SIGNATURE,
   DictionaryScope,
   ErrorType,
-  PollMoreResult, User
+  PollMoreResult,
+  User
 } from '../../src';
 import {CheckOptions} from '../../src/check';
-import {AcrolinxError} from '../../src/errors';
+import {AcrolinxError, ValidationDetail} from '../../src/errors';
 import {AcrolinxEndpoint, DocumentDescriptor, isSigninSuccessResult, SigninSuccessResult} from '../../src/index';
 import {SigninLinksResult} from '../../src/signin';
 import {waitMs} from '../../src/utils/mixed-utils';
@@ -314,6 +315,32 @@ describe('e2e - AcrolinxEndpoint', () => {
           expect(result.languageId).toEqual(audience.language.id);
         });
 
+        function assertValidValidationDetail(validationDetail: ValidationDetail) {
+          expect(typeof validationDetail.constraint).toBe('string');
+          expect(typeof validationDetail.title).toBe('string');
+          expect(typeof validationDetail.invalidValue).toBe('string');
+          expect(typeof validationDetail.detail).toBe('string');
+        }
+
+        it('validation error for invalid scope', async () => {
+          const error = await expectFailingPromise<AcrolinxError>(api.addToDictionary(ACROLINX_API_TOKEN, {
+            surface: 'TestSurface',
+            scope: 'invalidScope' as any,
+            languageId: 'en',
+          }), ErrorType.Validation);
+
+          const validationDetails = error.validationDetails!;
+
+          expect(error.validationDetails).not.toBeUndefined();
+          expect(validationDetails.length).toEqual(1);
+
+          const validationDetail = validationDetails[0]!;
+          expect(validationDetail.attributePath).toEqual('scope');
+          assertValidValidationDetail(validationDetail);
+          expect(Array.isArray(validationDetail.possibleValues)).toBeTruthy();
+        });
+
+
         it('validation error for invalid klingon language code', async () => {
           const invalidLanguageId = 'thl';
           const error = await expectFailingPromise<AcrolinxError>(api.addToDictionary(ACROLINX_API_TOKEN, {
@@ -328,12 +355,9 @@ describe('e2e - AcrolinxEndpoint', () => {
           expect(validationDetails.length).toEqual(1);
 
           const validationDetail = validationDetails[0]!;
-          expect(typeof validationDetail.constraint).toBe('string');
-          expect(typeof validationDetail.title).toBe('string');
-          expect(typeof validationDetail.invalidValue).toBe('string');
-          expect(typeof validationDetail.detail).toBe('string');
+          assertValidValidationDetail(validationDetail);
           expect(Array.isArray(validationDetail.possibleValues)).toBeTruthy();
-          expect(validationDetail.possibleValues!.length).toBeGreaterThan(2);
+          expect(validationDetail.possibleValues!.length).toBeGreaterThan(1);
         });
 
         it('validation error for invalid audience id', async () => {
@@ -348,11 +372,7 @@ describe('e2e - AcrolinxEndpoint', () => {
           expect(error.validationDetails).not.toBeUndefined();
           expect(validationDetails.length).toEqual(1);
 
-          const validationDetail = validationDetails[0]!;
-          expect(typeof validationDetail.constraint).toBe('string');
-          expect(typeof validationDetail.title).toBe('string');
-          expect(typeof validationDetail.invalidValue).toBe('string');
-          expect(typeof validationDetail.detail).toBe('string');
+          assertValidValidationDetail(validationDetails[0]!);
         });
       });
     });
