@@ -199,7 +199,17 @@ describe('e2e - AcrolinxEndpoint', () => {
         expect(Array.isArray(serverMessages.data.platformNotifications)).toBe(true);
         expect(serverMessages.data.requestTimeInMilliseconds).toBeGreaterThan(0);
       });
+
+      it('post notifications privilege validation', async () => {
+        await expectFailingPromise<AcrolinxError>(api.postServerNotifications(ACROLINX_API_TOKEN, {
+          title: 'dummyTitle',
+          body: 'dummyBody',
+          start: Date.now(),
+          end: Date.now() + 1000 * 60
+        }), ErrorType.InsufficientPrivileges);
+      });
     });
+
 
     describe('check', () => {
       it('can check', async () => {

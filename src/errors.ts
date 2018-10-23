@@ -17,7 +17,8 @@ export enum ErrorType {
   SigninTimedOut = 'interactive_sign_in_timed_out',
   CheckCancelled = 'check_cancelled',
   CustomFieldsIncorrect = 'custom_fields_incorrect',
-  Validation = 'validation'
+  Validation = 'validation',
+  InsufficientPrivileges = 'insufficient_privileges'
 }
 
 export interface AcrolinxErrorProps {
