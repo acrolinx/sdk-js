@@ -11,7 +11,7 @@ import {
 } from './check';
 import {AuthToken, SuccessResponse, UserId} from './common-types';
 import {AddToDictionaryRequest, AddToDictionaryResponse, DictionaryCapabilities} from './dictionary';
-import {ErrorType, wrapFetchError} from './errors';
+import {AcrolinxError, ErrorType, wrapFetchError} from './errors';
 import {
   HEADER_X_ACROLINX_AUTH,
   HEADER_X_ACROLINX_AUTH_OLD,
@@ -41,6 +41,7 @@ export {AcrolinxApiError} from './errors';
 export {setLoggingEnabled} from './utils/logging';
 export {SigninSuccessResult, isSigninLinksResult, PollMoreResult, SigninResult, SigninLinksResult};
 export {
+  AcrolinxError,
   AuthToken,
   CheckingCapabilities,
   CancelCheckResponse,
