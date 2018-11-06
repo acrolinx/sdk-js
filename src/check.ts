@@ -259,3 +259,8 @@ export interface CancelCheckResponseData {
 }
 
 export type CancelCheckResponse = SuccessResponse<CancelCheckResponseData>;
+
+// TODO: Might be unnecessary in the near future
+export function sanitizeDocumentDescriptor(d: DocumentDescriptor): DocumentDescriptor {
+  return {...d, customFields: d.customFields || []};
+}

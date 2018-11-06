@@ -34,3 +34,6 @@ export interface ProgressResponse {
 export type ApiResponse<Data, Links = {}> = SuccessResponse<Data, Links>;
 export type AsyncApiResponse<Data, Links = {}> = SuccessResponse<Data, Links> | ProgressResponse;
 
+export interface StringMap {
+  [index: string]: string;
+}

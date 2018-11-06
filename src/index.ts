@@ -6,10 +6,13 @@ import {
   CheckRequest,
   CheckResponse,
   CheckResult,
-  CheckResultResponse, DocumentDescriptor, DocumentId, KeyValuePair,
-  Report
+  CheckResultResponse,
+  DocumentDescriptor,
+  DocumentId,
+  KeyValuePair,
+  Report, sanitizeDocumentDescriptor
 } from './check';
-import {AuthToken, SuccessResponse, UserId} from './common-types';
+import {AuthToken, StringMap, SuccessResponse, UserId} from './common-types';
 import {AddToDictionaryRequest, AddToDictionaryResponse, DictionaryCapabilities} from './dictionary';
 import {AcrolinxError, ErrorType, wrapFetchError} from './errors';
 import {
@@ -21,6 +24,7 @@ import {
 } from './headers';
 import {MetaDataResponse, MetaDataValueMap} from './meta-data';
 import {ServerNotificationPost, ServerNotificationResponse} from './notifications';
+import {PlatformCapabilities} from './platform-capabilities';
 import {
   isSigninLinksResult,
   PollMoreResult,
@@ -64,6 +68,8 @@ export * from './check';
 export * from './capabilities';
 export * from './user';
 export * from './custom-fields';
+export * from './common-types';
+export * from './signin';
 
 // You'll get the clientSignature for your integration after a successful certification meeting.
 // See: https://support.acrolinx.com/hc/en-us/articles/205687652-Getting-Started-with-Custom-Integrations
@@ -115,10 +121,6 @@ export interface SsoSigninOption {
   password: string;
 }
 
-export interface StringMap {
-  [index: string]: string;
-}
-
 export type SigninOptions = HasAuthToken | SsoSigninOption | {};
 
 // FIX for Typescipt error in esnext compiled project...
@@ -148,6 +150,10 @@ export class AcrolinxEndpoint {
       await waitMs(lastPollResult.progress.retryAfter * 1000);
     }
     return this.getJsonFromUrl<SigninPollResult>(signinLinks.links.poll);
+  }
+
+  public getCapabilities(authToken: AuthToken): Promise<PlatformCapabilities> {
+    return getData(this.getJsonFromPath('/api/v1/capabilities', authToken));
   }
 
   public getCheckingCapabilities(authToken: AuthToken): Promise<CheckingCapabilities> {
@@ -201,7 +207,8 @@ export class AcrolinxEndpoint {
   }
 
   public getDocumentDescriptor(authToken: AuthToken, id: DocumentId): Promise<DocumentDescriptor> {
-    return getData(this.getJsonFromPath('/api/v1/document/' + id, authToken));
+    return getData<DocumentDescriptor>(this.getJsonFromPath('/api/v1/document/' + id, authToken))
+      .then(sanitizeDocumentDescriptor);
   }
 
   public setDocumentCustomFields(authToken: AuthToken,

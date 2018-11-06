@@ -74,7 +74,7 @@ describe('e2e - AcrolinxEndpoint', () => {
 
     it('should return the server version', async () => {
       const result = await api.getServerVersion();
-      expect(result.version).toBe('2018.11');
+      expect(result.version).toBe('2018.12');
     });
 
     it('should return the signin links', async () => {
@@ -83,10 +83,17 @@ describe('e2e - AcrolinxEndpoint', () => {
       expect(result.data.interactiveLinkTimeout).toBeGreaterThan(100);
     });
 
-    testIf(ACROLINX_API_TOKEN, 'should return the provided API-Token', async () => {
-      const result = await api.signin({authToken: ACROLINX_API_TOKEN}) as SigninSuccessResult;
-      expect(result.data.accessToken).toBe(ACROLINX_API_TOKEN);
-      expect(result.data.user.id).toBe(ACROLINX_API_USER_ID);
+    describeIf(ACROLINX_API_TOKEN, 'Signin with valid token', () => {
+      it('should return the provided API-Token', async () => {
+        const result = await api.signin({authToken: ACROLINX_API_TOKEN}) as SigninSuccessResult;
+        expect(result.data.accessToken).toBe(ACROLINX_API_TOKEN);
+        expect(result.data.user.id).toBe(ACROLINX_API_USER_ID);
+      });
+
+      it('should return client properties', async () => {
+        const result = await api.signin({authToken: ACROLINX_API_TOKEN}) as SigninSuccessResult;
+        expect(Object.keys(result.data.integration.properties).length).toBeGreaterThan(0);
+      });
     });
 
     it('should return an api error for invalid signin poll address', async () => {
@@ -185,6 +192,14 @@ describe('e2e - AcrolinxEndpoint', () => {
         }]);
 
         expect(updatedUser).toBeDefined();
+      });
+    });
+
+    describe('PlatformCapabilities', () => {
+      it('should contain checking and document capabilities', async () => {
+        const result = await api.getCapabilities(ACROLINX_API_TOKEN);
+        expect(result.document.customFields.length).toBeGreaterThan(0);
+        expect(result.checking.audiences.length).toBeGreaterThan(0);
       });
     });
 

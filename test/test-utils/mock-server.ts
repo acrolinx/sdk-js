@@ -263,7 +263,12 @@ export class AcrolinxServerMock {
         links: {},
         user: {
           id: DUMMY_USER_ID,
+        },
+        integration: {
+          properties: {},
+          addons: []
         }
+
       },
       links: {}
     };
