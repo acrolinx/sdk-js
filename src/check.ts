@@ -174,6 +174,9 @@ export interface Suggestion {
   replacements: Array<string | null>;
 }
 
+/**
+ * @deprecated
+ */
 export interface Action {
   id: ActionId | string;
   url: URL;
@@ -207,7 +210,12 @@ export interface CommonIssue {
   readonly: boolean;
   issueLocations: IssueLocation[];
   suggestions: Suggestion[];
+
+  /**
+   * @deprecated
+   */
   actions?: Action[];
+
   links?: IssueLinks;
   debug?: any;
   canAddToDictionary: boolean;
@@ -236,9 +244,10 @@ export interface IssueLocation {
 }
 
 export interface IssueLinks {
-  termContribution: URL;
-  addToDictionary: URL;
-  [linkId: string]: URL;
+  termContribution?: URL;
+  termContributionInteractive?: URL;
+  addToDictionary?: URL;
+  [linkId: string]: URL | undefined;
 }
 
 
