@@ -59,6 +59,7 @@ export enum ReportType {
   termharvesting = 'termharvesting',
   legacyJson = 'legacyJson',
   scorecard = 'scorecard',
+  request_text = 'extractedText'
 }
 
 export interface PlatformExtension {
