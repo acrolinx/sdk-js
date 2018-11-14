@@ -22,7 +22,6 @@ import {
   HEADER_X_ACROLINX_CLIENT,
   HEADER_X_ACROLINX_CLIENT_LOCALE
 } from './headers';
-import {MetaDataResponse, MetaDataValueMap} from './meta-data';
 import {ServerNotificationPost, ServerNotificationResponse} from './notifications';
 import {PlatformCapabilities} from './platform-capabilities';
 import {
@@ -224,36 +223,9 @@ export class AcrolinxEndpoint {
 
   // Here begin some calls to the old API
   // TODO: Remove when no old API calls are needed anymore
-
   public async getServerVersion(): Promise<ServerVersionInfo> {
     return this.getJsonFromPath<ServerVersionInfo>('/iq/services/v3/rest/core/serverVersion');
   }
-
-  /**
-   * @deprecated since new API implementation
-   * @param authToken
-   * @param username
-   */
-  public async getUserMetaData(authToken: AuthToken, username: string): Promise<MetaDataResponse> {
-    return this.getJsonFromPath<MetaDataResponse>('/iq/services/v2/rest/metadata/user/' + username, authToken);
-  }
-
-  /**
-   * @deprecated since new API implementation
-   * @param authToken
-   * @param username
-   * @param valueMap
-   */
-  public async saveUserMetaData(authToken: AuthToken, username: string, valueMap: MetaDataValueMap): Promise<void> {
-    try {
-      await this.post('/iq/services/v2/rest/metadata/user/update/' + username, {metaData: valueMap}, {}, authToken);
-    } catch (error) {
-      if (error.type !== ErrorType.InvalidJson) {
-        throw error;
-      }
-    }
-  }
-
   // Here end some calls to the old API
 
   private getSigninRequestHeaders(options: SigninOptions = {}) {

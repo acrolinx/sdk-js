@@ -15,7 +15,6 @@ import {AcrolinxError, ValidationDetail} from '../../src/errors';
 import {AcrolinxEndpoint, DocumentDescriptor, isSigninSuccessResult, SigninSuccessResult} from '../../src/index';
 import {SigninLinksResult} from '../../src/signin';
 import {waitMs} from '../../src/utils/mixed-utils';
-import {resetUserMetaData} from '../test-utils/meta-data';
 import {describeIf, expectFailingPromise, testIf} from '../test-utils/utils';
 
 dotenv.config();
@@ -128,9 +127,7 @@ describe('e2e - AcrolinxEndpoint', () => {
     let api: AcrolinxEndpoint;
 
     beforeAll(async () => {
-      if (ACROLINX_API_TOKEN) {
-        return resetUserMetaData(createEndpoint(TEST_SERVER_URL), ACROLINX_API_TOKEN);
-      }
+      // TODO: Do we need to configure required user custom fields?
     });
 
     beforeEach(() => {
