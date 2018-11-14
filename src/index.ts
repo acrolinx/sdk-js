@@ -137,6 +137,10 @@ export class AcrolinxEndpoint {
     };
   }
 
+  public setClientLocale(clientLocale: string) {
+    this.props.clientLocale = clientLocale;
+  }
+
   public async signin(options: SigninOptions = {}): Promise<SigninResult> {
     const signinRequestBody: SigninRequestBody = {clientName: this.props.client.name};
     return this.post<SigninResult>('/api/v1/auth/sign-ins', signinRequestBody,
