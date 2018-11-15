@@ -1,4 +1,4 @@
-import {ApiResponse, AsyncApiResponse, AuthToken, ProgressResponse, StringMap, UserId} from './common-types';
+import {ApiResponse, AsyncApiResponse, AuthToken, ProgressResponse, StringMap, UserId, Username} from './common-types';
 
 export type PollMoreResult = ProgressResponse;
 
@@ -49,6 +49,7 @@ export interface SigninSuccessData {
   accessToken: AuthToken;
   user: {
     id: UserId;
+    username: Username;
   };
   integration: {
     properties: StringMap,

@@ -3,6 +3,7 @@ import {AcrolinxApiError} from './errors';
 export type URL = string;
 export type LanguageId = string;
 export type UserId = string;
+export type Username = string;
 export type AuthToken = string;
 
 export interface Progress {
