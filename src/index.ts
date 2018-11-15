@@ -86,6 +86,7 @@ export interface AcrolinxEndpointProps {
   clientLocale?: string;
   enableHttpLogging?: boolean;
   serverAddress: string;
+  corsWithCredentials?: boolean;
   additionalFetchProperties?: any;
   fetch?: typeof fetch;
 }
@@ -307,10 +308,15 @@ export class AcrolinxEndpoint {
   /* tslint:disable:no-console */
   private async fetch(input: RequestInfo, init: RequestInit = {}): Promise<Response> {
     const fetchFunction = this.props.fetch || fetch;
+    const fetchProps: RequestInit = {
+      ...init,
+      credentials: this.props.corsWithCredentials ?  'include' : undefined,
+      ...(this.props.additionalFetchProperties || {})
+    };
     if (this.props.enableHttpLogging) {
       try {
         console.log('Fetch', input, init, this.props.additionalFetchProperties);
-        const result = await fetchFunction(input, {...init, ...(this.props.additionalFetchProperties || {})});
+        const result = await fetchFunction(input, fetchProps);
         console.log('Fetched Result', result.status);
         return result;
       } catch (error) {
@@ -318,12 +324,10 @@ export class AcrolinxEndpoint {
         throw error;
       }
     } else {
-      return fetchFunction(input, {...init, ...(this.props.additionalFetchProperties || {})});
+      return fetchFunction(input, fetchProps);
     }
   }
-
   /* tslint:enable:no-console */
-
 }
 
 function getData<T>(promise: Promise<SuccessResponse<T>>): Promise<T> {

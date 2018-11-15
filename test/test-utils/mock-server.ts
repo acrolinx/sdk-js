@@ -37,7 +37,8 @@ export const ALLOWED_CLIENT_SIGNATURES = ['dummyClientSignature', DEVELOPMENT_SI
 
 export interface LoggedRequest {
   opts: {
-    headers: StringMap
+    headers: StringMap;
+    credentials?: RequestCredentials;
   };
   url: string;
 }
