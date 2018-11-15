@@ -10,19 +10,31 @@ export async function handleExpectedJsonResponse<T>(res: Response): Promise<T> {
     }
     return jsonResult;
   } else {
-    let error;
-    try {
-      const jsonError = await toJson<any>(res);
-      if (jsonError.error) {
-        error = createErrorFromFetchResponse(res, jsonError.error);
-      } else {
-        error = createErrorFromFetchResponse(res, jsonError);
-      }
-    } catch {
-      error = createErrorFromFetchResponse(res, {});
-    }
-    throw error;
+    throw await createErrorFromResponse(res);
   }
+}
+
+export async function handleExpectedTextResponse(res: Response): Promise<string> {
+  if (200 <= res.status && res.status < 300) {
+   return res.text();
+  } else {
+    throw await createErrorFromResponse(res);
+  }
+}
+
+async function createErrorFromResponse(res: Response): Promise<Error> {
+  let error;
+  try {
+    const jsonError = await toJson<any>(res);
+    if (jsonError.error) {
+      error = createErrorFromFetchResponse(res, jsonError.error);
+    } else {
+      error = createErrorFromFetchResponse(res, jsonError);
+    }
+  } catch {
+    error = createErrorFromFetchResponse(res, {});
+  }
+  return error;
 }
 
 export function toJson<T>(res: Response): T | Promise<T> {

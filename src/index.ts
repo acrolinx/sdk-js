@@ -10,7 +10,8 @@ import {
   DocumentDescriptor,
   DocumentId,
   KeyValuePair,
-  Report, sanitizeDocumentDescriptor
+  Report,
+  sanitizeDocumentDescriptor
 } from './check';
 import {AuthToken, StringMap, SuccessResponse, UserId} from './common-types';
 import {AddToDictionaryRequest, AddToDictionaryResponse, DictionaryCapabilities} from './dictionary';
@@ -34,7 +35,7 @@ import {
   SigninSuccessResult
 } from './signin';
 import {User} from './user';
-import {handleExpectedJsonResponse} from './utils/fetch';
+import {handleExpectedJsonResponse, handleExpectedTextResponse} from './utils/fetch';
 import * as logging from './utils/logging';
 import {waitMs} from './utils/mixed-utils';
 
@@ -221,11 +222,18 @@ export class AcrolinxEndpoint {
     return getData(this.put('/api/v1/document/' + documentId, requestBody, {}, authToken));
   }
 
+  public async getTextFromUrl(url: string, authToken?: AuthToken): Promise<string> {
+    return this.fetch(url, {
+      headers: this.getCommonHeaders(authToken),
+    }).then( res => handleExpectedTextResponse(res), wrapFetchError);
+  }
+
   // Here begin some calls to the old API
   // TODO: Remove when no old API calls are needed anymore
   public async getServerVersion(): Promise<ServerVersionInfo> {
     return this.getJsonFromPath<ServerVersionInfo>('/iq/services/v3/rest/core/serverVersion');
   }
+
   // Here end some calls to the old API
 
   private getSigninRequestHeaders(options: SigninOptions = {}) {
