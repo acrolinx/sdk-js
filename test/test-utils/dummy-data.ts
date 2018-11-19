@@ -230,23 +230,8 @@ export const DUMMY_CHECK_RESULT: CheckResult = {
           replacements: ['sen', null, 'nce']
         }
       ],
-      actions: [
-        {
-          id: 'help',
-          url: 'https://tenant.acrolinx.cloud/htmldata/en/rules/help/title_case_chicago.html',
-          displayName: 'Help',
-          icon: 'help-icon'
-        },
-        {
-          id: 'termContributionForm',
-          url: 'https://tenant.acrolinx.cloud/termcontribution.html?surface=@@base64:cXdlcnR5dWlvcA==&' +
-          'locale=en&language=en&userid=admin&context=@@base64:VGhpcyBzZW50ZW5jZSBoYXMgYSBxd2VydHl1aW9wLg==#',
-          displayName: 'Add as Term',
-          icon: 'icon-term-contribute',
-          replacedBy: 'termContribution'
-        }
-      ],
       links: {
+        help: 'https://www.help.org',
         termContribution: 'https://tenant.acrolinx.cloud/terminology/v7/rest/contribute',
         addToDictionary: 'https://tenant.acrolinx.cloud/api/v1/dictionary/submit'
       }
@@ -287,14 +272,6 @@ export const DUMMY_CHECK_RESULT: CheckResult = {
           // TODO: icon class+url?
           groupId: '2653',
           replacements: ['blablub']
-        }
-      ],
-      actions: [
-        {
-          id: 'help',
-          url: 'https://tenant.acrolinx.cloud/termhelp?termUniversalId=9c2e9ffb-a314-4b61-94b2-d62db3c18945&locale=en',
-          displayName: 'Help',
-          icon: 'help-icon'
         }
       ],
       debug: {
@@ -466,15 +443,6 @@ export const DUMMY_CHECK_RESULT: CheckResult = {
         link: 'https://tenant.acrolinx.cloud/output/en/abcdef_1_report.json'
       },
     },
-  actions: [
-    {
-      id: 'termContributionForm',
-      url: 'https://tenant.acrolinx.cloud/termcontribution.html',
-      displayName: 'Add as Term',
-      icon: 'icon-term-contribute',
-      replacedBy: 'termContribution'
-    }
-  ],
   analysisResults: {},
   links: {
     termContribution: 'https://tenant.acrolinx.cloud/terminology/rest/v7/contribute',

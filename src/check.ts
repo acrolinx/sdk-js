@@ -93,7 +93,6 @@ export interface CheckResult {
   issues: Issue[];
   keywords: KeywordsSection;
   extraInfos: ExtraInfo[];
-  actions: Action[];
   links: {
     termContribution: URL
     deleteScorecard: URL
@@ -174,29 +173,6 @@ export interface Suggestion {
   replacements: Array<string | null>;
 }
 
-/**
- * @deprecated
- */
-export interface Action {
-  id: ActionId | string;
-  url: URL;
-  displayName: string;
-  icon: ActionIcon | string;
-  replacedBy?: LinkId;
-}
-
-export type LinkId = string;
-
-export enum ActionId {
-  help = 'help',
-  termContributionForm = 'termContributionForm'
-}
-
-export enum ActionIcon {
-  help = 'help',
-  termContribute = 'term-contribute'
-}
-
 export interface CommonIssue {
   issueId: string; // TODO: https://3.basecamp.com/3815263/buckets/5979286/todos/923856228
   internalName: string; // Why?
@@ -210,11 +186,6 @@ export interface CommonIssue {
   readonly: boolean;
   issueLocations: IssueLocation[];
   suggestions: Suggestion[];
-
-  /**
-   * @deprecated
-   */
-  actions?: Action[];
 
   links?: IssueLinks;
   debug?: any;
@@ -244,6 +215,7 @@ export interface IssueLocation {
 }
 
 export interface IssueLinks {
+  help?: URL;
   termContribution?: URL;
   termContributionInteractive?: URL;
   addToDictionary?: URL;
