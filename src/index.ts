@@ -1,4 +1,4 @@
-import {Audience, CheckingCapabilities, CheckType, ContentEncoding, ContentFormat, ReportType} from './capabilities';
+import {CheckingCapabilities, CheckType, ContentEncoding, ContentFormat, ContentGoal, ReportType} from './capabilities';
 import {
   AggregatedReportLinkResult,
   CancelCheckResponse,
@@ -49,7 +49,7 @@ export {
   AuthToken,
   CheckingCapabilities,
   CancelCheckResponse,
-  Audience,
+  ContentGoal,
   ErrorType,
   ContentEncoding,
   ContentFormat,

@@ -136,12 +136,12 @@ describe('e2e - AcrolinxEndpoint', () => {
 
     async function createDummyCheck(checkOptions: CheckOptions = {}) {
       const capabilities = await api.getCheckingCapabilities(ACROLINX_API_TOKEN);
-      const audience = _.find(capabilities.audiences!, a => _.startsWith(a.language.id, 'en'));
-      expect(audience).toBeDefined();
+      const contentGoal = _.find(capabilities.contentGoals!, a => _.startsWith(a.language.id, 'en'));
+      expect(contentGoal).toBeDefined();
 
       return await api.check(ACROLINX_API_TOKEN, {
         checkOptions: {
-          audienceId: audience!.id,
+          contentGoalId: contentGoal!.id,
           ...checkOptions
         },
         document: {
@@ -196,13 +196,13 @@ describe('e2e - AcrolinxEndpoint', () => {
       it('should contain checking and document capabilities', async () => {
         const result = await api.getCapabilities(ACROLINX_API_TOKEN);
         expect(result.document.customFields.length).toBeGreaterThan(0);
-        expect(result.checking.audiences.length).toBeGreaterThan(0);
+        expect(result.checking.contentGoals.length).toBeGreaterThan(0);
       });
     });
 
     it('should return the checking capabilities', async () => {
       const result = await api.getCheckingCapabilities(ACROLINX_API_TOKEN);
-      expect(result.audiences.length).toBeGreaterThan(0);
+      expect(result.contentGoals.length).toBeGreaterThan(0);
     });
 
     describe('server notifications', () => {
@@ -237,12 +237,12 @@ describe('e2e - AcrolinxEndpoint', () => {
           }
         } while ('progress' in checkResultOrProgress);
 
-        expect(checkResultOrProgress.data.goals.length).toBeGreaterThan(0);
+        expect(checkResultOrProgress.data.aspects.length).toBeGreaterThan(0);
         expect(_.sortBy(checkResultOrProgress.data.dictionaryScopes)).toEqual([
-          DictionaryScope.audience, DictionaryScope.document, DictionaryScope.language
+          DictionaryScope.contentGoal, DictionaryScope.document, DictionaryScope.language
         ]);
 
-        const spellingIssue = _.find(checkResultOrProgress.data.issues, issue => issue.goalId === 'SPELLING')!;
+        const spellingIssue = _.find(checkResultOrProgress.data.issues, issue => issue.aspectId === 'SPELLING')!;
         expect(spellingIssue).toBeDefined();
         expect(spellingIssue.canAddToDictionary).toBe(true);
       }, 10000);
@@ -304,7 +304,7 @@ describe('e2e - AcrolinxEndpoint', () => {
       it('getDictionaryCapabilities', async () => {
         const dictionaryCapabilities = await api.getDictionaryCapabilities(ACROLINX_API_TOKEN);
 
-        const expectedScopes = [DictionaryScope.language, DictionaryScope.audience,
+        const expectedScopes = [DictionaryScope.language, DictionaryScope.contentGoal,
           DictionaryScope.document];
         expect(dictionaryCapabilities.scopes).toEqual(expectedScopes);
       });
@@ -322,19 +322,19 @@ describe('e2e - AcrolinxEndpoint', () => {
           expect(result.languageId).toEqual('en');
         });
 
-        it('audience', async () => {
-          const audience = (await api.getCheckingCapabilities(ACROLINX_API_TOKEN)).audiences[0];
+        it('contentGoal', async () => {
+          const contentGoal = (await api.getCheckingCapabilities(ACROLINX_API_TOKEN)).contentGoals[0];
 
           const result = await api.addToDictionary(ACROLINX_API_TOKEN, {
             surface: 'TestSurface',
-            scope: DictionaryScope.audience,
-            audienceId: audience.id
+            scope: DictionaryScope.contentGoal,
+            contentGoalId: contentGoal.id
           });
 
           expect(result.surface).toEqual('TestSurface');
-          expect(result.scope).toEqual(DictionaryScope.audience);
-          expect(result.audienceId).toEqual(audience.id);
-          expect(result.languageId).toEqual(audience.language.id);
+          expect(result.scope).toEqual(DictionaryScope.contentGoal);
+          expect(result.contentGoalId).toEqual(contentGoal.id);
+          expect(result.languageId).toEqual(contentGoal.language.id);
         });
 
         function assertValidValidationDetail(validationDetail: ValidationDetail) {
@@ -382,11 +382,11 @@ describe('e2e - AcrolinxEndpoint', () => {
           expect(validationDetail.possibleValues!.length).toBeGreaterThan(1);
         });
 
-        it('validation error for invalid audience id', async () => {
+        it('validation error for invalid contentGoal id', async () => {
           const error = await expectFailingPromise<AcrolinxError>(api.addToDictionary(ACROLINX_API_TOKEN, {
             surface: 'TestSurface',
-            scope: DictionaryScope.audience,
-            audienceId: 'thisAudienceDoesReallyNotExist',
+            scope: DictionaryScope.contentGoal,
+            contentGoalId: 'thisContentGoalDoesReallyNotExist',
           }), ErrorType.Validation);
 
           const validationDetails = error.validationDetails!;

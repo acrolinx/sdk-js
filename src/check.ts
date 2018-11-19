@@ -1,11 +1,11 @@
 import {
   AnalysisType,
-  AudienceId,
+  Aspect,
+  AspectId,
   CheckType,
   ContentEncoding,
   ContentFormatId,
-  Goal,
-  GoalId,
+  ContentGoalId,
   ReportType,
 } from './capabilities';
 import {AsyncApiResponse, LanguageId, SuccessResponse, URL} from './common-types';
@@ -28,7 +28,7 @@ export interface CheckRequest {
 }
 
 export interface CheckOptions {
-  audienceId?: AudienceId;
+  contentGoalId?: ContentGoalId;
   reportTypes?: ReportType[];
   checkType?: CheckType;
   analysisTypes?: AnalysisType[];
@@ -89,7 +89,7 @@ export interface CheckResult {
     words: number;
     issues: number;
   };
-  goals: GoalWithIssueCount[];
+  aspects: AspectWithIssueCount[];
   issues: Issue[];
   keywords: KeywordsSection;
   extraInfos: ExtraInfo[];
@@ -220,11 +220,11 @@ export interface CommonIssue {
   debug?: any;
   canAddToDictionary: boolean;
   subIssues?: SubIssue[];
-  goalId?: GoalId;
+  aspectId?: AspectId;
 }
 
 export interface Issue extends CommonIssue {
-  goalId: GoalId;
+  aspectId: AspectId;
 }
 
 // tslint:disable-next-line no-empty-interface
@@ -253,7 +253,7 @@ export interface IssueLinks {
 
 export type Html = string;
 
-export interface GoalWithIssueCount extends Goal {
+export interface AspectWithIssueCount extends Aspect {
   issueCount: number;
 }
 

@@ -1,20 +1,20 @@
 import {LanguageId} from './common-types';
 
-export type GoalId = string;
-export type AudienceId = string;
+export type AspectId = string;
+export type ContentGoalId = string;
 export type ContentFormatId = string;
 export type AnalysisType = string;
 
-export interface Audience {
-  id: AudienceId;
+export interface ContentGoal {
+  id: ContentGoalId;
   displayName: string;
   language: Language;
-  goals: Goal[];
+  aspects: Aspect[];
   termSets: TermSet[];
-  status: AudienceStatus;
+  status: ContentGoalStatus;
 }
 
-export enum AudienceStatus {
+export enum ContentGoalStatus {
   ready = 'ready',
   loading = 'loading',
   unavailable = 'unavailable'
@@ -25,8 +25,8 @@ export interface Language {
   displayName: string;
 }
 
-export interface Goal {
-  id: GoalId;
+export interface Aspect {
+  id: AspectId;
   displayName: string;
   color: string;
 }
@@ -72,7 +72,7 @@ export interface PlatformExtension {
 }
 
 export interface CheckingCapabilities {
-  audiences: Audience[];
+  contentGoals: ContentGoal[];
   contentFormats: ContentFormat[];
   contentEncodings: ContentEncoding[];
   checkTypes: CheckType[];
