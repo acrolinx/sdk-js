@@ -2,7 +2,7 @@ import {CustomField} from './custom-fields';
 
 export interface User {
   id: string;
-  signIn: string;
+  username: string;
   fullName: string;
   tenantId: string;
   properties: {

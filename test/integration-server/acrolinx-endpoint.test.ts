@@ -176,7 +176,7 @@ describe('e2e - AcrolinxEndpoint', () => {
       });
 
       test('should return user data with custom fields', async () => {
-        expect(user.signIn).toBeDefined();
+        expect(user.username).toBeDefined();
         const departmentCustomField = _.find(user.customFields, cf => cf.key === DEPARTMENT_KEY);
         expect(departmentCustomField).toBeDefined();
         expect(departmentCustomField!.type).toEqual(CustomFieldType.TYPE_LIST);
