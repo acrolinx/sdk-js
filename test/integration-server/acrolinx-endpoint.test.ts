@@ -245,6 +245,12 @@ describe('e2e - AcrolinxEndpoint', () => {
         const spellingIssue = _.find(checkResultOrProgress.data.issues, issue => issue.aspectId === 'SPELLING')!;
         expect(spellingIssue).toBeDefined();
         expect(spellingIssue.canAddToDictionary).toBe(true);
+
+        const keywords = checkResultOrProgress.data.keywords!;
+        expect(typeof keywords.links.getTargetKeywords).toEqual('string');
+        expect(typeof keywords.links.putTargetKeywords).toEqual('string');
+        expect(Array.isArray(keywords.discovered)).toBeTruthy();
+        expect(Array.isArray(keywords.target)).toBeTruthy();
       }, 10000);
 
       it.skip('can cancel check', async () => {

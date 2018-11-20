@@ -91,7 +91,7 @@ export interface CheckResult {
   };
   aspects: AspectWithIssueCount[];
   issues: Issue[];
-  keywords: KeywordsSection;
+  keywords?: KeywordsSection; //  Can be empty for check selection (partialCheckRanges)
   extraInfos: ExtraInfo[];
   links: {
     termContribution: URL
@@ -132,15 +132,6 @@ export interface AggregatedReportLinkResult {
   }>;
 }
 
-export interface KeywordsSection {
-  links: {
-    getTargetKeywords: URL;
-    putTargetKeywords: URL;
-  };
-  discovered: KeywordInfo[];
-  target: KeywordInfo[];
-}
-
 export interface ExtraInfo {
   id: string;
   title: string;
@@ -149,12 +140,38 @@ export interface ExtraInfo {
   url: URL;
 }
 
-export interface KeywordInfo {
+export interface KeywordsSection {
+  links: KeywordsSectionLinks;
+  discovered: DiscoveredKeyword[];
+  target: Keyword[];
+}
+
+export interface KeywordsSectionLinks {
+  getTargetKeywords?: URL;
+  putTargetKeywords?: URL;
+}
+
+export interface Keyword {
   keyword: string;
-  sortKey: string;
-  density: number;
-  count: number;
-  prominence: number;
+  sortKey?: string;
+}
+
+export interface DiscoveredKeyword extends Keyword {
+  density?: number;
+  count?: number;
+  prominence?: number;
+  warnings?: KeywordWarning[];
+}
+
+
+export enum KeywordWarningType {
+  RankMismatch = 'RankMismatch',
+  Occurrence = 'Occurrence'
+}
+
+export interface KeywordWarning {
+  type: KeywordWarningType;
+  severity: 1 | 2;
 }
 
 export interface Match {
