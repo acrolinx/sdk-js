@@ -1,3 +1,4 @@
+import {AddonCheckResultSection} from './addons';
 import {
   AnalysisType,
   Aspect,
@@ -105,6 +106,7 @@ export interface CheckResult {
     };
   embed?: KeyValuePair[];
   analysisResults: AnalysisResultMap;
+  addons?: AddonCheckResultSection;
 }
 
 export interface AnalysisResult {

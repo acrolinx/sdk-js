@@ -1,3 +1,4 @@
+import {Addon} from './addons';
 import {ApiResponse, AsyncApiResponse, AuthToken, ProgressResponse, StringMap, UserId, Username} from './common-types';
 
 export type PollMoreResult = ProgressResponse;
@@ -53,7 +54,7 @@ export interface SigninSuccessData {
   };
   integration: {
     properties: StringMap,
-    addons: Array<unknown>
+    addons: Addon[]
   };
   authorizedUsing: AuthorizationType;
   links: {};
