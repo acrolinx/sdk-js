@@ -89,7 +89,6 @@ export const DUMMY_CAPABILITIES: CheckingCapabilities = {
   contentEncodings: ['none', 'zip,base64', 'base64'] as ContentEncoding[],
   checkTypes: ['batch', 'partial', 'interactive'] as CheckType[],
   reportTypes: ['scorecard.xml', 'scorecard.html', 'debug', 'termharvesting'] as ReportType[],
-  platformExtensions: []
 };
 
 
@@ -423,15 +422,6 @@ export const DUMMY_CHECK_RESULT: CheckResult = {
     ],
     target: []
   },
-  extraInfos: [
-    {
-      id: 'rioseo',
-      title: 'IBM KIS',
-      iconClass: 'search-icon',
-      iconUrl: '...',
-      url: 'https://kis.example.com/info?projectId=52351235'
-    }
-  ],
   reports:
     {
       scorecard: {
@@ -443,7 +433,7 @@ export const DUMMY_CHECK_RESULT: CheckResult = {
         link: 'https://tenant.acrolinx.cloud/output/en/abcdef_1_report.json'
       },
     },
-  analysisResults: {},
+  addons: [],
   links: {
     termContribution: 'https://tenant.acrolinx.cloud/terminology/rest/v7/contribute',
     deleteScorecard: 'https://tenant.acrolinx.cloud/api/v1/checking/153/result'

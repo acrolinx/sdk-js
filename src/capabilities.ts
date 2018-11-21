@@ -3,7 +3,6 @@ import {LanguageId} from './common-types';
 export type AspectId = string;
 export type ContentGoalId = string;
 export type ContentFormatId = string;
-export type AnalysisType = string;
 
 export interface ContentGoal {
   id: ContentGoalId;
@@ -62,21 +61,11 @@ export enum ReportType {
   request_text = 'extractedText'
 }
 
-export interface PlatformExtension {
-  id: string;
-  title: string;
-  iconUrl: string;
-  initialHtml: string;
-  analysisButtonText: string;
-  analysisType: AnalysisType;
-}
-
 export interface CheckingCapabilities {
   contentGoals: ContentGoal[];
   contentFormats: ContentFormat[];
   contentEncodings: ContentEncoding[];
   checkTypes: CheckType[];
   reportTypes: ReportType[];
-  platformExtensions: PlatformExtension[];
 }
 

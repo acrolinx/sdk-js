@@ -1,6 +1,5 @@
-import {AddonCheckResultSection} from './addons';
+import {Addon, AddonId} from './addons';
 import {
-  AnalysisType,
   Aspect,
   AspectId,
   CheckType,
@@ -32,7 +31,7 @@ export interface CheckOptions {
   contentGoalId?: ContentGoalId;
   reportTypes?: ReportType[];
   checkType?: CheckType;
-  analysisTypes?: AnalysisType[];
+  addons?: AddonId[];
   partialCheckRanges?: CheckRange[];
   contentFormat?: ContentFormatId;
   languageId?: LanguageId;
@@ -93,7 +92,6 @@ export interface CheckResult {
   aspects: AspectWithIssueCount[];
   issues: Issue[];
   keywords?: KeywordsSection; //  Can be empty for check selection (partialCheckRanges)
-  extraInfos: ExtraInfo[];
   links: {
     termContribution: URL
     deleteScorecard: URL
@@ -105,8 +103,7 @@ export interface CheckResult {
       scorecard: Report;
     };
   embed?: KeyValuePair[];
-  analysisResults: AnalysisResultMap;
-  addons?: AddonCheckResultSection;
+  addons?: Addon[];
 }
 
 export interface AnalysisResult {
@@ -132,14 +129,6 @@ export interface AggregatedReportLinkResult {
       reportType: string
       link: URL
   }>;
-}
-
-export interface ExtraInfo {
-  id: string;
-  title: string;
-  iconClass: string;
-  iconUrl: URL;
-  url: URL;
 }
 
 export interface KeywordsSection {
