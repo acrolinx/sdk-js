@@ -224,6 +224,12 @@ export class AcrolinxEndpoint {
     return getData(this.put('/api/v1/document/' + documentId, requestBody, {}, authToken));
   }
 
+  public async getJsonFromUrl<T>(url: string, authToken?: AuthToken): Promise<T> {
+    return this.fetch(url, {
+      headers: this.getCommonHeaders(authToken),
+    }).then(res => handleExpectedJsonResponse<T>(res), wrapFetchError);
+  }
+
   public async getTextFromUrl(url: string, authToken?: AuthToken): Promise<string> {
     return this.fetch(url, {
       headers: this.getCommonHeaders(authToken),
@@ -270,12 +276,6 @@ export class AcrolinxEndpoint {
 
   private async getJsonFromPath<T>(path: string, authToken?: AuthToken): Promise<T> {
     return this.getJsonFromUrl<T>(this.props.serverAddress + path, authToken);
-  }
-
-  private async getJsonFromUrl<T>(url: string, authToken?: AuthToken): Promise<T> {
-    return this.fetch(url, {
-      headers: this.getCommonHeaders(authToken),
-    }).then(res => handleExpectedJsonResponse<T>(res), wrapFetchError);
   }
 
   private async post<T>(path: string, body: {}, headers: StringMap = {}, authToken?: AuthToken): Promise<T> {
