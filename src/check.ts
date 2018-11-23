@@ -186,7 +186,7 @@ export interface CommonIssue {
   internalName: string; // Why?
   displayNameHtml: Html;
   guidanceHtml: Html;
-  extractedSurface: string;
+  displaySurface: string;
   positionalInformation: {
     hashes: IssueHashes;
     matches: Match[];

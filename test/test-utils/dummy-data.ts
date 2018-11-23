@@ -176,7 +176,7 @@ export const DUMMY_CHECK_RESULT: CheckResult = {
       "<li>Don't capitalize articles and conjunctions (example: <q>a</q>, <q>and</q>).</li>\n" +
       "<li>Don't capitalize prepositions independent of their length (example: <q>about</q>, <q>around</q>).</li>\n" +
       '</ul>\n</div>',
-      extractedSurface: 'zentense',
+      displaySurface: 'zentense',
       positionalInformation: {
         hashes: {
           // TODO: positional info? groupId grouped flags based on type (e.g. all flags of a rule),
@@ -244,7 +244,7 @@ export const DUMMY_CHECK_RESULT: CheckResult = {
       guidanceHtml: '<div class="guidance term">\n\t<b>Domains</b>\n\t\t\t<br/><i>Switches</i>\n\t\t\t\t\t<br/>\n' +
       '\t\t<b>Note</b>\n\t\t<br/>\n\t\tUse &#39;please&#39; in presale materials only. Do NOT use &#39;please&#39; ' +
       'in postsale material.\n\t</div>\n',
-      extractedSurface: 'Please',
+      displaySurface: 'Please',
       positionalInformation: {
         hashes: {
           issue: '3qyt/AVxwNTOUQSuMA7brw==',
@@ -294,7 +294,7 @@ export const DUMMY_CHECK_RESULT: CheckResult = {
       internalName: 'en-clarity-medium',
       displayNameHtml: 'Too complex? Your readers need a medium level of clarity. ',
       guidanceHtml: '',
-      extractedSurface: 'Reports ... length',
+      displaySurface: 'Reports ... length',
       positionalInformation: {
         hashes: {
           issue: 'E3OxJ3bFcfWLyAisUxufAA==',
@@ -335,7 +335,7 @@ export const DUMMY_CHECK_RESULT: CheckResult = {
           displayNameHtml: 'Try to split up this sentence.',
           guidanceHtml: "<p>This sentence doesn't seem to flow smoothly. We found a few embedded phrases in there " +
           'that could be messing with your flow somehow.</p>',
-          extractedSurface: 'Reports ... length',
+          displaySurface: 'Reports ... length',
           positionalInformation: {
             hashes: {
               issue: '7s1nqUN96X+P6VY4FlfSQQ==',
@@ -376,7 +376,7 @@ export const DUMMY_CHECK_RESULT: CheckResult = {
           displayNameHtml: 'The active voice is usually clearer.',
           guidanceHtml: "<p>This one could do with a bit of pep. It's probably because it feels kind of passive. " +
           "We love it when you're assertive.</p>",
-          extractedSurface: 'was first seen',
+          displaySurface: 'was first seen',
           positionalInformation: {
             hashes: {
               issue: 'dg+ih1XodWeL7lJ/wo17QQ==',
