@@ -1,3 +1,4 @@
+import {AddonCheckResult} from './addons';
 import {CheckingCapabilities, CheckType, ContentEncoding, ContentFormat, ContentGoal, ReportType} from './capabilities';
 import {
   AggregatedReportLinkResult,
@@ -13,7 +14,7 @@ import {
   Report,
   sanitizeDocumentDescriptor
 } from './check';
-import {AuthToken, StringMap, SuccessResponse, UserId} from './common-types';
+import {ApiResponse, AuthToken, StringMap, SuccessResponse, UserId} from './common-types';
 import {AddToDictionaryRequest, AddToDictionaryResponse, DictionaryCapabilities} from './dictionary';
 import {AcrolinxError, ErrorType, wrapFetchError} from './errors';
 import {
@@ -176,6 +177,10 @@ export class AcrolinxEndpoint {
 
   public async pollForCheckResult(authToken: AuthToken, check: CheckResponse): Promise<CheckResultResponse> {
     return this.getJsonFromUrl<CheckResultResponse>(check.links.result, authToken);
+  }
+
+  public async getAddonCheckResult(authToken: AuthToken, appDataLink: string): Promise<AddonCheckResult> {
+    return getData(this.getJsonFromUrl<ApiResponse<AddonCheckResult>>(appDataLink, authToken));
   }
 
   public async getLinkToAggregatedReport(authToken: AuthToken, batchId: string): Promise<AggregatedReportLinkResult> {

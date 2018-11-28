@@ -15,3 +15,8 @@ export interface Addon {
     app: string;
   };
 }
+
+export interface AddonCheckResult {
+  id: AddonId;
+  content: unknown;
+}
