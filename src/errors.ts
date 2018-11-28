@@ -18,7 +18,8 @@ export enum ErrorType {
   CheckCancelled = 'check_cancelled',
   CustomFieldsIncorrect = 'custom_fields_incorrect',
   Validation = 'validation',
-  InsufficientPrivileges = 'insufficient_privileges'
+  InsufficientPrivileges = 'insufficient_privileges',
+  ContentGoalDoesNotExist = 'content_goal_doesnt_exist'
 }
 
 export interface AcrolinxErrorProps {

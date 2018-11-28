@@ -157,8 +157,8 @@ describe('e2e - AcrolinxEndpoint', () => {
       });
     }
 
-    async function checkAndWaitUntilFinished(): Promise<CheckResult> {
-      const check = await createDummyCheck();
+    async function checkAndWaitUntilFinished(checkOptions?: CheckOptions): Promise<CheckResult> {
+      const check = await createDummyCheck(checkOptions);
 
       let checkResultOrProgress;
       do {
@@ -277,6 +277,17 @@ describe('e2e - AcrolinxEndpoint', () => {
       it.skip('exception if partialCheckRanges are invalid', async () => {
         await expectFailingPromise(createDummyCheck({partialCheckRanges: [{begin: 0, end: 1e9}]}), ErrorType.Client);
       });
+
+      it('exception ContentGoalDoesNotExist for unknown id', async () => {
+        await expectFailingPromise(checkAndWaitUntilFinished({contentGoalId: '12345-invalid'}),
+          ErrorType.ContentGoalDoesNotExist);
+      });
+
+      it('exception ContentGoalDoesNotExist for invalid uuid', async () => {
+        await expectFailingPromise(checkAndWaitUntilFinished({contentGoalId: 'invalid!uuid'}),
+          ErrorType.ContentGoalDoesNotExist);
+      });
+
     });
 
     describe('after check ', () => {
