@@ -1,4 +1,4 @@
-import {DictionaryScope} from '../../src';
+import {DictionaryScope, SuggestionIconId} from '../../src';
 import {CheckingCapabilities, CheckType, ContentEncoding, ContentGoalStatus, ReportType} from '../../src/capabilities';
 import {CheckResult, DocumentQualityStatus} from '../../src/check';
 
@@ -267,8 +267,7 @@ export const DUMMY_CHECK_RESULT: CheckResult = {
       suggestions: [
         {
           surface: 'blablub',
-          icon: 'https://tenant.acrolinx.cloud/tng/icons/preferred.svg',
-          // TODO: icon class+url?
+          iconId: SuggestionIconId.preferred,
           groupId: '2653',
           replacements: ['blablub']
         }

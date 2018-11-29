@@ -177,8 +177,13 @@ export interface Match {
 export interface Suggestion {
   surface: string;
   groupId: string;
-  icon?: string; // URL or enum?
+  iconId?: SuggestionIconId;
   replacements: Array<string | null>;
+}
+
+export enum SuggestionIconId {
+  admitted = 'admitted',
+  preferred = 'preferred'
 }
 
 export interface CommonIssue {
