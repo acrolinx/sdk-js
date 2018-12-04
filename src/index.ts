@@ -72,6 +72,7 @@ export * from './custom-fields';
 export * from './common-types';
 export * from './signin';
 export * from './addons';
+export * from './notifications';
 
 // You'll get the clientSignature for your integration after a successful certification meeting.
 // See: https://support.acrolinx.com/hc/en-us/articles/205687652-Getting-Started-with-Custom-Integrations

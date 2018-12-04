@@ -1,8 +1,8 @@
 import {SuccessResponse} from './common-types';
 
 export enum ServerNotificationImportance {
-  Normal = 'NORMAL',
-  High = 'HIGH',
+  Normal = 'normal',
+  High = 'high',
 }
 
 export interface ServerNotification {
