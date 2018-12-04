@@ -156,8 +156,8 @@ export interface DiscoveredKeyword extends Keyword {
 
 
 export enum KeywordWarningType {
-  RankMismatch = 'RankMismatch',
-  Occurrence = 'Occurrence'
+  RankMismatch = 'rankMismatch',
+  Occurrence = 'occurrence'
 }
 
 export interface KeywordWarning {
