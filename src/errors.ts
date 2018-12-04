@@ -9,17 +9,19 @@ export enum ErrorType {
   // https://github.com/acrolinx/server-api-spec/blob/master/apiary.apib
   Client = 'client',
   Server = 'server',
-  ClientSignatureMissing = 'client_signature_missing',
-  ClientSignatureRejected = 'client_signature_rejected',
+  ClientSignatureMissing = 'clientSignatureMissing',
+  ClientSignatureRejected = 'clientSignatureRejected',
   Auth = 'auth',
+  InvalidToken = 'invalidToken',
   SSO = 'sso',
   NotFound = 'not_found',
-  SigninTimedOut = 'interactive_sign_in_timed_out',
-  CheckCancelled = 'check_cancelled',
-  CustomFieldsIncorrect = 'custom_fields_incorrect',
+  SigninTimedOut = 'interactiveSignInTimedOut',
+  CheckCancelled = 'checkCancelled',
+  CheckFailed = 'checkFailed',
+  CustomFieldsIncorrect = 'customFieldsIncorrect',
   Validation = 'validation',
-  InsufficientPrivileges = 'insufficient_privileges',
-  ContentGoalDoesNotExist = 'content_goal_doesnt_exist'
+  InsufficientPrivileges = 'insufficientPrivileges',
+  ContentGoalDoesNotExist = 'contentGoalDoesntExist'
 }
 
 export interface AcrolinxErrorProps {
