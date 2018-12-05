@@ -49,9 +49,9 @@ describe('e2e - AcrolinxEndpoint', () => {
     const LONG_TIME_OUT_MS = 10000;
 
     it('should return an failing promise for 404', async () => {
-      const api = createEndpoint(TEST_SERVER_URL + '/not-there');
+      const api = createEndpoint(TEST_SERVER_URL);
       try {
-        await api.getServerVersion();
+        await api.getJsonFromPath('/not-there');
       } catch (e) {
         expect(e.type).toEqual(ErrorType.HttpErrorStatus);
         expect(e.status).toEqual(404);
@@ -61,12 +61,12 @@ describe('e2e - AcrolinxEndpoint', () => {
 
     it('should return an failing promise for non existing server', async () => {
       const api = createEndpoint('http://non-extisting-server');
-      await expectFailingPromise(api.getServerVersion(), ErrorType.HttpConnectionProblem);
+      await expectFailingPromise(api.getJsonFromPath('/something'), ErrorType.HttpConnectionProblem);
     }, LONG_TIME_OUT_MS);
 
     it('should return an failing promise for invalid URLS', async () => {
       const api = createEndpoint('http://non-ext!::?isting-server');
-      await expectFailingPromise(api.getServerVersion(), ErrorType.HttpConnectionProblem);
+      await expectFailingPromise(api.getJsonFromPath('/something'), ErrorType.HttpConnectionProblem);
     }, LONG_TIME_OUT_MS);
   });
 
@@ -75,11 +75,6 @@ describe('e2e - AcrolinxEndpoint', () => {
 
     beforeEach(() => {
       api = createEndpoint(TEST_SERVER_URL);
-    });
-
-    it('should return the server version', async () => {
-      const result = await api.getServerVersion();
-      expect(result.version).toBe('2018.12');
     });
 
     it('should return the signin links', async () => {

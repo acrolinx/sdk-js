@@ -19,7 +19,6 @@ import {AddToDictionaryRequest, AddToDictionaryResponse, DictionaryCapabilities}
 import {AcrolinxError, ErrorType, wrapFetchError} from './errors';
 import {
   HEADER_X_ACROLINX_AUTH,
-  HEADER_X_ACROLINX_AUTH_OLD,
   HEADER_X_ACROLINX_BASE_URL,
   HEADER_X_ACROLINX_CLIENT,
   HEADER_X_ACROLINX_CLIENT_LOCALE
@@ -230,6 +229,10 @@ export class AcrolinxEndpoint {
     return getData(this.put('/api/v1/document/' + documentId, requestBody, {}, authToken));
   }
 
+  public async getJsonFromPath<T>(path: string, authToken?: AuthToken): Promise<T> {
+    return this.getJsonFromUrl<T>(this.props.serverAddress + path, authToken);
+  }
+
   public async getJsonFromUrl<T>(url: string, authToken?: AuthToken): Promise<T> {
     return this.fetch(url, {
       headers: this.getCommonHeaders(authToken),
@@ -241,14 +244,6 @@ export class AcrolinxEndpoint {
       headers: this.getCommonHeaders(authToken),
     }).then( res => handleExpectedTextResponse(res), wrapFetchError);
   }
-
-  // Here begin some calls to the old API
-  // TODO: Remove when no old API calls are needed anymore
-  public async getServerVersion(): Promise<ServerVersionInfo> {
-    return this.getJsonFromPath<ServerVersionInfo>('/iq/services/v3/rest/core/serverVersion');
-  }
-
-  // Here end some calls to the old API
 
   private getSigninRequestHeaders(options: SigninOptions = {}) {
     if (hasAuthToken(options)) {
@@ -274,14 +269,8 @@ export class AcrolinxEndpoint {
     }
     if (authToken) {
       headers[HEADER_X_ACROLINX_AUTH] = authToken;
-      // TODO: Remove when no old API calls are needed anymore
-      headers[HEADER_X_ACROLINX_AUTH_OLD] = authToken;
     }
     return headers;
-  }
-
-  private async getJsonFromPath<T>(path: string, authToken?: AuthToken): Promise<T> {
-    return this.getJsonFromUrl<T>(this.props.serverAddress + path, authToken);
   }
 
   private async post<T>(path: string, body: {}, headers: StringMap = {}, authToken?: AuthToken): Promise<T> {

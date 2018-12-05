@@ -22,7 +22,7 @@ describe('errors', () => {
   it('should return an failing promise for broken json', async () => {
     const api = new AcrolinxEndpoint({...DUMMY_ENDPOINT_PROPS, serverAddress: BROKEN_JSON_SERVER});
     try {
-      await api.getServerVersion();
+      await api.getJsonFromUrl(BROKEN_JSON_SERVER);
     } catch (e) {
       expect(e.type).toEqual(ErrorType.InvalidJson);
     }
