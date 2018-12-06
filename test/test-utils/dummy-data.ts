@@ -1,5 +1,11 @@
 import {DictionaryScope, SuggestionIconId} from '../../src';
-import {CheckingCapabilities, CheckType, ContentEncoding, GuidanceProfileStatus, ReportType} from '../../src/capabilities';
+import {
+  CheckingCapabilities,
+  CheckType,
+  ContentEncoding,
+  GuidanceProfileStatus,
+  ReportType
+} from '../../src/capabilities';
 import {CheckResult, DocumentQualityStatus} from '../../src/check';
 
 export const DUMMY_CAPABILITIES: CheckingCapabilities = {

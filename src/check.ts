@@ -1,10 +1,10 @@
 import {Addon, AddonId} from './addons';
 import {
-  Goal,
-  GoalId,
   CheckType,
   ContentEncoding,
   ContentFormatId,
+  Goal,
+  GoalId,
   GuidanceProfileId,
   ReportType,
 } from './capabilities';
