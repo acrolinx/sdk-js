@@ -1,9 +1,9 @@
 import {DictionaryScope, SuggestionIconId} from '../../src';
-import {CheckingCapabilities, CheckType, ContentEncoding, ContentGoalStatus, ReportType} from '../../src/capabilities';
+import {CheckingCapabilities, CheckType, ContentEncoding, GuidanceProfileStatus, ReportType} from '../../src/capabilities';
 import {CheckResult, DocumentQualityStatus} from '../../src/check';
 
 export const DUMMY_CAPABILITIES: CheckingCapabilities = {
-  contentGoals: [
+  guidanceProfiles: [
     {
       id: 'aud-1',
       displayName: 'Tom the Technical CustomFieldType',
@@ -11,7 +11,7 @@ export const DUMMY_CAPABILITIES: CheckingCapabilities = {
         displayName: 'English (Great Britain)',
         id: 'en',
       },
-      aspects: [
+      goals: [
         {
           id: 'spelling',
           displayName: 'Spelling',
@@ -41,7 +41,7 @@ export const DUMMY_CAPABILITIES: CheckingCapabilities = {
           displayName: 'Acrolinx'
         }
       ],
-      status: ContentGoalStatus.ready
+      status: GuidanceProfileStatus.ready
     },
     {
       id: 'aud-2',
@@ -50,13 +50,13 @@ export const DUMMY_CAPABILITIES: CheckingCapabilities = {
         displayName: 'German',
         id: 'en',
       },
-      aspects: [{
+      goals: [{
         id: 'spelling',
         displayName: 'Spelling',
         color: '#f21'
       }],
       termSets: [],
-      status: ContentGoalStatus.loading
+      status: GuidanceProfileStatus.loading
     }
   ],
   contentFormats: [
@@ -94,9 +94,9 @@ export const DUMMY_CAPABILITIES: CheckingCapabilities = {
 
 export const DUMMY_CHECK_RESULT: CheckResult = {
   id: '153',
-  dictionaryScopes: [DictionaryScope.language, DictionaryScope.contentGoal, DictionaryScope.document],
+  dictionaryScopes: [DictionaryScope.language, DictionaryScope.guidanceProfile, DictionaryScope.document],
   checkOptions: {
-    contentGoalId: 'aud_1',
+    guidanceProfileId: 'aud_1',
     reportTypes: [
       ReportType.debug,
       ReportType.termharvesting
@@ -143,7 +143,7 @@ export const DUMMY_CHECK_RESULT: CheckResult = {
     words: 121,
     issues: 15
   },
-  aspects: [
+  goals: [
     {
       id: 'spelling',
       displayName: 'Spelling',
@@ -167,7 +167,7 @@ export const DUMMY_CHECK_RESULT: CheckResult = {
     {
       issueId: '1',
       canAddToDictionary: true,
-      aspectId: 'spelling',
+      goalId: 'spelling',
       internalName: 'title_case_chicago',
       displayNameHtml: 'Use Chicago style for the title case?',
       guidanceHtml: '<div class="shortHelp" lang="en" xml:lang="en">\n<p>According to' +
@@ -238,7 +238,7 @@ export const DUMMY_CHECK_RESULT: CheckResult = {
     {
       issueId: '2',
       canAddToDictionary: true,
-      aspectId: 'term.unsuitable',
+      goalId: 'term.unsuitable',
       internalName: 'term_flag',
       displayNameHtml: '<b>Illegal sublanguage variant</b> of preferred term',
       guidanceHtml: '<div class="guidance term">\n\t<b>Domains</b>\n\t\t\t<br/><i>Switches</i>\n\t\t\t\t\t<br/>\n' +
@@ -289,7 +289,7 @@ export const DUMMY_CHECK_RESULT: CheckResult = {
     {
       issueId: '3-sub-1',
       canAddToDictionary: true,
-      aspectId: 'voice.readability',
+      goalId: 'voice.readability',
       internalName: 'en-clarity-medium',
       displayNameHtml: 'Too complex? Your readers need a medium level of clarity. ',
       guidanceHtml: '',
@@ -329,7 +329,7 @@ export const DUMMY_CHECK_RESULT: CheckResult = {
         {
           issueId: '3-1',
           canAddToDictionary: true,
-          aspectId: 'voice.readability',
+          goalId: 'voice.readability',
           internalName: 'phenomenon_embedded_or_complex_sentence',
           displayNameHtml: 'Try to split up this sentence.',
           guidanceHtml: "<p>This sentence doesn't seem to flow smoothly. We found a few embedded phrases in there " +
@@ -370,7 +370,7 @@ export const DUMMY_CHECK_RESULT: CheckResult = {
         {
           issueId: '3-2',
           canAddToDictionary: true,
-          aspectId: 'voice.readability',
+          goalId: 'voice.readability',
           internalName: 'phenomenon_passive',
           displayNameHtml: 'The active voice is usually clearer.',
           guidanceHtml: "<p>This one could do with a bit of pep. It's probably because it feels kind of passive. " +

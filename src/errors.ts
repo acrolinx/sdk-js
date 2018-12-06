@@ -21,7 +21,7 @@ export enum ErrorType {
   CustomFieldsIncorrect = 'customFieldsIncorrect',
   Validation = 'validation',
   InsufficientPrivileges = 'insufficientPrivileges',
-  ContentGoalDoesNotExist = 'contentGoalDoesntExist'
+  GuidanceProfileDoesNotExist = 'guidanceProfileDoesntExist'
 }
 
 export interface AcrolinxErrorProps {

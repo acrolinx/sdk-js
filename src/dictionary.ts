@@ -1,10 +1,10 @@
-import {ContentGoalId} from './capabilities';
+import {GuidanceProfileId} from './capabilities';
 import {DocumentId} from './check';
 import {LanguageId} from './common-types';
 
 export enum DictionaryScope {
   language = 'language',
-  contentGoal = 'contentGoal',
+  guidanceProfile = 'guidanceProfile',
   document = 'document',
 }
 
@@ -17,24 +17,24 @@ export interface CommonAddToDictionaryRequest {
   languageId?: LanguageId;
 }
 
-export interface AddToDictionaryContentGoalRequest extends CommonAddToDictionaryRequest {
-  scope: DictionaryScope.contentGoal;
-  contentGoalId: ContentGoalId;
+export interface AddToDictionaryGuidanceProfileRequest extends CommonAddToDictionaryRequest {
+  scope: DictionaryScope.guidanceProfile;
+  guidanceProfileId: GuidanceProfileId;
 }
 
 export interface AddToDictionaryLanguageRequest extends CommonAddToDictionaryRequest {
   scope: DictionaryScope.language;
-  languageId: ContentGoalId;
+  languageId: GuidanceProfileId;
 }
 
 export interface AddToDictionaryDocumentRequest extends CommonAddToDictionaryRequest {
   scope: DictionaryScope.document;
-  languageId: ContentGoalId;
+  languageId: GuidanceProfileId;
   documentId: DocumentId;
 }
 
 export type AddToDictionaryRequest =
-  AddToDictionaryContentGoalRequest
+  AddToDictionaryGuidanceProfileRequest
   | AddToDictionaryLanguageRequest
   | AddToDictionaryDocumentRequest;
 
@@ -42,6 +42,6 @@ export type AddToDictionaryRequest =
 export interface AddToDictionaryResponse extends CommonAddToDictionaryRequest {
   scope: DictionaryScope;
   languageId: LanguageId;
-  contentGoalId?: ContentGoalId;
-  documentId?: ContentGoalId;
+  guidanceProfileId?: GuidanceProfileId;
+  documentId?: GuidanceProfileId;
 }

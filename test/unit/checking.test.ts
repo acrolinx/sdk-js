@@ -17,7 +17,7 @@ describe('checking', () => {
 
   it('get checking capabilities', async () => {
     const capabilities = await endpoint.getCheckingCapabilities(DUMMY_AUTH_TOKEN);
-    expect(capabilities.contentGoals.length).toBeGreaterThan(0);
+    expect(capabilities.guidanceProfiles.length).toBeGreaterThan(0);
   });
 
 

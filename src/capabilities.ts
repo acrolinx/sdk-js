@@ -1,19 +1,19 @@
 import {LanguageId} from './common-types';
 
-export type AspectId = string;
-export type ContentGoalId = string;
+export type GoalId = string;
+export type GuidanceProfileId = string;
 export type ContentFormatId = string;
 
-export interface ContentGoal {
-  id: ContentGoalId;
+export interface GuidanceProfile {
+  id: GuidanceProfileId;
   displayName: string;
   language: Language;
-  aspects: Aspect[];
+  goals: Goal[];
   termSets: TermSet[];
-  status: ContentGoalStatus;
+  status: GuidanceProfileStatus;
 }
 
-export enum ContentGoalStatus {
+export enum GuidanceProfileStatus {
   ready = 'ready',
   loading = 'loading',
   unavailable = 'unavailable'
@@ -24,8 +24,8 @@ export interface Language {
   displayName: string;
 }
 
-export interface Aspect {
-  id: AspectId;
+export interface Goal {
+  id: GoalId;
   displayName: string;
   color: string;
 }
@@ -62,7 +62,7 @@ export enum ReportType {
 }
 
 export interface CheckingCapabilities {
-  contentGoals: ContentGoal[];
+  guidanceProfiles: GuidanceProfile[];
   contentFormats: ContentFormat[];
   contentEncodings: ContentEncoding[];
   checkTypes: CheckType[];

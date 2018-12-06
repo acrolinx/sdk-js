@@ -1,5 +1,5 @@
 import {AddonCheckResult} from './addons';
-import {CheckingCapabilities, CheckType, ContentEncoding, ContentFormat, ContentGoal, ReportType} from './capabilities';
+import {CheckingCapabilities, CheckType, ContentEncoding, ContentFormat, GuidanceProfile, ReportType} from './capabilities';
 import {
   AggregatedReportLinkResult,
   CancelCheckResponse,
@@ -49,7 +49,7 @@ export {
   AuthToken,
   CheckingCapabilities,
   CancelCheckResponse,
-  ContentGoal,
+  GuidanceProfile,
   ErrorType,
   ContentEncoding,
   ContentFormat,

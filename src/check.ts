@@ -1,11 +1,11 @@
 import {Addon, AddonId} from './addons';
 import {
-  Aspect,
-  AspectId,
+  Goal,
+  GoalId,
   CheckType,
   ContentEncoding,
   ContentFormatId,
-  ContentGoalId,
+  GuidanceProfileId,
   ReportType,
 } from './capabilities';
 import {AsyncApiResponse, LanguageId, SuccessResponse, URL} from './common-types';
@@ -28,7 +28,7 @@ export interface CheckRequest {
 }
 
 export interface CheckOptions {
-  contentGoalId?: ContentGoalId;
+  guidanceProfileId?: GuidanceProfileId;
   reportTypes?: ReportType[];
   checkType?: CheckType;
   addons?: AddonId[];
@@ -89,7 +89,7 @@ export interface CheckResult {
     words: number;
     issues: number;
   };
-  aspects: AspectWithIssueCount[];
+  goals: GoalWithIssueCount[];
   issues: Issue[];
   keywords?: KeywordsSection; //  Can be empty for check selection (partialCheckRanges)
   links: {
@@ -204,11 +204,11 @@ export interface CommonIssue {
   debug?: any;
   canAddToDictionary: boolean;
   subIssues?: SubIssue[];
-  aspectId?: AspectId;
+  goalId?: GoalId;
 }
 
 export interface Issue extends CommonIssue {
-  aspectId: AspectId;
+  goalId: GoalId;
 }
 
 // tslint:disable-next-line no-empty-interface
@@ -238,7 +238,7 @@ export interface IssueLinks {
 
 export type Html = string;
 
-export interface AspectWithIssueCount extends Aspect {
+export interface GoalWithIssueCount extends Goal {
   issueCount: number;
 }
 

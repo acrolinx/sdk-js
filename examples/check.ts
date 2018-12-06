@@ -28,7 +28,7 @@ async function checkExample() {
 
   const check = await acrolinxEndpoint.check(authToken, {
     checkOptions: {
-      contentGoalId: capabilities.contentGoals[0].id,
+      guidanceProfileId: capabilities.guidanceProfiles[0].id,
     },
     document: {
       reference: 'filename.txt'

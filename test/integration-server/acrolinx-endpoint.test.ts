@@ -137,12 +137,12 @@ describe('e2e - AcrolinxEndpoint', () => {
 
     async function createDummyCheck(checkOptions: CheckOptions = {}) {
       const capabilities = await api.getCheckingCapabilities(ACROLINX_API_TOKEN);
-      const contentGoal = _.find(capabilities.contentGoals!, a => _.startsWith(a.language.id, 'en'));
-      expect(contentGoal).toBeDefined();
+      const guidanceProfile = _.find(capabilities.guidanceProfiles!, a => _.startsWith(a.language.id, 'en'));
+      expect(guidanceProfile).toBeDefined();
 
       return await api.check(ACROLINX_API_TOKEN, {
         checkOptions: {
-          contentGoalId: contentGoal!.id,
+          guidanceProfileId: guidanceProfile!.id,
           ...checkOptions
         },
         document: {
@@ -197,13 +197,13 @@ describe('e2e - AcrolinxEndpoint', () => {
       it('should contain checking and document capabilities', async () => {
         const result = await api.getCapabilities(ACROLINX_API_TOKEN);
         expect(result.document.customFields.length).toBeGreaterThan(0);
-        expect(result.checking.contentGoals.length).toBeGreaterThan(0);
+        expect(result.checking.guidanceProfiles.length).toBeGreaterThan(0);
       });
     });
 
     it('should return the checking capabilities', async () => {
       const result = await api.getCheckingCapabilities(ACROLINX_API_TOKEN);
-      expect(result.contentGoals.length).toBeGreaterThan(0);
+      expect(result.guidanceProfiles.length).toBeGreaterThan(0);
     });
 
     describe('server notifications', () => {
@@ -238,10 +238,10 @@ describe('e2e - AcrolinxEndpoint', () => {
           }
         } while ('progress' in checkResultOrProgress);
 
-        expect(checkResultOrProgress.data.aspects.length).toBeGreaterThan(0);
+        expect(checkResultOrProgress.data.goals.length).toBeGreaterThan(0);
         assertDictionaryScopes(checkResultOrProgress.data.dictionaryScopes);
 
-        const spellingIssue = _.find(checkResultOrProgress.data.issues, issue => issue.aspectId === 'SPELLING')!;
+        const spellingIssue = _.find(checkResultOrProgress.data.issues, issue => issue.goalId === 'SPELLING')!;
         expect(spellingIssue).toBeDefined();
         expect(spellingIssue.canAddToDictionary).toBe(true);
 
@@ -273,14 +273,14 @@ describe('e2e - AcrolinxEndpoint', () => {
         await expectFailingPromise(createDummyCheck({partialCheckRanges: [{begin: 0, end: 1e9}]}), ErrorType.Client);
       });
 
-      it('exception ContentGoalDoesNotExist for unknown id', async () => {
-        await expectFailingPromise(checkAndWaitUntilFinished({contentGoalId: '12345-invalid'}),
-          ErrorType.ContentGoalDoesNotExist);
+      it('exception GuidanceProfileDoesNotExist for unknown id', async () => {
+        await expectFailingPromise(checkAndWaitUntilFinished({guidanceProfileId: '12345-invalid'}),
+          ErrorType.GuidanceProfileDoesNotExist);
       });
 
-      it('exception ContentGoalDoesNotExist for invalid uuid', async () => {
-        await expectFailingPromise(checkAndWaitUntilFinished({contentGoalId: 'invalid!uuid'}),
-          ErrorType.ContentGoalDoesNotExist);
+      it('exception GuidanceProfileDoesNotExist for invalid uuid', async () => {
+        await expectFailingPromise(checkAndWaitUntilFinished({guidanceProfileId: 'invalid!uuid'}),
+          ErrorType.GuidanceProfileDoesNotExist);
       });
 
     });
@@ -336,19 +336,19 @@ describe('e2e - AcrolinxEndpoint', () => {
           expect(result.languageId).toEqual('en');
         });
 
-        it.skip('contentGoal', async () => {
-          const contentGoal = (await api.getCheckingCapabilities(ACROLINX_API_TOKEN)).contentGoals[0];
+        it.skip('guidanceProfile', async () => {
+          const guidanceProfile = (await api.getCheckingCapabilities(ACROLINX_API_TOKEN)).guidanceProfiles[0];
 
           const result = await api.addToDictionary(ACROLINX_API_TOKEN, {
             surface: 'TestSurface',
-            scope: DictionaryScope.contentGoal,
-            contentGoalId: contentGoal.id
+            scope: DictionaryScope.guidanceProfile,
+            guidanceProfileId: guidanceProfile.id
           });
 
           expect(result.surface).toEqual('TestSurface');
-          expect(result.scope).toEqual(DictionaryScope.contentGoal);
-          expect(result.contentGoalId).toEqual(contentGoal.id);
-          expect(result.languageId).toEqual(contentGoal.language.id);
+          expect(result.scope).toEqual(DictionaryScope.guidanceProfile);
+          expect(result.guidanceProfileId).toEqual(guidanceProfile.id);
+          expect(result.languageId).toEqual(guidanceProfile.language.id);
         });
 
         function assertValidValidationDetail(validationDetail: ValidationDetail) {
@@ -396,11 +396,11 @@ describe('e2e - AcrolinxEndpoint', () => {
           expect(validationDetail.possibleValues!.length).toBeGreaterThan(1);
         });
 
-        it.skip('validation error for invalid contentGoal id', async () => {
+        it.skip('validation error for invalid guidanceProfile id', async () => {
           const error = await expectFailingPromise<AcrolinxError>(api.addToDictionary(ACROLINX_API_TOKEN, {
             surface: 'TestSurface',
-            scope: DictionaryScope.contentGoal,
-            contentGoalId: 'thisContentGoalDoesReallyNotExist',
+            scope: DictionaryScope.guidanceProfile,
+            guidanceProfileId: 'thisGuidanceProfileDoesReallyNotExist',
           }), ErrorType.Validation);
 
           const validationDetails = error.validationDetails!;
