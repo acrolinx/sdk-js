@@ -56,7 +56,6 @@ export enum ReportType {
   scorecard_html = 'scorecard.html',
   debug = 'debug',
   termharvesting = 'termharvesting',
-  legacyJson = 'legacyJson',
   scorecard = 'scorecard',
   request_text = 'extractedText'
 }
