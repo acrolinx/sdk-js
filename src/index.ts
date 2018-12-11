@@ -85,9 +85,13 @@ export * from './notifications';
 export const DEVELOPMENT_SIGNATURE = 'SW50ZWdyYXRpb25EZXZlbG9wbWVudERlbW9Pbmx5';
 
 export interface ServerVersionInfo {
-  buildDate: string;
-  buildNumber: string;
   version: string;
+  name: string;
+}
+
+export interface ServerInfo {
+  server: ServerVersionInfo;
+  locales: string[];
 }
 
 export interface AcrolinxEndpointProps {
@@ -149,6 +153,10 @@ export class AcrolinxEndpoint {
 
   public setClientLocale(clientLocale: string) {
     this.props.clientLocale = clientLocale;
+  }
+
+  public async getServerInfo(): Promise<ServerInfo> {
+    return getData<ServerInfo>(this.getJsonFromPath('/api/v1/'));
   }
 
   public async signin(options: SigninOptions = {}): Promise<SigninResult> {
@@ -249,7 +257,7 @@ export class AcrolinxEndpoint {
   public async getTextFromUrl(url: string, authToken?: AuthToken): Promise<string> {
     return this.fetch(url, {
       headers: this.getCommonHeaders(authToken),
-    }).then( res => handleExpectedTextResponse(res), wrapFetchError);
+    }).then(res => handleExpectedTextResponse(res), wrapFetchError);
   }
 
   private getSigninRequestHeaders(options: SigninOptions = {}) {
@@ -313,7 +321,7 @@ export class AcrolinxEndpoint {
     const fetchFunction = this.props.fetch || fetch;
     const fetchProps: RequestInit = {
       ...init,
-      credentials: this.props.corsWithCredentials ?  'include' : undefined,
+      credentials: this.props.corsWithCredentials ? 'include' : undefined,
       ...(this.props.additionalFetchProperties || {})
     };
     if (this.props.enableHttpLogging) {
@@ -330,6 +338,7 @@ export class AcrolinxEndpoint {
       return fetchFunction(input, fetchProps);
     }
   }
+
   /* tslint:enable:no-console */
 }
 

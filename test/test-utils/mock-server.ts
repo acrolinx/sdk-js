@@ -5,7 +5,7 @@ import * as _ from 'lodash';
 import {SuccessResponse} from '../../src/common-types';
 import {AcrolinxApiError} from '../../src/errors';
 import {HEADER_X_ACROLINX_AUTH, HEADER_X_ACROLINX_BASE_URL, HEADER_X_ACROLINX_CLIENT} from '../../src/headers';
-import {DEVELOPMENT_SIGNATURE, ServerVersionInfo} from '../../src/index';
+import {DEVELOPMENT_SIGNATURE} from '../../src/index';
 import {ServerNotificationResponseData} from '../../src/notifications';
 import {AuthorizationType, SigninPollResult, SigninResult, SigninSuccessResult} from '../../src/signin';
 import {MockResponseObjectOf, Route} from './common-mocking';
@@ -17,12 +17,6 @@ import {
   CLIENT_SIGNATURE_MISSING,
   SIGNIN_URL_EXPIRED_ERROR
 } from './mocked-errors';
-
-export const DUMMY_SERVER_INFO: ServerVersionInfo = {
-  buildDate: '2018-01-10',
-  buildNumber: '1234',
-  version: '1.2.3',
-};
 
 export {SIGNIN_URL_EXPIRED_ERROR};
 
@@ -70,11 +64,6 @@ export class AcrolinxServerMock {
   constructor(public readonly serverAddress: string) {
     this.checkService = new CheckServiceMock(serverAddress);
     this.routes = [
-      {
-        handler: () => this.getServerVersion(),
-        method: 'GET',
-        path: new RegExp('/iq/services/v3/rest/core/serverVersion$'),
-      },
       {
         handler: (_args, opts) => this.signin(opts),
         method: 'POST',
@@ -190,10 +179,6 @@ export class AcrolinxServerMock {
 
   private returnResponse(body: {}) {
     return {body};
-  }
-
-  private getServerVersion(): ServerVersionInfo {
-    return DUMMY_SERVER_INFO;
   }
 
   private getPlatformNotifications(_sinceTimeStamp: string,
