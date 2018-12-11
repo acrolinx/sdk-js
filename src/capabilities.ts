@@ -66,5 +66,6 @@ export interface CheckingCapabilities {
   contentEncodings: ContentEncoding[];
   checkTypes: CheckType[];
   reportTypes: ReportType[];
+  referencePattern: string;
 }
 

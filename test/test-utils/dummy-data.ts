@@ -95,6 +95,7 @@ export const DUMMY_CAPABILITIES: CheckingCapabilities = {
   contentEncodings: ['none', 'zip,base64', 'base64'] as ContentEncoding[],
   checkTypes: ['batch', 'partial', 'interactive'] as CheckType[],
   reportTypes: ['scorecard.xml', 'scorecard.html', 'debug', 'termharvesting'] as ReportType[],
+  referencePattern: 'someRegex'
 };
 
 
