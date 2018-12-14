@@ -9,3 +9,5 @@ tmp
 dist
 npm-debug.log
 **/.env
+coverage
+.nyc_output
