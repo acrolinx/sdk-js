@@ -137,10 +137,6 @@ export interface SsoSigninOption {
 
 export type SigninOptions = HasAuthToken | SsoSigninOption | {};
 
-// FIX for Typescipt error in esnext compiled project...
-// https://stackoverflow.com/questions/44987899/typescript-cannot-find-name-fetch-universal-library?rq=1
-// export declare var fetch: any;
-
 export class AcrolinxEndpoint {
   public readonly props: AcrolinxEndpointProps;
 
@@ -161,8 +157,7 @@ export class AcrolinxEndpoint {
 
   public async signin(options: SigninOptions = {}): Promise<SigninResult> {
     const signinRequestBody: SigninRequestBody = {clientName: this.props.client.name};
-    return this.post<SigninResult>('/api/v1/auth/sign-ins', signinRequestBody,
-      this.getSigninRequestHeaders(options));
+    return this.post<SigninResult>('/api/v1/auth/sign-ins', signinRequestBody, getSigninRequestHeaders(options));
   }
 
   public async pollForSignin(signinLinks: SigninLinksResult,
@@ -260,19 +255,6 @@ export class AcrolinxEndpoint {
     }).then(res => handleExpectedTextResponse(res), wrapFetchError);
   }
 
-  private getSigninRequestHeaders(options: SigninOptions = {}) {
-    if (hasAuthToken(options)) {
-      return {[HEADER_X_ACROLINX_AUTH]: options.authToken};
-    } else if (isSsoSigninOption(options)) {
-      return {
-        [options.passwordKey || 'username']: options.userId,
-        [options.passwordKey || 'password']: options.password,
-      };
-    } else {
-      return {};
-    }
-  }
-
   private getCommonHeaders(authToken?: AuthToken): StringMap {
     const headers: StringMap = {
       'Content-Type': 'application/json',
@@ -344,4 +326,17 @@ export class AcrolinxEndpoint {
 
 function getData<T>(promise: Promise<SuccessResponse<T>>): Promise<T> {
   return promise.then(r => r.data);
+}
+
+function getSigninRequestHeaders(options: SigninOptions = {}) {
+  if (hasAuthToken(options)) {
+    return {[HEADER_X_ACROLINX_AUTH]: options.authToken};
+  } else if (isSsoSigninOption(options)) {
+    return {
+      [options.passwordKey || 'username']: options.userId,
+      [options.passwordKey || 'password']: options.password,
+    };
+  } else {
+    return {};
+  }
 }

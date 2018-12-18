@@ -1,5 +1,3 @@
-import {AcrolinxApiError} from './errors';
-
 export type URL = string;
 export type LanguageId = string;
 export type UserId = string;
@@ -19,10 +17,6 @@ export interface Progress {
 export interface SuccessResponse<Data, Links = {}> {
   data: Data;
   links: Links;
-}
-
-export interface ErrorResponse {
-  error: AcrolinxApiError;
 }
 
 export interface ProgressResponse {

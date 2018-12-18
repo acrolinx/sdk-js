@@ -105,14 +105,6 @@ export interface CheckResult {
   addons?: Addon[];
 }
 
-export interface AnalysisResult {
-  reportContentHtml: string;
-}
-
-export interface AnalysisResultMap {
-  [analysisType: string]: AnalysisResult;
-}
-
 export interface Report {
   linkAuthenticated: URL;
   link: URL;
@@ -186,8 +178,7 @@ export enum SuggestionIconId {
 }
 
 export interface CommonIssue {
-  issueId: string; // TODO: https://3.basecamp.com/3815263/buckets/5979286/todos/923856228
-  internalName: string; // Why?
+  internalName: string;
   displayNameHtml: Html;
   guidanceHtml: Html;
   displaySurface: string;
@@ -210,9 +201,7 @@ export interface Issue extends CommonIssue {
   goalId: GoalId;
 }
 
-// tslint:disable-next-line no-empty-interface
-export interface SubIssue extends CommonIssue {
-}
+type SubIssue = CommonIssue;
 
 export interface IssueHashes {
   issue: string;

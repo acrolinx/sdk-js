@@ -172,7 +172,6 @@ export const DUMMY_CHECK_RESULT: CheckResult = {
   ],
   issues: [
     {
-      issueId: '1',
       canAddToDictionary: true,
       goalId: 'spelling',
       internalName: 'title_case_chicago',
@@ -243,7 +242,6 @@ export const DUMMY_CHECK_RESULT: CheckResult = {
       }
     },
     {
-      issueId: '2',
       canAddToDictionary: true,
       goalId: 'term.unsuitable',
       internalName: 'term_flag',
@@ -294,7 +292,6 @@ export const DUMMY_CHECK_RESULT: CheckResult = {
       }
     },
     {
-      issueId: '3-sub-1',
       canAddToDictionary: true,
       goalId: 'voice.readability',
       internalName: 'en-clarity-medium',
@@ -334,7 +331,6 @@ export const DUMMY_CHECK_RESULT: CheckResult = {
       },
       subIssues: [
         {
-          issueId: '3-1',
           canAddToDictionary: true,
           goalId: 'voice.readability',
           internalName: 'phenomenon_embedded_or_complex_sentence',
@@ -375,7 +371,6 @@ export const DUMMY_CHECK_RESULT: CheckResult = {
           }
         },
         {
-          issueId: '3-2',
           canAddToDictionary: true,
           goalId: 'voice.readability',
           internalName: 'phenomenon_passive',

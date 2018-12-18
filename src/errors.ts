@@ -1,18 +1,19 @@
 import {DocumentId} from './check';
 
+/**
+ * See also https://github.com/acrolinx/server-api-spec/blob/master/apiary.apib
+ * and https://acrolinxapi.docs.apiary.io/#introduction/response-format/error-responses
+ */
 export enum ErrorType {
   HttpErrorStatus = 'http_error_status',
   HttpConnectionProblem = 'http_connection_problem',
-  Unknown = 'unknown_error',
   InvalidJson = 'invalid_json',
 
-  // https://github.com/acrolinx/server-api-spec/blob/master/apiary.apib
   Client = 'client',
   Server = 'server',
   ClientSignatureMissing = 'clientSignatureMissing',
   ClientSignatureRejected = 'clientSignatureRejected',
   Auth = 'auth',
-  InvalidToken = 'invalidToken',
   SSO = 'sso',
   NotFound = 'not_found',
   SigninTimedOut = 'interactiveSignInTimedOut',
@@ -21,7 +22,9 @@ export enum ErrorType {
   CustomFieldsIncorrect = 'customFieldsIncorrect',
   Validation = 'validation',
   InsufficientPrivileges = 'insufficientPrivileges',
-  GuidanceProfileDoesNotExist = 'guidanceProfileDoesntExist'
+  GuidanceProfileDoesNotExist = 'guidanceProfileDoesntExist',
+  InvalidBaseUrl = 'invalidBaseUrl',
+  NoGuidanceProfileConfigured = 'noGuidanceProfileConfigured'
 }
 
 export interface AcrolinxErrorProps {
