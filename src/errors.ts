@@ -91,7 +91,7 @@ export function createErrorFromFetchResponse(res: Response, jsonBody: any | Acro
     });
   } else {
     return new AcrolinxError({
-      detail: res.statusText + ':' + JSON.stringify(jsonBody),
+      detail:  `${res.statusText}:${JSON.stringify(jsonBody)}`,
       status: res.status,
       title: 'Unknown HTTP Error',
       type: ErrorType.HttpErrorStatus,

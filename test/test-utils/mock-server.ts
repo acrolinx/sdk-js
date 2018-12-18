@@ -105,7 +105,6 @@ export class AcrolinxServerMock {
       this.signinIds[signinId].authorizationType = authorizationType;
     } else {
       _.forEach(this.signinIds, (signinState) => {
-        // console.log('Fake it for', signinState);
         signinState.authorizationType = authorizationType;
       });
     }
@@ -145,14 +144,10 @@ export class AcrolinxServerMock {
       }
     }
 
-    // console.log('try to match url', url);
     for (const route of this.routes) {
-      // console.log('try rout', route);
       const matches = url.match(route.path);
       if (matches && opts.method === route.method) {
-        // console.log('Found match!', matches);
-        const handlerResult = route.handler(matches!, opts);
-        // console.log(`Handler for URL ${url} returned`, handlerResult);
+        const handlerResult = route.handler(matches, opts);
         if (isMockResponseObject(handlerResult)) {
           return handlerResult;
         } else if (isAcrolinxApiError(handlerResult)) {
@@ -169,7 +164,6 @@ export class AcrolinxServerMock {
 
   public deleteSigninPollUrl(url: string) {
     const signinId = url.substr(url.lastIndexOf('/') + 1);
-    // console.warn('deleteSigninPollUrl', signinId);
     this.deleteSignin(signinId);
   }
 
@@ -208,7 +202,6 @@ export class AcrolinxServerMock {
   private pollForSignin(signinId: string,
                         _opts: RequestInit): MockResponseObjectOf<SigninPollResult | AcrolinxApiError> {
     const signinState = this.signinIds[signinId];
-    // console.log('pollForSignin', signinId, signinState);
     if (!signinState) {
       return this.createAcrolinxApiErrorResponse(SIGNIN_URL_EXPIRED_ERROR);
     }

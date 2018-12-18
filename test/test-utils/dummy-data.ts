@@ -8,6 +8,9 @@ import {
 } from '../../src/capabilities';
 import {CheckResult, DocumentQualityStatus} from '../../src/check';
 
+const GOAL_VOICE_ID = 'voice.readability';
+const GOAL_TERM_ID = 'term.unsuitable';
+
 export const DUMMY_CAPABILITIES: CheckingCapabilities = {
   guidanceProfiles: [
     {
@@ -24,12 +27,12 @@ export const DUMMY_CAPABILITIES: CheckingCapabilities = {
           color: '#f21'
         },
         {
-          id: 'voice.readability',
+          id: GOAL_VOICE_ID,
           displayName: 'Clarity',
           color: '#f22'
         },
         {
-          id: 'term.unsuitable',
+          id: GOAL_TERM_ID,
           displayName: 'Unsuitable Term',
           color: '#f23'
         },
@@ -99,6 +102,8 @@ export const DUMMY_CAPABILITIES: CheckingCapabilities = {
 };
 
 
+const ENVIRONMENT_HASH = 'XVYQZVyCoFOr1TDeyXuMgg==';
+
 export const DUMMY_CHECK_RESULT: CheckResult = {
   id: '153',
   dictionaryScopes: [DictionaryScope.language, DictionaryScope.guidanceProfile, DictionaryScope.document],
@@ -158,13 +163,13 @@ export const DUMMY_CHECK_RESULT: CheckResult = {
       issueCount: 13
     },
     {
-      id: 'voice.readability',
+      id: GOAL_VOICE_ID,
       displayName: 'Clarity',
       color: '#f22',
       issueCount: 2
     },
     {
-      id: 'term.unsuitable',
+      id: GOAL_TERM_ID,
       displayName: 'Unsuitable Term',
       color: '#f23',
       issueCount: 0
@@ -176,12 +181,12 @@ export const DUMMY_CHECK_RESULT: CheckResult = {
       goalId: 'spelling',
       internalName: 'title_case_chicago',
       displayNameHtml: 'Use Chicago style for the title case?',
-      guidanceHtml: '<div class="shortHelp" lang="en" xml:lang="en">\n<p>According to' +
-      " the <q>Chicago Manual of Style</q>, here's how you write titles:</p>\n<ul>\n" +
-      '<li>Capitalize the first word and the last word.</li>\n<li>Capitalize all "main" words.</li>\n' +
-      "<li>Don't capitalize articles and conjunctions (example: <q>a</q>, <q>and</q>).</li>\n" +
-      "<li>Don't capitalize prepositions independent of their length (example: <q>about</q>, <q>around</q>).</li>\n" +
-      '</ul>\n</div>',
+      guidanceHtml: `<div class="shortHelp" lang="en" xml:lang="en">\n<p>According to
+       the <q>Chicago Manual of Style</q>, here's how you write titles:</p>\n<ul>
+      <li>Capitalize the first word and the last word.</li>\n<li>Capitalize all "main" words.</li>
+      <li>Don't capitalize articles and conjunctions (example: <q>a</q>, <q>and</q>).</li>
+      <li>Don't capitalize prepositions independent of their length (example: <q>about</q>, <q>around</q>).</li>
+      </ul>\n</div>`,
       displaySurface: 'zentense',
       positionalInformation: {
         hashes: {
@@ -243,12 +248,12 @@ export const DUMMY_CHECK_RESULT: CheckResult = {
     },
     {
       canAddToDictionary: true,
-      goalId: 'term.unsuitable',
+      goalId: GOAL_TERM_ID,
       internalName: 'term_flag',
       displayNameHtml: '<b>Illegal sublanguage variant</b> of preferred term',
-      guidanceHtml: '<div class="guidance term">\n\t<b>Domains</b>\n\t\t\t<br/><i>Switches</i>\n\t\t\t\t\t<br/>\n' +
-      '\t\t<b>Note</b>\n\t\t<br/>\n\t\tUse &#39;please&#39; in presale materials only. Do NOT use &#39;please&#39; ' +
-      'in postsale material.\n\t</div>\n',
+      guidanceHtml: `<div class="guidance term">\n\t<b>Domains</b>\n\t\t\t<br/><i>Switches</i>\n\t\t\t\t\t<br/>
+      \t\t<b>Note</b>\n\t\t<br/>\n\t\tUse &#39;please&#39; in presale materials only. Do NOT use &#39;please&#39;
+      in postsale material.\n\t</div>\n`,
       displaySurface: 'Please',
       positionalInformation: {
         hashes: {
@@ -293,7 +298,7 @@ export const DUMMY_CHECK_RESULT: CheckResult = {
     },
     {
       canAddToDictionary: true,
-      goalId: 'voice.readability',
+      goalId: GOAL_VOICE_ID,
       internalName: 'en-clarity-medium',
       displayNameHtml: 'Too complex? Your readers need a medium level of clarity. ',
       guidanceHtml: '',
@@ -301,7 +306,7 @@ export const DUMMY_CHECK_RESULT: CheckResult = {
       positionalInformation: {
         hashes: {
           issue: 'E3OxJ3bFcfWLyAisUxufAA==',
-          environment: 'XVYQZVyCoFOr1TDeyXuMgg==',
+          environment: ENVIRONMENT_HASH,
           index: 'accsS0dbn/3rafcbT9NJGw==1'
         },
         matches: [
@@ -332,16 +337,16 @@ export const DUMMY_CHECK_RESULT: CheckResult = {
       subIssues: [
         {
           canAddToDictionary: true,
-          goalId: 'voice.readability',
+          goalId: GOAL_VOICE_ID,
           internalName: 'phenomenon_embedded_or_complex_sentence',
           displayNameHtml: 'Try to split up this sentence.',
           guidanceHtml: "<p>This sentence doesn't seem to flow smoothly. We found a few embedded phrases in there " +
-          'that could be messing with your flow somehow.</p>',
+            'that could be messing with your flow somehow.</p>',
           displaySurface: 'Reports ... length',
           positionalInformation: {
             hashes: {
               issue: '7s1nqUN96X+P6VY4FlfSQQ==',
-              environment: 'XVYQZVyCoFOr1TDeyXuMgg==',
+              environment: ENVIRONMENT_HASH,
               index: '++0c1Z/OQu1Mwzt0KpkYYA==1'
             },
             matches: [
@@ -372,16 +377,16 @@ export const DUMMY_CHECK_RESULT: CheckResult = {
         },
         {
           canAddToDictionary: true,
-          goalId: 'voice.readability',
+          goalId: GOAL_VOICE_ID,
           internalName: 'phenomenon_passive',
           displayNameHtml: 'The active voice is usually clearer.',
           guidanceHtml: "<p>This one could do with a bit of pep. It's probably because it feels kind of passive. " +
-          "We love it when you're assertive.</p>",
+            "We love it when you're assertive.</p>",
           displaySurface: 'was first seen',
           positionalInformation: {
             hashes: {
               issue: 'dg+ih1XodWeL7lJ/wo17QQ==',
-              environment: 'XVYQZVyCoFOr1TDeyXuMgg==',
+              environment: ENVIRONMENT_HASH,
               index: 'fOJLASZHiwnwcJWcfbkXnw==1'
             },
             matches: [
@@ -408,9 +413,9 @@ export const DUMMY_CHECK_RESULT: CheckResult = {
   keywords: {
     links: {
       getTargetKeywords: 'https://tenant.acrolinx.cloud/services/v1/rest/findability/targetKeywords?' +
-      'contextId=C%3A%5CUsers%5Cgrabowski%5CDesktop%5Ccloud-linguistic-smoketest.docx',
+        'contextId=C%3A%5CUsers%5Cgrabowski%5CDesktop%5Ccloud-linguistic-smoketest.docx',
       putTargetKeywords: 'https://tenant.acrolinx.cloud/services/v1/rest/findability/targetKeywords?' +
-      'contextId=C%3A%5CUsers%5Cgrabowski%5CDesktop%5Ccloud-linguistic-smoketest.docx'
+        'contextId=C%3A%5CUsers%5Cgrabowski%5CDesktop%5Ccloud-linguistic-smoketest.docx'
     },
     discovered: [
       {

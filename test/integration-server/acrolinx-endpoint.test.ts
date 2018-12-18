@@ -44,6 +44,7 @@ function assertDictionaryScopes(scopes: DictionaryScope[]) {
   expect(scopes).toContain(DictionaryScope.document);
 }
 
+// tslint:disable:next-line: no-big-function
 describe('e2e - AcrolinxEndpoint', () => {
   describe('errors by bad server address', () => {
     const LONG_TIME_OUT_MS = 10000;
@@ -137,7 +138,7 @@ describe('e2e - AcrolinxEndpoint', () => {
 
     async function createDummyCheck(checkOptions: CheckOptions = {}) {
       const capabilities = await api.getCheckingCapabilities(ACROLINX_API_TOKEN);
-      const guidanceProfile = _.find(capabilities.guidanceProfiles!, a => _.startsWith(a.language.id, 'en'));
+      const guidanceProfile = _.find(capabilities.guidanceProfiles, a => _.startsWith(a.language.id, 'en'));
       expect(guidanceProfile).toBeDefined();
 
       return await api.check(ACROLINX_API_TOKEN, {
@@ -292,7 +293,7 @@ describe('e2e - AcrolinxEndpoint', () => {
       beforeEach(async () => {
         checkResult = await checkAndWaitUntilFinished();
         expect(checkResult.document.id).toBeDefined();
-        document = await api.getDocumentDescriptor(ACROLINX_API_TOKEN, checkResult.document.id!);
+        document = await api.getDocumentDescriptor(ACROLINX_API_TOKEN, checkResult.document.id);
       });
 
       it('should get custom fields', async () => {
@@ -370,7 +371,7 @@ describe('e2e - AcrolinxEndpoint', () => {
           expect(error.validationDetails).not.toBeUndefined();
           expect(validationDetails.length).toEqual(1);
 
-          const validationDetail = validationDetails[0]!;
+          const validationDetail = validationDetails[0];
           expect(validationDetail.attributePath).toEqual('scope');
           assertValidValidationDetail(validationDetail);
           expect(Array.isArray(validationDetail.possibleValues)).toBeTruthy();
@@ -390,7 +391,7 @@ describe('e2e - AcrolinxEndpoint', () => {
           expect(error.validationDetails).not.toBeUndefined();
           expect(validationDetails.length).toEqual(1);
 
-          const validationDetail = validationDetails[0]!;
+          const validationDetail = validationDetails[0];
           assertValidValidationDetail(validationDetail);
           expect(Array.isArray(validationDetail.possibleValues)).toBeTruthy();
           expect(validationDetail.possibleValues!.length).toBeGreaterThan(1);
@@ -408,7 +409,7 @@ describe('e2e - AcrolinxEndpoint', () => {
           expect(error.validationDetails).not.toBeUndefined();
           expect(validationDetails.length).toEqual(1);
 
-          assertValidValidationDetail(validationDetails[0]!);
+          assertValidValidationDetail(validationDetails[0]);
         });
       });
     });

@@ -10,8 +10,7 @@ export function isSigninLinksResult(signinResult: SigninResult): signinResult is
 }
 
 export function isSigninSuccessResult(signinResult: SigninSuccessResult
-  | PollMoreResult | SigninLinksResult
-  | undefined): signinResult is SigninSuccessResult {
+  | PollMoreResult | SigninLinksResult): signinResult is SigninSuccessResult {
   const asSigninSuccessResult = signinResult as SigninSuccessResult;
   return !!(asSigninSuccessResult && asSigninSuccessResult.data && asSigninSuccessResult.data.accessToken);
 }

@@ -259,7 +259,7 @@ export class AcrolinxEndpoint {
     const headers: StringMap = {
       'Content-Type': 'application/json',
       [HEADER_X_ACROLINX_BASE_URL]: this.props.serverAddress,
-      [HEADER_X_ACROLINX_CLIENT]: this.props.client.signature + '; ' + this.props.client.version,
+      [HEADER_X_ACROLINX_CLIENT]: `${this.props.client.signature}; ${this.props.client.version}`,
     };
     if (this.props.clientLocale) {
       headers[HEADER_X_ACROLINX_CLIENT_LOCALE] = this.props.clientLocale;
@@ -283,7 +283,6 @@ export class AcrolinxEndpoint {
                         body: {},
                         headers: StringMap = {},
                         authToken?: AuthToken): Promise<T> {
-    // console.log('post', this.props.serverAddress, path, body, headers);
     return this.fetch(this.props.serverAddress + path, {
       body: JSON.stringify(body),
       headers: {...this.getCommonHeaders(authToken), ...headers},

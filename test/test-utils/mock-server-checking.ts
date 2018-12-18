@@ -1,7 +1,7 @@
 import * as _ from 'lodash';
 import {CheckingCapabilities} from '../../src';
 import {CheckId, CheckRequest, CheckResponse, CheckResultResponse} from '../../src/check';
-import {ProgressResponse, SuccessResponse, URL} from '../../src/common-types';
+import {SuccessResponse, URL} from '../../src/common-types';
 import {AcrolinxApiError} from '../../src/errors';
 import {Route} from './common-mocking';
 import {DUMMY_CAPABILITIES, DUMMY_CHECK_RESULT} from './dummy-data';
@@ -20,18 +20,17 @@ export class Check {
     const elapsedTimeMs = Date.now() - this.startTime;
     if (elapsedTimeMs < CHECK_TIME_MS) {
       const percent = Math.min(elapsedTimeMs / CHECK_TIME_MS * 100, 100);
-      const progressResponse: ProgressResponse = {
+      return {
         progress: {
           percent,
           message: `Still working ${percent}%`,
           retryAfter: 1
         },
         links: {
-          poll: serverAddress + '/api/v1/checking/checks/' + this.id
+          poll: `${serverAddress}/api/v1/checking/checks/${this.id}`
 
         }
       };
-      return progressResponse;
     } else {
       return {data: {...DUMMY_CHECK_RESULT, id: this.id}, links: {}};
 
