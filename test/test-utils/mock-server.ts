@@ -57,6 +57,11 @@ interface SigninState {
 export class AcrolinxServerMock {
   public readonly checkService: CheckServiceMock;
   public requests: LoggedRequest[] = [];
+  public simulatedError: {
+    signin?: Error;
+  } = {};
+  public retryAfter: number = DUMMY_RETRY_AFTER;
+
   private routes: Route[];
   private signinIds: { [id: string]: SigninState } = {};
   private ssoEnabled: boolean = false;
@@ -167,6 +172,27 @@ export class AcrolinxServerMock {
     this.deleteSignin(signinId);
   }
 
+  public pollForSignin(signinId: string,
+                       _opts: RequestInit): MockResponseObjectOf<SigninPollResult | AcrolinxApiError> {
+    const signinState = this.signinIds[signinId];
+    if (!signinState) {
+      return this.createAcrolinxApiErrorResponse(SIGNIN_URL_EXPIRED_ERROR);
+    }
+
+    if (signinState.authorizationType) {
+      return {
+        body: this.createLoginSuccessResult(AuthorizationType.ACROLINX_SIGN_IN),
+        status: 200,
+      };
+    } else {
+      return {
+        body: {progress: {percent: 0, message: 'bla', retryAfter: this.retryAfter}, links: {poll: 'dummmy'}},
+        headers: {'retry-after': '' + this.retryAfter},
+        status: 202,
+      };
+    }
+  }
+
   private deleteSignin(signinId: string) {
     delete this.signinIds[signinId];
   }
@@ -181,11 +207,17 @@ export class AcrolinxServerMock {
   }
 
   private signin(opts: RequestInit): SigninResult {
+    if (this.simulatedError.signin) {
+      throw this.simulatedError.signin;
+    }
+
     if (this.ssoEnabled) {
       return this.createLoginSuccessResult(AuthorizationType.ACROLINX_SSO);
+
     }
     if (getHeader(opts, HEADER_X_ACROLINX_AUTH) === DUMMY_AUTH_TOKEN) {
       return this.createLoginSuccessResult(AuthorizationType.ACROLINX_TOKEN);
+
     }
     const baseUrl = getHeader(opts, HEADER_X_ACROLINX_BASE_URL) || this.serverAddress;
     const id = _.uniqueId('signin-id-');
@@ -197,27 +229,6 @@ export class AcrolinxServerMock {
         poll: baseUrl + DUMMY_SIGNIN_LINK_PATH_POLL + id,
       }
     };
-  }
-
-  private pollForSignin(signinId: string,
-                        _opts: RequestInit): MockResponseObjectOf<SigninPollResult | AcrolinxApiError> {
-    const signinState = this.signinIds[signinId];
-    if (!signinState) {
-      return this.createAcrolinxApiErrorResponse(SIGNIN_URL_EXPIRED_ERROR);
-    }
-
-    if (signinState.authorizationType) {
-      return {
-        body: this.createLoginSuccessResult(AuthorizationType.ACROLINX_SIGN_IN),
-        status: 200,
-      };
-    } else {
-      return {
-        body: {progress: {percent: 0, message: 'bla', retryAfter: 1}, links: {poll: 'dummmy'}},
-        headers: {'retry-after': '' + DUMMY_RETRY_AFTER},
-        status: 202,
-      };
-    }
   }
 
   private createAcrolinxApiErrorResponse(apiError: Partial<AcrolinxApiError>): MockResponseObjectOf<AcrolinxApiError> {
