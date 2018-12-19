@@ -1,7 +1,7 @@
 import {ErrorType} from '../../src/errors';
 
 export const SIGNIN_URL_EXPIRED_ERROR = {
-  detail: 'The sign-in URL is does not exists or is expired. Please start a new sign-in process.',
+  detail: 'The sign-in URL does not exists or is expired. Please start a new sign-in process.',
   status: 404,
   title: 'Sign-in URL is not available.',
   type: ErrorType.Client,
