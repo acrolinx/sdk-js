@@ -37,7 +37,6 @@ export interface TermSet {
 export interface ContentFormat {
   id: ContentFormatId;
   displayName: string;
-  extensions: string[];
 }
 
 export enum CheckType {
@@ -47,10 +46,11 @@ export enum CheckType {
 
 export enum ContentEncoding {
   none = 'none',
-  zip_base64 = 'zip,base64',
+  zip_base64 = 'zip,base64',  // TODO: Remove
   base64 = 'base64',
 }
 
+// TODO: Remove all except scorecard and extractedText
 export enum ReportType {
   scorecard_xml = 'scorecard.xml',
   scorecard_html = 'scorecard.html',

@@ -72,27 +72,22 @@ export const DUMMY_CAPABILITIES: CheckingCapabilities = {
     {
       id: 'auto',
       displayName: 'Automatic Detection',   // TODO: what do we do with this again?
-      extensions: ['*']                     // TODO: what do we do with this again?
     },
     {
       id: 'text',
       displayName: 'Plain Text',
-      extensions: ['txt']
     },
     {
       id: 'markdown',
       displayName: 'Markdown',
-      extensions: ['md']
     },
     {
       id: 'xml',
       displayName: 'XML',
-      extensions: ['xml', 'dita', 'docbook']
     },
     {
       id: 'word_xml',
       displayName: 'XML (MS Word 2003)',
-      extensions: ['xml']
     }
   ],
   contentEncodings: ['none', 'zip,base64', 'base64'] as ContentEncoding[],
