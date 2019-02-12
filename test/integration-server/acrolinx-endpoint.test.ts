@@ -1,3 +1,4 @@
+import * as Ajv from 'ajv';
 import 'cross-fetch/polyfill';
 import * as dotenv from 'dotenv';
 import * as _ from 'lodash';
@@ -15,6 +16,7 @@ import {AcrolinxError, ValidationDetail} from '../../src/errors';
 import {AcrolinxEndpoint, DocumentDescriptor, isSigninSuccessResult, SigninSuccessResult} from '../../src/index';
 import {SigninLinksResult} from '../../src/signin';
 import {waitMs} from '../../src/utils/mixed-utils';
+import * as checkResultSchema from '../schemas/check-result.json';
 import {describeIf, expectFailingPromise, testIf} from '../test-utils/utils';
 
 dotenv.config();
@@ -25,6 +27,7 @@ const SSO_PASSWORD = process.env.SSO_PASSWORD;
 const ACROLINX_API_TOKEN = process.env.ACROLINX_API_TOKEN || '';
 const ACROLINX_API_USER_ID = process.env.ACROLINX_API_USER_ID || 'jenkins-api-js';
 
+const ajv = new Ajv({allErrors: true});
 
 function createEndpoint(serverAddress: string) {
   return new AcrolinxEndpoint({
@@ -251,6 +254,10 @@ describe('e2e - AcrolinxEndpoint', () => {
         expect(typeof keywords.links.putTargetKeywords).toEqual('string');
         expect(Array.isArray(keywords.discovered)).toBeTruthy();
         expect(Array.isArray(keywords.target)).toBeTruthy();
+
+        const validateCheckResult = ajv.compile(checkResultSchema);
+        validateCheckResult(checkResultOrProgress.data);
+        expect(validateCheckResult.errors).toBeNull();
       }, 10000);
 
       it.skip('can cancel check', async () => {

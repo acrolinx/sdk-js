@@ -7,6 +7,7 @@
       "ES5",
       "DOM"
     ],
+    "resolveJsonModule": true,
     "noImplicitAny": true,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,

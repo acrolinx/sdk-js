@@ -32,7 +32,7 @@ export interface CheckOptions {
   reportTypes?: ReportType[];
   checkType?: CheckType;
   addons?: AddonId[];
-  partialCheckRanges?: CheckRange[];
+  partialCheckRanges?: CheckRange[] | null;
   contentFormat?: ContentFormatId;
   languageId?: LanguageId;
   batchId?: string;
@@ -41,12 +41,12 @@ export interface CheckOptions {
 
 export interface DocumentDescriptor {
   id: DocumentId;
-  reference: string;
-  author: string;
-  mimeType: string;
-  contentType: string;
-  metadata: MetaData[];
-  displayInfo: {
+  reference?: string;
+  author?: string;
+  mimeType?: string;
+  contentType?: string;
+  metadata?: MetaData[];
+  displayInfo?: {
     reference?: string;
   };
   customFields: CustomField[];
@@ -92,10 +92,6 @@ export interface CheckResult {
   goals: GoalWithIssueCount[];
   issues: Issue[];
   keywords?: KeywordsSection; //  Can be empty for check selection (partialCheckRanges)
-  links: {
-    termContribution: URL
-    deleteScorecard: URL
-  };
   reports:
     {
       [key: string]: Report;
@@ -168,7 +164,7 @@ export interface Match {
 export interface Suggestion {
   surface: string;
   groupId: string;
-  iconId?: SuggestionIconId;
+  iconId?: SuggestionIconId | null;
   replacements: Array<string | null>;
 }
 
@@ -186,7 +182,7 @@ export interface CommonIssue {
     hashes: IssueHashes;
     matches: Match[];
   };
-  readonly: boolean;
+  readOnly: boolean;
   issueLocations: IssueLocation[];
   suggestions: Suggestion[];
 
@@ -227,7 +223,7 @@ export interface IssueLinks {
 export type Html = string;
 
 export interface GoalWithIssueCount extends Goal {
-  issueCount: number;
+  issues: number;
 }
 
 export enum DocumentQualityStatus {

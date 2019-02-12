@@ -155,19 +155,19 @@ export const DUMMY_CHECK_RESULT: CheckResult = {
       id: 'spelling',
       displayName: 'Spelling',
       color: '#f21',
-      issueCount: 13
+      issues: 13
     },
     {
       id: GOAL_VOICE_ID,
       displayName: 'Clarity',
       color: '#f22',
-      issueCount: 2
+      issues: 2
     },
     {
       id: GOAL_TERM_ID,
       displayName: 'Unsuitable Term',
       color: '#f23',
-      issueCount: 0
+      issues: 0
     }
   ],
   issues: [
@@ -218,7 +218,7 @@ export const DUMMY_CHECK_RESULT: CheckResult = {
           }
         ]
       },
-      readonly: true,
+      readOnly: true,
       issueLocations: [
         {
           locationId: 'pageLocation',
@@ -267,7 +267,7 @@ export const DUMMY_CHECK_RESULT: CheckResult = {
           }
         ]
       },
-      readonly: false,
+      readOnly: false,
       issueLocations: [],
       suggestions: [
         {
@@ -325,7 +325,7 @@ export const DUMMY_CHECK_RESULT: CheckResult = {
       },
       suggestions: [],
       issueLocations: [],
-      readonly: false,
+      readOnly: false,
       debug: {
         penalty: 1234.0967741949999
       },
@@ -365,7 +365,7 @@ export const DUMMY_CHECK_RESULT: CheckResult = {
           },
           suggestions: [],
           issueLocations: [],
-          readonly: false,
+          readOnly: false,
           debug: {
             penalty: 320.0
           }
@@ -397,7 +397,7 @@ export const DUMMY_CHECK_RESULT: CheckResult = {
           },
           suggestions: [],
           issueLocations: [],
-          readonly: false,
+          readOnly: false,
           debug: {
             penalty: 40.0
           }
@@ -430,10 +430,6 @@ export const DUMMY_CHECK_RESULT: CheckResult = {
         link: 'https://tenant.acrolinx.cloud/output/en/abcdef_1_report.html'
       }
     },
-  addons: [],
-  links: {
-    termContribution: 'https://tenant.acrolinx.cloud/terminology/rest/v7/contribute',
-    deleteScorecard: 'https://tenant.acrolinx.cloud/api/v1/checking/153/result'
-  }
+  addons: []
 };
 
