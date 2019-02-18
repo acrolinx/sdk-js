@@ -3,12 +3,14 @@ import 'cross-fetch/polyfill';
 import * as dotenv from 'dotenv';
 import * as _ from 'lodash';
 import {
+  CheckRequest,
   CheckResult,
   CustomFieldType,
   DEVELOPMENT_SIGNATURE,
   DictionaryScope,
-  ErrorType,
+  ErrorType, HasTermHarvestingReport,
   PollMoreResult,
+  ReportType,
   User
 } from '../../src';
 import {CheckOptions} from '../../src/check';
@@ -17,6 +19,7 @@ import {AcrolinxEndpoint, DocumentDescriptor, isSigninSuccessResult, SigninSucce
 import {SigninLinksResult} from '../../src/signin';
 import {waitMs} from '../../src/utils/mixed-utils';
 import * as checkResultSchema from '../schemas/check-result.json';
+import * as termHarvestingReportSchema from '../schemas/term-harvesting-report.json';
 import {describeIf, expectFailingPromise, testIf} from '../test-utils/utils';
 
 dotenv.config();
@@ -139,25 +142,49 @@ describe('e2e - AcrolinxEndpoint', () => {
       api = createEndpoint(TEST_SERVER_URL);
     });
 
-    async function createDummyCheck(checkOptions: CheckOptions = {}) {
+    async function getGuidanceProfileId(guidanceProfilePrefix = 'en'): Promise<string> {
       const capabilities = await api.getCheckingCapabilities(ACROLINX_API_TOKEN);
-      const guidanceProfile = _.find(capabilities.guidanceProfiles, a => _.startsWith(a.language.id, 'en'));
+      const guidanceProfile = _.find(capabilities.guidanceProfiles, a =>
+        _.startsWith(a.displayName, guidanceProfilePrefix))!;
       expect(guidanceProfile).toBeDefined();
+      return guidanceProfile.id;
+    }
 
-      return await api.check(ACROLINX_API_TOKEN, {
-        checkOptions: {
-          guidanceProfileId: guidanceProfile!.id,
-          ...checkOptions
-        },
-        document: {
-          reference: 'filename.txt'
-        },
-        content: 'Testt Textt'
-      });
+    async function createDummyCheck(checkRequestArg: Partial<CheckRequest> = {}) {
+      const checkRequest = _.cloneDeep(checkRequestArg);
+
+      if (!checkRequest.checkOptions || !checkRequest.checkOptions.guidanceProfileId) {
+        checkRequest.checkOptions = {
+          guidanceProfileId: await getGuidanceProfileId(),
+          ...checkRequest.checkOptions
+        };
+      }
+
+      if (!checkRequest.document) {
+        checkRequest.document = {reference: 'filename.txt'};
+      }
+
+      return await api.check(ACROLINX_API_TOKEN, {content: 'Testt Textt', ...checkRequest});
+    }
+
+    async function checkAndWaitForResult(checkRequestArg: Partial<CheckRequest> = {}): Promise<CheckResult> {
+      const check = await createDummyCheck(checkRequestArg);
+
+      let checkResultOrProgress;
+      do {
+        checkResultOrProgress = await api.pollForCheckResult(ACROLINX_API_TOKEN, check);
+        if ('progress' in checkResultOrProgress) {
+          expect(checkResultOrProgress.progress.percent).toBeGreaterThanOrEqual(0);
+          expect(checkResultOrProgress.progress.percent).toBeLessThanOrEqual(100);
+          // We could wait for checkResultOrProgress.progress.retryAfter but this would slow down the test.
+        }
+      } while ('progress' in checkResultOrProgress);
+
+      return checkResultOrProgress.data;
     }
 
     async function checkAndWaitUntilFinished(checkOptions?: CheckOptions): Promise<CheckResult> {
-      const check = await createDummyCheck(checkOptions);
+      const check = await createDummyCheck({checkOptions});
 
       let checkResultOrProgress;
       do {
@@ -230,33 +257,23 @@ describe('e2e - AcrolinxEndpoint', () => {
 
     describe('check', () => {
       it('can check', async () => {
-        const check = await createDummyCheck();
+        const checkResult = await checkAndWaitForResult();
 
-        let checkResultOrProgress;
-        do {
-          checkResultOrProgress = await api.pollForCheckResult(ACROLINX_API_TOKEN, check);
-          if ('progress' in checkResultOrProgress) {
-            expect(checkResultOrProgress.progress.percent).toBeGreaterThanOrEqual(0);
-            expect(checkResultOrProgress.progress.percent).toBeLessThanOrEqual(100);
-            // We could wait for checkResultOrProgress.progress.retryAfter but this would slow down the test.
-          }
-        } while ('progress' in checkResultOrProgress);
+        expect(checkResult.goals.length).toBeGreaterThan(0);
+        assertDictionaryScopes(checkResult.dictionaryScopes);
 
-        expect(checkResultOrProgress.data.goals.length).toBeGreaterThan(0);
-        assertDictionaryScopes(checkResultOrProgress.data.dictionaryScopes);
-
-        const spellingIssue = _.find(checkResultOrProgress.data.issues, issue => issue.goalId === 'SPELLING')!;
+        const spellingIssue = _.find(checkResult.issues, issue => issue.goalId === 'SPELLING')!;
         expect(spellingIssue).toBeDefined();
         expect(spellingIssue.canAddToDictionary).toBe(true);
 
-        const keywords = checkResultOrProgress.data.keywords!;
+        const keywords = checkResult.keywords!;
         expect(typeof keywords.links.getTargetKeywords).toEqual('string');
         expect(typeof keywords.links.putTargetKeywords).toEqual('string');
         expect(Array.isArray(keywords.discovered)).toBeTruthy();
         expect(Array.isArray(keywords.target)).toBeTruthy();
 
         const validateCheckResult = ajv.compile(checkResultSchema);
-        validateCheckResult(checkResultOrProgress.data);
+        validateCheckResult(checkResult);
         expect(validateCheckResult.errors).toBeNull();
       }, 10000);
 
@@ -278,7 +295,14 @@ describe('e2e - AcrolinxEndpoint', () => {
       });
 
       it.skip('exception if partialCheckRanges are invalid', async () => {
-        await expectFailingPromise(createDummyCheck({partialCheckRanges: [{begin: 0, end: 1e9}]}), ErrorType.Client);
+        await expectFailingPromise(createDummyCheck({
+          checkOptions: {
+            partialCheckRanges: [{
+              begin: 0,
+              end: 1e9
+            }]
+          }
+        }), ErrorType.Client);
       });
 
       it('exception GuidanceProfileDoesNotExist for unknown id', async () => {
@@ -290,6 +314,28 @@ describe('e2e - AcrolinxEndpoint', () => {
         await expectFailingPromise(checkAndWaitUntilFinished({guidanceProfileId: 'invalid!uuid'}),
           ErrorType.GuidanceProfileDoesNotExist);
       });
+
+      it('can request the termharvesting report', async () => {
+        const checkResult = await checkAndWaitForResult({
+          checkOptions: {
+            guidanceProfileId: await getGuidanceProfileId('en-Publications'),
+            reportTypes: [ReportType.termharvesting]
+          },
+          content: 'NewTerm'
+        });
+        const reports: HasTermHarvestingReport = checkResult.reports as HasTermHarvestingReport;
+        expect(typeof reports.termharvesting.link).toEqual('string');
+
+        const termHarvestingReport = await api.getTermHarvestingReport(ACROLINX_API_TOKEN, reports);
+
+        const validateTermHarvestingReport = ajv.compile(termHarvestingReportSchema);
+        validateTermHarvestingReport(termHarvestingReport);
+        expect(validateTermHarvestingReport.errors).toBeNull();
+
+        const harvestedTerm = termHarvestingReport.terms[0];
+        expect(harvestedTerm.occurrences).toHaveLength(1);
+        expect(harvestedTerm.occurrences[0].positionalInformation.matches).toHaveLength(1);
+      }, 10000);
 
     });
 

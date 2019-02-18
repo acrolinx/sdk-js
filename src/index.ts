@@ -16,10 +16,10 @@ import {
   CheckResult,
   CheckResultResponse,
   DocumentDescriptor,
-  DocumentId,
+  DocumentId, HasTermHarvestingReport,
   KeyValuePair,
   Report,
-  sanitizeDocumentDescriptor
+  sanitizeDocumentDescriptor, TermHarvestingReport
 } from './check';
 import {ApiResponse, AuthToken, StringMap, SuccessResponse, UserId} from './common-types';
 import {AddToDictionaryRequest, AddToDictionaryResponse, DictionaryCapabilities} from './dictionary';
@@ -191,6 +191,11 @@ export class AcrolinxEndpoint {
 
   public async getAddonCheckResult(authToken: AuthToken, appDataLink: string): Promise<AddonCheckResult> {
     return getData(this.getJsonFromUrl<ApiResponse<AddonCheckResult>>(appDataLink, authToken));
+  }
+
+  public async getTermHarvestingReport(authToken: AuthToken,
+                                       reports: HasTermHarvestingReport): Promise<TermHarvestingReport> {
+    return getData(this.getJsonFromUrl<ApiResponse<TermHarvestingReport>>(reports.termharvesting.link, authToken));
   }
 
   public async getLinkToAggregatedReport(authToken: AuthToken, batchId: string): Promise<AggregatedReportLinkResult> {

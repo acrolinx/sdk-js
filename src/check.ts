@@ -73,7 +73,7 @@ export interface CheckResponse extends SuccessResponse<CheckResponseData> {
   // Lots of stuff that looks similar to CheckRequest
 }
 
-export type CheckResultResponse  = AsyncApiResponse<CheckResult>;
+export type CheckResultResponse = AsyncApiResponse<CheckResult>;
 
 export interface CheckResult {
   id: CheckId;
@@ -92,13 +92,19 @@ export interface CheckResult {
   goals: GoalWithIssueCount[];
   issues: Issue[];
   keywords?: KeywordsSection; //  Can be empty for check selection (partialCheckRanges)
-  reports:
-    {
-      [key: string]: Report;
-      scorecard: Report;
-    };
+  reports: CheckResultReports;
   embed?: KeyValuePair[];
   addons?: Addon[];
+}
+
+export interface HasTermHarvestingReport {
+  termharvesting: Report;
+}
+
+export interface CheckResultReports extends Partial<HasTermHarvestingReport> {
+  [key: string]: Report | undefined;
+
+  scorecard: Report;
 }
 
 export interface Report {
@@ -113,8 +119,8 @@ export interface KeyValuePair {
 
 export interface AggregatedReportLinkResult {
   reports: Array<{
-      reportType: string
-      link: URL
+    reportType: string
+    link: URL
   }>;
 }
 
@@ -178,10 +184,7 @@ export interface CommonIssue {
   displayNameHtml: Html;
   guidanceHtml: Html;
   displaySurface: string;
-  positionalInformation: {
-    hashes: IssueHashes;
-    matches: Match[];
-  };
+  positionalInformation: PositionalInformation;
   readOnly: boolean;
   issueLocations: IssueLocation[];
   suggestions: Suggestion[];
@@ -191,6 +194,11 @@ export interface CommonIssue {
   canAddToDictionary: boolean;
   subIssues?: SubIssue[];
   goalId?: GoalId;
+}
+
+interface PositionalInformation {
+  hashes: IssueHashes;
+  matches: Match[];
 }
 
 export interface Issue extends CommonIssue {
@@ -211,11 +219,16 @@ export interface IssueLocation {
   values: { [id: string]: string };
 }
 
-export interface IssueLinks {
-  help?: URL;
+export interface TermContributionLinks {
   termContribution?: URL;
   termContributionInteractive?: URL;
+}
+
+
+export interface IssueLinks extends TermContributionLinks {
+  help?: URL;
   addToDictionary?: URL;
+
   [linkId: string]: URL | undefined;
 }
 
@@ -241,4 +254,20 @@ export type CancelCheckResponse = SuccessResponse<CancelCheckResponseData>;
 // TODO: Might be unnecessary in the near future
 export function sanitizeDocumentDescriptor(d: DocumentDescriptor): DocumentDescriptor {
   return {...d, customFields: d.customFields || []};
+}
+
+
+export interface TermHarvestingReport {
+  terms: HarvestedTerm[];
+}
+
+export interface HarvestedTerm {
+  displaySurface: string;
+  occurrences: HarvestedTermOccurrence[];
+}
+
+interface HarvestedTermOccurrence {
+  context: string;
+  displayContextHtml: string;
+  positionalInformation: PositionalInformation;
 }
