@@ -105,7 +105,6 @@ export const DUMMY_CHECK_RESULT: CheckResult = {
   checkOptions: {
     guidanceProfileId: 'aud_1',
     reportTypes: [
-      ReportType.debug,
       ReportType.termharvesting
     ],
     contentFormat: 'word_xml',

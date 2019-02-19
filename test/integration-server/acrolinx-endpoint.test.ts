@@ -8,7 +8,7 @@ import {
   CustomFieldType,
   DEVELOPMENT_SIGNATURE,
   DictionaryScope,
-  ErrorType, HasTermHarvestingReport,
+  ErrorType, hasTermHarvestingReport, HasTermHarvestingReport,
   PollMoreResult,
   ReportType,
   User
@@ -156,6 +156,7 @@ describe('e2e - AcrolinxEndpoint', () => {
       if (!checkRequest.checkOptions || !checkRequest.checkOptions.guidanceProfileId) {
         checkRequest.checkOptions = {
           guidanceProfileId: await getGuidanceProfileId(),
+          disableCustomFieldValidation: true,
           ...checkRequest.checkOptions
         };
       }
@@ -323,6 +324,8 @@ describe('e2e - AcrolinxEndpoint', () => {
           },
           content: 'NewTerm'
         });
+
+        expect(hasTermHarvestingReport(checkResult.reports)).toEqual(true);
         const reports: HasTermHarvestingReport = checkResult.reports as HasTermHarvestingReport;
         expect(typeof reports.termharvesting.link).toEqual('string');
 

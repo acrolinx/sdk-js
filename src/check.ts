@@ -98,13 +98,15 @@ export interface CheckResult {
 }
 
 export interface HasTermHarvestingReport {
-  termharvesting: Report;
+  [ReportType.termharvesting]: Report;
 }
 
-export interface CheckResultReports extends Partial<HasTermHarvestingReport> {
-  [key: string]: Report | undefined;
+export type CheckResultReports = {
+  [P in ReportType]?: Report;
+};
 
-  scorecard: Report;
+export function hasTermHarvestingReport(reports: CheckResultReports): reports is HasTermHarvestingReport {
+  return !!reports.termharvesting;
 }
 
 export interface Report {
