@@ -272,5 +272,5 @@ export interface HarvestedTermOccurrence {
   context: string;
   displayContextHtml: string;
   positionalInformation: PositionalInformation;
-  HarvestedTermOccurrence: IssueLocation[];
+  locations: IssueLocation[];
 }
