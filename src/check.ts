@@ -268,8 +268,9 @@ export interface HarvestedTerm {
   occurrences: HarvestedTermOccurrence[];
 }
 
-interface HarvestedTermOccurrence {
+export interface HarvestedTermOccurrence {
   context: string;
   displayContextHtml: string;
   positionalInformation: PositionalInformation;
+  HarvestedTermOccurrence: IssueLocation[];
 }
