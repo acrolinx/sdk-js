@@ -195,7 +195,7 @@ export class AcrolinxEndpoint {
 
   public async getTermHarvestingReport(authToken: AuthToken,
                                        reports: HasTermHarvestingReport): Promise<TermHarvestingReport> {
-    return getData(this.getJsonFromUrl<ApiResponse<TermHarvestingReport>>(reports.termharvesting.link, authToken));
+    return getData(this.getJsonFromUrl<ApiResponse<TermHarvestingReport>>(reports.termHarvesting.link, authToken));
   }
 
   public async getLinkToAggregatedReport(authToken: AuthToken, batchId: string): Promise<AggregatedReportLinkResult> {

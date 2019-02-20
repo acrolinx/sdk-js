@@ -98,7 +98,7 @@ export interface CheckResult {
 }
 
 export interface HasTermHarvestingReport {
-  [ReportType.termharvesting]: Report;
+  [ReportType.termHarvesting]: Report;
 }
 
 export type CheckResultReports = {
@@ -106,7 +106,7 @@ export type CheckResultReports = {
 };
 
 export function hasTermHarvestingReport(reports: CheckResultReports): reports is HasTermHarvestingReport {
-  return !!reports.termharvesting;
+  return !!reports.termHarvesting;
 }
 
 export interface Report {

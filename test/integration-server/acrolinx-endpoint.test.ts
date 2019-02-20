@@ -316,18 +316,18 @@ describe('e2e - AcrolinxEndpoint', () => {
           ErrorType.GuidanceProfileDoesNotExist);
       });
 
-      it('can request the termharvesting report', async () => {
+      it('can request the termHarvesting report', async () => {
         const checkResult = await checkAndWaitForResult({
           checkOptions: {
             guidanceProfileId: await getGuidanceProfileId('en-Publications'),
-            reportTypes: [ReportType.termharvesting]
+            reportTypes: [ReportType.termHarvesting]
           },
           content: 'NewTerm'
         });
 
         expect(hasTermHarvestingReport(checkResult.reports)).toEqual(true);
         const reports: HasTermHarvestingReport = checkResult.reports as HasTermHarvestingReport;
-        expect(typeof reports.termharvesting.link).toEqual('string');
+        expect(typeof reports.termHarvesting.link).toEqual('string');
 
         const termHarvestingReport = await api.getTermHarvestingReport(ACROLINX_API_TOKEN, reports);
 

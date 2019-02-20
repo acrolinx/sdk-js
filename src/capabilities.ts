@@ -50,7 +50,7 @@ export enum ContentEncoding {
 }
 
 export enum ReportType {
-  termharvesting = 'termharvesting',
+  termHarvesting = 'termHarvesting',
   scorecard = 'scorecard',
   extractedText = 'extractedText',
   request_text = 'extractedText' // TODO: Remove doubled enum value

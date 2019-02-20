@@ -92,7 +92,7 @@ export const DUMMY_CAPABILITIES: CheckingCapabilities = {
   ],
   contentEncodings: ['none', 'zip,base64', 'base64'] as ContentEncoding[],
   checkTypes: ['batch', 'partial', 'interactive'] as CheckType[],
-  reportTypes: ['scorecard.xml', 'scorecard.html', 'debug', 'termharvesting'] as ReportType[],
+  reportTypes: [ReportType.scorecard, ReportType.extractedText, ReportType.termHarvesting],
   referencePattern: 'someRegex'
 };
 
@@ -105,7 +105,7 @@ export const DUMMY_CHECK_RESULT: CheckResult = {
   checkOptions: {
     guidanceProfileId: 'aud_1',
     reportTypes: [
-      ReportType.termharvesting
+      ReportType.termHarvesting
     ],
     contentFormat: 'word_xml',
     checkType: CheckType.interactive,
