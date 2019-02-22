@@ -336,6 +336,8 @@ describe('e2e - AcrolinxEndpoint', () => {
         expect(validateTermHarvestingReport.errors).toBeNull();
 
         const harvestedTerm = termHarvestingReport.terms[0];
+        // TODO: expect harvestedTerm.links.termContribution
+        expect(harvestedTerm.links.termContributionInteractive).toMatch(/^http/);
         expect(harvestedTerm.occurrences).toHaveLength(1);
         expect(harvestedTerm.occurrences[0].positionalInformation.matches).toHaveLength(1);
       }, 10000);

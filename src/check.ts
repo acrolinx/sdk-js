@@ -266,6 +266,7 @@ export interface TermHarvestingReport {
 export interface HarvestedTerm {
   displaySurface: string;
   occurrences: HarvestedTermOccurrence[];
+  links: TermContributionLinks;
 }
 
 export interface HarvestedTermOccurrence {
