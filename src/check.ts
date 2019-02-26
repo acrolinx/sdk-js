@@ -198,7 +198,7 @@ export interface CommonIssue {
   goalId?: GoalId;
 }
 
-interface PositionalInformation {
+export interface PositionalInformation {
   hashes: IssueHashes;
   matches: Match[];
 }
