@@ -122,18 +122,6 @@ export const DUMMY_CHECK_RESULT: CheckResult = {
   },
   document: {
     id: '283ab1e075f21a',
-    reference: 'C:\\abc.docx',
-    mimeType: 'application/word',
-    author: 'Ralf',
-    contentType: 'E-Mail',
-    metadata: [
-      {
-        displayName: 'Project ID',
-        key: 'projectId',
-        value: 'Marketing Campaign',
-        required: true
-      }
-    ],
     displayInfo: {
       reference: 'abc.docx'
     },

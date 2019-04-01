@@ -23,8 +23,7 @@ export interface CheckRequest {
   content: string;
   contentEncoding?: ContentEncoding;
   checkOptions?: CheckOptions;
-  document?: Partial<DocumentDescriptor>;
-  // clientInfo ???
+  document?: DocumentDescriptorRequest;
 }
 
 export interface CheckOptions {
@@ -41,22 +40,14 @@ export interface CheckOptions {
 
 export interface DocumentDescriptor {
   id: DocumentId;
-  reference?: string;
-  author?: string;
-  mimeType?: string;
-  contentType?: string;
-  metadata?: MetaData[];
+  customFields: CustomField[];
   displayInfo?: {
     reference?: string;
   };
-  customFields: CustomField[];
 }
 
-export interface MetaData {
-  displayName: string;
-  key: string;
-  value: string;
-  required: boolean;
+export interface DocumentDescriptorRequest extends Partial<DocumentDescriptor> {
+  reference?: string;
 }
 
 export type CheckId = string;
