@@ -9,7 +9,8 @@ export function isSigninLinksResult(signinResult: SigninResult): signinResult is
   return !!((signinResult as SigninLinksResult).links.interactive);
 }
 
-export function isSigninSuccessResult(signinResult: SigninResult | SigninPollResult): signinResult is SigninSuccessResult {
+export function isSigninSuccessResult(
+  signinResult: SigninResult | SigninPollResult): signinResult is SigninSuccessResult {
   const asSigninSuccessResult = signinResult as SigninSuccessResult;
   return !!(asSigninSuccessResult && asSigninSuccessResult.data && asSigninSuccessResult.data.accessToken);
 }
