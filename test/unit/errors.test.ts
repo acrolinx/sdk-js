@@ -1,10 +1,6 @@
-import {ErrorType} from '../../src/errors';
+import {CheckCancelledByClientError, ErrorType} from '../../src/errors';
 import {AcrolinxEndpoint} from '../../src/index';
-import {
-  mockAcrolinxServer,
-  mockBrokenJsonServer,
-  restoreOriginalFetch
-} from '../test-utils/mock-server';
+import {mockAcrolinxServer, mockBrokenJsonServer, restoreOriginalFetch} from '../test-utils/mock-server';
 import {DUMMY_ENDPOINT_PROPS, DUMMY_SERVER_URL} from './common';
 
 const BROKEN_JSON_SERVER = 'http://broken-json-server';
@@ -45,4 +41,16 @@ describe('errors', () => {
     expect.hasAssertions();
   });
 
+  describe('custom errors and instanceof', () => {
+    // Needed because of https://github.com/Microsoft/TypeScript/wiki/Breaking-Changes#extending-built-ins-like-error-array-and-map-may-no-longer-work
+    it('CheckCancelledByClientError should support instanceof', () => {
+      const error = new CheckCancelledByClientError({
+        detail: 'The check was cancelled. No result is available.',
+        type: ErrorType.CheckCancelled,
+        title: 'Check cancelled',
+        status: 400
+      });
+      expect(error).toBeInstanceOf(CheckCancelledByClientError);
+    });
+  });
 });

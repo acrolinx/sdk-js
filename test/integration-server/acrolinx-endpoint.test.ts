@@ -3,12 +3,15 @@ import 'cross-fetch/polyfill';
 import * as dotenv from 'dotenv';
 import * as _ from 'lodash';
 import {
+  CheckCancelledByClientError,
   CheckRequest,
   CheckResult,
   CustomFieldType,
   DEVELOPMENT_SIGNATURE,
   DictionaryScope,
-  ErrorType, hasTermHarvestingReport, HasTermHarvestingReport,
+  ErrorType,
+  hasTermHarvestingReport,
+  HasTermHarvestingReport,
   PollMoreResult,
   ReportType,
   User
@@ -150,7 +153,7 @@ describe('e2e - AcrolinxEndpoint', () => {
       return guidanceProfile.id;
     }
 
-    async function createDummyCheck(checkRequestArg: Partial<CheckRequest> = {}) {
+    async function createDummyCheckRequest(checkRequestArg: Partial<CheckRequest> = {}) {
       const checkRequest = _.cloneDeep(checkRequestArg);
 
       if (!checkRequest.checkOptions || !checkRequest.checkOptions.guidanceProfileId) {
@@ -165,7 +168,11 @@ describe('e2e - AcrolinxEndpoint', () => {
         checkRequest.document = {reference: 'filename.txt'};
       }
 
-      return await api.check(ACROLINX_API_TOKEN, {content: 'Testt Textt', ...checkRequest});
+      return {content: 'Testt Textt', ...checkRequest};
+    }
+
+    async function createDummyCheck(checkRequestArg: Partial<CheckRequest> = {}) {
+      return await api.check(ACROLINX_API_TOKEN, await createDummyCheckRequest(checkRequestArg));
     }
 
     async function checkAndWaitForResult(checkRequestArg: Partial<CheckRequest> = {}): Promise<CheckResult> {
@@ -278,7 +285,7 @@ describe('e2e - AcrolinxEndpoint', () => {
         expect(validateCheckResult.errors).toBeNull();
       }, 10000);
 
-      it.skip('can cancel check', async () => {
+      it('can cancel check', async () => {
         const check = await createDummyCheck();
 
         const cancelResponse = await api.cancelCheck(ACROLINX_API_TOKEN, check);
@@ -342,6 +349,22 @@ describe('e2e - AcrolinxEndpoint', () => {
         expect(harvestedTerm.occurrences[0].positionalInformation.matches).toHaveLength(1);
       }, 10000);
 
+    });
+
+    describe('checkAndGetResult', () => {
+      it('should check', async () => {
+        const checkResult = await api.checkAndGetResult(ACROLINX_API_TOKEN, await createDummyCheckRequest()).promise;
+        expect(checkResult.goals.length).toBeGreaterThan(0);
+      });
+
+      it('can be cancelled', async () => {
+        const currentCheck = api.checkAndGetResult(ACROLINX_API_TOKEN, await createDummyCheckRequest());
+
+        currentCheck.cancel();
+
+        const error = await expectFailingPromise<AcrolinxError>(currentCheck.promise, ErrorType.CheckCancelled);
+        expect(error).toBeInstanceOf(CheckCancelledByClientError);
+      });
     });
 
     describe('after check ', () => {

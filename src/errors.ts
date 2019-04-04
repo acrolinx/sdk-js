@@ -42,7 +42,7 @@ export interface AcrolinxErrorProps {
   documentId?: DocumentId;
 }
 
-export interface ValidationDetail  {
+export interface ValidationDetail {
   title: string;
   constraint: string;
   attributePath: string;
@@ -91,7 +91,7 @@ export function createErrorFromFetchResponse(res: Response, jsonBody: any | Acro
     });
   } else {
     return new AcrolinxError({
-      detail:  `${res.statusText}:${JSON.stringify(jsonBody)}`,
+      detail: `${res.statusText}:${JSON.stringify(jsonBody)}`,
       status: res.status,
       title: 'Unknown HTTP Error',
       type: ErrorType.HttpErrorStatus,
@@ -109,3 +109,14 @@ export function wrapFetchError(error: Error): Promise<any> {
   });
 }
 
+export class CheckCancelledByClientError extends AcrolinxError {
+  constructor(props: AcrolinxErrorProps) {
+    super(props);
+    setCorrectErrorPrototype(this, CheckCancelledByClientError);
+  }
+}
+
+function setCorrectErrorPrototype<T>(self: T, clazz: new(...args: any[]) => T) {
+  // https://github.com/Microsoft/TypeScript/wiki/Breaking-Changes#extending-built-ins-like-error-array-and-map-may-no-longer-work
+  (Object as any).setPrototypeOf(self, clazz.prototype);
+}

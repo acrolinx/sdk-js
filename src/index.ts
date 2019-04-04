@@ -16,14 +16,16 @@ import {
   CheckResult,
   CheckResultResponse,
   DocumentDescriptor,
-  DocumentId, HasTermHarvestingReport,
+  DocumentId,
+  HasTermHarvestingReport,
   KeyValuePair,
   Report,
-  sanitizeDocumentDescriptor, TermHarvestingReport
+  sanitizeDocumentDescriptor,
+  TermHarvestingReport
 } from './check';
-import {ApiResponse, AuthToken, StringMap, SuccessResponse, UserId} from './common-types';
+import {ApiResponse, AuthToken, isProgressResponse, Progress, StringMap, SuccessResponse, UserId} from './common-types';
 import {AddToDictionaryRequest, AddToDictionaryResponse, DictionaryCapabilities} from './dictionary';
-import {AcrolinxError, ErrorType, wrapFetchError} from './errors';
+import {AcrolinxError, CheckCancelledByClientError, ErrorType, wrapFetchError} from './errors';
 import {
   HEADER_X_ACROLINX_AUTH,
   HEADER_X_ACROLINX_BASE_URL,
@@ -55,6 +57,7 @@ export {
   AcrolinxError,
   AuthToken,
   CheckingCapabilities,
+  CheckCancelledByClientError,
   CancelCheckResponse,
   GuidanceProfile,
   ErrorType,
@@ -137,6 +140,16 @@ export interface SsoSigninOption {
 
 export type SigninOptions = HasAuthToken | SsoSigninOption | {};
 
+export interface CheckAndGetResultOptions {
+  onProgress?(progress: Progress): void;
+}
+
+export interface CancelablePromiseWrapper<T> {
+  promise: Promise<T>;
+
+  cancel(): void;
+}
+
 export class AcrolinxEndpoint {
   public readonly props: AcrolinxEndpointProps;
 
@@ -179,6 +192,71 @@ export class AcrolinxEndpoint {
 
   public async check(authToken: AuthToken, req: CheckRequest): Promise<CheckResponse> {
     return this.post<CheckResponse>('/api/v1/checking/checks', req, {}, authToken);
+  }
+
+  public checkAndGetResult(
+    authToken: AuthToken,
+    req: CheckRequest,
+    opts: CheckAndGetResultOptions = {}
+  ): CancelablePromiseWrapper<CheckResult> {
+    let canceledByClient = false;
+    let requestedCanceledOnServer = false;
+    let runningCheck: CheckResponse | undefined;
+
+    let cancelPromiseReject: (e: Error) => void;
+    const cancelPromise = new Promise<CheckResult>((_resolve, reject) => {
+      cancelPromiseReject = reject;
+    });
+
+    function cancel() {
+      canceledByClient = true;
+      cancelPromiseReject(createCheckCanceledByClientError());
+      cancelOnServerIfPossibleAndStillNeeded();
+    }
+
+    const handlePotentialCancellation = () => {
+      if (canceledByClient) {
+        cancelOnServerIfPossibleAndStillNeeded();
+        // We don't want to poll forever if the canceling does not work on the server.
+        // To be consistent we throw the same exception, that the server would throw while polling.
+        throw createCheckCanceledByClientError();
+      }
+    };
+
+    const cancelOnServerIfPossibleAndStillNeeded = () => {
+      if (!requestedCanceledOnServer && runningCheck) {
+        requestedCanceledOnServer = true;
+        /* tslint:disable-next-line:no-floating-promises */
+        this.cancelCheck(authToken, runningCheck);
+      }
+    };
+
+    const checkAndPoll = async (): Promise<CheckResult> => {
+      runningCheck = await this.check(authToken, req);
+      handlePotentialCancellation();
+
+      let checkResultOrProgress: CheckResultResponse;
+      do {
+        checkResultOrProgress = await this.pollForCheckResult(authToken, runningCheck);
+        handlePotentialCancellation();
+
+        if (isProgressResponse(checkResultOrProgress)) {
+          if (opts.onProgress) {
+            opts.onProgress(checkResultOrProgress.progress);
+          }
+
+          await waitMs(checkResultOrProgress.progress.retryAfter * 1000);
+          handlePotentialCancellation();
+        }
+      } while (isProgressResponse(checkResultOrProgress));
+
+      return checkResultOrProgress.data;
+    };
+
+    return {
+      promise: Promise.race([checkAndPoll(), cancelPromise]),
+      cancel
+    };
   }
 
   public async cancelCheck(authToken: AuthToken, check: CheckResponse): Promise<CancelCheckResponse> {
@@ -343,4 +421,13 @@ function getSigninRequestHeaders(options: SigninOptions = {}) {
   } else {
     return {};
   }
+}
+
+function createCheckCanceledByClientError() {
+  return new CheckCancelledByClientError({
+    detail: 'The check was cancelled. No result is available.',
+    type: ErrorType.CheckCancelled,
+    title: 'Check cancelled',
+    status: 400
+  });
 }

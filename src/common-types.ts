@@ -32,3 +32,7 @@ export type AsyncApiResponse<Data, Links = {}> = SuccessResponse<Data, Links> | 
 export interface StringMap {
   [index: string]: string;
 }
+
+export function isProgressResponse<T>(asyncApiResponse: AsyncApiResponse<T>): asyncApiResponse is ProgressResponse {
+  return !!(asyncApiResponse as ProgressResponse).progress;
+}
