@@ -385,7 +385,8 @@ export class AcrolinxEndpoint {
     const fetchFunction = this.props.fetch || fetch;
     const fetchProps: RequestInit = {
       ...init,
-      credentials: this.props.corsWithCredentials ? 'include' : undefined,
+      // Ensure credentials: 'same-origin' in old browsers: https://github.com/github/fetch#sending-cookies
+      credentials: this.props.corsWithCredentials ? 'include' : 'same-origin',
       ...(this.props.additionalFetchProperties || {})
     };
     if (this.props.enableHttpLogging) {

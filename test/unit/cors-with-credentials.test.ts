@@ -24,12 +24,16 @@ describe('corsWithCredentials', () => {
     expect(mockedAcrolinxServer.requests[0].opts.credentials).toEqual('include');
   });
 
-  it('corsWithCredentials !== true should set fetch option credentials to undefined', async () => {
+
+  /**
+   * Ensure credentials: 'same-origin' in old browsers: https://github.com/github/fetch#sending-cookies
+   */
+  it('corsWithCredentials !== true should set fetch option credentials to "same-origin"', async () => {
     endpoint = new AcrolinxEndpoint(DUMMY_ENDPOINT_PROPS);
 
     const result = await endpoint.signin() as SigninLinksResult;
 
     expect(result).toBeDefined();
-    expect(mockedAcrolinxServer.requests[0].opts.credentials).toBeUndefined();
+    expect(mockedAcrolinxServer.requests[0].opts.credentials).toEqual('same-origin');
   });
 });
