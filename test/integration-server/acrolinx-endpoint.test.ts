@@ -57,26 +57,32 @@ function assertDictionaryScopes(scopes: DictionaryScope[]) {
 describe('e2e - AcrolinxEndpoint', () => {
   describe('errors by bad server address', () => {
     const LONG_TIME_OUT_MS = 10000;
+    const DUMMY_PATH = '/something';
 
     it('should return an failing promise for 404', async () => {
       const api = createEndpoint(TEST_SERVER_URL);
       try {
         await api.getJsonFromPath('/not-there');
-      } catch (e) {
-        expect(e.type).toEqual(ErrorType.HttpErrorStatus);
-        expect(e.status).toEqual(404);
+      } catch (error) {
+        expect(error.type).toEqual(ErrorType.HttpErrorStatus);
+        expect(error.status).toEqual(404);
+        expect(error.httpRequest).toEqual({method: 'GET', url: TEST_SERVER_URL + '/not-there'});
       }
       expect.hasAssertions();
     });
 
     it('should return an failing promise for non existing server', async () => {
       const api = createEndpoint('http://non-extisting-server');
-      await expectFailingPromise(api.getJsonFromPath('/something'), ErrorType.HttpConnectionProblem);
+      await expectFailingPromise(api.getJsonFromPath(DUMMY_PATH), ErrorType.HttpConnectionProblem,
+        {method: 'GET', url: 'http://non-extisting-server' + DUMMY_PATH});
     }, LONG_TIME_OUT_MS);
 
     it('should return an failing promise for invalid URLS', async () => {
-      const api = createEndpoint('http://non-ext!::?isting-server');
-      await expectFailingPromise(api.getJsonFromPath('/something'), ErrorType.HttpConnectionProblem);
+      const invalidServerAddress = 'http://non-ext!::?isting-server';
+      const api = createEndpoint(invalidServerAddress);
+      await expectFailingPromise(api.getJsonFromPath(DUMMY_PATH), ErrorType.HttpConnectionProblem,
+        {method: 'GET', url: invalidServerAddress + DUMMY_PATH});
+
     }, LONG_TIME_OUT_MS);
   });
 
@@ -254,11 +260,12 @@ describe('e2e - AcrolinxEndpoint', () => {
 
       it('post notifications privilege validation', async () => {
         await expectFailingPromise<AcrolinxError>(api.postServerNotifications(ACROLINX_API_TOKEN, {
-          title: 'dummyTitle',
-          body: 'dummyBody',
-          start: Date.now(),
-          end: Date.now() + 1000 * 60
-        }), ErrorType.InsufficientPrivileges);
+            title: 'dummyTitle',
+            body: 'dummyBody',
+            start: Date.now(),
+            end: Date.now() + 1000 * 60
+          }), ErrorType.InsufficientPrivileges,
+          {method: 'POST', url: TEST_SERVER_URL + '/api/v1/broadcasts/platform-notifications/'});
       });
     });
 
@@ -299,7 +306,8 @@ describe('e2e - AcrolinxEndpoint', () => {
 
       it('cancel needs correct auth token', async () => {
         const check = await createDummyCheck();
-        await expectFailingPromise(api.cancelCheck('invalid token', check), ErrorType.Auth);
+        await expectFailingPromise(api.cancelCheck('invalid token', check), ErrorType.Auth,
+          {method: 'DELETE', url: check.links.cancel});
       });
 
       it.skip('exception if partialCheckRanges are invalid', async () => {
@@ -331,7 +339,6 @@ describe('e2e - AcrolinxEndpoint', () => {
           },
           content: 'NewTerm'
         });
-
         expect(hasTermHarvestingReport(checkResult.reports)).toEqual(true);
         const reports: HasTermHarvestingReport = checkResult.reports as HasTermHarvestingReport;
         expect(typeof reports.termHarvesting.link).toEqual('string');

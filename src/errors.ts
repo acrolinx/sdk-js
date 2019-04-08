@@ -1,4 +1,5 @@
 import {DocumentId} from './check';
+import {HttpRequest} from './utils/fetch';
 
 /**
  * See also https://github.com/acrolinx/server-api-spec/blob/master/apiary.apib
@@ -31,6 +32,7 @@ export interface AcrolinxErrorProps {
   title: string;
   detail: string;
   type: string;
+  httpRequest?: HttpRequest;
   status?: number;
   reference?: string;
   validationDetails?: ValidationDetail[];
@@ -59,6 +61,7 @@ export class AcrolinxError extends Error implements AcrolinxErrorProps {
   public readonly type: string;
   public readonly title: string;
   public readonly detail: string;
+  public readonly httpRequest?: HttpRequest;
   public readonly status?: number;
   public readonly reference?: string;
   public readonly cause?: Error;
@@ -70,6 +73,7 @@ export class AcrolinxError extends Error implements AcrolinxErrorProps {
     super(props.title);
     this.type = props.type;
     this.status = props.status;
+    this.httpRequest = props.httpRequest;
     this.title = props.title;
     this.detail = props.detail;
     this.reference = props.reference;
@@ -79,11 +83,16 @@ export class AcrolinxError extends Error implements AcrolinxErrorProps {
   }
 }
 
-export function createErrorFromFetchResponse(res: Response, jsonBody: any | AcrolinxApiError): AcrolinxError {
+export function createErrorFromFetchResponse(
+  req: HttpRequest,
+  res: Response,
+  jsonBody: any | AcrolinxApiError
+): AcrolinxError {
   if (jsonBody.type) {
     return new AcrolinxError({
       detail: jsonBody.detail || 'Unknown HTTP Error',
       status: jsonBody.status || res.status,
+      httpRequest: req,
       title: jsonBody.title || res.statusText,
       validationDetails: jsonBody.validationDetails,
       type: jsonBody.type,
@@ -93,6 +102,7 @@ export function createErrorFromFetchResponse(res: Response, jsonBody: any | Acro
     return new AcrolinxError({
       detail: `${res.statusText}:${JSON.stringify(jsonBody)}`,
       status: res.status,
+      httpRequest: req,
       title: 'Unknown HTTP Error',
       type: ErrorType.HttpErrorStatus,
     });
@@ -100,10 +110,11 @@ export function createErrorFromFetchResponse(res: Response, jsonBody: any | Acro
 }
 
 
-export function wrapFetchError(error: Error): Promise<any> {
+export function wrapFetchError(httpRequest: HttpRequest, error: Error): Promise<any> {
   throw new AcrolinxError({
     detail: `${error.message} (${error.name})`,
     title: 'Http Connection Problem',
+    httpRequest,
     type: ErrorType.HttpConnectionProblem,
     cause: error
   });

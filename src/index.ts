@@ -327,15 +327,19 @@ export class AcrolinxEndpoint {
   }
 
   public async getJsonFromUrl<T>(url: string, authToken?: AuthToken): Promise<T> {
-    return this.fetch(url, {
+    return this.fetchJson(url, {
       headers: this.getCommonHeaders(authToken),
-    }).then(res => handleExpectedJsonResponse<T>(res), wrapFetchError);
+    });
   }
 
   public async getTextFromUrl(url: string, authToken?: AuthToken): Promise<string> {
+    const httpRequest = {url, method: 'GET'};
     return this.fetch(url, {
       headers: this.getCommonHeaders(authToken),
-    }).then(res => handleExpectedTextResponse(res), wrapFetchError);
+    }).then(
+      res => handleExpectedTextResponse(httpRequest, res),
+      error => wrapFetchError(httpRequest, error)
+    );
   }
 
   private getCommonHeaders(authToken?: AuthToken): StringMap {
@@ -366,18 +370,28 @@ export class AcrolinxEndpoint {
                         body: {},
                         headers: StringMap = {},
                         authToken?: AuthToken): Promise<T> {
-    return this.fetch(this.props.serverAddress + path, {
+    return this.fetchJson(this.props.serverAddress + path, {
       body: JSON.stringify(body),
       headers: {...this.getCommonHeaders(authToken), ...headers},
       method,
-    }).then(res => handleExpectedJsonResponse<T>(res), wrapFetchError);
+    });
   }
 
   private async deleteUrl<T>(url: string, authToken: AuthToken): Promise<T> {
-    return this.fetch(url, {
+    return this.fetchJson(url, {
       headers: this.getCommonHeaders(authToken),
       method: 'DELETE',
-    }).then(res => handleExpectedJsonResponse<T>(res), wrapFetchError);
+    });
+  }
+
+
+  private async fetchJson<T>(url: string, init: RequestInit = {}): Promise<T> {
+    const httpRequest = {
+      url,
+      method: init.method || 'GET'
+    };
+    return this.fetch(url, init).then((res) => handleExpectedJsonResponse(httpRequest, res),
+      error => wrapFetchError(httpRequest, error));
   }
 
   /* tslint:disable:no-console */
