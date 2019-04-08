@@ -204,7 +204,7 @@ export class AcrolinxEndpoint {
     let runningCheck: CheckResponse | undefined;
 
     let cancelPromiseReject: (e: Error) => void;
-    const cancelPromise = new Promise<CheckResult>((_resolve, reject) => {
+    const cancelPromise = new Promise<never>((_resolve, reject) => {
       cancelPromiseReject = reject;
     });
 
