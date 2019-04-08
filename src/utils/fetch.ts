@@ -1,9 +1,4 @@
-import {AcrolinxError, createErrorFromFetchResponse, ErrorType} from '../errors';
-
-export interface HttpRequest {
-  url: string;
-  method: string;
-}
+import {AcrolinxError, createErrorFromFetchResponse, ErrorType, HttpRequest} from '../errors';
 
 // TODO: Simplify as soon as all API Urls wraps the error
 export async function handleExpectedJsonResponse<T>(req: HttpRequest, res: Response): Promise<T> {

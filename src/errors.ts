@@ -1,5 +1,4 @@
-import {DocumentId} from './check';
-import {HttpRequest} from './utils/fetch';
+import {DocumentId} from './document-descriptor';
 
 /**
  * See also https://github.com/acrolinx/server-api-spec/blob/master/apiary.apib
@@ -51,6 +50,11 @@ export interface ValidationDetail {
   detail: string;
   invalidValue: any;
   possibleValues?: any[];
+}
+
+export interface HttpRequest {
+  url: string;
+  method: string;
 }
 
 export interface AcrolinxApiError extends AcrolinxErrorProps {

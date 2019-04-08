@@ -9,15 +9,13 @@ import {
   ReportType,
 } from './capabilities';
 import {AsyncApiResponse, LanguageId, SuccessResponse, URL} from './common-types';
-import {CustomField} from './custom-fields';
 import {DictionaryScope} from './dictionary';
+import {DocumentDescriptor} from './document-descriptor';
 
 export interface CheckRange {
   begin: number;
   end: number;
 }
-
-export type DocumentId = string;
 
 export interface CheckRequest {
   content: string;
@@ -36,14 +34,6 @@ export interface CheckOptions {
   languageId?: LanguageId;
   batchId?: string;
   disableCustomFieldValidation?: boolean;
-}
-
-export interface DocumentDescriptor {
-  id: DocumentId;
-  customFields: CustomField[];
-  displayInfo?: {
-    reference?: string;
-  };
 }
 
 export interface DocumentDescriptorRequest extends Partial<DocumentDescriptor> {
@@ -243,12 +233,6 @@ export interface CancelCheckResponseData {
 }
 
 export type CancelCheckResponse = SuccessResponse<CancelCheckResponseData>;
-
-// TODO: Might be unnecessary in the near future
-export function sanitizeDocumentDescriptor(d: DocumentDescriptor): DocumentDescriptor {
-  return {...d, customFields: d.customFields || []};
-}
-
 
 export interface TermHarvestingReport {
   terms: HarvestedTerm[];

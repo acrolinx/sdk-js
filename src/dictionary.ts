@@ -1,6 +1,6 @@
 import {GuidanceProfileId} from './capabilities';
-import {DocumentId} from './check';
 import {LanguageId} from './common-types';
+import {DocumentId} from './document-descriptor';
 
 export enum DictionaryScope {
   language = 'language',

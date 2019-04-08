@@ -17,8 +17,9 @@ import {
   User
 } from '../../src';
 import {CheckOptions} from '../../src/check';
+import {DocumentDescriptor} from '../../src/document-descriptor';
 import {AcrolinxError, ValidationDetail} from '../../src/errors';
-import {AcrolinxEndpoint, DocumentDescriptor, isSigninSuccessResult, SigninSuccessResult} from '../../src/index';
+import {AcrolinxEndpoint, isSigninSuccessResult, SigninSuccessResult} from '../../src/index';
 import {SigninLinksResult} from '../../src/signin';
 import {waitMs} from '../../src/utils/mixed-utils';
 import * as checkResultSchema from '../schemas/check-result.json';

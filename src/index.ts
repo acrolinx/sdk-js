@@ -15,16 +15,14 @@ import {
   CheckResponse,
   CheckResult,
   CheckResultResponse,
-  DocumentDescriptor,
-  DocumentId,
   HasTermHarvestingReport,
   KeyValuePair,
   Report,
-  sanitizeDocumentDescriptor,
   TermHarvestingReport
 } from './check';
 import {ApiResponse, AuthToken, isProgressResponse, Progress, StringMap, SuccessResponse, UserId} from './common-types';
 import {AddToDictionaryRequest, AddToDictionaryResponse, DictionaryCapabilities} from './dictionary';
+import {DocumentDescriptor, DocumentId, sanitizeDocumentDescriptor} from './document-descriptor';
 import {AcrolinxError, CheckCancelledByClientError, ErrorType, wrapFetchError} from './errors';
 import {
   HEADER_X_ACROLINX_AUTH,
@@ -65,6 +63,8 @@ export {
   ContentFormat,
   CheckOptions,
   CheckType,
+  DocumentDescriptor,
+  DocumentId,
   ReportType,
   SuccessResponse,
   CheckRequest,

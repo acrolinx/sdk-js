@@ -1,5 +1,4 @@
-import {ErrorType} from '../../src/errors';
-import {HttpRequest} from '../../src/utils/fetch';
+import {ErrorType, HttpRequest} from '../../src/errors';
 
 export function testIf(condition: boolean | string | undefined, testName: string, test: (done: () => void) => void) {
   if (condition) {
