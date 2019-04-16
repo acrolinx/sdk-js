@@ -175,7 +175,7 @@ describe('e2e - AcrolinxEndpoint', () => {
         checkRequest.document = {reference: 'filename.txt'};
       }
 
-      return {content: 'Testt Textt', ...checkRequest};
+      return {content: 'Testt Textt with errror', ...checkRequest};
     }
 
     async function createDummyCheck(checkRequestArg: Partial<CheckRequest> = {}) {
