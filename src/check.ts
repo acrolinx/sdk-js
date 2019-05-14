@@ -124,9 +124,9 @@ export interface Keyword {
 }
 
 export interface DiscoveredKeyword extends Keyword {
-  density?: number;
-  count?: number;
-  prominence?: number;
+  density: number;
+  count: number;
+  prominence: number;
   warnings?: KeywordWarning[];
 }
 
