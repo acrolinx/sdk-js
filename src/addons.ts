@@ -1,8 +1,8 @@
 export type AddonId = string;
 
 export enum AddonType {
-  default = "default",
-  experimental = "experimental"
+  default = 'default',
+  experimental = 'experimental'
 }
 
 export interface Addon {
