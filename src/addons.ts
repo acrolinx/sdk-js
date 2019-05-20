@@ -1,5 +1,10 @@
 export type AddonId = string;
 
+export enum AddonType {
+  default = "default",
+  experimental = "experimental"
+}
+
 export interface Addon {
   id: AddonId;
   title: string;
@@ -14,6 +19,10 @@ export interface Addon {
 
     app: string;
   };
+
+  // The following attributes are experimental and will change.
+  showCheckButton?: boolean;
+  type?: AddonType;
 }
 
 export interface AddonCheckResult {
