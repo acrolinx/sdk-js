@@ -21,7 +21,6 @@ export interface Addon {
   };
 
   // The following attributes are experimental and will change.
-  showCheckButton?: boolean;
   type?: AddonType;
 }
 
