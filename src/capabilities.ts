@@ -53,7 +53,16 @@ export enum ReportType {
   termHarvesting = 'termHarvesting',
   scorecard = 'scorecard',
   extractedText = 'extractedText',
-  request_text = 'extractedText' // TODO: Remove doubled enum value
+  /**
+   * TODO: Remove doubled enum value
+   * @Deprecated Use extractedText
+   */
+  request_text = 'extractedText',
+
+  /**
+   * Experimental for Acrolinx apps.
+   */
+  extractedText4App = 'extractedText4App',
 }
 
 export interface CheckingCapabilities {
