@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 
 import os.path
 import json
@@ -38,13 +38,13 @@ def get_argparser():
 def main():
     args = get_argparser().parse_args()
 
-    with open("package.json", "rb") as fh:
+    with open("package.json", "r", encoding="utf-8") as fh:
         version = json.load(fh)[args.version_key]
 
     for in_path, out_path in make_src_dest_tuples(FILES):
-        with open(out_path, "w") as fout, open(in_path, "r") as fin:
+        with open(out_path, "wb") as fout, open(in_path, "rb") as fin:
             for line in fin:
-                fout.write(line.replace("%__version__%", version))
+                fout.write(line.replace(b"%__version__%", version.encode()))
 
 
 if __name__ == "__main__":
