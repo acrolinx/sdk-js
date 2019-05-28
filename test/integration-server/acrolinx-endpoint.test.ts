@@ -375,6 +375,22 @@ describe('e2e - AcrolinxEndpoint', () => {
       });
     });
 
+    describe('extractAndGetResult', () => {
+      it('should extract', async () => {
+        const inputText = 'This is text';
+        const result = await api.extractAndPoll(ACROLINX_API_TOKEN, {content: inputText}).promise;
+
+        expect(new URL(result.extracted.link)).toBeTruthy();
+        expect(new URL(result.extracted.linkAuthenticated)).toBeTruthy();
+
+        const extractedText = await api.getTextFromUrl(result.extracted.link, ACROLINX_API_TOKEN);
+        expect(extractedText).toContain(inputText);
+
+        const extractedTextAuthenticated = await api.getTextFromUrl(result.extracted.linkAuthenticated);
+        expect(extractedTextAuthenticated).toContain(inputText);
+      });
+    });
+
     describe('after check ', () => {
       let checkResult: CheckResult;
       let document: DocumentDescriptor;

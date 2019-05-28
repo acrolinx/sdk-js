@@ -20,10 +20,20 @@ import {
   Report,
   TermHarvestingReport
 } from './check';
-import {ApiResponse, AuthToken, isProgressResponse, Progress, StringMap, SuccessResponse, UserId} from './common-types';
+import {
+  ApiResponse, AsyncApiResponse,
+  AsyncStartedProcess,
+  AuthToken,
+  isProgressResponse,
+  Progress,
+  StringMap,
+  SuccessResponse,
+  UserId
+} from './common-types';
 import {AddToDictionaryRequest, AddToDictionaryResponse, DictionaryCapabilities} from './dictionary';
 import {DocumentDescriptor, DocumentId, sanitizeDocumentDescriptor} from './document-descriptor';
 import {AcrolinxError, CheckCancelledByClientError, ErrorType, wrapFetchError} from './errors';
+import {ExtractionRequest, ExtractionResult} from './extraction';
 import {
   HEADER_X_ACROLINX_AUTH,
   HEADER_X_ACROLINX_BASE_URL,
@@ -47,6 +57,7 @@ import * as logging from './utils/logging';
 import {waitMs} from './utils/mixed-utils';
 
 export * from './dictionary';
+export * from './extraction';
 export {isSigninSuccessResult, AuthorizationType} from './signin';
 export {AcrolinxApiError} from './errors';
 export {setLoggingEnabled} from './utils/logging';
@@ -199,9 +210,26 @@ export class AcrolinxEndpoint {
     req: CheckRequest,
     opts: CheckAndGetResultOptions = {}
   ): CancelablePromiseWrapper<CheckResult> {
+    return this.startCancelablePollLoop(authToken, this.check(authToken, req), opts);
+  }
+
+  public extractAndPoll(
+    authToken: AuthToken,
+    req: ExtractionRequest,
+    opts: CheckAndGetResultOptions = {}
+  ): CancelablePromiseWrapper<ExtractionResult> {
+    const asyncStartedProcessPromise = this.post<AsyncStartedProcess>('/api/v1/apps/extract', req, {}, authToken);
+    return this.startCancelablePollLoop(authToken, asyncStartedProcessPromise, opts);
+  }
+
+  public startCancelablePollLoop<Result>(
+    authToken: AuthToken,
+    asyncStartedProcessPromise: Promise<AsyncStartedProcess>,
+    opts: CheckAndGetResultOptions = {}
+  ): CancelablePromiseWrapper<Result> {
     let canceledByClient = false;
     let requestedCanceledOnServer = false;
-    let runningCheck: CheckResponse | undefined;
+    let runningCheck: AsyncStartedProcess | undefined;
 
     let cancelPromiseReject: (e: Error) => void;
     const cancelPromise = new Promise<never>((_resolve, reject) => {
@@ -227,17 +255,17 @@ export class AcrolinxEndpoint {
       if (!requestedCanceledOnServer && runningCheck) {
         requestedCanceledOnServer = true;
         /* tslint:disable-next-line:no-floating-promises */
-        this.cancelCheck(authToken, runningCheck);
+        this.cancelAsyncStartedProcess(authToken, runningCheck);
       }
     };
 
-    const checkAndPoll = async (): Promise<CheckResult> => {
-      runningCheck = await this.check(authToken, req);
+    const poll = async (): Promise<Result> => {
+      runningCheck = await asyncStartedProcessPromise;
       handlePotentialCancellation();
 
-      let checkResultOrProgress: CheckResultResponse;
+      let checkResultOrProgress: AsyncApiResponse<Result>;
       do {
-        checkResultOrProgress = await this.pollForCheckResult(authToken, runningCheck);
+        checkResultOrProgress = await this.pollForAsyncResult(authToken, runningCheck);
         handlePotentialCancellation();
 
         if (isProgressResponse(checkResultOrProgress)) {
@@ -254,17 +282,18 @@ export class AcrolinxEndpoint {
     };
 
     return {
-      promise: Promise.race([checkAndPoll(), cancelPromise]),
+      promise: Promise.race([poll(), cancelPromise]),
       cancel
     };
   }
 
+
   public async cancelCheck(authToken: AuthToken, check: CheckResponse): Promise<CancelCheckResponse> {
-    return this.deleteUrl<CancelCheckResponse>(check.links.cancel, authToken);
+    return this.cancelAsyncStartedProcess(authToken, check);
   }
 
   public async pollForCheckResult(authToken: AuthToken, check: CheckResponse): Promise<CheckResultResponse> {
-    return this.getJsonFromUrl<CheckResultResponse>(check.links.result, authToken);
+    return this.pollForAsyncResult<CheckResultResponse>(authToken, check);
   }
 
   public async getAddonCheckResult(authToken: AuthToken, appDataLink: string): Promise<AddonCheckResult> {
@@ -340,6 +369,17 @@ export class AcrolinxEndpoint {
       res => handleExpectedTextResponse(httpRequest, res),
       error => wrapFetchError(httpRequest, error)
     );
+  }
+
+  private async pollForAsyncResult<R>(authToken: AuthToken, check: AsyncStartedProcess): Promise<R> {
+    return this.getJsonFromUrl<R>(check.links.result, authToken);
+  }
+
+  private async cancelAsyncStartedProcess<CancelResponse>(
+    authToken: AuthToken,
+    process: AsyncStartedProcess
+  ): Promise<CancelResponse> {
+    return this.deleteUrl<CancelResponse>(process.links.cancel, authToken);
   }
 
   private getCommonHeaders(authToken?: AuthToken): StringMap {

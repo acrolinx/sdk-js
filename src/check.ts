@@ -8,7 +8,13 @@ import {
   GuidanceProfileId,
   ReportType,
 } from './capabilities';
-import {AsyncApiResponse, LanguageId, SuccessResponse, URL} from './common-types';
+import {
+  AsyncApiResponse,
+  AsyncStartedProcessLinks,
+  LanguageId,
+  SuccessResponse,
+  URL
+} from './common-types';
 import {DictionaryScope} from './dictionary';
 import {DocumentDescriptor} from './document-descriptor';
 
@@ -46,11 +52,7 @@ export interface CheckResponseData {
   id: CheckId;
 }
 
-export interface CheckResponse extends SuccessResponse<CheckResponseData> {
-  links: {
-    result: URL;
-    cancel: URL;
-  };
+export interface CheckResponse extends SuccessResponse<CheckResponseData, AsyncStartedProcessLinks> {
   // Lots of stuff that looks similar to CheckRequest
 }
 
