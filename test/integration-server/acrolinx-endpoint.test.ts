@@ -378,7 +378,10 @@ describe('e2e - AcrolinxEndpoint', () => {
     describe('extractAndGetResult', () => {
       it('should extract', async () => {
         const inputText = 'This is text';
-        const result = await api.extractAndPoll(ACROLINX_API_TOKEN, {content: inputText}).promise;
+        const result = await api.extractAndPoll(ACROLINX_API_TOKEN, {
+          content: inputText,
+          options: {contentFormat: 'TEXT'}
+        }).promise;
 
         expect(new URL(result.extracted.link)).toBeTruthy();
         expect(new URL(result.extracted.linkAuthenticated)).toBeTruthy();

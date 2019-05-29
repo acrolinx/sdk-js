@@ -3,7 +3,7 @@ import {UrlString} from './common-types';
 
 export interface ExtractionRequest  {
   content: string;
-  checkOptions?: CheckOptions;
+  options?: CheckOptions;
   document?: DocumentDescriptorRequest;
 }
 
