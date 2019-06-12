@@ -383,6 +383,9 @@ describe('e2e - AcrolinxEndpoint', () => {
           options: {contentFormat: 'TEXT'}
         }).promise;
 
+        expect(result.options.languageId).toEqual('en');
+        expect(result.options.contentFormat).toEqual('TEXT');
+
         expect(new URL(result.extracted.link)).toBeTruthy();
         expect(new URL(result.extracted.linkAuthenticated)).toBeTruthy();
 

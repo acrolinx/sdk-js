@@ -1,5 +1,6 @@
+import {ContentFormatId} from './capabilities';
 import {CheckOptions, DocumentDescriptorRequest} from './check';
-import {UrlString} from './common-types';
+import {LanguageId, UrlString} from './common-types';
 
 export interface ExtractionRequest  {
   content: string;
@@ -8,6 +9,10 @@ export interface ExtractionRequest  {
 }
 
 export interface ExtractionResult  {
+  options: {
+    contentFormat: ContentFormatId;
+    languageId: LanguageId;
+  };
   extracted: {
     link: UrlString;
     linkAuthenticated: UrlString;
