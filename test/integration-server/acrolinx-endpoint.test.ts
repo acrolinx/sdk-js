@@ -3,6 +3,7 @@ import 'cross-fetch/polyfill';
 import * as dotenv from 'dotenv';
 import * as _ from 'lodash';
 import {
+  AnalysisType,
   CheckCancelledByClientError,
   CheckRequest,
   CheckResult,
@@ -11,9 +12,9 @@ import {
   DictionaryScope,
   ErrorType,
   hasTermHarvestingReport,
-  HasTermHarvestingReport,
+  HasTermHarvestingReport, OffsetReport,
   PollMoreResult,
-  ReportType,
+  ReportType, SuccessResponse,
   User
 } from '../../src';
 import {CheckOptions} from '../../src/check';
@@ -375,17 +376,21 @@ describe('e2e - AcrolinxEndpoint', () => {
       });
     });
 
-    describe('extractAndGetResult', () => {
+    describe('analyzeAndGetResult', () => {
       it('should extract', async () => {
         const inputText = 'This is text';
-        const result = await api.extractAndPoll(ACROLINX_API_TOKEN, {
+        const result = await api.analyzeAndPoll(ACROLINX_API_TOKEN, {
           content: inputText,
-          options: {contentFormat: 'TEXT'}
+          options: {
+            contentFormat: 'TEXT',
+            analysisTypes: [AnalysisType.extractedText, AnalysisType.offsets]
+          },
         }).promise;
 
         expect(result.options.languageId).toEqual('en');
         expect(result.options.contentFormat).toEqual('TEXT');
 
+        // Verify extracted text
         expect(new URL(result.extracted.link)).toBeTruthy();
         expect(new URL(result.extracted.linkAuthenticated)).toBeTruthy();
 
@@ -394,6 +399,19 @@ describe('e2e - AcrolinxEndpoint', () => {
 
         const extractedTextAuthenticated = await api.getTextFromUrl(result.extracted.linkAuthenticated);
         expect(extractedTextAuthenticated).toContain(inputText);
+
+        // Verify offsets
+        expect(new URL(result.offsets!.link)).toBeTruthy();
+        const offsets = (await api.getJsonFromUrl<SuccessResponse<OffsetReport>>(
+          result.offsets!.link, ACROLINX_API_TOKEN)).data;
+
+        const firstRange = offsets.ranges[0];
+
+        expect(firstRange.extracted.begin).toEqual(0);
+        expect(firstRange.extracted.end).toEqual(inputText.length);
+
+        expect(firstRange.original.begin).toEqual(0);
+        expect(firstRange.original.end).toEqual(inputText.length);
       });
     });
 

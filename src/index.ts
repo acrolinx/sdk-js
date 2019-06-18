@@ -33,7 +33,7 @@ import {
 import {AddToDictionaryRequest, AddToDictionaryResponse, DictionaryCapabilities} from './dictionary';
 import {DocumentDescriptor, DocumentId, sanitizeDocumentDescriptor} from './document-descriptor';
 import {AcrolinxError, CheckCancelledByClientError, ErrorType, wrapFetchError} from './errors';
-import {ExtractionRequest, ExtractionResult} from './extraction';
+import {AnalysisRequest, ExtractionResult} from './extraction';
 import {
   HEADER_X_ACROLINX_AUTH,
   HEADER_X_ACROLINX_BASE_URL,
@@ -213,12 +213,12 @@ export class AcrolinxEndpoint {
     return this.startCancelablePollLoop(authToken, this.check(authToken, req), opts);
   }
 
-  public extractAndPoll(
+  public analyzeAndPoll(
     authToken: AuthToken,
-    req: ExtractionRequest,
+    req: AnalysisRequest,
     opts: CheckAndGetResultOptions = {}
   ): CancelablePromiseWrapper<ExtractionResult> {
-    const asyncStartedProcessPromise = this.post<AsyncStartedProcess>('/api/v1/apps/extract', req, {}, authToken);
+    const asyncStartedProcessPromise = this.post<AsyncStartedProcess>('/api/v1/apps/analyzes', req, {}, authToken);
     return this.startCancelablePollLoop(authToken, asyncStartedProcessPromise, opts);
   }
 

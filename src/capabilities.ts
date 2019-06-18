@@ -58,11 +58,6 @@ export enum ReportType {
    * @Deprecated Use extractedText
    */
   request_text = 'extractedText',
-
-  /**
-   * Experimental for Acrolinx apps.
-   */
-  extractedText4App = 'extractedText4App',
 }
 
 export interface CheckingCapabilities {
