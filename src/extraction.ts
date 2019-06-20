@@ -39,6 +39,7 @@ export interface OffsetReport {
 export interface MappedOffsetRange {
   original: OffsetRange;
   extracted: OffsetRange;
+  changed?: boolean;
 }
 
 export interface OffsetRange {
