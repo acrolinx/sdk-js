@@ -377,7 +377,7 @@ describe('e2e - AcrolinxEndpoint', () => {
     });
 
     describe('analyzeAndGetResult', () => {
-      it('should extract', async () => {
+      it('should extract simple text', async () => {
         const inputText = 'This is text';
         const result = await api.analyzeAndPoll(ACROLINX_API_TOKEN, {
           content: inputText,
@@ -406,12 +406,54 @@ describe('e2e - AcrolinxEndpoint', () => {
           result.offsets!.link, ACROLINX_API_TOKEN)).data;
 
         const firstRange = offsets.ranges[0];
+        expect(firstRange.changed).toEqual(false);
 
         expect(firstRange.extracted.begin).toEqual(0);
         expect(firstRange.extracted.end).toEqual(inputText.length);
 
         expect(firstRange.original.begin).toEqual(0);
         expect(firstRange.original.end).toEqual(inputText.length);
+      });
+
+      it('should extract html', async () => {
+        const inputText = 'K<b>&ouml;r</b>per';
+        const result = await api.analyzeAndPoll(ACROLINX_API_TOKEN, {
+          content: inputText,
+          options: {
+            contentFormat: 'HTML',
+            analysisTypes: [AnalysisType.extractedText, AnalysisType.offsets]
+          },
+        }).promise;
+
+        expect(result.options.languageId).toEqual('en');
+        expect(result.options.contentFormat).toEqual('HTML');
+
+        // Verify extracted text
+        expect(new URL(result.extracted.link)).toBeTruthy();
+        expect(new URL(result.extracted.linkAuthenticated)).toBeTruthy();
+
+        const extractedText = await api.getTextFromUrl(result.extracted.link, ACROLINX_API_TOKEN);
+        expect(extractedText).toEqual('Körper');
+
+        const extractedTextAuthenticated = await api.getTextFromUrl(result.extracted.linkAuthenticated);
+        expect(extractedTextAuthenticated).toContain('Körper');
+
+        // Verify offsets
+        expect(new URL(result.offsets!.link)).toBeTruthy();
+        const offsets = (await api.getJsonFromUrl<SuccessResponse<OffsetReport>>(
+          result.offsets!.link, ACROLINX_API_TOKEN)).data;
+
+        expect(offsets).toEqual({
+          ranges: [{
+            original: {begin: 0, end: 1}, extracted: {begin: 0, end: 1}, changed: false
+          }, {
+            original: {begin: 4, end: 10}, extracted: {begin: 1, end: 2}, changed: true
+          }, {
+            original: {begin: 10, end: 11}, extracted: {begin: 2, end: 3}, changed: false
+          }, {
+            original: {begin: 15, end: 18}, extracted: {begin: 3, end: 6}, changed: false
+          }]
+        });
       });
     });
 
