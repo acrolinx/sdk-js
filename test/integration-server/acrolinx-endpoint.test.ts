@@ -8,13 +8,16 @@ import {
   CheckRequest,
   CheckResult,
   CustomFieldType,
+  DEVELOPMENT_APP_SIGNATURE,
   DEVELOPMENT_SIGNATURE,
   DictionaryScope,
   ErrorType,
   hasTermHarvestingReport,
-  HasTermHarvestingReport, OffsetReport,
+  HasTermHarvestingReport,
+  OffsetReport,
   PollMoreResult,
-  ReportType, SuccessResponse,
+  ReportType,
+  SuccessResponse,
   User
 } from '../../src';
 import {CheckOptions} from '../../src/check';
@@ -385,6 +388,7 @@ describe('e2e - AcrolinxEndpoint', () => {
             contentFormat: 'TEXT',
             analysisTypes: [AnalysisType.extractedText, AnalysisType.offsets]
           },
+          appSignature: DEVELOPMENT_APP_SIGNATURE
         }).promise;
 
         expect(result.options.languageId).toEqual('en');
@@ -423,6 +427,7 @@ describe('e2e - AcrolinxEndpoint', () => {
             contentFormat: 'HTML',
             analysisTypes: [AnalysisType.extractedText, AnalysisType.offsets]
           },
+          appSignature: DEVELOPMENT_APP_SIGNATURE
         }).promise;
 
         expect(result.options.languageId).toEqual('en');

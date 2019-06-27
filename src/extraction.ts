@@ -15,6 +15,7 @@ export interface AnalysisRequest {
   content: string;
   options?: AnalysisRequestOptions;
   document?: DocumentDescriptorRequest;
+  appSignature: string;
 }
 
 export interface ExtractionResult {

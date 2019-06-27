@@ -21,7 +21,8 @@ import {
   TermHarvestingReport
 } from './check';
 import {
-  ApiResponse, AsyncApiResponse,
+  ApiResponse,
+  AsyncApiResponse,
   AsyncStartedProcess,
   AuthToken,
   isProgressResponse,
@@ -35,6 +36,7 @@ import {DocumentDescriptor, DocumentId, sanitizeDocumentDescriptor} from './docu
 import {AcrolinxError, CheckCancelledByClientError, ErrorType, wrapFetchError} from './errors';
 import {AnalysisRequest, ExtractionResult} from './extraction';
 import {
+  HEADER_X_ACROLINX_APP_SIGNATURE,
   HEADER_X_ACROLINX_AUTH,
   HEADER_X_ACROLINX_BASE_URL,
   HEADER_X_ACROLINX_CLIENT,
@@ -85,6 +87,8 @@ export {
   Report
 };
 
+export {HEADER_X_ACROLINX_APP_SIGNATURE};
+
 export * from './check';
 export * from './capabilities';
 export * from './user';
@@ -97,6 +101,9 @@ export * from './notifications';
 // You'll get the clientSignature for your integration after a successful certification meeting.
 // See: https://support.acrolinx.com/hc/en-us/articles/205687652-Getting-Started-with-Custom-Integrations
 export const DEVELOPMENT_SIGNATURE = 'SW50ZWdyYXRpb25EZXZlbG9wbWVudERlbW9Pbmx5';
+
+/* tslint:disable-next-line:max-line-length*/
+export const DEVELOPMENT_APP_SIGNATURE = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJuYW1lIjoiS2lsbGVyIEFwcCIsImlkIjoiNGVlZDM3NjctMGYzMS00ZDVmLWI2MjktYzg2MWFiM2VkODUyIiwidHlwZSI6IkFQUCIsImlhdCI6MTU2MTE4ODI5M30.zlVJuGITMjAJ2p4nl-qtpj4N0p_8e4tenr-4dkrGdXg';
 
 export interface ServerVersionInfo {
   version: string;
@@ -153,6 +160,13 @@ export type SigninOptions = HasAuthToken | SsoSigninOption | {};
 
 export interface CheckAndGetResultOptions {
   onProgress?(progress: Progress): void;
+}
+
+export interface AdditionalRequestOptions {
+  headers?: StringMap;
+}
+
+export interface CancelablePollLoopOptions extends CheckAndGetResultOptions, AdditionalRequestOptions {
 }
 
 export interface CancelablePromiseWrapper<T> {
@@ -218,75 +232,10 @@ export class AcrolinxEndpoint {
     req: AnalysisRequest,
     opts: CheckAndGetResultOptions = {}
   ): CancelablePromiseWrapper<ExtractionResult> {
-    const asyncStartedProcessPromise = this.post<AsyncStartedProcess>('/api/v1/apps/analyzes', req, {}, authToken);
-    return this.startCancelablePollLoop(authToken, asyncStartedProcessPromise, opts);
+    const headers = {[HEADER_X_ACROLINX_APP_SIGNATURE]: req.appSignature};
+    const asyncStartedProcessPromise = this.post<AsyncStartedProcess>('/api/v1/apps/analyzes', req, headers, authToken);
+    return this.startCancelablePollLoop(authToken, asyncStartedProcessPromise, {...opts, headers});
   }
-
-  public startCancelablePollLoop<Result>(
-    authToken: AuthToken,
-    asyncStartedProcessPromise: Promise<AsyncStartedProcess>,
-    opts: CheckAndGetResultOptions = {}
-  ): CancelablePromiseWrapper<Result> {
-    let canceledByClient = false;
-    let requestedCanceledOnServer = false;
-    let runningCheck: AsyncStartedProcess | undefined;
-
-    let cancelPromiseReject: (e: Error) => void;
-    const cancelPromise = new Promise<never>((_resolve, reject) => {
-      cancelPromiseReject = reject;
-    });
-
-    function cancel() {
-      canceledByClient = true;
-      cancelPromiseReject(createCheckCanceledByClientError());
-      cancelOnServerIfPossibleAndStillNeeded();
-    }
-
-    const handlePotentialCancellation = () => {
-      if (canceledByClient) {
-        cancelOnServerIfPossibleAndStillNeeded();
-        // We don't want to poll forever if the canceling does not work on the server.
-        // To be consistent we throw the same exception, that the server would throw while polling.
-        throw createCheckCanceledByClientError();
-      }
-    };
-
-    const cancelOnServerIfPossibleAndStillNeeded = () => {
-      if (!requestedCanceledOnServer && runningCheck) {
-        requestedCanceledOnServer = true;
-        /* tslint:disable-next-line:no-floating-promises */
-        this.cancelAsyncStartedProcess(authToken, runningCheck);
-      }
-    };
-
-    const poll = async (): Promise<Result> => {
-      runningCheck = await asyncStartedProcessPromise;
-      handlePotentialCancellation();
-
-      let checkResultOrProgress: AsyncApiResponse<Result>;
-      do {
-        checkResultOrProgress = await this.pollForAsyncResult(authToken, runningCheck);
-        handlePotentialCancellation();
-
-        if (isProgressResponse(checkResultOrProgress)) {
-          if (opts.onProgress) {
-            opts.onProgress(checkResultOrProgress.progress);
-          }
-
-          await waitMs(checkResultOrProgress.progress.retryAfter * 1000);
-          handlePotentialCancellation();
-        }
-      } while (isProgressResponse(checkResultOrProgress));
-
-      return checkResultOrProgress.data;
-    };
-
-    return {
-      promise: Promise.race([poll(), cancelPromise]),
-      cancel
-    };
-  }
-
 
   public async cancelCheck(authToken: AuthToken, check: CheckResponse): Promise<CancelCheckResponse> {
     return this.cancelAsyncStartedProcess(authToken, check);
@@ -355,31 +304,106 @@ export class AcrolinxEndpoint {
     return this.getJsonFromUrl<T>(this.props.serverAddress + path, authToken);
   }
 
-  public async getJsonFromUrl<T>(url: string, authToken?: AuthToken): Promise<T> {
+  public async getJsonFromUrl<T>(url: string, authToken?: AuthToken, opts: AdditionalRequestOptions = {}): Promise<T> {
     return this.fetchJson(url, {
-      headers: this.getCommonHeaders(authToken),
+      headers: {...this.getCommonHeaders(authToken), ...opts.headers},
     });
   }
 
-  public async getTextFromUrl(url: string, authToken?: AuthToken): Promise<string> {
+  public async getTextFromUrl(
+    url: string,
+    authToken?: AuthToken,
+    opts: AdditionalRequestOptions = {}
+  ): Promise<string> {
     const httpRequest = {url, method: 'GET'};
     return this.fetch(url, {
-      headers: this.getCommonHeaders(authToken),
+      headers: {...this.getCommonHeaders(authToken), ...opts.headers},
     }).then(
       res => handleExpectedTextResponse(httpRequest, res),
       error => wrapFetchError(httpRequest, error)
     );
   }
 
-  private async pollForAsyncResult<R>(authToken: AuthToken, check: AsyncStartedProcess): Promise<R> {
-    return this.getJsonFromUrl<R>(check.links.result, authToken);
+  private startCancelablePollLoop<Result>(
+    authToken: AuthToken,
+    asyncStartedProcessPromise: Promise<AsyncStartedProcess>,
+    opts: CancelablePollLoopOptions = {}
+  ): CancelablePromiseWrapper<Result> {
+    let canceledByClient = false;
+    let requestedCanceledOnServer = false;
+    let runningCheck: AsyncStartedProcess | undefined;
+
+    let cancelPromiseReject: (e: Error) => void;
+    const cancelPromise = new Promise<never>((_resolve, reject) => {
+      cancelPromiseReject = reject;
+    });
+
+    function cancel() {
+      canceledByClient = true;
+      cancelPromiseReject(createCheckCanceledByClientError());
+      cancelOnServerIfPossibleAndStillNeeded();
+    }
+
+    const handlePotentialCancellation = () => {
+      if (canceledByClient) {
+        cancelOnServerIfPossibleAndStillNeeded();
+        // We don't want to poll forever if the canceling does not work on the server.
+        // To be consistent we throw the same exception, that the server would throw while polling.
+        throw createCheckCanceledByClientError();
+      }
+    };
+
+    const cancelOnServerIfPossibleAndStillNeeded = () => {
+      if (!requestedCanceledOnServer && runningCheck) {
+        requestedCanceledOnServer = true;
+        /* tslint:disable-next-line:no-floating-promises */
+        this.cancelAsyncStartedProcess(authToken, runningCheck, opts);
+      }
+    };
+
+    const poll = async (): Promise<Result> => {
+      runningCheck = await asyncStartedProcessPromise;
+      handlePotentialCancellation();
+
+      let checkResultOrProgress: AsyncApiResponse<Result>;
+      do {
+        checkResultOrProgress = await this.pollForAsyncResult(authToken, runningCheck, opts);
+        handlePotentialCancellation();
+
+        if (isProgressResponse(checkResultOrProgress)) {
+          if (opts.onProgress) {
+            opts.onProgress(checkResultOrProgress.progress);
+          }
+
+          await waitMs(checkResultOrProgress.progress.retryAfter * 1000);
+          handlePotentialCancellation();
+        }
+      } while (isProgressResponse(checkResultOrProgress));
+
+      return checkResultOrProgress.data;
+    };
+
+    return {
+      promise: Promise.race([poll(), cancelPromise]),
+      cancel
+    };
+  }
+
+
+  private async pollForAsyncResult<R>(
+    authToken: AuthToken,
+    check: AsyncStartedProcess,
+    opts: AdditionalRequestOptions = {}
+  ): Promise<R> {
+    return this.getJsonFromUrl<R>(check.links.result, authToken, opts);
   }
 
   private async cancelAsyncStartedProcess<CancelResponse>(
     authToken: AuthToken,
-    process: AsyncStartedProcess
+    process: AsyncStartedProcess,
+    opts: AdditionalRequestOptions = {}
   ): Promise<CancelResponse> {
-    return this.deleteUrl<CancelResponse>(process.links.cancel, authToken);
+    return this.deleteUrl<CancelResponse>(process.links.cancel, authToken, opts);
   }
 
   private getCommonHeaders(authToken?: AuthToken): StringMap {
@@ -417,9 +441,9 @@ export class AcrolinxEndpoint {
     });
   }
 
-  private async deleteUrl<T>(url: string, authToken: AuthToken): Promise<T> {
+  private async deleteUrl<T>(url: string, authToken: AuthToken, opts: AdditionalRequestOptions = {}): Promise<T> {
     return this.fetchJson(url, {
-      headers: this.getCommonHeaders(authToken),
+      headers: {...this.getCommonHeaders(authToken), ...opts.headers},
       method: 'DELETE',
     });
   }
