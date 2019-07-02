@@ -24,7 +24,8 @@ export enum ErrorType {
   InsufficientPrivileges = 'insufficientPrivileges',
   GuidanceProfileDoesNotExist = 'guidanceProfileDoesntExist',
   InvalidBaseUrl = 'invalidBaseUrl',
-  NoGuidanceProfileConfigured = 'noGuidanceProfileConfigured'
+  NoGuidanceProfileConfigured = 'noGuidanceProfileConfigured',
+  AppSignatureRejected = 'appSignatureRejected'
 }
 
 export interface AcrolinxErrorProps {

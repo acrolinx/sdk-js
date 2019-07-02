@@ -460,6 +460,49 @@ describe('e2e - AcrolinxEndpoint', () => {
           }]
         });
       });
+
+      describe('error handling', () => {
+        function analyzeAndPollWithSignature(appSignature: string) {
+          return api.analyzeAndPoll(ACROLINX_API_TOKEN, {
+            content: 'This is text',
+            options: {
+              contentFormat: 'TEXT',
+              analysisTypes: [AnalysisType.extractedText, AnalysisType.offsets]
+            },
+            appSignature
+          }).promise;
+        }
+
+        it('should work with an empty signature', async () => {
+          const result = await analyzeAndPollWithSignature('');
+          expect(result).toBeTruthy();
+        });
+
+        it('should not work with broken signature', async () => {
+          const error = await expectFailingPromise<AcrolinxError>(
+            analyzeAndPollWithSignature('brokenAppSignature'),
+            ErrorType.AppSignatureRejected
+          );
+
+          expect(error.status).toEqual(403);
+          expect(error.title).toEqual('App signature rejected'); // This string might change, that's fine
+          expect(error.detail).toEqual('JWT Token is not decodable.'); // This string might change, that's fine
+        });
+
+        it('should only work with signature type "APP"', async () => {
+          /* tslint:disable-next-line:max-line-length*/
+          const appSignatureWithInvalidType = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJuYW1lIjoiS2FqYSBBbm91ayBTdGFobCIsImlkIjoiNGVlZDM3NjctMGYzMS00ZDVmLWI2MjktYzg2MWFiM2VkODUyIiwidHlwZSI6IktBSkEiLCJpYXQiOjE1NjExODgyOTN9.XaCSr2piA0u-JZLjRlO4QtuhsRgDOuurbhsvTFmCv1w';
+          const error = await expectFailingPromise<AcrolinxError>(
+            analyzeAndPollWithSignature(appSignatureWithInvalidType),
+            ErrorType.AppSignatureRejected
+          );
+
+          expect(error.status).toEqual(403);
+          // These strings might change in the future, that's fine.
+          expect(error.title).toEqual('App signature rejected');
+          expect(error.detail).toEqual('JWT Token type \'KAJA\' is not known.');
+        });
+      });
     });
 
     describe('after check ', () => {
