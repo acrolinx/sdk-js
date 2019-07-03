@@ -233,7 +233,7 @@ export class AcrolinxEndpoint {
     opts: CheckAndGetResultOptions = {}
   ): CancelablePromiseWrapper<ExtractionResult> {
     const headers = {[HEADER_X_ACROLINX_APP_SIGNATURE]: req.appSignature};
-    const asyncStartedProcessPromise = this.post<AsyncStartedProcess>('/api/v1/apps/analyzes', req, headers, authToken);
+    const asyncStartedProcessPromise = this.post<AsyncStartedProcess>('/api/v1/apps/analyses', req, headers, authToken);
     return this.startCancelablePollLoop(authToken, asyncStartedProcessPromise, {...opts, headers});
   }
 
