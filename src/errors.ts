@@ -78,7 +78,13 @@ export class AcrolinxError extends Error implements AcrolinxErrorProps {
     super(props.title);
     this.type = props.type;
     this.status = props.status;
-    this.httpRequest = props.httpRequest;
+
+    // Copy only known props, to avoid accidental leaking of stuff.
+    this.httpRequest = props.httpRequest ? {
+      url: props.httpRequest.url,
+      method: props.httpRequest.method
+    } : undefined;
+
     this.title = props.title;
     this.detail = props.detail;
     this.reference = props.reference;

@@ -3,7 +3,7 @@ import {AcrolinxError, createErrorFromFetchResponse, ErrorType, HttpRequest} fro
 // TODO: Simplify as soon as all API Urls wraps the error
 export async function handleExpectedJsonResponse<T>(req: HttpRequest, res: Response): Promise<T> {
   if (200 <= res.status && res.status < 300) {
-    const jsonResult = await toJson<any>(res);
+    const jsonResult = await toJson<any>(req, res);
     if (jsonResult.error) {
       throw createErrorFromFetchResponse(req, res, jsonResult.error);
     }
@@ -24,7 +24,7 @@ export async function handleExpectedTextResponse(req: HttpRequest, res: Response
 async function createErrorFromResponse(req: HttpRequest, res: Response): Promise<Error> {
   let error;
   try {
-    const jsonError = await toJson<any>(res);
+    const jsonError = await toJson<any>(req, res);
     if (jsonError.error) {
       error = createErrorFromFetchResponse(req, res, jsonError.error);
     } else {
@@ -36,10 +36,11 @@ async function createErrorFromResponse(req: HttpRequest, res: Response): Promise
   return error;
 }
 
-export function toJson<T>(res: Response): T | Promise<T> {
+export function toJson<T>(httpRequest: HttpRequest, res: Response): T | Promise<T> {
   return res.json().catch(e => {
     throw new AcrolinxError({
       detail: e.message,
+      httpRequest,
       title: 'Invalid Json',
       type: ErrorType.InvalidJson,
     });
