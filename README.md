@@ -1,5 +1,7 @@
-# acrolinx-api-js
-NPM Module to talk to Acrolinx
+# Acrolinx JavaScript SDK
+
+This library is meant to be used to interact with the Acrolinx Platform API in JavaScript integrations. 
+It does NOT offer an interface to work with the Acrolinx Sidebar (see [Sidebar JavaScript SDK](https://github.com/acrolinx/sidebar-sdk-js)).
 
 ## License
 
