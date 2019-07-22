@@ -149,12 +149,12 @@ export function hasAccessToken(signinOptions: SigninOptions): signinOptions is H
 
 export function isSsoSigninOption(signinOptions: SigninOptions): signinOptions is SsoSigninOption {
   const potentialSsoOptions = signinOptions as SsoSigninOption;
-  return !!(potentialSsoOptions.password && potentialSsoOptions.userId);
+  return !!(potentialSsoOptions.genericToken && potentialSsoOptions.username);
 }
 
 export interface SsoSigninOption {
-  userId: string;
-  password: string;
+  username: string;
+  genericToken: string;
 }
 
 export type SigninOptions = HasAccessToken | SsoSigninOption | {};
@@ -502,8 +502,8 @@ function getSigninRequestHeaders(options: SigninOptions = {}): StringMap {
     return {[HEADER_X_ACROLINX_AUTH]: options.accessToken};
   } else if (isSsoSigninOption(options)) {
     return {
-      username: options.userId,
-      password: options.password,
+      username: options.username,
+      password: options.genericToken,
     };
   } else {
     return {};

@@ -33,8 +33,8 @@ import {describeIf, expectFailingPromise, testIf} from '../test-utils/utils';
 dotenv.config();
 
 const TEST_SERVER_URL = process.env.TEST_SERVER_URL || 'https://test-next-ssl.acrolinx.com';
-const SSO_USER_ID = process.env.SSO_USER_ID;
-const SSO_PASSWORD = process.env.SSO_PASSWORD;
+const SSO_USERNAME = process.env.SSO_USERNAME;
+const SSO_GENERIC_TOKEN = process.env.SSO_GENERIC_TOKEN;
 const ACROLINX_API_TOKEN = process.env.ACROLINX_API_TOKEN || '';
 const ACROLINX_API_USER_ID = process.env.ACROLINX_API_USER_ID || 'jenkins-api-js';
 
@@ -128,13 +128,13 @@ describe('e2e - AcrolinxEndpoint', () => {
       await expectFailingPromise(signinPollResultPromise, ErrorType.SigninTimedOut);
     });
 
-    testIf(SSO_USER_ID || SSO_PASSWORD, 'signin with sso', async () => {
+    testIf(SSO_USERNAME || SSO_GENERIC_TOKEN, 'signin with sso', async () => {
       const result = await api.signin({
-          password: SSO_PASSWORD,
-          userId: SSO_USER_ID,
+          genericToken: SSO_GENERIC_TOKEN,
+          username: SSO_USERNAME,
         }
       ) as SigninSuccessResult;
-      expect(result.data.user.id).toContain(SSO_USER_ID);
+      expect(result.data.user.id).toContain(SSO_USERNAME);
     });
 
     it('poll for signin', async () => {
