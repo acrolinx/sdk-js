@@ -190,7 +190,6 @@ export class AcrolinxEndpoint {
     this.props.clientLocale = clientLocale;
   }
 
-  // TODO: getPlatformInformation
   public async getPlatformInformation(): Promise<PlatformInformation> {
     return getData<PlatformInformation>(this.getJsonFromPath('/api/v1/'));
   }
