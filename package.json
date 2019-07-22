@@ -12,8 +12,8 @@
     "node": ">=8.9.4"
   },
   "scripts": {
-    "ci": "npm run build && npm run tslint && npm run testCoverage",
-    "ciWithoutIntegrationServerTest": "npm run build && npm run tslint && npm run testUnitCoverage",
+    "ci": "npm run build && npm run tslint && npm run testCoverage && npm run testMarkdown",
+    "ciWithoutIntegrationServerTest": "npm run build && npm run tslint && npm run testUnitCoverage && npm run testMarkdown",
     "clean": "rm -rf dist",
     "prepare": "npm run generateSchemas && tsc",
     "generateSchemas": "npm run generateSchemaCheckResult && npm run generateSchemasTermHarvestingReport",
@@ -28,13 +28,15 @@
     "runMockServer": "tsc && node dist/test/test-utils/mock-server-http.js",
     "test": "jest",
     "testCoverage": "jest --coverage",
+    "testMarkdown": "markdown-doctest",
     "testUnit": "jest unit",
     "testUnitCoverage": "jest unit --coverage",
     "testIntegrationServer": "jest integration-server",
     "testIntegrationServerCoverage": "jest integration-server --coverage",
     "tscWatch": "tsc -w",
     "tslint": "tslint -p tsconfig.json -t stylish",
-    "tslintFix": "tslint --fix -p tsconfig.json -t stylish"
+    "tslintFix": "tslint --fix -p tsconfig.json -t stylish",
+    "docs": "typedoc --mode file --out docs src"
   },
   "devDependencies": {
     "@types/co-body": "^0.0.3",
@@ -51,10 +53,12 @@
     "jest": "^24.8.0",
     "jest-junit": "^6.4.0",
     "lodash": "^4.17.14",
+    "markdown-doctest": "^0.9.1",
     "ts-jest": "^24.0.2",
     "tslint": "5.17.0",
     "tslint-no-circular-imports": "^0.7.0",
     "tslint-sonarts": "^1.9.0",
+    "typedoc": "^0.14.2",
     "typescript": "^3.5.1",
     "typescript-json-schema": "^0.38.3"
   },

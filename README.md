@@ -3,6 +3,35 @@
 This library is meant to be used to interact with the Acrolinx Platform API in JavaScript integrations. 
 It does NOT offer an interface to work with the Acrolinx Sidebar (see [Sidebar JavaScript SDK](https://github.com/acrolinx/sidebar-sdk-js)).
 
+## Getting Started
+
+### Installation
+
+```bash
+npm install @acrolinx/sdk
+```
+
+### Example Code
+
+#### Getting some info
+
+```javascript
+import 'cross-fetch/polyfill'; // Use a fetch polyfill, when you target Node.js or IE11
+import assert from 'assert';
+import {AcrolinxEndpoint, DEVELOPMENT_SIGNATURE} from '@acrolinx/sdk';
+
+const acrolinxEndpoint = new AcrolinxEndpoint({
+  client: {version: '1.2.3.666', name: 'DummyName', signature: DEVELOPMENT_SIGNATURE},
+  serverAddress: 'https://test-ssl.acrolinx.com',
+});
+
+acrolinxEndpoint.getServerInfo().then(info => {
+  assert.ok(info.server.name.length > 0);
+  assert.ok(info.server.version.split('.').length, 2);
+  assert.ok(info.locales.includes('en'));
+});
+```
+
 ## License
 
 Copyright 2018-present Acrolinx GmbH
