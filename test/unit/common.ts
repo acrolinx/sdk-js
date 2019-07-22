@@ -4,7 +4,6 @@ export const DUMMY_SERVER_URL = 'http://dummy-server';
 
 export const DUMMY_ENDPOINT_PROPS: AcrolinxEndpointProps = {
   client: {
-    name: 'TestClient',
     signature: DEVELOPMENT_SIGNATURE,
     version: '1.2.3.666'
   },

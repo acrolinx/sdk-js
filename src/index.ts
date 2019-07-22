@@ -49,7 +49,6 @@ import {
   PollMoreResult,
   SigninLinksResult,
   SigninPollResult,
-  SigninRequestBody,
   SigninResult,
   SigninSuccessResult
 } from './signin';
@@ -105,6 +104,7 @@ export const DEVELOPMENT_SIGNATURE = 'SW50ZWdyYXRpb25EZXZlbG9wbWVudERlbW9Pbmx5';
 /* tslint:disable-next-line:max-line-length*/
 export const DEVELOPMENT_APP_SIGNATURE = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJuYW1lIjoiS2lsbGVyIEFwcCIsImlkIjoiNGVlZDM3NjctMGYzMS00ZDVmLWI2MjktYzg2MWFiM2VkODUyIiwidHlwZSI6IkFQUCIsImlhdCI6MTU2MTE4ODI5M30.zlVJuGITMjAJ2p4nl-qtpj4N0p_8e4tenr-4dkrGdXg';
 
+// TODO: Server
 export interface ServerVersionInfo {
   version: string;
   name: string;
@@ -118,15 +118,19 @@ export interface ServerInfo {
 export interface AcrolinxEndpointProps {
   client: ClientInformation;
   clientLocale?: string;
-  enableHttpLogging?: boolean;
-  serverAddress: string;
+  serverAddress: string;      // TODO: acrolinxUrl
+
   corsWithCredentials?: boolean;
   additionalFetchProperties?: any;
   fetch?: typeof fetch;
+
+  /**
+   * @ignore
+   */
+  enableHttpLogging?: boolean;
 }
 
 export interface ClientInformation {
-  name: string;
   signature: string;
   /**
    * The version of the client.
@@ -137,7 +141,7 @@ export interface ClientInformation {
 }
 
 export interface HasAuthToken {
-  authToken: string;
+  authToken: string;  // TODO: accessToken
 }
 
 export function hasAuthToken(signinOptions: SigninOptions): signinOptions is HasAuthToken {
@@ -150,8 +154,6 @@ export function isSsoSigninOption(signinOptions: SigninOptions): signinOptions i
 }
 
 export interface SsoSigninOption {
-  usernameKey?: string;
-  passwordKey?: string;
   userId: string;
   password: string;
 }
@@ -189,13 +191,13 @@ export class AcrolinxEndpoint {
     this.props.clientLocale = clientLocale;
   }
 
+  // TODO: getPlatformInformation
   public async getServerInfo(): Promise<ServerInfo> {
     return getData<ServerInfo>(this.getJsonFromPath('/api/v1/'));
   }
 
   public async signin(options: SigninOptions = {}): Promise<SigninResult> {
-    const signinRequestBody: SigninRequestBody = {clientName: this.props.client.name};
-    return this.post<SigninResult>('/api/v1/auth/sign-ins', signinRequestBody, getSigninRequestHeaders(options));
+    return this.post<SigninResult>('/api/v1/auth/sign-ins', {}, getSigninRequestHeaders(options));
   }
 
   public async pollForSignin(signinLinks: SigninLinksResult,
@@ -489,13 +491,13 @@ function getData<T>(promise: Promise<SuccessResponse<T>>): Promise<T> {
   return promise.then(r => r.data);
 }
 
-function getSigninRequestHeaders(options: SigninOptions = {}) {
+function getSigninRequestHeaders(options: SigninOptions = {}): StringMap {
   if (hasAuthToken(options)) {
     return {[HEADER_X_ACROLINX_AUTH]: options.authToken};
   } else if (isSsoSigninOption(options)) {
     return {
-      [options.passwordKey || 'username']: options.userId,
-      [options.passwordKey || 'password']: options.password,
+      username: options.userId,
+      password: options.password,
     };
   } else {
     return {};

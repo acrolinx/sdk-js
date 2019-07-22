@@ -15,10 +15,6 @@ export function isSigninSuccessResult(
   return !!(asSigninSuccessResult && asSigninSuccessResult.data && asSigninSuccessResult.data.accessToken);
 }
 
-export interface SigninRequestBody {
-  clientName: string;
-}
-
 export type SigninResult = SigninLinksResult | SigninSuccessResult;
 
 export interface SigninLinksData {

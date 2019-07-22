@@ -5,7 +5,6 @@ function createEndpoint(serverAddress: string) {
   return new AcrolinxEndpoint({
     enableHttpLogging: true,
     client: {
-      name: 'TestClient',
       signature: DEVELOPMENT_SIGNATURE,
       version: '1.2.3.666'
     }, serverAddress
