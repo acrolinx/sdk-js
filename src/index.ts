@@ -25,7 +25,7 @@ import {
   ApiResponse,
   AsyncApiResponse,
   AsyncStartedProcess,
-  isProgressResponse,
+  isProgressResponse, NoFields,
   Progress,
   StringMap,
   SuccessResponse,
@@ -140,7 +140,7 @@ export interface ClientInformation {
 }
 
 export interface HasAccessToken {
-  accessToken: string;  // TODO: accessToken
+  accessToken: string;
 }
 
 export function hasAccessToken(signinOptions: SigninOptions): signinOptions is HasAccessToken {
@@ -157,7 +157,7 @@ export interface SsoSigninOption {
   genericToken: string;
 }
 
-export type SigninOptions = HasAccessToken | SsoSigninOption | {};
+export type SigninOptions = HasAccessToken | SsoSigninOption | NoFields;
 
 export interface CheckAndGetResultOptions {
   onProgress?(progress: Progress): void;

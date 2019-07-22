@@ -128,10 +128,10 @@ describe('e2e - AcrolinxEndpoint', () => {
       await expectFailingPromise(signinPollResultPromise, ErrorType.SigninTimedOut);
     });
 
-    testIf(SSO_USERNAME || SSO_GENERIC_TOKEN, 'signin with sso', async () => {
+    testIf(SSO_USERNAME && SSO_GENERIC_TOKEN, 'signin with sso', async () => {
       const result = await api.signin({
-          genericToken: SSO_GENERIC_TOKEN,
-          username: SSO_USERNAME,
+          genericToken: SSO_GENERIC_TOKEN!,
+          username: SSO_USERNAME!,
         }
       ) as SigninSuccessResult;
       expect(result.data.user.id).toContain(SSO_USERNAME);

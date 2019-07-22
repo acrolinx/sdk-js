@@ -5,6 +5,10 @@ export type UserId = string;
 export type Username = string;
 export type AccessToken = string;
 
+export interface NoFields {
+  [key: string]: never;
+}
+
 export interface Progress {
   percent: number;  // TODO: optional?
   message: string;  // TODO: optional?
