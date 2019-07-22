@@ -25,7 +25,7 @@ const acrolinxEndpoint = new AcrolinxEndpoint({
   acrolinxUrl: 'https://test-ssl.acrolinx.com',
 });
 
-acrolinxEndpoint.getServerInfo().then(info => {
+acrolinxEndpoint.getPlatformInformation().then(info => {
   assert.ok(info.server.name.length > 0);
   assert.ok(info.server.version.split('.').length >= 2 );
   assert.ok(info.locales.includes('en'));

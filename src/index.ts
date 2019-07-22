@@ -104,14 +104,13 @@ export const DEVELOPMENT_SIGNATURE = 'SW50ZWdyYXRpb25EZXZlbG9wbWVudERlbW9Pbmx5';
 /* tslint:disable-next-line:max-line-length*/
 export const DEVELOPMENT_APP_SIGNATURE = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJuYW1lIjoiS2lsbGVyIEFwcCIsImlkIjoiNGVlZDM3NjctMGYzMS00ZDVmLWI2MjktYzg2MWFiM2VkODUyIiwidHlwZSI6IkFQUCIsImlhdCI6MTU2MTE4ODI5M30.zlVJuGITMjAJ2p4nl-qtpj4N0p_8e4tenr-4dkrGdXg';
 
-// TODO: Server
-export interface ServerVersionInfo {
+export interface Server {
   version: string;
   name: string;
 }
 
-export interface ServerInfo {
-  server: ServerVersionInfo;
+export interface PlatformInformation {
+  server: Server;
   locales: string[];
 }
 
@@ -192,8 +191,8 @@ export class AcrolinxEndpoint {
   }
 
   // TODO: getPlatformInformation
-  public async getServerInfo(): Promise<ServerInfo> {
-    return getData<ServerInfo>(this.getJsonFromPath('/api/v1/'));
+  public async getPlatformInformation(): Promise<PlatformInformation> {
+    return getData<PlatformInformation>(this.getJsonFromPath('/api/v1/'));
   }
 
   public async signin(options: SigninOptions = {}): Promise<SigninResult> {
