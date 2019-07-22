@@ -118,7 +118,7 @@ export interface ServerInfo {
 export interface AcrolinxEndpointProps {
   client: ClientInformation;
   clientLocale?: string;
-  serverAddress: string;      // TODO: acrolinxUrl
+  acrolinxUrl: string;
 
   corsWithCredentials?: boolean;
   additionalFetchProperties?: any;
@@ -183,7 +183,7 @@ export class AcrolinxEndpoint {
   constructor(props: AcrolinxEndpointProps) {
     this.props = {
       ...props,
-      serverAddress: props.serverAddress.trim().replace(/\/$/, '')
+      acrolinxUrl: props.acrolinxUrl.trim().replace(/\/$/, '')
     };
   }
 
@@ -303,7 +303,7 @@ export class AcrolinxEndpoint {
   }
 
   public async getJsonFromPath<T>(path: string, authToken?: AuthToken): Promise<T> {
-    return this.getJsonFromUrl<T>(this.props.serverAddress + path, authToken);
+    return this.getJsonFromUrl<T>(this.props.acrolinxUrl + path, authToken);
   }
 
   public async getJsonFromUrl<T>(url: string, authToken?: AuthToken, opts: AdditionalRequestOptions = {}): Promise<T> {
@@ -411,7 +411,7 @@ export class AcrolinxEndpoint {
   private getCommonHeaders(authToken?: AuthToken): StringMap {
     const headers: StringMap = {
       'Content-Type': 'application/json',
-      [HEADER_X_ACROLINX_BASE_URL]: this.props.serverAddress,
+      [HEADER_X_ACROLINX_BASE_URL]: this.props.acrolinxUrl,
       [HEADER_X_ACROLINX_CLIENT]: `${this.props.client.signature}; ${this.props.client.version}`,
     };
     if (this.props.clientLocale) {
@@ -436,7 +436,7 @@ export class AcrolinxEndpoint {
                         body: {},
                         headers: StringMap = {},
                         authToken?: AuthToken): Promise<T> {
-    return this.fetchJson(this.props.serverAddress + path, {
+    return this.fetchJson(this.props.acrolinxUrl + path, {
       body: JSON.stringify(body),
       headers: {...this.getCommonHeaders(authToken), ...headers},
       method,

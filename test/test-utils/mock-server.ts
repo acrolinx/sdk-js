@@ -66,8 +66,8 @@ export class AcrolinxServerMock {
   private signinIds: { [id: string]: SigninState } = {};
   private ssoEnabled: boolean = false;
 
-  constructor(public readonly serverAddress: string) {
-    this.checkService = new CheckServiceMock(serverAddress);
+  constructor(public readonly acrolinxUrl: string) {
+    this.checkService = new CheckServiceMock(acrolinxUrl);
     this.routes = [
       {
         handler: (_args, opts) => this.signin(opts),
@@ -219,7 +219,7 @@ export class AcrolinxServerMock {
       return this.createLoginSuccessResult(AuthorizationType.ACROLINX_TOKEN);
 
     }
-    const baseUrl = getHeader(opts, HEADER_X_ACROLINX_BASE_URL) || this.serverAddress;
+    const baseUrl = getHeader(opts, HEADER_X_ACROLINX_BASE_URL) || this.acrolinxUrl;
     const id = _.uniqueId('signin-id-');
     this.signinIds[id] = {};
     return {

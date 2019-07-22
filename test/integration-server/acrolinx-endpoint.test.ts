@@ -40,13 +40,14 @@ const ACROLINX_API_USER_ID = process.env.ACROLINX_API_USER_ID || 'jenkins-api-js
 
 const ajv = new Ajv({allErrors: true});
 
-function createEndpoint(serverAddress: string) {
+function createEndpoint(acrolinxUrl: string) {
   return new AcrolinxEndpoint({
+    acrolinxUrl,
     enableHttpLogging: true,
     client: {
       signature: DEVELOPMENT_SIGNATURE,
       version: '1.2.3.666'
-    }, serverAddress
+    }
   });
 }
 
@@ -82,10 +83,10 @@ describe('e2e - AcrolinxEndpoint', () => {
     }, LONG_TIME_OUT_MS);
 
     it('should return an failing promise for invalid URLS', async () => {
-      const invalidServerAddress = 'http://non-ext!::?isting-server';
-      const api = createEndpoint(invalidServerAddress);
+      const invalidAcrolinxUrl = 'http://non-ext!::?isting-server';
+      const api = createEndpoint(invalidAcrolinxUrl);
       await expectFailingPromise(api.getJsonFromPath(DUMMY_PATH), ErrorType.HttpConnectionProblem,
-        {method: 'GET', url: invalidServerAddress + DUMMY_PATH});
+        {method: 'GET', url: invalidAcrolinxUrl + DUMMY_PATH});
 
     }, LONG_TIME_OUT_MS);
   });

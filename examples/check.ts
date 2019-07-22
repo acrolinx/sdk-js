@@ -19,7 +19,7 @@ async function checkExample() {
 
   const acrolinxEndpoint = new AcrolinxEndpoint({
     ...EXAMPLE_ACROLINX_ENDPOINT_PROPS,
-    serverAddress: acrolinxAddress,
+    acrolinxUrl: acrolinxAddress,
     // enableHttpLogging: true,
   });
 

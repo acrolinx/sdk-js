@@ -16,7 +16,7 @@ export class Check {
   constructor(public request: CheckRequest) {
   }
 
-  public getCheckingResult(serverAddress: URL): CheckResultResponse {
+  public getCheckingResult(acrolinxUrl: URL): CheckResultResponse {
     const elapsedTimeMs = Date.now() - this.startTime;
     if (elapsedTimeMs < CHECK_TIME_MS) {
       const percent = Math.min(elapsedTimeMs / CHECK_TIME_MS * 100, 100);
@@ -27,7 +27,7 @@ export class Check {
           retryAfter: 1
         },
         links: {
-          poll: `${serverAddress}/api/v1/checking/checks/${this.id}`
+          poll: `${acrolinxUrl}/api/v1/checking/checks/${this.id}`
 
         }
       };
@@ -41,7 +41,7 @@ export class Check {
 export class CheckServiceMock {
   public checks: Check[] = [];
 
-  constructor(private serverAddress: URL) {
+  constructor(private acrolinxUrl: URL) {
   }
 
   public getRoutes(): Route[] {
@@ -73,7 +73,7 @@ export class CheckServiceMock {
     if (!check) {
       return NOT_FOUND_CHECK_ID;
     }
-    return check.getCheckingResult(this.serverAddress);
+    return check.getCheckingResult(this.acrolinxUrl);
   }
 
   private submitCheck(opts: RequestInit): CheckResponse {
@@ -82,8 +82,8 @@ export class CheckServiceMock {
     return {
       data: {id: check.id},
       links: {
-        result: this.serverAddress + `/api/v1/checking/checks/${check.id}`,
-        cancel: this.serverAddress + `/api/v1/checking/checks/${check.id}`
+        result: this.acrolinxUrl + `/api/v1/checking/checks/${check.id}`,
+        cancel: this.acrolinxUrl + `/api/v1/checking/checks/${check.id}`
       }
     };
   }

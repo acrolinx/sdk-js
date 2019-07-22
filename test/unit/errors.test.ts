@@ -16,7 +16,7 @@ describe('errors', () => {
   });
 
   it('should return an failing promise for broken json', async () => {
-    const api = new AcrolinxEndpoint({...DUMMY_ENDPOINT_PROPS, serverAddress: BROKEN_JSON_SERVER});
+    const api = new AcrolinxEndpoint({...DUMMY_ENDPOINT_PROPS, acrolinxUrl: BROKEN_JSON_SERVER});
     try {
       await api.getJsonFromUrl(BROKEN_JSON_SERVER);
     } catch (e) {
@@ -32,7 +32,7 @@ describe('errors', () => {
         data: {interactiveLinkTimeout: 0},
         links: {
           interactive: 'dummy',
-          poll: DUMMY_ENDPOINT_PROPS.serverAddress + '/api/v1/auth/sign-ins/0ddece9c-464a-442b-8a5d-d2f242d54c81'
+          poll: DUMMY_ENDPOINT_PROPS.acrolinxUrl + '/api/v1/auth/sign-ins/0ddece9c-464a-442b-8a5d-d2f242d54c81'
         }
       });
     } catch (e) {

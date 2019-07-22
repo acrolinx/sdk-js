@@ -21,13 +21,13 @@ import assert from 'assert';
 import {AcrolinxEndpoint, DEVELOPMENT_SIGNATURE} from '@acrolinx/sdk';
 
 const acrolinxEndpoint = new AcrolinxEndpoint({
-  client: {version: '1.2.3.666', name: 'DummyName', signature: DEVELOPMENT_SIGNATURE},
-  serverAddress: 'https://test-ssl.acrolinx.com',
+  client: {version: '1.2.3.666', signature: DEVELOPMENT_SIGNATURE},
+  acrolinxUrl: 'https://test-ssl.acrolinx.com',
 });
 
 acrolinxEndpoint.getServerInfo().then(info => {
   assert.ok(info.server.name.length > 0);
-  assert.ok(info.server.version.split('.').length, 2);
+  assert.ok(info.server.version.split('.').length >= 2 );
   assert.ok(info.locales.includes('en'));
 });
 ```

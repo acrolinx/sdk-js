@@ -7,5 +7,5 @@ export const DUMMY_ENDPOINT_PROPS: AcrolinxEndpointProps = {
     signature: DEVELOPMENT_SIGNATURE,
     version: '1.2.3.666'
   },
-  serverAddress: DUMMY_SERVER_URL
+  acrolinxUrl: DUMMY_SERVER_URL
 };

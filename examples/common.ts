@@ -5,5 +5,5 @@ export const EXAMPLE_ACROLINX_ENDPOINT_PROPS: AcrolinxEndpointProps = {
     signature: DEVELOPMENT_SIGNATURE,
     version: '1.2.3.666'
   },
-  serverAddress: 'https://test-latest-ssl.acrolinx.com'
+  acrolinxUrl: 'https://test-latest-ssl.acrolinx.com'
 };
