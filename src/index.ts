@@ -25,7 +25,7 @@ import {
   ApiResponse,
   AsyncApiResponse,
   AsyncStartedProcess,
-  isProgressResponse, NoFields,
+  isProgressResponse,
   Progress,
   StringMap,
   SuccessResponse,
@@ -139,15 +139,11 @@ export interface ClientInformation {
   version: string;
 }
 
-export interface HasAccessToken {
-  accessToken: string;
+interface AccessTokenSigninOption {
+  accessToken?: string;
 }
 
-export function hasAccessToken(signinOptions: SigninOptions): signinOptions is HasAccessToken {
-  return !!((signinOptions as HasAccessToken).accessToken);
-}
-
-export function isSsoSigninOption(signinOptions: SigninOptions): signinOptions is SsoSigninOption {
+function isSsoSigninOption(signinOptions: SigninOptions): signinOptions is SsoSigninOption {
   const potentialSsoOptions = signinOptions as SsoSigninOption;
   return !!(potentialSsoOptions.genericToken && potentialSsoOptions.username);
 }
@@ -157,7 +153,7 @@ export interface SsoSigninOption {
   genericToken: string;
 }
 
-export type SigninOptions = HasAccessToken | SsoSigninOption | NoFields;
+export type SigninOptions = AccessTokenSigninOption | SsoSigninOption;
 
 export interface CheckAndGetResultOptions {
   onProgress?(progress: Progress): void;
@@ -498,7 +494,7 @@ function getData<T>(promise: Promise<SuccessResponse<T>>): Promise<T> {
 }
 
 function getSigninRequestHeaders(options: SigninOptions = {}): StringMap {
-  if (hasAccessToken(options)) {
+  if ('accessToken' in options && options.accessToken) {
     return {[HEADER_X_ACROLINX_AUTH]: options.accessToken};
   } else if (isSsoSigninOption(options)) {
     return {
