@@ -22,7 +22,7 @@ export {SIGNIN_URL_EXPIRED_ERROR};
 
 export const DUMMY_SIGNIN_LINK_PATH_INTERACTIVE = '/signin-ui/';
 const DUMMY_SIGNIN_LINK_PATH_POLL = '/api/v1/auth/sign-ins/';
-export const DUMMY_AUTH_TOKEN = 'dummyAuthToken';
+export const DUMMY_AUTH_TOKEN = 'dummyAccessToken';
 export const DUMMY_USER_ID = 'dummyUserId';
 export const DUMMY_RETRY_AFTER = 1;
 export const DUMMY_INTERACTIVE_LINK_TIMEOUT = 900;

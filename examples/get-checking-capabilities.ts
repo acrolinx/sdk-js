@@ -4,10 +4,10 @@ import {AcrolinxEndpoint} from '../src/index';
 import {EXAMPLE_ACROLINX_ENDPOINT_PROPS} from './common';
 
 async function getCheckingCapabilitiesExample() {
-  const authToken = process.argv[2];
+  const accessToken = process.argv[2];
 
-  if (!authToken) {
-    console.error('Missing AuthToken');
+  if (!accessToken) {
+    console.error('Missing AccessToken');
   }
 
   const acrolinxEndpoint = new AcrolinxEndpoint({
@@ -15,7 +15,7 @@ async function getCheckingCapabilitiesExample() {
     acrolinxUrl: 'http://localhost:3000'
   });
 
-  const capabilities = await acrolinxEndpoint.getCheckingCapabilities(authToken);
+  const capabilities = await acrolinxEndpoint.getCheckingCapabilities(accessToken);
   console.log(JSON.stringify(capabilities, null, 2));
 }
 

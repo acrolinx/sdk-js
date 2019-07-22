@@ -11,10 +11,10 @@ function waitMs(ms: number) {
 
 async function checkExample() {
   const acrolinxAddress = process.argv[2];
-  const authToken = process.argv[3];
+  const accessToken = process.argv[3];
 
-  if (!authToken) {
-    console.error('Missing AuthToken');
+  if (!accessToken) {
+    console.error('Missing AccessToken');
   }
 
   const acrolinxEndpoint = new AcrolinxEndpoint({
@@ -23,10 +23,10 @@ async function checkExample() {
     // enableHttpLogging: true,
   });
 
-  const capabilities = await acrolinxEndpoint.getCheckingCapabilities(authToken);
+  const capabilities = await acrolinxEndpoint.getCheckingCapabilities(accessToken);
   console.log(capabilities);
 
-  const check = await acrolinxEndpoint.check(authToken, {
+  const check = await acrolinxEndpoint.check(accessToken, {
     checkOptions: {
       guidanceProfileId: capabilities.guidanceProfiles[0].id,
     },
@@ -39,7 +39,7 @@ async function checkExample() {
 
   let checkResultOrProgress: CheckResultResponse;
   do {
-    checkResultOrProgress = await acrolinxEndpoint.pollForCheckResult(authToken, check);
+    checkResultOrProgress = await acrolinxEndpoint.pollForCheckResult(accessToken, check);
     console.log('checkResultOrProgress:', JSON.stringify(checkResultOrProgress, null, 2));
     if ('progress' in checkResultOrProgress) {
       await waitMs(checkResultOrProgress.progress.retryAfter * 1000);

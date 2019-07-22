@@ -33,7 +33,7 @@ describe('signin', () => {
   });
 
   it('should return the provided auth token if valid', async () => {
-    const result = await endpoint.signin({authToken: DUMMY_AUTH_TOKEN}) as SigninLinksResult;
+    const result = await endpoint.signin({accessToken: DUMMY_AUTH_TOKEN}) as SigninLinksResult;
     if (isSigninSuccessResult(result)) {
       expect(result.data.accessToken).toEqual(DUMMY_AUTH_TOKEN);
     } else {
@@ -41,7 +41,7 @@ describe('signin', () => {
     }
   });
 
-  it('polling should return authtoken after signin', async () => {
+  it('polling should return accessToken after signin', async () => {
     const signinLinks = await endpoint.signin() as SigninLinksResult;
 
     const pollResult1 = await endpoint.pollForSignin(signinLinks) as PollMoreResult;

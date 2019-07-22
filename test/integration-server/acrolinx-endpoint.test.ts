@@ -106,13 +106,13 @@ describe('e2e - AcrolinxEndpoint', () => {
 
     describeIf(ACROLINX_API_TOKEN, 'Signin with valid token', () => {
       it('should return the provided API-Token', async () => {
-        const result = await api.signin({authToken: ACROLINX_API_TOKEN}) as SigninSuccessResult;
+        const result = await api.signin({accessToken: ACROLINX_API_TOKEN}) as SigninSuccessResult;
         expect(result.data.accessToken).toBe(ACROLINX_API_TOKEN);
         expect(result.data.user.id).toBe(ACROLINX_API_USER_ID);
       });
 
       it('should return client properties', async () => {
-        const result = await api.signin({authToken: ACROLINX_API_TOKEN}) as SigninSuccessResult;
+        const result = await api.signin({accessToken: ACROLINX_API_TOKEN}) as SigninSuccessResult;
         expect(Object.keys(result.data.integration.properties).length).toBeGreaterThan(0);
       });
     });
@@ -222,7 +222,7 @@ describe('e2e - AcrolinxEndpoint', () => {
       const DEPARTMENT_KEY = 'Department';
 
       beforeEach(async () => {
-        const result = await api.signin({authToken: ACROLINX_API_TOKEN}) as SigninSuccessResult;
+        const result = await api.signin({accessToken: ACROLINX_API_TOKEN}) as SigninSuccessResult;
         user = await api.getUserData(ACROLINX_API_TOKEN, result.data.user.id);
       });
 

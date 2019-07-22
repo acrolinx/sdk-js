@@ -5,15 +5,15 @@ import {isSigninLinksResult} from '../src/signin';
 import {EXAMPLE_ACROLINX_ENDPOINT_PROPS} from './common';
 
 async function signInExample() {
-  const authToken = process.argv[2];
+  const accessToken = process.argv[2];
 
   const acrolinxEndpoint = new AcrolinxEndpoint(EXAMPLE_ACROLINX_ENDPOINT_PROPS);
 
-  const loginResult = await acrolinxEndpoint.signin({authToken});
+  const loginResult = await acrolinxEndpoint.signin({accessToken});
 
   if (isSigninLinksResult(loginResult)) {
-    if (authToken) {
-      console.log('Authtoken was invalid');
+    if (accessToken) {
+      console.log('AccessToken was invalid');
     }
 
     console.log(`Please signin at "${loginResult.links.interactive}"
@@ -26,7 +26,7 @@ async function signInExample() {
     }
 
     console.log('Success:', pollResult);
-    console.log('authToken:', pollResult.data.accessToken);
+    console.log('accessToken:', pollResult.data.accessToken);
     console.log('User:', pollResult.data.user.id);
   } else {
     console.log('loginResult', loginResult);

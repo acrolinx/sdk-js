@@ -23,9 +23,9 @@ export const CLIENT_SIGNATURE_INVALID = {
 };
 
 export const AUTH_TOKEN_MISSING = {
-  detail: 'Where is my lovely AuthToken?',
+  detail: 'Where is my lovely AccessToken?',
   status: 401,
-  title: 'AuthToken is missing',
+  title: 'AccessToken is missing',
   type: ErrorType.Auth,
 };
 

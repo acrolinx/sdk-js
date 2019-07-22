@@ -3,7 +3,7 @@ export type URL = UrlString;
 export type LanguageId = string;
 export type UserId = string;
 export type Username = string;
-export type AuthToken = string;
+export type AccessToken = string;
 
 export interface Progress {
   percent: number;  // TODO: optional?

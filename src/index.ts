@@ -21,10 +21,10 @@ import {
   TermHarvestingReport
 } from './check';
 import {
+  AccessToken,
   ApiResponse,
   AsyncApiResponse,
   AsyncStartedProcess,
-  AuthToken,
   isProgressResponse,
   Progress,
   StringMap,
@@ -65,7 +65,7 @@ export {setLoggingEnabled} from './utils/logging';
 export {SigninSuccessResult, isSigninLinksResult, PollMoreResult, SigninResult, SigninLinksResult};
 export {
   AcrolinxError,
-  AuthToken,
+  AccessToken,
   CheckingCapabilities,
   CheckCancelledByClientError,
   CancelCheckResponse,
@@ -139,12 +139,12 @@ export interface ClientInformation {
   version: string;
 }
 
-export interface HasAuthToken {
-  authToken: string;  // TODO: accessToken
+export interface HasAccessToken {
+  accessToken: string;  // TODO: accessToken
 }
 
-export function hasAuthToken(signinOptions: SigninOptions): signinOptions is HasAuthToken {
-  return !!((signinOptions as HasAuthToken).authToken);
+export function hasAccessToken(signinOptions: SigninOptions): signinOptions is HasAccessToken {
+  return !!((signinOptions as HasAccessToken).accessToken);
 }
 
 export function isSsoSigninOption(signinOptions: SigninOptions): signinOptions is SsoSigninOption {
@@ -157,7 +157,7 @@ export interface SsoSigninOption {
   password: string;
 }
 
-export type SigninOptions = HasAuthToken | SsoSigninOption | {};
+export type SigninOptions = HasAccessToken | SsoSigninOption | {};
 
 export interface CheckAndGetResultOptions {
   onProgress?(progress: Progress): void;
@@ -207,117 +207,125 @@ export class AcrolinxEndpoint {
     return this.getJsonFromUrl<SigninPollResult>(signinLinks.links.poll);
   }
 
-  public getCapabilities(authToken: AuthToken): Promise<PlatformCapabilities> {
-    return getData(this.getJsonFromPath('/api/v1/capabilities', authToken));
+  public getCapabilities(accessToken: AccessToken): Promise<PlatformCapabilities> {
+    return getData(this.getJsonFromPath('/api/v1/capabilities', accessToken));
   }
 
-  public getCheckingCapabilities(authToken: AuthToken): Promise<CheckingCapabilities> {
-    return getData(this.getJsonFromPath('/api/v1/checking/capabilities', authToken));
+  public getCheckingCapabilities(accessToken: AccessToken): Promise<CheckingCapabilities> {
+    return getData(this.getJsonFromPath('/api/v1/checking/capabilities', accessToken));
   }
 
-  public async check(authToken: AuthToken, req: CheckRequest): Promise<CheckResponse> {
-    return this.post<CheckResponse>('/api/v1/checking/checks', req, {}, authToken);
+  public async check(accessToken: AccessToken, req: CheckRequest): Promise<CheckResponse> {
+    return this.post<CheckResponse>('/api/v1/checking/checks', req, {}, accessToken);
   }
 
   public checkAndGetResult(
-    authToken: AuthToken,
+    accessToken: AccessToken,
     req: CheckRequest,
     opts: CheckAndGetResultOptions = {}
   ): CancelablePromiseWrapper<CheckResult> {
-    return this.startCancelablePollLoop(authToken, this.check(authToken, req), opts);
+    return this.startCancelablePollLoop(accessToken, this.check(accessToken, req), opts);
   }
 
   public analyzeAndPoll(
-    authToken: AuthToken,
+    accessToken: AccessToken,
     req: AnalysisRequest,
     opts: CheckAndGetResultOptions = {}
   ): CancelablePromiseWrapper<ExtractionResult> {
     const headers = {[HEADER_X_ACROLINX_APP_SIGNATURE]: req.appSignature};
-    const asyncStartedProcessPromise = this.post<AsyncStartedProcess>('/api/v1/apps/analyses', req, headers, authToken);
-    return this.startCancelablePollLoop(authToken, asyncStartedProcessPromise, {...opts, headers});
+    const asyncStartedProcessPromise = this.post<AsyncStartedProcess>('/api/v1/apps/analyses', req, headers,
+      accessToken);
+    return this.startCancelablePollLoop(accessToken, asyncStartedProcessPromise, {...opts, headers});
   }
 
-  public async cancelCheck(authToken: AuthToken, check: CheckResponse): Promise<CancelCheckResponse> {
-    return this.cancelAsyncStartedProcess(authToken, check);
+  public async cancelCheck(accessToken: AccessToken, check: CheckResponse): Promise<CancelCheckResponse> {
+    return this.cancelAsyncStartedProcess(accessToken, check);
   }
 
-  public async pollForCheckResult(authToken: AuthToken, check: CheckResponse): Promise<CheckResultResponse> {
-    return this.pollForAsyncResult<CheckResultResponse>(authToken, check);
+  public async pollForCheckResult(accessToken: AccessToken, check: CheckResponse): Promise<CheckResultResponse> {
+    return this.pollForAsyncResult<CheckResultResponse>(accessToken, check);
   }
 
-  public async getAddonCheckResult(authToken: AuthToken, appDataLink: string): Promise<AddonCheckResult> {
-    return getData(this.getJsonFromUrl<ApiResponse<AddonCheckResult>>(appDataLink, authToken));
+  public async getAddonCheckResult(accessToken: AccessToken, appDataLink: string): Promise<AddonCheckResult> {
+    return getData(this.getJsonFromUrl<ApiResponse<AddonCheckResult>>(appDataLink, accessToken));
   }
 
-  public async getTermHarvestingReport(authToken: AuthToken,
+  public async getTermHarvestingReport(accessToken: AccessToken,
                                        reports: HasTermHarvestingReport): Promise<TermHarvestingReport> {
-    return getData(this.getJsonFromUrl<ApiResponse<TermHarvestingReport>>(reports.termHarvesting.link, authToken));
+    return getData(this.getJsonFromUrl<ApiResponse<TermHarvestingReport>>(reports.termHarvesting.link, accessToken));
   }
 
-  public async getLinkToAggregatedReport(authToken: AuthToken, batchId: string): Promise<AggregatedReportLinkResult> {
+  public async getLinkToAggregatedReport(
+    accessToken: AccessToken,
+    batchId: string
+  ): Promise<AggregatedReportLinkResult> {
     return this.getJsonFromPath<AggregatedReportLinkResult>('/api/v1/checking/aggregation/'
-      + encodeURIComponent(batchId), authToken);
+      + encodeURIComponent(batchId), accessToken);
   }
 
-  public async getServerNotifications(authToken: AuthToken,
+  public async getServerNotifications(accessToken: AccessToken,
                                       sinceTimeStamp: number): Promise<ServerNotificationResponse> {
-    return this.getJsonFromPath<any>('/api/v1/broadcasts/platform-notifications/' + sinceTimeStamp, authToken);
+    return this.getJsonFromPath<any>('/api/v1/broadcasts/platform-notifications/' + sinceTimeStamp, accessToken);
   }
 
   // TODO (marco) Review! Added this method to test DEV-17460
-  public async postServerNotifications(authToken: AuthToken,
+  public async postServerNotifications(accessToken: AccessToken,
                                        notification: ServerNotificationPost): Promise<ServerNotificationResponse> {
     return this.post<ServerNotificationResponse>('/api/v1/broadcasts/platform-notifications/',
-      notification, {}, authToken);
+      notification, {}, accessToken);
   }
 
-  public getDictionaryCapabilities(authToken: AuthToken): Promise<DictionaryCapabilities> {
-    return getData(this.getJsonFromPath('/api/v1/dictionary/capabilities', authToken));
+  public getDictionaryCapabilities(accessToken: AccessToken): Promise<DictionaryCapabilities> {
+    return getData(this.getJsonFromPath('/api/v1/dictionary/capabilities', accessToken));
   }
 
-  public addToDictionary(authToken: AuthToken, req: AddToDictionaryRequest): Promise<AddToDictionaryResponse> {
-    return getData(this.post('/api/v1/dictionary/submit', req, {}, authToken));
+  public addToDictionary(accessToken: AccessToken, req: AddToDictionaryRequest): Promise<AddToDictionaryResponse> {
+    return getData(this.post('/api/v1/dictionary/submit', req, {}, accessToken));
   }
 
-  public getUserData(authToken: AuthToken, id: UserId): Promise<User> {
-    return getData(this.getJsonFromPath('/api/v1/user/' + id, authToken));
+  public getUserData(accessToken: AccessToken, id: UserId): Promise<User> {
+    return getData(this.getJsonFromPath('/api/v1/user/' + id, accessToken));
   }
 
-  public setUserCustomFields(authToken: AuthToken, id: UserId, customFieldValues: KeyValuePair[]): Promise<User> {
+  public setUserCustomFields(accessToken: AccessToken, id: UserId, customFieldValues: KeyValuePair[]): Promise<User> {
     const requestBody = {id, customFields: customFieldValues};
-    return getData(this.put('/api/v1/user/' + id, requestBody, {}, authToken));
+    return getData(this.put('/api/v1/user/' + id, requestBody, {}, accessToken));
   }
 
-  public getDocumentDescriptor(authToken: AuthToken, id: DocumentId): Promise<DocumentDescriptor> {
-    return getData<DocumentDescriptor>(this.getJsonFromPath('/api/v1/document/' + id, authToken))
+  public getDocumentDescriptor(accessToken: AccessToken, id: DocumentId): Promise<DocumentDescriptor> {
+    return getData<DocumentDescriptor>(this.getJsonFromPath('/api/v1/document/' + id, accessToken))
       .then(sanitizeDocumentDescriptor);
   }
 
-  public setDocumentCustomFields(authToken: AuthToken,
+  public setDocumentCustomFields(accessToken: AccessToken,
                                  documentId: DocumentId,
                                  customFieldValues: KeyValuePair[]): Promise<DocumentDescriptor> {
     const requestBody = {id: documentId, customFields: customFieldValues};
-    return getData(this.put('/api/v1/document/' + documentId, requestBody, {}, authToken));
+    return getData(this.put('/api/v1/document/' + documentId, requestBody, {}, accessToken));
   }
 
-  public async getJsonFromPath<T>(path: string, authToken?: AuthToken): Promise<T> {
-    return this.getJsonFromUrl<T>(this.props.acrolinxUrl + path, authToken);
+  public async getJsonFromPath<T>(path: string, accessToken?: AccessToken): Promise<T> {
+    return this.getJsonFromUrl<T>(this.props.acrolinxUrl + path, accessToken);
   }
 
-  public async getJsonFromUrl<T>(url: string, authToken?: AuthToken, opts: AdditionalRequestOptions = {}): Promise<T> {
+  public async getJsonFromUrl<T>(
+    url: string,
+    accessToken?: AccessToken,
+    opts: AdditionalRequestOptions = {}
+  ): Promise<T> {
     return this.fetchJson(url, {
-      headers: {...this.getCommonHeaders(authToken), ...opts.headers},
+      headers: {...this.getCommonHeaders(accessToken), ...opts.headers},
     });
   }
 
   public async getTextFromUrl(
     url: string,
-    authToken?: AuthToken,
+    accessToken?: AccessToken,
     opts: AdditionalRequestOptions = {}
   ): Promise<string> {
     const httpRequest = {url, method: 'GET'};
     return this.fetch(url, {
-      headers: {...this.getCommonHeaders(authToken), ...opts.headers},
+      headers: {...this.getCommonHeaders(accessToken), ...opts.headers},
     }).then(
       res => handleExpectedTextResponse(httpRequest, res),
       error => wrapFetchError(httpRequest, error)
@@ -325,7 +333,7 @@ export class AcrolinxEndpoint {
   }
 
   private startCancelablePollLoop<Result>(
-    authToken: AuthToken,
+    accessToken: AccessToken,
     asyncStartedProcessPromise: Promise<AsyncStartedProcess>,
     opts: CancelablePollLoopOptions = {}
   ): CancelablePromiseWrapper<Result> {
@@ -357,7 +365,7 @@ export class AcrolinxEndpoint {
       if (!requestedCanceledOnServer && runningCheck) {
         requestedCanceledOnServer = true;
         /* tslint:disable-next-line:no-floating-promises */
-        this.cancelAsyncStartedProcess(authToken, runningCheck, opts);
+        this.cancelAsyncStartedProcess(accessToken, runningCheck, opts);
       }
     };
 
@@ -367,7 +375,7 @@ export class AcrolinxEndpoint {
 
       let checkResultOrProgress: AsyncApiResponse<Result>;
       do {
-        checkResultOrProgress = await this.pollForAsyncResult(authToken, runningCheck, opts);
+        checkResultOrProgress = await this.pollForAsyncResult(accessToken, runningCheck, opts);
         handlePotentialCancellation();
 
         if (isProgressResponse(checkResultOrProgress)) {
@@ -391,22 +399,22 @@ export class AcrolinxEndpoint {
 
 
   private async pollForAsyncResult<R>(
-    authToken: AuthToken,
+    accessToken: AccessToken,
     check: AsyncStartedProcess,
     opts: AdditionalRequestOptions = {}
   ): Promise<R> {
-    return this.getJsonFromUrl<R>(check.links.result, authToken, opts);
+    return this.getJsonFromUrl<R>(check.links.result, accessToken, opts);
   }
 
   private async cancelAsyncStartedProcess<CancelResponse>(
-    authToken: AuthToken,
+    accessToken: AccessToken,
     process: AsyncStartedProcess,
     opts: AdditionalRequestOptions = {}
   ): Promise<CancelResponse> {
-    return this.deleteUrl<CancelResponse>(process.links.cancel, authToken, opts);
+    return this.deleteUrl<CancelResponse>(process.links.cancel, accessToken, opts);
   }
 
-  private getCommonHeaders(authToken?: AuthToken): StringMap {
+  private getCommonHeaders(accessToken?: AccessToken): StringMap {
     const headers: StringMap = {
       'Content-Type': 'application/json',
       [HEADER_X_ACROLINX_BASE_URL]: this.props.acrolinxUrl,
@@ -415,35 +423,35 @@ export class AcrolinxEndpoint {
     if (this.props.clientLocale) {
       headers[HEADER_X_ACROLINX_CLIENT_LOCALE] = this.props.clientLocale;
     }
-    if (authToken) {
-      headers[HEADER_X_ACROLINX_AUTH] = authToken;
+    if (accessToken) {
+      headers[HEADER_X_ACROLINX_AUTH] = accessToken;
     }
     return headers;
   }
 
-  private async post<T>(path: string, body: {}, headers: StringMap = {}, authToken?: AuthToken): Promise<T> {
-    return this.send<T>('POST', path, body, headers, authToken);
+  private async post<T>(path: string, body: {}, headers: StringMap = {}, accessToken?: AccessToken): Promise<T> {
+    return this.send<T>('POST', path, body, headers, accessToken);
   }
 
-  private async put<T>(path: string, body: {}, headers: StringMap = {}, authToken?: AuthToken): Promise<T> {
-    return this.send<T>('PUT', path, body, headers, authToken);
+  private async put<T>(path: string, body: {}, headers: StringMap = {}, accessToken?: AccessToken): Promise<T> {
+    return this.send<T>('PUT', path, body, headers, accessToken);
   }
 
   private async send<T>(method: 'POST' | 'PUT',
                         path: string,
                         body: {},
                         headers: StringMap = {},
-                        authToken?: AuthToken): Promise<T> {
+                        accessToken?: AccessToken): Promise<T> {
     return this.fetchJson(this.props.acrolinxUrl + path, {
       body: JSON.stringify(body),
-      headers: {...this.getCommonHeaders(authToken), ...headers},
+      headers: {...this.getCommonHeaders(accessToken), ...headers},
       method,
     });
   }
 
-  private async deleteUrl<T>(url: string, authToken: AuthToken, opts: AdditionalRequestOptions = {}): Promise<T> {
+  private async deleteUrl<T>(url: string, accessToken: AccessToken, opts: AdditionalRequestOptions = {}): Promise<T> {
     return this.fetchJson(url, {
-      headers: {...this.getCommonHeaders(authToken), ...opts.headers},
+      headers: {...this.getCommonHeaders(accessToken), ...opts.headers},
       method: 'DELETE',
     });
   }
@@ -490,8 +498,8 @@ function getData<T>(promise: Promise<SuccessResponse<T>>): Promise<T> {
 }
 
 function getSigninRequestHeaders(options: SigninOptions = {}): StringMap {
-  if (hasAuthToken(options)) {
-    return {[HEADER_X_ACROLINX_AUTH]: options.authToken};
+  if (hasAccessToken(options)) {
+    return {[HEADER_X_ACROLINX_AUTH]: options.accessToken};
   } else if (isSsoSigninOption(options)) {
     return {
       username: options.userId,
