@@ -3,7 +3,7 @@ import * as fetchMock from 'fetch-mock';
 import {MockResponseObject} from 'fetch-mock';
 import * as _ from 'lodash';
 import {SuccessResponse} from '../../src/common-types';
-import {AcrolinxApiError} from '../../src/errors';
+import {AcrolinxApiError, AcrolinxError, ErrorType} from '../../src/errors';
 import {HEADER_X_ACROLINX_AUTH, HEADER_X_ACROLINX_BASE_URL, HEADER_X_ACROLINX_CLIENT} from '../../src/headers';
 import {DEVELOPMENT_SIGNATURE} from '../../src/index';
 import {ServerNotificationResponseData} from '../../src/notifications';
@@ -22,12 +22,14 @@ export {SIGNIN_URL_EXPIRED_ERROR};
 
 export const DUMMY_SIGNIN_LINK_PATH_INTERACTIVE = '/signin-ui/';
 const DUMMY_SIGNIN_LINK_PATH_POLL = '/api/v1/auth/sign-ins/';
-export const DUMMY_AUTH_TOKEN = 'dummyAccessToken';
+export const DUMMY_ACCESS_TOKEN = 'dummyAccessToken';
 export const DUMMY_USER_ID = 'dummyUserId';
+export const DUMMY_USER_NAME = 'dummy@username.org';
 export const DUMMY_RETRY_AFTER = 1;
 export const DUMMY_INTERACTIVE_LINK_TIMEOUT = 900;
 
 export const ALLOWED_CLIENT_SIGNATURES = ['dummyClientSignature', DEVELOPMENT_SIGNATURE];
+export const SSO_GENERIC_TOKEN = 'secretSsoToken';
 
 export interface LoggedRequest {
   opts: {
@@ -143,7 +145,7 @@ export class AcrolinxServerMock {
       if (!token) {
         console.error('Missing Token', token);
         return this.createAcrolinxApiErrorResponse(AUTH_TOKEN_MISSING);
-      } else if (token !== DUMMY_AUTH_TOKEN) {
+      } else if (token !== DUMMY_ACCESS_TOKEN) {
         console.error('Invalid Token', token);
         return this.createAcrolinxApiErrorResponse(AUTH_TOKEN_INVALID);
       }
@@ -152,13 +154,17 @@ export class AcrolinxServerMock {
     for (const route of this.routes) {
       const matches = url.match(route.path);
       if (matches && opts.method === route.method) {
-        const handlerResult = route.handler(matches, opts);
-        if (isMockResponseObject(handlerResult)) {
-          return handlerResult;
-        } else if (isAcrolinxApiError(handlerResult)) {
-          return {body: handlerResult, status: handlerResult.status};
-        } else {
-          return this.returnResponse(handlerResult);
+        try {
+          const handlerResult = route.handler(matches, opts);
+          if (isMockResponseObject(handlerResult)) {
+            return handlerResult;
+          } else if (isAcrolinxApiError(handlerResult)) {
+            return {body: handlerResult, status: handlerResult.status};
+          } else {
+            return this.returnResponse(handlerResult);
+          }
+        } catch (error) {
+          return {body: {error}, status: 500};
         }
       }
     }
@@ -212,10 +218,13 @@ export class AcrolinxServerMock {
     }
 
     if (this.ssoEnabled) {
-      return this.createLoginSuccessResult(AuthorizationType.ACROLINX_SSO);
+      if (getHeader(opts, 'password') !== SSO_GENERIC_TOKEN) {
+        throw new AcrolinxError({type: ErrorType.SSO, title: 'SSO Error Title', detail: 'SSO Error Details'});
+      }
+      return this.createLoginSuccessResult(AuthorizationType.ACROLINX_SSO, getHeader(opts, 'username'));
 
     }
-    if (getHeader(opts, HEADER_X_ACROLINX_AUTH) === DUMMY_AUTH_TOKEN) {
+    if (getHeader(opts, HEADER_X_ACROLINX_AUTH) === DUMMY_ACCESS_TOKEN) {
       return this.createLoginSuccessResult(AuthorizationType.ACROLINX_TOKEN);
 
     }
@@ -245,15 +254,18 @@ export class AcrolinxServerMock {
     };
   }
 
-  private createLoginSuccessResult(authorizedUsing: AuthorizationType): SigninSuccessResult {
+  private createLoginSuccessResult(
+    authorizedUsing: AuthorizationType,
+    username = DUMMY_USER_NAME
+  ): SigninSuccessResult {
     return {
       data: {
-        accessToken: DUMMY_AUTH_TOKEN,
+        accessToken: DUMMY_ACCESS_TOKEN,
         authorizedUsing,
         links: {},
         user: {
           id: DUMMY_USER_ID,
-          username: 'dummy@username.org'
+          username
         },
         integration: {
           properties: {},

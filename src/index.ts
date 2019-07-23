@@ -45,11 +45,11 @@ import {
 import {ServerNotificationPost, ServerNotificationResponse} from './notifications';
 import {PlatformCapabilities} from './platform-capabilities';
 import {
-  isSigninLinksResult,
+  isSigninLinksResult, isSigninSuccessResult,
   PollMoreResult,
   SigninLinksResult,
   SigninPollResult,
-  SigninResult,
+  SigninResult, SigninSuccessData,
   SigninSuccessResult
 } from './signin';
 import {User} from './user';
@@ -172,6 +172,12 @@ export interface CancelablePromiseWrapper<T> {
   cancel(): void;
 }
 
+interface SignInInteractiveOptions {
+  onSignInUrl: (url: string) => void;
+  accessToken?: string;
+  timeoutMs?: number;
+}
+
 export class AcrolinxEndpoint {
   public readonly props: AcrolinxEndpointProps;
 
@@ -186,8 +192,34 @@ export class AcrolinxEndpoint {
     this.props.clientLocale = clientLocale;
   }
 
+
   public async getPlatformInformation(): Promise<PlatformInformation> {
     return getData<PlatformInformation>(this.getJsonFromPath('/api/v1/'));
+  }
+
+  public async signInWithSSO(genericToken: string, username: string) {
+    const signinResult = await this.signin({genericToken, username});
+    if (isSigninSuccessResult(signinResult)) {
+      return signinResult;
+    } else {
+      throw new AcrolinxError({
+        type: ErrorType.SSO,
+        title: 'SSO Error',
+        detail: 'Sign-In by SSO failed.',
+      });
+    }
+  }
+
+  public async singInInteractive(opts: SignInInteractiveOptions): Promise<SigninSuccessData> {
+    const signinResult = await this.signin({accessToken: opts.accessToken});
+
+    if (isSigninSuccessResult(signinResult)) {
+      return signinResult.data;
+    }
+
+    opts.onSignInUrl(signinResult.links.interactive);
+
+    return this.pollForInteractiveSignIn(signinResult, opts.timeoutMs || 60 * 60 * 1000);
   }
 
   public async signin(options: SigninOptions = {}): Promise<SigninResult> {
@@ -325,6 +357,27 @@ export class AcrolinxEndpoint {
     }).then(
       res => handleExpectedTextResponse(httpRequest, res),
       error => wrapFetchError(httpRequest, error)
+    );
+  }
+
+  private async pollForInteractiveSignIn(
+    signinLinksResult: SigninLinksResult,
+    timeoutMs: number
+  ): Promise<SigninSuccessData> {
+    const startTime = Date.now();
+    let pollResult;
+    while (Date.now() < startTime + timeoutMs) {
+      pollResult = await this.pollForSignin(signinLinksResult, pollResult);
+      if (isSigninSuccessResult(pollResult)) {
+        return pollResult.data;
+      }
+    }
+
+    throw new AcrolinxError({
+        type: ErrorType.SigninTimedOut,
+        title: 'Interactive sign-in time out',
+        detail: `Interactive sign-in has timed out by client (${Date.now() - startTime} > ${timeoutMs} ms).`
+      }
     );
   }
 

@@ -137,6 +137,14 @@ describe('e2e - AcrolinxEndpoint', () => {
       expect(result.data.user.id).toContain(SSO_USERNAME);
     });
 
+    it('signInWithSSO throws SSO Error', async () =>
+      expectFailingPromise(
+        api.signInWithSSO('invalidGenericToken', 'dummyUsername'),
+        ErrorType.SSO
+      )
+    );
+
+
     it('poll for signin', async () => {
       const result = await api.signin() as SigninLinksResult;
       const pollResult = await api.pollForSignin(result);
