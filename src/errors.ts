@@ -123,7 +123,7 @@ export function createErrorFromFetchResponse(
 
 export function wrapFetchError(httpRequest: HttpRequest, error: Error): Promise<any> {
   throw new AcrolinxError({
-    detail: `${error.message} (${error.name})`,
+    detail: `${error.message} (${error.name}, URL: ${httpRequest.url}, Method: ${httpRequest.method})`,
     title: 'Http Connection Problem',
     httpRequest,
     type: ErrorType.HttpConnectionProblem,
