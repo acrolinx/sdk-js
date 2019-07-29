@@ -56,6 +56,20 @@ interface SigninState {
   authorizationType?: AuthorizationType;
 }
 
+export enum SsoMockMode {
+  none= 'none',
+
+  /**
+   * Used by to simulate a proxy that add credentials automatically (eg. for the Sidebar).
+   */
+  proxy= 'proxy',
+
+  /**
+   * Used to simulate an Acrolinx server that requires the correct generic password and a username for SSO.
+   */
+  direct= 'direct',
+}
+
 export class AcrolinxServerMock {
   public readonly checkService: CheckServiceMock;
   public requests: LoggedRequest[] = [];
@@ -66,7 +80,7 @@ export class AcrolinxServerMock {
 
   private routes: Route[];
   private signinIds: { [id: string]: SigninState } = {};
-  private ssoEnabled: boolean = false;
+  private ssoMockMode: SsoMockMode = SsoMockMode.none;
 
   constructor(public readonly acrolinxUrl: string) {
     this.checkService = new CheckServiceMock(acrolinxUrl);
@@ -117,8 +131,8 @@ export class AcrolinxServerMock {
     }
   }
 
-  public enableSSO() {
-    this.ssoEnabled = true;
+  public enableSSO(ssoMockMode: SsoMockMode) {
+    this.ssoMockMode = ssoMockMode;
   }
 
   public handleFetchRequest = (url: string, optsArg: RequestInit = {}): MockResponseObject => {
@@ -217,13 +231,17 @@ export class AcrolinxServerMock {
       throw this.simulatedError.signin;
     }
 
-    if (this.ssoEnabled) {
-      if (getHeader(opts, 'password') !== SSO_GENERIC_TOKEN) {
-        throw new AcrolinxError({type: ErrorType.SSO, title: 'SSO Error Title', detail: 'SSO Error Details'});
-      }
-      return this.createLoginSuccessResult(AuthorizationType.ACROLINX_SSO, getHeader(opts, 'username'));
-
+    switch (this.ssoMockMode) {
+      case SsoMockMode.direct:
+        if (getHeader(opts, 'password') !== SSO_GENERIC_TOKEN) {
+          throw new AcrolinxError({type: ErrorType.SSO, title: 'SSO Error Title', detail: 'SSO Error Details'});
+        }
+        return this.createLoginSuccessResult(AuthorizationType.ACROLINX_SSO, getHeader(opts, 'username'));
+      case SsoMockMode.proxy:
+        return this.createLoginSuccessResult(AuthorizationType.ACROLINX_SSO);
+      case SsoMockMode.none:
     }
+
     if (getHeader(opts, HEADER_X_ACROLINX_AUTH) === DUMMY_ACCESS_TOKEN) {
       return this.createLoginSuccessResult(AuthorizationType.ACROLINX_TOKEN);
 

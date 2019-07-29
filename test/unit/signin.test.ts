@@ -11,7 +11,8 @@ import {
   DUMMY_USER_NAME,
   mockAcrolinxServer,
   restoreOriginalFetch,
-  SSO_GENERIC_TOKEN
+  SSO_GENERIC_TOKEN,
+  SsoMockMode
 } from '../test-utils/mock-server';
 import {expectFailingPromise} from '../test-utils/utils';
 import {DUMMY_ENDPOINT_PROPS, DUMMY_SERVER_URL} from './common';
@@ -61,7 +62,7 @@ describe('signin', () => {
 
   describe('signInWithSSO', () => {
     it('success', async () => {
-      mockedAcrolinxServer.enableSSO();
+      mockedAcrolinxServer.enableSSO(SsoMockMode.direct);
       const signinSuccess = await endpoint.signInWithSSO(SSO_GENERIC_TOKEN, 'kaja');
       expect(signinSuccess.data.user.username).toEqual('kaja');
     });
@@ -71,7 +72,7 @@ describe('signin', () => {
     });
 
     it('failure because of wrong generic password', async () => {
-      mockedAcrolinxServer.enableSSO();
+      mockedAcrolinxServer.enableSSO(SsoMockMode.direct);
       return expectFailingPromise(endpoint.signInWithSSO('wrongGenericPassword', 'kaja'), ErrorType.SSO);
     });
 
