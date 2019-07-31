@@ -102,9 +102,17 @@ export interface KeyValuePair {
   value: string;
 }
 
+
 export interface AggregatedReportLinkResult {
   reports: Array<{
     reportType: string
+    link: URL
+  }>;
+}
+
+export interface ContentAnalysisDashboardResult {
+  links: Array<{
+    linkType: string
     link: URL
   }>;
 }

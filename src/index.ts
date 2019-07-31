@@ -15,6 +15,7 @@ import {
   CheckResponse,
   CheckResult,
   CheckResultResponse,
+  ContentAnalysisDashboardResult,
   HasTermHarvestingReport,
   KeyValuePair,
   Report,
@@ -45,11 +46,13 @@ import {
 import {ServerNotificationPost, ServerNotificationResponse} from './notifications';
 import {PlatformCapabilities} from './platform-capabilities';
 import {
-  isSigninLinksResult, isSigninSuccessResult,
+  isSigninLinksResult,
+  isSigninSuccessResult,
   PollMoreResult,
   SigninLinksResult,
   SigninPollResult,
-  SigninResult, SigninSuccessData,
+  SigninResult,
+  SigninSuccessData,
   SigninSuccessResult
 } from './signin';
 import {User} from './user';
@@ -283,12 +286,25 @@ export class AcrolinxEndpoint {
     return getData(this.getJsonFromUrl<ApiResponse<TermHarvestingReport>>(reports.termHarvesting.link, accessToken));
   }
 
+  /**
+   * @deprecated Please use {@link getContentAnalysisDashboard}
+   */
   public async getLinkToAggregatedReport(
     accessToken: AccessToken,
     batchId: string
   ): Promise<AggregatedReportLinkResult> {
     return this.getJsonFromPath<AggregatedReportLinkResult>('/api/v1/checking/aggregation/'
       + encodeURIComponent(batchId), accessToken);
+  }
+
+  public async getContentAnalysisDashboard(
+    accessToken: AccessToken,
+    batchId: string
+  ): Promise<string> {
+    const serviceResult = await getData(this.getJsonFromPath<SuccessResponse<ContentAnalysisDashboardResult>>(
+      `/api/v1/checking/${encodeURIComponent(batchId)}/contentanalysis`, accessToken));
+    const shortWithoutAccessToken = serviceResult.links.filter(link => link.linkType === 'shortWithoutAccessToken')[0];
+    return shortWithoutAccessToken.link;
   }
 
   public async getServerNotifications(accessToken: AccessToken,

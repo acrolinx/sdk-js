@@ -387,6 +387,36 @@ describe('e2e - AcrolinxEndpoint', () => {
       });
     });
 
+    describe('getContentAnalysisDashboard', () => {
+      it('it works also without any checks', async () => {
+        const urlString = await api.getContentAnalysisDashboard(ACROLINX_API_TOKEN, 'dummyId');
+        expect(urlString).toContain(TEST_SERVER_URL);
+
+        const url = new URL(urlString);
+        expect(url).toBeTruthy();
+      });
+
+      it('works with real checks', async () => {
+        const batchId = 'batch' + Date.now();
+        await api.checkAndGetResult(ACROLINX_API_TOKEN, await createDummyCheckRequest({
+          content: 'This text is nice.',
+          checkOptions: {batchId},
+          document: {reference: 'nice.txt'}
+        })).promise;
+
+        await api.checkAndGetResult(ACROLINX_API_TOKEN, await createDummyCheckRequest({
+          content: 'Thiss textt iss stupidd',
+          checkOptions: {batchId},
+          document: {reference: 'stupid.txt'}
+        })).promise;
+
+        const urlString = await api.getContentAnalysisDashboard(ACROLINX_API_TOKEN, batchId);
+        const url = new URL(urlString);
+        expect(url).toBeTruthy();
+        // Here you should open the url and test of it loads the correct results :-)
+      });
+    });
+
     describe('analyzeAndGetResult', () => {
       it('should extract simple text', async () => {
         const inputText = 'This is text';
