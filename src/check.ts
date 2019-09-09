@@ -23,11 +23,23 @@ export interface CheckRange {
   end: number;
 }
 
+export interface ExternalContentField {
+  id: string;
+  content: string;
+}
+
+export interface ExternalContent {
+  textReplacements?: ExternalContentField[];
+  entities?: ExternalContentField[];
+  ditaReferences?: ExternalContentField[];
+}
+
 export interface CheckRequest {
   content: string;
   contentEncoding?: ContentEncoding;
   checkOptions?: CheckOptions;
   document?: DocumentDescriptorRequest;
+  externalContent?: ExternalContent;
 }
 
 export interface CheckOptions {

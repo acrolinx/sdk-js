@@ -305,6 +305,28 @@ describe('e2e - AcrolinxEndpoint', () => {
         expect(validateCheckResult.errors).toBeNull();
       }, 10000);
 
+      it('can check with external content set', async () => {
+        const text =
+          `<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "topic.dtd">
+<topic id="copyright">
+    <title>Copyright</title>
+    <body>
+        <p conref="#Link_zur_ID">Der Inhalt des Elements, der ignoriert und ersetzt wird.</p>
+    </body>
+</topic>`;
+        const checkResult = await checkAndWaitForResult({
+          content: text,
+          externalContent: {
+            ditaReferences: [{
+              id: '#Link_zur_ID',
+              content: 'This is the actual great content, that is supposed to show up...'
+            }]
+          }
+        });
+        expect(checkResult.goals.length).toBeGreaterThan(0);
+      }, 10000);
+
       it('can cancel check', async () => {
         const check = await createDummyCheck();
 
