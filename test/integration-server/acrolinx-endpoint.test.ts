@@ -178,7 +178,6 @@ describe('e2e - AcrolinxEndpoint', () => {
       if (!checkRequest.checkOptions || !checkRequest.checkOptions.guidanceProfileId) {
         checkRequest.checkOptions = {
           guidanceProfileId: await getGuidanceProfileId(),
-          disableCustomFieldValidation: true,
           ...checkRequest.checkOptions
         };
       }

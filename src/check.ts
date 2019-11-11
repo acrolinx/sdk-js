@@ -51,7 +51,6 @@ export interface CheckOptions {
   contentFormat?: ContentFormatId;
   languageId?: LanguageId;
   batchId?: string;
-  disableCustomFieldValidation?: boolean;
 }
 
 export interface DocumentDescriptorRequest extends Partial<DocumentDescriptor> {
