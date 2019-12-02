@@ -1,4 +1,3 @@
-import {AddonCheckResult} from './addons';
 import {
   CheckingCapabilities,
   CheckType,
@@ -275,10 +274,6 @@ export class AcrolinxEndpoint {
 
   public async pollForCheckResult(accessToken: AccessToken, check: CheckResponse): Promise<CheckResultResponse> {
     return this.pollForAsyncResult<CheckResultResponse>(accessToken, check);
-  }
-
-  public async getAddonCheckResult(accessToken: AccessToken, appDataLink: string): Promise<AddonCheckResult> {
-    return getData(this.getJsonFromUrl<ApiResponse<AddonCheckResult>>(appDataLink, accessToken));
   }
 
   public async getTermHarvestingReport(accessToken: AccessToken,
