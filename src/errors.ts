@@ -25,7 +25,8 @@ export enum ErrorType {
   GuidanceProfileDoesNotExist = 'guidanceProfileDoesntExist',
   InvalidBaseUrl = 'invalidBaseUrl',
   NoGuidanceProfileConfigured = 'noGuidanceProfileConfigured',
-  AppSignatureRejected = 'appSignatureRejected'
+  AppSignatureRejected = 'appSignatureRejected',
+  LicenseLimitExceeded = 'licenseLimitExceeded'
 }
 
 export interface AcrolinxErrorProps {
