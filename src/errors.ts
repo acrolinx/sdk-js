@@ -107,6 +107,7 @@ export function createErrorFromFetchResponse(
       httpRequest: req,
       title: jsonBody.title || res.statusText,
       validationDetails: jsonBody.validationDetails,
+      reference: jsonBody.reference,
       type: jsonBody.type,
       documentId: jsonBody.documentId,
     });
