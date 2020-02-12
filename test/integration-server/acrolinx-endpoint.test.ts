@@ -564,6 +564,20 @@ describe('e2e - AcrolinxEndpoint', () => {
       });
     });
 
+    it('request and validate app token', async () => {
+      const appId = 'selectRanges';
+
+      const appTokenResult = await api.getAppToken(ACROLINX_API_TOKEN, appId);
+
+      expect(appTokenResult.appAccessToken).toMatch(/\S+/);
+      expect(appTokenResult.user.id).toEqual(ACROLINX_API_USER_ID);
+      expect(appTokenResult.user.username).toMatch(/\S+/);
+      expect(appTokenResult.appId).toEqual(appId);
+
+      const tokenVerificationResult = await api.validateAppToken(appTokenResult.appAccessToken);
+      expect(tokenVerificationResult.user).toEqual(appTokenResult.user);
+    });
+
     describe('after check ', () => {
       let checkResult: CheckResult;
       let document: DocumentDescriptor;

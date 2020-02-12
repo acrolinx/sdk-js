@@ -1,3 +1,4 @@
+import {AddonId, AppToken, AppTokenResult, AppTokenValidationResult} from './addons';
 import {
   CheckingCapabilities,
   CheckType,
@@ -235,6 +236,14 @@ export class AcrolinxEndpoint {
       await waitMs(lastPollResult.progress.retryAfter * 1000);
     }
     return this.getJsonFromUrl<SigninPollResult>(signinLinks.links.poll);
+  }
+
+  public async getAppToken(accessToken: AccessToken, appId: AddonId): Promise<AppTokenResult> {
+    return getData(this.post('/api/v1/apps/accessToken/' + appId, {}, undefined, accessToken));
+  }
+
+  public async validateAppToken(appToken: AppToken): Promise<AppTokenValidationResult> {
+    return getData(this.getJsonFromPath('/api/v1/apps/whoami', appToken));
   }
 
   public getCapabilities(accessToken: AccessToken): Promise<PlatformCapabilities> {
