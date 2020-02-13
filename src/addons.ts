@@ -1,7 +1,7 @@
-import {UserId, Username} from './common-types';
+import {StringMap, UserId, Username} from './common-types';
 
 export type AddonId = string;
-export type AppToken = string;
+export type AppAccessToken = string;
 
 export interface Addon {
   id: AddonId;
@@ -17,12 +17,22 @@ interface AppUser {
   username: Username;
 }
 
-export interface AppTokenResult {
-  appAccessToken: AppToken;
+export interface AppAccessTokenApiResult {
+  appAccessToken: AppAccessToken;
   user: AppUser;
   appId: AddonId;
 }
 
-export interface AppTokenValidationResult {
+
+export interface AppAccessTokenResult extends AppAccessTokenApiResult {
+  validationRequest: HttpGetRequest;
+}
+
+interface HttpGetRequest {
+  url: string;
+  headers: StringMap;
+}
+
+export interface AppAccessTokenValidationResult {
   user: AppUser;
 }

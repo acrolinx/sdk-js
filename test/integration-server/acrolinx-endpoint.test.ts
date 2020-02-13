@@ -4,6 +4,7 @@ import * as dotenv from 'dotenv';
 import * as _ from 'lodash';
 import {
   AnalysisType,
+  AppAccessTokenValidationResult,
   CheckCancelledByClientError,
   CheckRequest,
   CheckResult,
@@ -564,18 +565,24 @@ describe('e2e - AcrolinxEndpoint', () => {
       });
     });
 
-    it('request and validate app token', async () => {
+    it.only('request and validate app token', async () => {
       const appId = 'selectRanges';
 
-      const appTokenResult = await api.getAppToken(ACROLINX_API_TOKEN, appId);
+      const appTokenResult = await api.getAppAccessToken(ACROLINX_API_TOKEN, appId);
 
       expect(appTokenResult.appAccessToken).toMatch(/\S+/);
       expect(appTokenResult.user.id).toEqual(ACROLINX_API_USER_ID);
       expect(appTokenResult.user.username).toMatch(/\S+/);
       expect(appTokenResult.appId).toEqual(appId);
 
-      const tokenVerificationResult = await api.validateAppToken(appTokenResult.appAccessToken);
+      const tokenVerificationResult = await api.validateAppAccessToken(appTokenResult.appAccessToken);
       expect(tokenVerificationResult.user).toEqual(appTokenResult.user);
+
+      const tokenVerificationResult2: SuccessResponse<AppAccessTokenValidationResult> =
+        await fetch(appTokenResult.validationRequest.url, {headers: appTokenResult.validationRequest.headers})
+          .then(r => r.json());
+
+      expect(tokenVerificationResult2.data.user).toEqual(tokenVerificationResult.user);
     });
 
     describe('after check ', () => {

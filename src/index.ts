@@ -1,4 +1,10 @@
-import {AddonId, AppToken, AppTokenResult, AppTokenValidationResult} from './addons';
+import {
+  AddonId,
+  AppAccessToken,
+  AppAccessTokenApiResult,
+  AppAccessTokenResult,
+  AppAccessTokenValidationResult
+} from './addons';
 import {
   CheckingCapabilities,
   CheckType,
@@ -181,6 +187,8 @@ interface SignInInteractiveOptions {
   timeoutMs?: number;
 }
 
+const VALIDATE_APP_ACCESS_TOKEN_PATH = '/api/v1/apps/whoami';
+
 export class AcrolinxEndpoint {
   public readonly props: AcrolinxEndpointProps;
 
@@ -238,12 +246,25 @@ export class AcrolinxEndpoint {
     return this.getJsonFromUrl<SigninPollResult>(signinLinks.links.poll);
   }
 
-  public async getAppToken(accessToken: AccessToken, appId: AddonId): Promise<AppTokenResult> {
-    return getData(this.post('/api/v1/apps/accessToken/' + appId, {}, undefined, accessToken));
+  public async getAppAccessToken(accessToken: AccessToken, appId: AddonId): Promise<AppAccessTokenResult> {
+    const tokenApiResult = await getData<AppAccessTokenApiResult>(
+      this.post('/api/v1/apps/accessToken/' + appId, {}, undefined, accessToken)
+    );
+    return {
+      ...tokenApiResult,
+      validationRequest: {
+        url: this.getUrlOfPath(VALIDATE_APP_ACCESS_TOKEN_PATH),
+        headers: {
+          'Content-Type': 'application/json',
+          [HEADER_X_ACROLINX_CLIENT]: this.getAcrolinxClientHttpHeader(),
+          [HEADER_X_ACROLINX_AUTH]: accessToken
+        }
+      }
+    };
   }
 
-  public async validateAppToken(appToken: AppToken): Promise<AppTokenValidationResult> {
-    return getData(this.getJsonFromPath('/api/v1/apps/whoami', appToken));
+  public async validateAppAccessToken(appToken: AppAccessToken): Promise<AppAccessTokenValidationResult> {
+    return getData(this.getJsonFromPath(VALIDATE_APP_ACCESS_TOKEN_PATH, appToken));
   }
 
   public getCapabilities(accessToken: AccessToken): Promise<PlatformCapabilities> {
@@ -353,7 +374,7 @@ export class AcrolinxEndpoint {
   }
 
   public async getJsonFromPath<T>(path: string, accessToken?: AccessToken): Promise<T> {
-    return this.getJsonFromUrl<T>(this.props.acrolinxUrl + path, accessToken);
+    return this.getJsonFromUrl<T>(this.getUrlOfPath(path), accessToken);
   }
 
   public async getJsonFromUrl<T>(
@@ -378,6 +399,10 @@ export class AcrolinxEndpoint {
       res => handleExpectedTextResponse(httpRequest, res),
       error => wrapFetchError(httpRequest, error)
     );
+  }
+
+  private getUrlOfPath(path: string) {
+    return this.props.acrolinxUrl + path;
   }
 
   private async pollForInteractiveSignIn(
@@ -487,7 +512,7 @@ export class AcrolinxEndpoint {
     const headers: StringMap = {
       'Content-Type': 'application/json',
       [HEADER_X_ACROLINX_BASE_URL]: this.props.acrolinxUrl,
-      [HEADER_X_ACROLINX_CLIENT]: `${this.props.client.signature}; ${this.props.client.version}`,
+      [HEADER_X_ACROLINX_CLIENT]: this.getAcrolinxClientHttpHeader(),
     };
     if (this.props.clientLocale) {
       headers[HEADER_X_ACROLINX_CLIENT_LOCALE] = this.props.clientLocale;
@@ -496,6 +521,10 @@ export class AcrolinxEndpoint {
       headers[HEADER_X_ACROLINX_AUTH] = accessToken;
     }
     return headers;
+  }
+
+  private getAcrolinxClientHttpHeader() {
+    return `${this.props.client.signature}; ${this.props.client.version}`;
   }
 
   private async post<T>(path: string, body: {}, headers: StringMap = {}, accessToken?: AccessToken): Promise<T> {
@@ -511,7 +540,7 @@ export class AcrolinxEndpoint {
                         body: {},
                         headers: StringMap = {},
                         accessToken?: AccessToken): Promise<T> {
-    return this.fetchJson(this.props.acrolinxUrl + path, {
+    return this.fetchJson(this.getUrlOfPath(path), {
       body: JSON.stringify(body),
       headers: {...this.getCommonHeaders(accessToken), ...headers},
       method,
