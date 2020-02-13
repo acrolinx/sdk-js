@@ -61,31 +61,5 @@
     "typedoc": "^0.15.6",
     "typescript": "^3.7.4",
     "typescript-json-schema": "^0.41.0"
-  },
-  "jest": {
-    "transform": {
-      "^.+\\.ts$": "ts-jest"
-    },
-    "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(ts)$",
-    "moduleFileExtensions": [
-      "ts",
-      "js"
-    ],
-    "coverageDirectory": "tmp/coverage",
-    "coverageReporters": [
-      "cobertura",
-      "json",
-      "lcov",
-      "text"
-    ],
-    "reporters": [
-      "default",
-      "jest-junit"
-    ],
-    "testURL": "http://localhost/"
-  },
-  "jest-junit": {
-    "outputDirectory": "tmp",
-    "outputName": "junit.xml"
   }
 }

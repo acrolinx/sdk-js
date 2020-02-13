@@ -565,7 +565,7 @@ describe('e2e - AcrolinxEndpoint', () => {
       });
     });
 
-    it.only('request and validate app token', async () => {
+    it('request and validate app token', async () => {
       const appId = 'selectRanges';
 
       const appTokenResult = await api.getAppAccessToken(ACROLINX_API_TOKEN, appId);
