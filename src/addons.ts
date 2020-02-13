@@ -28,7 +28,7 @@ export interface AppAccessTokenResult extends AppAccessTokenApiResult {
   validationRequest: HttpGetRequest;
 }
 
-interface HttpGetRequest {
+export interface HttpGetRequest {
   url: string;
   headers: StringMap;
 }
