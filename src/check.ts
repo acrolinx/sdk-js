@@ -114,18 +114,22 @@ export interface KeyValuePair {
 }
 
 
+type AggregatedReport = {
+  reportType: string
+  link: URL
+};
+
 export interface AggregatedReportLinkResult {
-  reports: Array<{
-    reportType: string
-    link: URL
-  }>;
+  reports: AggregatedReport[];
 }
 
+type ContentAnalysisDashboardLink = {
+  linkType: string
+  link: URL
+};
+
 export interface ContentAnalysisDashboardResult {
-  links: Array<{
-    linkType: string
-    link: URL
-  }>;
+  links: ContentAnalysisDashboardLink[];
 }
 
 export interface KeywordsSection {
@@ -175,7 +179,7 @@ export interface Suggestion {
   surface: string;
   groupId: string;
   iconId?: SuggestionIconId | null;
-  replacements: Array<string | null>;
+  replacements: (string | null)[];
 }
 
 export enum SuggestionIconId {
