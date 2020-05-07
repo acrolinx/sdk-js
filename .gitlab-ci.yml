@@ -1,0 +1,24 @@
+image: node:latest
+
+cache:
+  paths:
+    - node_modules/
+
+build_batch_api:
+  stage: build
+  script:
+    - npm install && npm run build
+  artifacts:
+    paths:
+      - node_modules/
+      - dist/
+
+test_batch_api:
+  stage: test
+  script:
+    - npm run npm run testUnitCoverage
+    - npm run testMarkdown
+  artifacts:
+    paths:
+      - node_modules/
+      - dist/
