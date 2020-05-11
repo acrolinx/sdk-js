@@ -57,7 +57,9 @@ export interface ContentFormat {
 
 export enum CheckType {
   batch = 'batch',
-  interactive = 'interactive'
+  interactive = 'interactive',
+  baseline = "baseline",
+  automated = "automated"
 }
 
 export enum ContentEncoding {
