@@ -51,4 +51,9 @@ export interface HttpGetRequest {
 
 export interface AppAccessTokenValidationResult {
   user: AppUser;
+
+  /**
+   * Since Acrolinx platform 2020.7
+   */
+  privileges: string[];
 }

@@ -49,7 +49,7 @@ import {describeIf, expectFailingPromise, testIf} from '../test-utils/utils';
 
 dotenv.config();
 
-const TEST_SERVER_URL = process.env.TEST_SERVER_URL || 'https://test-next-ssl.acrolinx.com';
+const TEST_SERVER_URL = process.env.TEST_SERVER_URL || 'https://unstable.acrolinx.com';
 const SSO_USERNAME = process.env.SSO_USERNAME;
 const SSO_GENERIC_TOKEN = process.env.SSO_GENERIC_TOKEN;
 const ACROLINX_API_TOKEN = process.env.ACROLINX_API_TOKEN || '';
@@ -599,6 +599,9 @@ describe('e2e - AcrolinxEndpoint', () => {
           .then(r => r.json());
 
       expect(tokenVerificationResult2.data.user).toEqual(tokenVerificationResult.user);
+
+      // TODO: expect(tokenVerificationResult2.data.privileges).toEqual(['admin']);
+      expect(tokenVerificationResult2.data.privileges).toContain('admin');
     });
 
     describe('after check ', () => {
