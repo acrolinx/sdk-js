@@ -273,7 +273,7 @@ export class AcrolinxEndpoint {
         headers: {
           'Content-Type': 'application/json',
           [HEADER_X_ACROLINX_CLIENT]: this.getAcrolinxClientHttpHeader(),
-          [HEADER_X_ACROLINX_AUTH]: accessToken
+          [HEADER_X_ACROLINX_AUTH]: tokenApiResult.appAccessToken
         }
       }
     };

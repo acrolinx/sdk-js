@@ -600,8 +600,7 @@ describe('e2e - AcrolinxEndpoint', () => {
 
       expect(tokenVerificationResult2.data.user).toEqual(tokenVerificationResult.user);
 
-      // TODO: expect(tokenVerificationResult2.data.privileges).toEqual(['admin']);
-      expect(tokenVerificationResult2.data.privileges).toContain('admin');
+      expect(tokenVerificationResult2.data.privileges).toEqual(['admin']);
     });
 
     describe('after check ', () => {
