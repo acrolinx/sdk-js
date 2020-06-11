@@ -581,6 +581,10 @@ describe('e2e - AcrolinxEndpoint', () => {
       });
     });
 
+    /**
+     * The user associated with the used ACROLINX_API_TOKEN must have the admin privilege for
+     * the test app "selectRanges".
+     */
     it('request and validate app token', async () => {
       const appId = 'selectRanges';
 
