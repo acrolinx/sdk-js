@@ -85,6 +85,11 @@ export interface CheckResponse extends SuccessResponse<CheckResponseData, AsyncS
 
 export type CheckResultResponse = AsyncApiResponse<CheckResult>;
 
+export interface ScoreByGoal {
+  id: string,
+  score: number
+}
+
 export interface CheckResult {
   id: CheckId;
   checkOptions: CheckOptions;
@@ -93,7 +98,8 @@ export interface CheckResult {
   quality: {
     score: number;
     status: DocumentQualityStatus;
-  };
+    scoresByGoal?: ScoreByGoal[];
+  }
   counts: {
     sentences: number;
     words: number;
