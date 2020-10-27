@@ -29,8 +29,11 @@ import {
   DEVELOPMENT_SIGNATURE,
   DictionaryScope,
   ErrorType,
+  hasTermHarvestingReport,
+  HasTermHarvestingReport,
   OffsetReport,
   PollMoreResult,
+  ReportType,
   SuccessResponse,
   User
 } from '../../src';
@@ -41,6 +44,7 @@ import {AcrolinxEndpoint, isSigninSuccessResult, SigninSuccessResult} from '../.
 import {SigninLinksResult} from '../../src/signin';
 import {waitMs} from '../../src/utils/mixed-utils';
 import * as checkResultSchema from '../schemas/check-result.json';
+import * as termHarvestingReportSchema from '../schemas/term-harvesting-report.json';
 import {describeIf, expectFailingPromise, testIf} from '../test-utils/utils';
 
 dotenv.config();
@@ -377,6 +381,32 @@ describe('e2e - AcrolinxEndpoint', () => {
         await expectFailingPromise(checkAndWaitUntilFinished({guidanceProfileId: 'invalid!uuid'}),
           ErrorType.GuidanceProfileDoesNotExist);
       });
+
+       it('can request the termHarvesting report', async () => {
+        const checkResult = await checkAndWaitForResult({
+          checkOptions: {
+            guidanceProfileId: await getGuidanceProfileId('en-Publications'),
+            reportTypes: [ReportType.termHarvesting]
+          },
+          content: 'NewTerm'
+        });
+        expect(hasTermHarvestingReport(checkResult.reports)).toEqual(true);
+        const reports: HasTermHarvestingReport = checkResult.reports as HasTermHarvestingReport;
+        expect(typeof reports.termHarvesting.link).toEqual('string');
+
+        const termHarvestingReport = await api.getTermHarvestingReport(ACROLINX_API_TOKEN, reports);
+
+        const validateTermHarvestingReport = ajv.compile(termHarvestingReportSchema);
+        validateTermHarvestingReport(termHarvestingReport);
+        expect(validateTermHarvestingReport.errors).toBeNull();
+
+        const harvestedTerm = termHarvestingReport.terms[0];
+        // TODO: expect harvestedTerm.links.termContribution
+        expect(harvestedTerm.links.termContributionInteractive).toMatch(/^http/);
+        expect(harvestedTerm.occurrences).toHaveLength(1);
+        expect(harvestedTerm.occurrences[0].positionalInformation.matches).toHaveLength(1);
+      }, 10000);
+
     });
 
     describe('checkAndGetResult', () => {

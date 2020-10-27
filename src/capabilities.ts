@@ -68,8 +68,7 @@ export enum ContentEncoding {
 }
 
 export enum ReportType {
-  // See https://acrolinx.atlassian.net/browse/DEV-19514
-  // termHarvesting = 'termHarvesting',
+  termHarvesting = 'termHarvesting',
   scorecard = 'scorecard',
   extractedText = 'extractedText',
   /**
