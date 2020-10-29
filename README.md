@@ -1,19 +1,48 @@
 # Acrolinx JavaScript SDK
 
-This library is meant to be used to interact with the Acrolinx Platform API in JavaScript integrations. 
+This library is meant to be used to interact with the [Acrolinx](https://www.acrolinx.com/) Platform API in JavaScript integrations.
 It does NOT offer an interface to work with the Acrolinx Sidebar (see [Sidebar JavaScript SDK](https://github.com/acrolinx/sidebar-sdk-js)).
 
-## Getting Started
+## Get Started with Your Integration
 
-### Installation
+### Prerequisites
+
+Please contact [Acrolinx SDK support](https://github.com/acrolinx/acrolinx-coding-guidance/blob/master/topics/sdk-support.md)
+for consulting and getting your integration certified.
+The tests in this SDK work with a test license on an internal Acrolinx URL.
+This license is only meant for demonstration and developing purposes.
+Once you finished your integration, you'll have to get a license for your integration from Acrolinx.
+
+Acrolinx offers different other SDKs, and examples for developing integrations.
+
+Before you start developing your own integration, you might benefit from looking into:
+
+* [Getting Started with Custom Integrations](https://docs.acrolinx.com/customintegrations),
+* the [Guidance for the Development of Acrolinx Integrations](https://github.com/acrolinx/acrolinx-coding-guidance),
+* the [Acrolinx Platform API](https://github.com/acrolinx/platform-api)
+* the [Rendered Version of the Acrolinx Platform API](https://acrolinxapi.docs.apiary.io/#)
+* the [Acrolinx SDKs](https://github.com/acrolinx?q=sdk), and
+* the [Acrolinx Demo Projects](https://github.com/acrolinx?q=demo).
+
+### Start Developing
+
+#### Installation
 
 ```bash
 npm install @acrolinx/sdk
 ```
 
-### Example Code
+#### First Steps
 
-#### Getting some info
+Create instance of `AcrolinxEndpoint` to begin.
+
+`AcrolinxEndpoint` offers a single entry point to the avail features provided by the SDK.
+
+See [`Check.ts`](examples/check.ts) for more examples.
+
+#### Example Code
+
+##### Getting Some Info
 
 ```javascript
 import 'cross-fetch/polyfill'; // Use a fetch polyfill, when you target Node.js or IE11
