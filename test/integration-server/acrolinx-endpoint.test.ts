@@ -452,7 +452,7 @@ describe('e2e - AcrolinxEndpoint', () => {
         const url = new URL(urlString);
         expect(url).toBeTruthy();
         // Here you should open the url and test of it loads the correct results :-)
-      });
+      }, 10_000);
     });
 
     describe('analyzeAndGetResult', () => {
