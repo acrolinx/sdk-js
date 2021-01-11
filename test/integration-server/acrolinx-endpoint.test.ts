@@ -29,6 +29,7 @@ import {
   DEVELOPMENT_SIGNATURE,
   DictionaryScope,
   ErrorType,
+  GoalScoring,
   hasTermHarvestingReport,
   HasTermHarvestingReport,
   OffsetReport,
@@ -275,6 +276,13 @@ describe('e2e - AcrolinxEndpoint', () => {
       });
     });
 
+    describe('Features', () => {
+      it('should return features', async () => {
+        const features = await api.getFeatures(ACROLINX_API_TOKEN);
+        expect(typeof features.enableTargetService).toBe('boolean');
+      });
+    });
+
     it('should return the checking capabilities', async () => {
       const result = await api.getCheckingCapabilities(ACROLINX_API_TOKEN);
       expect(result.guidanceProfiles.length).toBeGreaterThan(0);
@@ -302,6 +310,11 @@ describe('e2e - AcrolinxEndpoint', () => {
     describe('check', () => {
       it('can check', async () => {
         const checkResult = await checkAndWaitForResult();
+
+        const features = await api.getFeatures(ACROLINX_API_TOKEN);
+        if (features.enableTargetService) {
+          expect(checkResult.goals.every(goal => goal.scoring! in GoalScoring)).toBeTruthy();
+        }
 
         expect(checkResult.goals.length).toBeGreaterThan(0);
         assertDictionaryScopes(checkResult.dictionaryScopes);
@@ -382,7 +395,7 @@ describe('e2e - AcrolinxEndpoint', () => {
           ErrorType.GuidanceProfileDoesNotExist);
       });
 
-       it('can request the termHarvesting report', async () => {
+      it('can request the termHarvesting report', async () => {
         const checkResult = await checkAndWaitForResult({
           checkOptions: {
             guidanceProfileId: await getGuidanceProfileId('en-Publications'),

@@ -44,6 +44,17 @@ export interface Goal {
   id: GoalId;
   displayName: string;
   color: string;
+
+  /**
+   * New since Acrolinx platform API 2021.2.
+   * Only available if the server runs in Targets mode.
+   */
+  scoring?: GoalScoring
+}
+
+export enum GoalScoring {
+  required = 'required',
+  recommended= 'recommended',
 }
 
 export interface TermSet {

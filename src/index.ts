@@ -58,6 +58,7 @@ import {AddToDictionaryRequest, AddToDictionaryResponse, DictionaryCapabilities}
 import {DocumentDescriptor, DocumentId, sanitizeDocumentDescriptor} from './document-descriptor';
 import {AcrolinxError, CheckCancelledByClientError, ErrorType, wrapFetchError} from './errors';
 import {AnalysisRequest, ExtractionResult} from './extraction';
+import {PlatformFeatures, PlatformFeaturesResponse} from './features';
 import {
   HEADER_X_ACROLINX_APP_SIGNATURE,
   HEADER_X_ACROLINX_AUTH,
@@ -108,7 +109,8 @@ export {
   CheckResult,
   CheckResultResponse,
   CheckResponse,
-  Report
+  Report,
+  PlatformFeatures
 };
 
 export {HEADER_X_ACROLINX_APP_SIGNATURE};
@@ -285,6 +287,11 @@ export class AcrolinxEndpoint {
 
   public getCapabilities(accessToken: AccessToken): Promise<PlatformCapabilities> {
     return getData(this.getJsonFromPath('/api/v1/capabilities', accessToken));
+  }
+
+  public async getFeatures(accessToken: AccessToken): Promise<PlatformFeatures> {
+    const responsePromise = await getData<PlatformFeaturesResponse>(this.getJsonFromPath('/api/v1/configuration/features', accessToken));
+    return responsePromise.features;
   }
 
   public getCheckingCapabilities(accessToken: AccessToken): Promise<CheckingCapabilities> {
