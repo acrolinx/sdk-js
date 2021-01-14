@@ -79,9 +79,7 @@ export interface CheckResponseData {
   id: CheckId;
 }
 
-export interface CheckResponse extends SuccessResponse<CheckResponseData, AsyncStartedProcessLinks> {
-  // Lots of stuff that looks similar to CheckRequest
-}
+export type CheckResponse = SuccessResponse<CheckResponseData, AsyncStartedProcessLinks>;
 
 export type CheckResultResponse = AsyncApiResponse<CheckResult>;
 

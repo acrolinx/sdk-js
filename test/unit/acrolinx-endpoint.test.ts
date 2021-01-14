@@ -32,6 +32,7 @@ describe('AcrolinxEndpoint', () => {
   describe('sanitize acrolinxUrl', () => {
     it('trim and remove training slash', () => {
       expect(createEndpoint(' http://host/ ').props.acrolinxUrl).toEqual('http://host');
+      // eslint-disable-next-line sonarjs/no-duplicate-string
       expect(createEndpoint(' http://host/path/ ').props.acrolinxUrl).toEqual('http://host/path');
 
       expect(createEndpoint(' http://host/path ').props.acrolinxUrl).toEqual('http://host/path');

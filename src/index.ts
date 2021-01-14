@@ -481,7 +481,7 @@ export class AcrolinxEndpoint {
     const cancelOnServerIfPossibleAndStillNeeded = () => {
       if (!requestedCanceledOnServer && runningCheck) {
         requestedCanceledOnServer = true;
-        /* tslint:disable-next-line:no-floating-promises */
+        // eslint-disable-next-line @typescript-eslint/no-floating-promises
         this.cancelAsyncStartedProcess(accessToken, runningCheck, opts);
       }
     };

@@ -146,6 +146,7 @@ describe('e2e - AcrolinxEndpoint', () => {
       await expectFailingPromise(signinPollResultPromise, ErrorType.SigninTimedOut);
     });
 
+    // eslint-disable-next-line @typescript-eslint/no-misused-promises
     testIf(SSO_USERNAME && SSO_GENERIC_TOKEN, 'signin with sso', async () => {
       const result = await api.signin({
           genericToken: SSO_GENERIC_TOKEN!,
@@ -171,7 +172,7 @@ describe('e2e - AcrolinxEndpoint', () => {
     });
   });
 
-  describeIf(ACROLINX_API_TOKEN, 'with API token', async () => {
+  describeIf(ACROLINX_API_TOKEN, 'with API token', () => {
     let api: AcrolinxEndpoint;
 
     beforeAll(async () => {
@@ -251,7 +252,7 @@ describe('e2e - AcrolinxEndpoint', () => {
         user = await api.getUserData(ACROLINX_API_TOKEN, result.data.user.id);
       });
 
-      test('should return user data with custom fields', async () => {
+      test('should return user data with custom fields', () => {
         expect(user.username).toBeDefined();
         const departmentCustomField = _.find(user.customFields, cf => cf.key === DEPARTMENT_KEY);
         expect(departmentCustomField).toBeDefined();
@@ -630,7 +631,7 @@ describe('e2e - AcrolinxEndpoint', () => {
         document = await api.getDocumentDescriptor(ACROLINX_API_TOKEN, checkResult.document.id);
       });
 
-      it('should get custom fields', async () => {
+      it('should get custom fields', () => {
         expect(document.id).toBeTruthy();
         expect(Array.isArray(document.customFields)).toEqual(true);
       });

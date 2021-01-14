@@ -62,8 +62,7 @@ export enum AuthorizationType {
   ACROLINX_TOKEN = 'ACROLINX_TOKEN'
 }
 
-export interface SigninSuccessResult extends ApiResponse<SigninSuccessData> {
-}
+export type SigninSuccessResult =  ApiResponse<SigninSuccessData>;
 
 export interface SigninSuccessData {
   accessToken: AccessToken;

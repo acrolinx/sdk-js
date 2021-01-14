@@ -1,0 +1,6 @@
+node_modules
+dist
+tmp
+docs
+examples
+app/i18n/all-localizations.template.ts
