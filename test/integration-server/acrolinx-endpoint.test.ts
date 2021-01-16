@@ -54,7 +54,7 @@ const TEST_SERVER_URL = process.env.TEST_SERVER_URL || 'https://unstable.acrolin
 const SSO_USERNAME = process.env.SSO_USERNAME;
 const SSO_GENERIC_TOKEN = process.env.SSO_GENERIC_TOKEN;
 const ACROLINX_API_TOKEN = process.env.ACROLINX_API_TOKEN || '';
-const ACROLINX_API_USER_ID = process.env.ACROLINX_API_USER_ID || 'jenkins-api-js';
+const ACROLINX_API_USERNAME = process.env.ACROLINX_API_USERNAME || 'api-js-test-user';
 
 const ajv = new Ajv({allErrors: true});
 
@@ -126,7 +126,7 @@ describe('e2e - AcrolinxEndpoint', () => {
       it('should return the provided API-Token', async () => {
         const result = await api.signin({accessToken: ACROLINX_API_TOKEN}) as SigninSuccessResult;
         expect(result.data.accessToken).toBe(ACROLINX_API_TOKEN);
-        expect(result.data.user.id).toBe(ACROLINX_API_USER_ID);
+        expect(result.data.user.username).toBe(ACROLINX_API_USERNAME);
       });
 
       it('should return client properties', async () => {
@@ -608,8 +608,7 @@ describe('e2e - AcrolinxEndpoint', () => {
       const appTokenResult = await api.getAppAccessToken(ACROLINX_API_TOKEN, appId);
 
       expect(appTokenResult.appAccessToken).toMatch(/\S+/);
-      expect(appTokenResult.user.id).toEqual(ACROLINX_API_USER_ID);
-      expect(appTokenResult.user.username).toMatch(/\S+/);
+      expect(appTokenResult.user.username).toEqual(ACROLINX_API_USERNAME);
       expect(appTokenResult.appId).toEqual(appId);
 
       const tokenVerificationResult = await api.validateAppAccessToken(appTokenResult.appAccessToken);
