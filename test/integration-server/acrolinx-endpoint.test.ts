@@ -320,7 +320,7 @@ describe('e2e - AcrolinxEndpoint', () => {
         expect(checkResult.goals.length).toBeGreaterThan(0);
         assertDictionaryScopes(checkResult.dictionaryScopes);
 
-        const spellingIssue = _.find(checkResult.issues, issue => issue.goalId === 'SPELLING')!;
+        const spellingIssue = _.find(checkResult.issues, issue => issue.goalId === 'SPELLING' || issue.goalId === 'CORRECTNESS')!;
         expect(spellingIssue).toBeDefined();
         expect(spellingIssue.canAddToDictionary).toBe(true);
 
@@ -397,9 +397,11 @@ describe('e2e - AcrolinxEndpoint', () => {
       });
 
       it('can request the termHarvesting report', async () => {
+        // Formerly (before targets) we used the "en-Publications" profile, which had termHarvesting enabled.
+        const guidanceProfileIdWithTermHarvesting = await getGuidanceProfileId();
         const checkResult = await checkAndWaitForResult({
           checkOptions: {
-            guidanceProfileId: await getGuidanceProfileId('en-Publications'),
+            guidanceProfileId: guidanceProfileIdWithTermHarvesting,
             reportTypes: [ReportType.termHarvesting]
           },
           content: 'NewTerm'
