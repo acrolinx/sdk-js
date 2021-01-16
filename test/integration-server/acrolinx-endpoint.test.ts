@@ -172,6 +172,7 @@ describe('e2e - AcrolinxEndpoint', () => {
     });
   });
 
+  // eslint-disable-next-line sonarjs/cognitive-complexity
   describeIf(ACROLINX_API_TOKEN, 'with API token', () => {
     let api: AcrolinxEndpoint;
 
