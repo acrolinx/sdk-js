@@ -60,5 +60,8 @@ export interface AsyncStartedProcessLinks {
 }
 
 export interface AsyncStartedProcess {
+  data: {
+    id: string;
+  };
   links: AsyncStartedProcessLinks;
 }

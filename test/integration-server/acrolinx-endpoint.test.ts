@@ -423,14 +423,26 @@ describe('e2e - AcrolinxEndpoint', () => {
         expect(harvestedTerm.occurrences).toHaveLength(1);
         expect(harvestedTerm.occurrences[0].positionalInformation.matches).toHaveLength(1);
       }, 10000);
-
     });
 
     describe('checkAndGetResult', () => {
       it('should check', async () => {
-        const checkResult = await api.checkAndGetResult(ACROLINX_API_TOKEN, await createDummyCheckRequest()).promise;
+        const checkProcess = api.checkAndGetResult(ACROLINX_API_TOKEN, await createDummyCheckRequest());
+        const checkResult = await checkProcess.promise;
+        expect(checkProcess.getId()).toBeTruthy();
         expect(checkResult.goals.length).toBeGreaterThan(0);
       });
+
+      it('should return the check id even in case of some kind of errors', async () => {
+        const checkProcess = api.checkAndGetResult(ACROLINX_API_TOKEN, await createDummyCheckRequest({
+          content: '<tag>test</wrong>',
+          checkOptions: {contentFormat: 'XML'}
+        }));
+
+        await expectFailingPromise<AcrolinxError>(checkProcess.promise, ErrorType.CheckFailed);
+        expect(checkProcess.getId()).toBeTruthy();
+      });
+
 
       it('can be cancelled', async () => {
         const currentCheck = api.checkAndGetResult(ACROLINX_API_TOKEN, await createDummyCheckRequest());

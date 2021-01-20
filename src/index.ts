@@ -196,6 +196,8 @@ export interface CancelablePollLoopOptions extends CheckAndGetResultOptions, Add
 export interface CancelablePromiseWrapper<T> {
   promise: Promise<T>;
 
+  getId(): string | undefined;
+
   cancel(): void;
 }
 
@@ -510,6 +512,9 @@ export class AcrolinxEndpoint {
 
     return {
       promise: Promise.race([poll(), cancelPromise]),
+      getId(): string | undefined {
+        return runningCheck?.data.id;
+      },
       cancel
     };
   }
