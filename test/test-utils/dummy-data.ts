@@ -339,6 +339,7 @@ export const DUMMY_CHECK_RESULT: CheckResult = {
         {
           canAddToDictionary: true,
           goalId: GOAL_VOICE_ID,
+          issueType: IssueType.actionable,
           internalName: 'phenomenon_embedded_or_complex_sentence',
           displayNameHtml: 'Try to split up this sentence.',
           guidanceHtml: "<p>This sentence doesn't seem to flow smoothly. We found a few embedded phrases in there " +
@@ -379,6 +380,7 @@ export const DUMMY_CHECK_RESULT: CheckResult = {
         {
           canAddToDictionary: true,
           goalId: GOAL_VOICE_ID,
+          issueType: IssueType.actionable,
           internalName: 'phenomenon_passive',
           displayNameHtml: 'The active voice is usually clearer.',
           guidanceHtml: "<p>This one could do with a bit of pep. It's probably because it feels kind of passive. " +
