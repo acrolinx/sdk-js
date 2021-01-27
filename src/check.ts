@@ -229,8 +229,18 @@ export interface PositionalInformation {
   matches: Match[];
 }
 
+export enum IssueType {
+  analytical = 'analytical',
+  actionable = 'actionable'
+}
+
 export interface Issue extends CommonIssue {
   goalId: GoalId;
+
+  /**
+   * Since Acrolinx platform 2021.2
+   */
+  issueType: IssueType;
 }
 
 type SubIssue = CommonIssue;
