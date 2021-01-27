@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import {DictionaryScope, SuggestionIconId} from '../../src';
+import {DictionaryScope, IssueType, SuggestionIconId} from '../../src';
 import {
   CheckingCapabilities,
   CheckType,
@@ -177,6 +177,7 @@ export const DUMMY_CHECK_RESULT: CheckResult = {
     {
       canAddToDictionary: true,
       goalId: 'spelling',
+      issueType: IssueType.actionable,
       internalName: 'title_case_chicago',
       displayNameHtml: 'Use Chicago style for the title case?',
       guidanceHtml: `<div class="shortHelp" lang="en" xml:lang="en">\n<p>According to
@@ -247,6 +248,7 @@ export const DUMMY_CHECK_RESULT: CheckResult = {
     {
       canAddToDictionary: true,
       goalId: GOAL_TERM_ID,
+      issueType: IssueType.actionable,
       internalName: 'term_flag',
       displayNameHtml: '<b>Illegal sublanguage variant</b> of preferred term',
       guidanceHtml: `<div class="guidance term">\n\t<b>Domains</b>\n\t\t\t<br/><i>Switches</i>\n\t\t\t\t\t<br/>
@@ -297,6 +299,7 @@ export const DUMMY_CHECK_RESULT: CheckResult = {
     {
       canAddToDictionary: true,
       goalId: GOAL_VOICE_ID,
+      issueType: IssueType.actionable,
       internalName: 'en-clarity-medium',
       displayNameHtml: 'Too complex? Your readers need a medium level of clarity. ',
       guidanceHtml: '',
