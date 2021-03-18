@@ -24,7 +24,7 @@
     "runExampleSignin": "tsc && node dist/examples/signin.js",
     "runExampleGetCheckingCapabilitites": "tsc && node dist/examples/get-checking-capabilities.js dummyToken",
     "runExampleCheck": "tsc && node dist/examples/check.js https://test-latest-ssl.acrolinx.com eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhcGktanMtdGVzdC11c2VyIiwiYXVkIjoiYWNyb2xpbng6OTk4ODhjZDE1YjM5YTUyMCIsIm5iZiI6MTUxNzgzODc5NywiaXNzIjoiYWNyb2xpbng6OTk4ODhjZDE1YjM5YTUyMDplYzljZGRlMjNiMjUzZGM3IiwiZXhwIjoxNjQ0MDY5MTk3LCJ0b2tlblR5cGUiOiJhcGkiLCJpYXQiOjE1MTc5MjUxOTcsImp0aSI6IjMxY2FhNWI2NjhhNjdiZDk2MDhkMTM4M2RlNzRkNmM5In0.wtiefF9mHqe_N6BzXqT7PucSMWs3lwq2xla_x8KYGWE",
-    "runExampleCheckMocked": "tsc && node dist/examples/check.js http://localhost:3000 dummyAuthToken",
+    "runExampleCheckMocked": "tsc && node dist/examples/check.js http://localhost:3000 dummyAccessToken",
     "runMockServer": "tsc && node dist/test/test-utils/mock-server-http.js",
     "test": "jest",
     "testCoverage": "jest --coverage",
