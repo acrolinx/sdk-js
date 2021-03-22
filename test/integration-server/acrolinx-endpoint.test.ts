@@ -38,15 +38,15 @@ import {
   SuccessResponse,
   User
 } from '../../src';
-import {CheckOptions} from '../../src/check';
-import {DocumentDescriptor} from '../../src/document-descriptor';
-import {AcrolinxError, ValidationDetail} from '../../src/errors';
-import {AcrolinxEndpoint, isSigninSuccessResult, SigninSuccessResult} from '../../src/index';
-import {SigninLinksResult} from '../../src/signin';
-import {waitMs} from '../../src/utils/mixed-utils';
+import { CheckOptions } from '../../src/check';
+import { DocumentDescriptor } from '../../src/document-descriptor';
+import { AcrolinxError, ValidationDetail } from '../../src/errors';
+import { AcrolinxEndpoint, isSigninSuccessResult, SigninSuccessResult } from '../../src/index';
+import { SigninLinksResult } from '../../src/signin';
+import { waitMs } from '../../src/utils/mixed-utils';
 import * as checkResultSchema from '../schemas/check-result.json';
 import * as termHarvestingReportSchema from '../schemas/term-harvesting-report.json';
-import {describeIf, expectFailingPromise, testIf} from '../test-utils/utils';
+import { describeIf, expectFailingPromise, testIf } from '../test-utils/utils';
 
 dotenv.config();
 
@@ -56,7 +56,7 @@ const SSO_GENERIC_TOKEN = process.env.SSO_GENERIC_TOKEN;
 const ACROLINX_API_TOKEN = process.env.ACROLINX_API_TOKEN || '';
 const ACROLINX_API_USERNAME = process.env.ACROLINX_API_USERNAME || 'api-js-test-user';
 
-const ajv = new Ajv({allErrors: true});
+const ajv = new Ajv({ allErrors: true });
 
 function createEndpoint(acrolinxUrl: string) {
   return new AcrolinxEndpoint({
@@ -89,7 +89,7 @@ describe('e2e - AcrolinxEndpoint', () => {
       } catch (error) {
         expect(error.type).toEqual(ErrorType.HttpErrorStatus);
         expect(error.status).toEqual(404);
-        expect(error.httpRequest).toEqual({method: 'GET', url: TEST_SERVER_URL + '/not-there'});
+        expect(error.httpRequest).toEqual({ method: 'GET', url: TEST_SERVER_URL + '/not-there' });
       }
       expect.hasAssertions();
     });
@@ -97,14 +97,14 @@ describe('e2e - AcrolinxEndpoint', () => {
     it('should return an failing promise for non existing server', async () => {
       const api = createEndpoint('http://non-extisting-server');
       await expectFailingPromise(api.getJsonFromPath(DUMMY_PATH), ErrorType.HttpConnectionProblem,
-        {method: 'GET', url: 'http://non-extisting-server' + DUMMY_PATH});
+        { method: 'GET', url: 'http://non-extisting-server' + DUMMY_PATH });
     }, LONG_TIME_OUT_MS);
 
     it('should return an failing promise for invalid URLS', async () => {
       const invalidAcrolinxUrl = 'http://non-ext!::?isting-server';
       const api = createEndpoint(invalidAcrolinxUrl);
       await expectFailingPromise(api.getJsonFromPath(DUMMY_PATH), ErrorType.HttpConnectionProblem,
-        {method: 'GET', url: invalidAcrolinxUrl + DUMMY_PATH});
+        { method: 'GET', url: invalidAcrolinxUrl + DUMMY_PATH });
 
     }, LONG_TIME_OUT_MS);
   });
@@ -124,20 +124,20 @@ describe('e2e - AcrolinxEndpoint', () => {
 
     describeIf(ACROLINX_API_TOKEN, 'Signin with valid token', () => {
       it('should return the provided API-Token', async () => {
-        const result = await api.signin({accessToken: ACROLINX_API_TOKEN}) as SigninSuccessResult;
+        const result = await api.signin({ accessToken: ACROLINX_API_TOKEN }) as SigninSuccessResult;
         expect(result.data.accessToken).toBe(ACROLINX_API_TOKEN);
         expect(result.data.user.username).toBe(ACROLINX_API_USERNAME);
       });
 
       it('should return client properties', async () => {
-        const result = await api.signin({accessToken: ACROLINX_API_TOKEN}) as SigninSuccessResult;
+        const result = await api.signin({ accessToken: ACROLINX_API_TOKEN }) as SigninSuccessResult;
         expect(Object.keys(result.data.integration.properties).length).toBeGreaterThan(0);
       });
     });
 
     it('should return an api error for invalid signin poll address', async () => {
       const signinPollResultPromise = api.pollForSignin({
-        data: {interactiveLinkTimeout: 0},
+        data: { interactiveLinkTimeout: 0 },
         links: {
           interactive: 'dummy',
           poll: TEST_SERVER_URL + '/api/v1/auth/sign-ins/0ddece9c-464a-442b-8a5d-d2f242d54c81'
@@ -149,9 +149,9 @@ describe('e2e - AcrolinxEndpoint', () => {
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
     testIf(SSO_USERNAME && SSO_GENERIC_TOKEN, 'signin with sso', async () => {
       const result = await api.signin({
-          genericToken: SSO_GENERIC_TOKEN!,
-          username: SSO_USERNAME!,
-        }
+        genericToken: SSO_GENERIC_TOKEN!,
+        username: SSO_USERNAME!,
+      }
       ) as SigninSuccessResult;
       expect(result.data.user.id).toContain(SSO_USERNAME);
     });
@@ -203,10 +203,10 @@ describe('e2e - AcrolinxEndpoint', () => {
       }
 
       if (!checkRequest.document) {
-        checkRequest.document = {reference: 'filename.txt'};
+        checkRequest.document = { reference: 'filename.txt' };
       }
 
-      return {content: 'Testt Textt with errror', ...checkRequest};
+      return { content: 'Testt Textt with errror', ...checkRequest };
     }
 
     async function createDummyCheck(checkRequestArg: Partial<CheckRequest> = {}) {
@@ -230,7 +230,7 @@ describe('e2e - AcrolinxEndpoint', () => {
     }
 
     async function checkAndWaitUntilFinished(checkOptions?: CheckOptions): Promise<CheckResult> {
-      const check = await createDummyCheck({checkOptions});
+      const check = await createDummyCheck({ checkOptions });
 
       let checkResultOrProgress;
       do {
@@ -249,7 +249,7 @@ describe('e2e - AcrolinxEndpoint', () => {
       const DEPARTMENT_KEY = 'Department';
 
       beforeEach(async () => {
-        const result = await api.signin({accessToken: ACROLINX_API_TOKEN}) as SigninSuccessResult;
+        const result = await api.signin({ accessToken: ACROLINX_API_TOKEN }) as SigninSuccessResult;
         user = await api.getUserData(ACROLINX_API_TOKEN, result.data.user.id);
       });
 
@@ -299,12 +299,12 @@ describe('e2e - AcrolinxEndpoint', () => {
 
       it('post notifications privilege validation', async () => {
         await expectFailingPromise<AcrolinxError>(api.postServerNotifications(ACROLINX_API_TOKEN, {
-            title: 'dummyTitle',
-            body: 'dummyBody',
-            start: Date.now(),
-            end: Date.now() + 1000 * 60
-          }), ErrorType.InsufficientPrivileges,
-          {method: 'POST', url: TEST_SERVER_URL + '/api/v1/broadcasts/platform-notifications/'});
+          title: 'dummyTitle',
+          body: 'dummyBody',
+          start: Date.now(),
+          end: Date.now() + 1000 * 60
+        }), ErrorType.InsufficientPrivileges,
+          { method: 'POST', url: TEST_SERVER_URL + '/api/v1/broadcasts/platform-notifications/' });
       });
     });
 
@@ -373,7 +373,7 @@ describe('e2e - AcrolinxEndpoint', () => {
       it('cancel needs correct auth token', async () => {
         const check = await createDummyCheck();
         await expectFailingPromise(api.cancelCheck('invalid token', check), ErrorType.Auth,
-          {method: 'DELETE', url: check.links.cancel});
+          { method: 'DELETE', url: check.links.cancel });
       });
 
       it.skip('exception if partialCheckRanges are invalid', async () => {
@@ -388,12 +388,12 @@ describe('e2e - AcrolinxEndpoint', () => {
       });
 
       it('exception GuidanceProfileDoesNotExist for unknown id', async () => {
-        await expectFailingPromise(checkAndWaitUntilFinished({guidanceProfileId: '12345-invalid'}),
+        await expectFailingPromise(checkAndWaitUntilFinished({ guidanceProfileId: '12345-invalid' }),
           ErrorType.GuidanceProfileDoesNotExist);
       });
 
       it('exception GuidanceProfileDoesNotExist for invalid uuid', async () => {
-        await expectFailingPromise(checkAndWaitUntilFinished({guidanceProfileId: 'invalid!uuid'}),
+        await expectFailingPromise(checkAndWaitUntilFinished({ guidanceProfileId: 'invalid!uuid' }),
           ErrorType.GuidanceProfileDoesNotExist);
       });
 
@@ -436,7 +436,7 @@ describe('e2e - AcrolinxEndpoint', () => {
       it('should return the check id even in case of some kind of errors', async () => {
         const checkProcess = api.checkAndGetResult(ACROLINX_API_TOKEN, await createDummyCheckRequest({
           content: '<tag>test</wrong>',
-          checkOptions: {contentFormat: 'XML'}
+          checkOptions: { contentFormat: 'XML' }
         }));
 
         await expectFailingPromise<AcrolinxError>(checkProcess.promise, ErrorType.CheckFailed);
@@ -467,14 +467,14 @@ describe('e2e - AcrolinxEndpoint', () => {
         const batchId = 'batch' + Date.now();
         await api.checkAndGetResult(ACROLINX_API_TOKEN, await createDummyCheckRequest({
           content: 'This text is nice.',
-          checkOptions: {batchId},
-          document: {reference: 'nice.txt'}
+          checkOptions: { batchId },
+          document: { reference: 'nice.txt' }
         })).promise;
 
         await api.checkAndGetResult(ACROLINX_API_TOKEN, await createDummyCheckRequest({
           content: 'Thiss textt iss stupidd',
-          checkOptions: {batchId},
-          document: {reference: 'stupid.txt'}
+          checkOptions: { batchId },
+          document: { reference: 'stupid.txt' }
         })).promise;
 
         const urlString = await api.getContentAnalysisDashboard(ACROLINX_API_TOKEN, batchId);
@@ -555,13 +555,13 @@ describe('e2e - AcrolinxEndpoint', () => {
 
         expect(offsets).toEqual({
           ranges: [{
-            original: {begin: 0, end: 1}, extracted: {begin: 0, end: 1}, changed: false
+            original: { begin: 0, end: 1 }, extracted: { begin: 0, end: 1 }, changed: false
           }, {
-            original: {begin: 4, end: 10}, extracted: {begin: 1, end: 2}, changed: true
+            original: { begin: 4, end: 10 }, extracted: { begin: 1, end: 2 }, changed: true
           }, {
-            original: {begin: 10, end: 11}, extracted: {begin: 2, end: 3}, changed: false
+            original: { begin: 10, end: 11 }, extracted: { begin: 2, end: 3 }, changed: false
           }, {
-            original: {begin: 15, end: 18}, extracted: {begin: 3, end: 6}, changed: false
+            original: { begin: 15, end: 18 }, extracted: { begin: 3, end: 6 }, changed: false
           }]
         });
       });
@@ -627,7 +627,7 @@ describe('e2e - AcrolinxEndpoint', () => {
       expect(tokenVerificationResult.user).toEqual(appTokenResult.user);
 
       const tokenVerificationResult2: SuccessResponse<AppAccessTokenValidationResult> =
-        await fetch(appTokenResult.validationRequest.url, {headers: appTokenResult.validationRequest.headers})
+        await fetch(appTokenResult.validationRequest.url, { headers: appTokenResult.validationRequest.headers })
           .then(r => r.json());
 
       expect(tokenVerificationResult2.data.user).toEqual(tokenVerificationResult.user);

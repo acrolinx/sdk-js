@@ -27,8 +27,7 @@ async function getCheckingCapabilitiesExample() {
   }
 
   const acrolinxEndpoint = new AcrolinxEndpoint({
-    ...EXAMPLE_ACROLINX_ENDPOINT_PROPS,
-    acrolinxUrl: 'http://localhost:3000'
+    ...EXAMPLE_ACROLINX_ENDPOINT_PROPS
   });
 
   const capabilities = await acrolinxEndpoint.getCheckingCapabilities(accessToken);

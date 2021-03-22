@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import {LanguageId} from './common-types';
+import { LanguageId } from './common-types';
 
 export type GoalId = string;
 export type GuidanceProfileId = string;
@@ -54,7 +54,7 @@ export interface Goal {
 
 export enum GoalScoring {
   required = 'required',
-  recommended= 'recommended',
+  recommended = 'recommended',
 }
 
 export interface TermSet {
@@ -87,6 +87,8 @@ export enum ReportType {
    * @Deprecated Use extractedText
    */
   request_text = 'extractedText',
+  linguisticDebugInfo = 'linguisticDebugInfo',
+  contentAnalysisDashboard = 'contentAnalysisDashboard'
 }
 
 export interface CheckingCapabilities {
