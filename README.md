@@ -61,6 +61,10 @@ acrolinxEndpoint.getPlatformInformation().then(info => {
 });
 ```
 
+## Contributing to this SDK
+
+See: [`CONTRIBUTING.md`](CONTRIBUTING.md)
+
 ## License
 
 Copyright 2018-present Acrolinx GmbH
