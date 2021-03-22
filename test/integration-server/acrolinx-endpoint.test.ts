@@ -153,7 +153,7 @@ describe('e2e - AcrolinxEndpoint', () => {
         username: SSO_USERNAME!,
       }
       ) as SigninSuccessResult;
-      expect(result.data.user.id).toContain(SSO_USERNAME);
+      expect(result.data.user.username).toContain(SSO_USERNAME);
     });
 
     it('signInWithSSO throws SSO Error', async () =>
