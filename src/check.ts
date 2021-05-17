@@ -20,7 +20,7 @@ import {
   ContentEncoding,
   ContentFormatId,
   Goal,
-  GoalId,
+  GoalId, GoalScoring,
   GuidanceProfileId,
   ReportType,
 } from './capabilities';
@@ -227,6 +227,12 @@ export interface CommonIssue {
    * Since Acrolinx platform 2021.2
    */
   issueType: IssueType;
+
+  /**
+   * Since Acrolinx platform 2021.4
+   * Only available if the server runs in Targets mode.
+   */
+  scoring?: GoalScoring
 }
 
 export interface PositionalInformation {
