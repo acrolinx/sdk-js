@@ -51,6 +51,7 @@ export interface AcrolinxErrorProps {
   type: string;
   httpRequest?: HttpRequest;
   status?: number;
+  responseHeaders?: Headers;
   reference?: string;
   validationDetails?: ValidationDetail[];
   cause?: Error;
@@ -85,6 +86,7 @@ export class AcrolinxError extends Error implements AcrolinxErrorProps {
   public readonly detail: string;
   public readonly httpRequest?: HttpRequest;
   public readonly status?: number;
+  public readonly responseHeaders?: Headers;
   public readonly reference?: string;
   public readonly cause?: Error;
   public readonly validationDetails?: ValidationDetail[];
@@ -95,6 +97,7 @@ export class AcrolinxError extends Error implements AcrolinxErrorProps {
     super(props.title);
     this.type = props.type;
     this.status = props.status;
+    this.responseHeaders = props.responseHeaders;
 
     // Copy only known props, to avoid accidental leaking of stuff.
     this.httpRequest = props.httpRequest ? {
@@ -120,6 +123,7 @@ export function createErrorFromFetchResponse(
     return new AcrolinxError({
       detail: jsonBody.detail || 'Unknown HTTP Error',
       status: jsonBody.status || res.status,
+      responseHeaders: res.headers,
       httpRequest: req,
       title: jsonBody.title || res.statusText,
       validationDetails: jsonBody.validationDetails,

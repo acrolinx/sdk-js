@@ -594,6 +594,16 @@ describe('e2e - AcrolinxEndpoint', () => {
           expect(error.detail).toEqual('JWT Token is not decodable.'); // This string might change, that's fine
         });
 
+        it('should return response headers in case of error', async () => {
+          const error = await expectFailingPromise<AcrolinxError>(
+            analyzeAndPollWithSignature('brokenAppSignature'),
+            ErrorType.AppSignatureRejected
+          );
+
+          expect(error.status).toEqual(403);
+          expect(error.responseHeaders).toBeDefined();
+        });
+
         it('should only work with signature type "APP"', async () => {
           /* tslint:disable-next-line:max-line-length*/
           const appSignatureWithInvalidType = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJuYW1lIjoiS2FqYSBBbm91ayBTdGFobCIsImlkIjoiNGVlZDM3NjctMGYzMS00ZDVmLWI2MjktYzg2MWFiM2VkODUyIiwidHlwZSI6IktBSkEiLCJpYXQiOjE1NjExODgyOTN9.XaCSr2piA0u-JZLjRlO4QtuhsRgDOuurbhsvTFmCv1w';
