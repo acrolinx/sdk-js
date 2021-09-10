@@ -49,4 +49,5 @@ jobs:
           npm -v
           npm ci
           echo ACROLINX_TEST_SERVER_URL $ACROLINX_TEST_SERVER_URL
-          script --return -c "npm run ci" /dev/null
+          # script --return -c "npm run ci" /dev/null
+          npm run ci
