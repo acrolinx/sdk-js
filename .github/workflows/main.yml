@@ -26,7 +26,7 @@ jobs:
     strategy:
       matrix:
         # , macos-latest, windows-latest
-        os: [ubuntu-latest]
+        os: [ubuntu-latest, macos-latest, windows-latest]
         # 12.x, , 15.x
         node: [14]
     env:
