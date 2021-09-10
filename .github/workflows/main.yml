@@ -1,0 +1,46 @@
+ name: CI Acrolinx sdk-js
+
+on:
+  # Triggers the workflow on push or pull request events but only for the master branch
+  push:
+    # TODO change to master
+    branches: [ build-migration ]
+    tags:
+      - 'v*'
+  pull_request:
+    # TODO change to master
+    branches: [ build-migration ]
+  schedule:
+    # TODO verify schedule
+  - cron: "0 2 * * *"
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest] # , macos-latest, windows-latest
+        node: [14.x] # , 15.x
+    env:
+      ACROLINX_API_TOKEN: ${{secrets.ACROLINX_API_TOKEN}}
+      ACROLINX_API_USERNAME: api-js-test-user
+      TEST_SERVER_URL: https://unstable.acrolinx.com
+
+    # TODO add timeout
+    # TODO Provide Node & npm bin/ folder to PATH
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Test sdk-js-matrix
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node }}
+      - run: |
+          node -v
+          npm -v
+          npm ci
+          echo ACROLINX_TEST_SERVER_URL $ACROLINX_TEST_SERVER_URL
+          script --return -c "npm run ci" /dev/null
