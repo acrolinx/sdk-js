@@ -5,12 +5,14 @@ on:
   # but only for the master branch
   push:
     # master
-    branches: [ build-migration ]
+    branches:
+      - build-migration
     # tags:
     #   - 'v*'
   pull_request:
     # master
-    branches: [ build-migration ]
+    branches:
+      - build-migration
   schedule:
     # TODO verify schedule
     - cron: "0 2 * * *"
