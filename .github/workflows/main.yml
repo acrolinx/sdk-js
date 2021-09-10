@@ -51,5 +51,3 @@ jobs:
           echo ACROLINX_TEST_SERVER_URL $ACROLINX_TEST_SERVER_URL
           # removed the test coverage which is currently failing
           npm run build && npm run lint && npm run test && npm run testMarkdown
-          # script --return -c "npm run ci" /dev/null
-          # npm run ci
