@@ -4,8 +4,8 @@ on:
   # Triggers the workflow on push or pull request events but only for the master branch
   push:
     branches: [ build-migration ] # master
-    tags:
-      - 'v*'
+    # tags:
+    #   - 'v*'
   pull_request:
     branches: [ build-migration ] # master
   schedule:
