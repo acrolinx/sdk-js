@@ -32,7 +32,7 @@ jobs:
     env:
       ACROLINX_API_TOKEN: ${{secrets.ACROLINX_API_TOKEN}}
       ACROLINX_API_USERNAME: api-js-test-user
-      ACROLINX_TEST_SERVER_URL: https://unstable.acrolinx.com
+      TEST_SERVER_URL: https://unstable.acrolinx.com
 
     # TODO add timeout
     # TODO Provide Node & npm bin/ folder to PATH
