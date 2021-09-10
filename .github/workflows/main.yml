@@ -3,13 +3,11 @@
 on:
   # Triggers the workflow on push or pull request events but only for the master branch
   push:
-    # TODO change to master
-    branches: [ build-migration ]
+    branches: [ build-migration ] # master
     tags:
       - 'v*'
   pull_request:
-    # TODO change to master
-    branches: [ build-migration ]
+    branches: [ build-migration ] # master
   schedule:
     # TODO verify schedule
   - cron: "0 2 * * *"
