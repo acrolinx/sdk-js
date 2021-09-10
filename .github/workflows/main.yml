@@ -1,15 +1,15 @@
 name: CI Acrolinx sdk-js
 
 on:
+  # Triggers the workflow on push or pull request events
+  # but only for the master branch
   push:
     branches:
       - build-migration
+      # tags:
+      #   - 'v*'
 
-# Triggers the workflow on push or pull request events
-# but only for the master branch
 # set to master branch
-#   # tags:
-#   #   - 'v*'
 # pull_request:
 #   # master
 #   branches:
