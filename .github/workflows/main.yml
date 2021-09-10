@@ -27,8 +27,8 @@ jobs:
       matrix:
         # , macos-latest, windows-latest
         os: [ubuntu-latest]
-        # 14.x, 15.x
-        node: [12.x]
+        # 12.x, , 15.x
+        node: [14.x]
     env:
       ACROLINX_API_TOKEN: ${{secrets.ACROLINX_API_TOKEN}}
       ACROLINX_API_USERNAME: api-js-test-user
@@ -49,5 +49,6 @@ jobs:
           npm -v
           npm ci
           echo ACROLINX_TEST_SERVER_URL $ACROLINX_TEST_SERVER_URL
-          # removed the test coverage which is currently failing
-          npm run build && npm run lint && npm run test && npm run testMarkdown
+          # without test coverage which is currently failing
+          # npm run build && npm run lint && npm run test && npm run testMarkdown
+          npm run ci
