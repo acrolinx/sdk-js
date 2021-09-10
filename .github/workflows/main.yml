@@ -30,10 +30,12 @@ jobs:
         # 12.x, , 15.x
         node: [12]
     env:
-      ACROLINX_API_TOKEN: ${{secrets.ACROLINX_API_TOKEN}}
       # ACROLINX_API_USERNAME: api-js-test-user
       # TEST_SERVER_URL: https://unstable.acrolinx.com
       ACROLINX_API_USERNAME: samir.sekkat@acrolinx.com
+      ACROLINX_API_TOKEN: ${{secrets.ACROLINX_API_TOKEN}}
+      SSO_USERNAME: samir.sekkat@acrolinx.com
+      SSO_GENERIC_TOKEN: ${{secrets.SSO_GENERIC_TOKEN}}
       TEST_SERVER_URL: https://stable.acrolinx.com
 
     # TODO add timeout
