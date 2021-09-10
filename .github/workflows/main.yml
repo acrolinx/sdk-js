@@ -49,7 +49,7 @@ jobs:
           npm -v
           npm ci
           echo ACROLINX_TEST_SERVER_URL $ACROLINX_TEST_SERVER_URL
-          # npm run build && npm run lint && npm run testCoverage && npm run testMarkdown
-          npm run build && npm run lint && npm run testMarkdown
+          # removed the test coverage which is currently failing
+          npm run build && npm run lint && npm run test && npm run testMarkdown
           # script --return -c "npm run ci" /dev/null
-          # npm run ci && echo npm run ci ended with successful exit code
+          # npm run ci
