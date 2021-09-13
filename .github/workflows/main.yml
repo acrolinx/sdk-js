@@ -37,19 +37,21 @@ jobs:
       ACROLINX_API_TOKEN: ${{secrets.ACROLINX_API_TOKEN}}
       SSO_USERNAME: sdk-js-github-ci-tests
       SSO_GENERIC_TOKEN: ${{secrets.SSO_GENERIC_TOKEN}}
-      TEST_SERVER_URL: https://k3s-load-testing.acrolinx-repohosting.acrolinx.sh
+      TEST_SERVER_URL: https://test-ssl.acrolinx.com
 
     # TODO add timeout
     # TODO Provide Node & npm bin/ folder to PATH
     steps:
-      - uses: actions/checkout@v2
+      - name: checkout the code
+        uses: actions/checkout@v2
 
-      - name: Test sdk-js-matrix
+      - name: setup node.js
         uses: actions/setup-node@v2
         with:
           node-version: ${{ matrix.node }}
 
-      - run: |
+      - name: run the CI tests
+        run: |
           node -v
           npm -v
           npm ci
