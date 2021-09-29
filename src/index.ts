@@ -56,7 +56,7 @@ import {
 } from './common-types';
 import {AddToDictionaryRequest, AddToDictionaryResponse, DictionaryCapabilities} from './dictionary';
 import {DocumentDescriptor, DocumentId, sanitizeDocumentDescriptor} from './document-descriptor';
-import {AcrolinxError, CheckCanceledByClientError, ErrorType, wrapFetchError} from './errors';
+import {AcrolinxError, CheckCancelledByClientError, ErrorType, wrapFetchError} from './errors';
 import {AnalysisRequest, ExtractionResult} from './extraction';
 import {PlatformFeatures, PlatformFeaturesResponse} from './features';
 import {
@@ -93,7 +93,7 @@ export {
   AcrolinxError,
   AccessToken,
   CheckingCapabilities,
-  CheckCanceledByClientError,
+  CheckCancelledByClientError,
   CancelCheckResponse,
   GuidanceProfile,
   ErrorType,
@@ -456,8 +456,8 @@ export class AcrolinxEndpoint {
     asyncStartedProcessPromise: Promise<AsyncStartedProcess>,
     opts: CancelablePollLoopOptions = {}
   ): CancelablePromiseWrapper<Result> {
-    let canceledByClient = false;
-    let requestedCanceledOnServer = false;
+    let cancelledByClient = false;
+    let requestedCancelledOnServer = false;
     let runningCheck: AsyncStartedProcess | undefined;
 
     let cancelPromiseReject: (e: Error) => void;
@@ -466,23 +466,23 @@ export class AcrolinxEndpoint {
     });
 
     function cancel() {
-      canceledByClient = true;
-      cancelPromiseReject(createCheckCanceledByClientError());
+      cancelledByClient = true;
+      cancelPromiseReject(createCheckCancelledByClientError());
       cancelOnServerIfPossibleAndStillNeeded();
     }
 
     const handlePotentialCancellation = () => {
-      if (canceledByClient) {
+      if (cancelledByClient) {
         cancelOnServerIfPossibleAndStillNeeded();
         // We don't want to poll forever if the canceling does not work on the server.
         // To be consistent we throw the same exception, that the server would throw while polling.
-        throw createCheckCanceledByClientError();
+        throw createCheckCancelledByClientError();
       }
     };
 
     const cancelOnServerIfPossibleAndStillNeeded = () => {
-      if (!requestedCanceledOnServer && runningCheck) {
-        requestedCanceledOnServer = true;
+      if (!requestedCancelledOnServer && runningCheck) {
+        requestedCancelledOnServer = true;
         // eslint-disable-next-line @typescript-eslint/no-floating-promises
         this.cancelAsyncStartedProcess(accessToken, runningCheck, opts);
       }
@@ -636,11 +636,11 @@ function getSigninRequestHeaders(options: SigninOptions = {}): StringMap {
   }
 }
 
-function createCheckCanceledByClientError() {
-  return new CheckCanceledByClientError({
-    detail: 'The check was canceled. No result is available.',
-    type: ErrorType.CheckCanceled,
-    title: 'Check canceled',
+function createCheckCancelledByClientError() {
+  return new CheckCancelledByClientError({
+    detail: 'The check was cancelled. No result is available.',
+    type: ErrorType.CheckCancelled,
+    title: 'Check cancelled',
     status: 400
   });
 }

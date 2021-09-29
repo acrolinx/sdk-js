@@ -33,7 +33,7 @@ export enum ErrorType {
   SSO = 'sso',
   NotFound = 'not_found',
   SigninTimedOut = 'interactiveSignInTimedOut',
-  CheckCanceled = 'checkCanceled',
+  CheckCancelled = 'checkCancelled',
   CheckFailed = 'checkFailed',
   CustomFieldsIncorrect = 'customFieldsIncorrect',
   Validation = 'validation',
@@ -153,10 +153,10 @@ export function wrapFetchError(httpRequest: HttpRequest, error: Error): Promise<
   });
 }
 
-export class CheckCanceledByClientError extends AcrolinxError {
+export class CheckCancelledByClientError extends AcrolinxError {
   constructor(props: AcrolinxErrorProps) {
     super(props);
-    setCorrectErrorPrototype(this, CheckCanceledByClientError);
+    setCorrectErrorPrototype(this, CheckCancelledByClientError);
   }
 }
 
