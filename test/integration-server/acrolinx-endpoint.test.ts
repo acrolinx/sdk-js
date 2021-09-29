@@ -21,7 +21,7 @@ import * as _ from 'lodash';
 import {
   AnalysisType,
   AppAccessTokenValidationResult,
-  CheckCancelledByClientError,
+  CheckCanceledByClientError,
   CheckRequest,
   CheckResult,
   CustomFieldType,
@@ -367,7 +367,7 @@ describe('e2e - AcrolinxEndpoint', () => {
         // According to Heiko, cancelling may need some time. (See also DEV-17377)
         await waitMs(1000);
 
-        await expectFailingPromise(api.pollForCheckResult(ACROLINX_API_TOKEN, check), ErrorType.CheckCancelled);
+        await expectFailingPromise(api.pollForCheckResult(ACROLINX_API_TOKEN, check), ErrorType.CheckCanceled);
       });
 
       it('cancel needs correct auth token', async () => {
@@ -444,13 +444,13 @@ describe('e2e - AcrolinxEndpoint', () => {
       });
 
 
-      it('can be cancelled', async () => {
+      it('can be canceled', async () => {
         const currentCheck = api.checkAndGetResult(ACROLINX_API_TOKEN, await createDummyCheckRequest());
 
         currentCheck.cancel();
 
-        const error = await expectFailingPromise<AcrolinxError>(currentCheck.promise, ErrorType.CheckCancelled);
-        expect(error).toBeInstanceOf(CheckCancelledByClientError);
+        const error = await expectFailingPromise<AcrolinxError>(currentCheck.promise, ErrorType.CheckCanceled);
+        expect(error).toBeInstanceOf(CheckCanceledByClientError);
       });
     });
 
