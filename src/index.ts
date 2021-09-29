@@ -56,7 +56,7 @@ import {
 } from './common-types';
 import {AddToDictionaryRequest, AddToDictionaryResponse, DictionaryCapabilities} from './dictionary';
 import {DocumentDescriptor, DocumentId, sanitizeDocumentDescriptor} from './document-descriptor';
-import {AcrolinxError, CheckCancelledByClientError, ErrorType, wrapFetchError} from './errors';
+import {AcrolinxError, CheckCanceledByClientError, ErrorType, wrapFetchError} from './errors';
 import {AnalysisRequest, ExtractionResult} from './extraction';
 import {PlatformFeatures, PlatformFeaturesResponse} from './features';
 import {
@@ -93,7 +93,7 @@ export {
   AcrolinxError,
   AccessToken,
   CheckingCapabilities,
-  CheckCancelledByClientError,
+  CheckCanceledByClientError,
   CancelCheckResponse,
   GuidanceProfile,
   ErrorType,
@@ -637,9 +637,9 @@ function getSigninRequestHeaders(options: SigninOptions = {}): StringMap {
 }
 
 function createCheckCanceledByClientError() {
-  return new CheckCancelledByClientError({
+  return new CheckCanceledByClientError({
     detail: 'The check was canceled. No result is available.',
-    type: ErrorType.CheckCancelled,
+    type: ErrorType.CheckCanceled,
     title: 'Check canceled',
     status: 400
   });
