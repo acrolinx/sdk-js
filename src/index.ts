@@ -638,9 +638,9 @@ function getSigninRequestHeaders(options: SigninOptions = {}): StringMap {
 
 function createCheckCanceledByClientError() {
   return new CheckCancelledByClientError({
-    detail: 'The check was cancelled. No result is available.',
+    detail: 'The check was canceled. No result is available.',
     type: ErrorType.CheckCancelled,
-    title: 'Check cancelled',
+    title: 'Check canceled',
     status: 400
   });
 }

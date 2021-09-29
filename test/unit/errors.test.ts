@@ -61,9 +61,9 @@ describe('errors', () => {
     // Needed because of https://github.com/Microsoft/TypeScript/wiki/Breaking-Changes#extending-built-ins-like-error-array-and-map-may-no-longer-work
     it('CheckCancelledByClientError should support instanceof', () => {
       const error = new CheckCancelledByClientError({
-        detail: 'The check was cancelled. No result is available.',
-        type: ErrorType.CheckCancelled,
-        title: 'Check cancelled',
+        detail: 'The check was canceled. No result is available.',
+        type: ErrorType.CheckCanceled,
+        title: 'Check canceled',
         status: 400
       });
       expect(error).toBeInstanceOf(CheckCancelledByClientError);

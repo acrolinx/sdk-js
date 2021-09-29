@@ -444,7 +444,7 @@ describe('e2e - AcrolinxEndpoint', () => {
       });
 
 
-      it('can be cancelled', async () => {
+      it('can be canceled', async () => {
         const currentCheck = api.checkAndGetResult(ACROLINX_API_TOKEN, await createDummyCheckRequest());
 
         currentCheck.cancel();
