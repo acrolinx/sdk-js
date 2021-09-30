@@ -33,7 +33,7 @@ export enum ErrorType {
   SSO = 'sso',
   NotFound = 'not_found',
   SigninTimedOut = 'interactiveSignInTimedOut',
-  CheckCanceled = 'checkCanceled',
+  CheckCanceled = 'checkCancelled',
   CheckFailed = 'checkFailed',
   CustomFieldsIncorrect = 'customFieldsIncorrect',
   Validation = 'validation',
