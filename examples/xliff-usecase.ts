@@ -26,7 +26,7 @@ function waitMs(ms: number) {
 }
 
 
-async function checkExample() {
+async function xliffExample() {
   const acrolinxAddress = process.argv[2];
   const accessToken = process.argv[3];
   const xliffDocument = process.argv[4];
@@ -93,6 +93,6 @@ async function checkExample() {
 
 }
 
-checkExample().catch(error => {
+xliffExample().catch(error => {
   console.error(error);
 });
