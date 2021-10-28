@@ -61,6 +61,18 @@ acrolinxEndpoint.getPlatformInformation().then(info => {
 });
 ```
 
+#### Running Samples
+
+See package.json for script starting with name `runExample` eg: `runExampleXliff`
+
+Look at the script if they require to set any environment varaibles and create a document
+
+example: For running script `runExampleXliff` you need to set $ACROLINX_URL, $ACROLINX_TOKEN and a .xlf file.
+Set them to Acrolinx platform URL and Acrolinx Access Token respectively.
+Place the .xlf file in directory and rename it to sample.xlf `testdocs/sample.xlf`
+
+Run script `npm run runExampleXliff`
+
 ## Contributing to this SDK
 
 See: [`CONTRIBUTING.md`](CONTRIBUTING.md)
