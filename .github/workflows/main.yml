@@ -35,7 +35,7 @@ jobs:
       # ACROLINX_API_USERNAME: sdk-js-github-ci-tests
       # Using a different secret name for the URL to harmonize secrets
       # between integrations
-      TEST_SERVER_URL:       ${{ secrets.ACROLINX_URL }}
+      TEST_SERVER_URL:       ${{ secrets.TEST_SERVER_URL }}
       ACROLINX_API_USERNAME: ${{ secrets.ACROLINX_API_USERNAME }}
       ACROLINX_API_TOKEN:    ${{ secrets.ACROLINX_API_TOKEN }}
       SSO_GENERIC_TOKEN:     ${{ secrets.ACROLINX_API_SSO_TOKEN }}
