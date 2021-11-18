@@ -36,6 +36,8 @@ jobs:
 
       # Using a different secret name for the URL to harmonize secrets
       # between integrations
+
+      # TODO Are these env variables used or directly the secrets env?
       TEST_SERVER_URL:       ${{ secrets.TEST_SERVER_URL }}
       ACROLINX_API_USERNAME: ${{ secrets.ACROLINX_API_USERNAME }}
       ACROLINX_API_TOKEN:    ${{ secrets.ACROLINX_API_TOKEN }}
