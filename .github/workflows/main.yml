@@ -33,6 +33,7 @@ jobs:
       # ACROLINX_API_USERNAME: api-js-test-user
       # TEST_SERVER_URL: https://unstable.acrolinx.com
       # ACROLINX_API_USERNAME: sdk-js-github-ci-tests
+
       # Using a different secret name for the URL to harmonize secrets
       # between integrations
       TEST_SERVER_URL:       ${{ secrets.TEST_SERVER_URL }}
