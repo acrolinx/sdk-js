@@ -33,11 +33,13 @@ jobs:
       # ACROLINX_API_USERNAME: api-js-test-user
       # TEST_SERVER_URL: https://unstable.acrolinx.com
       # ACROLINX_API_USERNAME: sdk-js-github-ci-tests
-      ACROLINX_API_USERNAME: samir.sekkat@acrolinx.com
-      ACROLINX_API_TOKEN: ${{secrets.ACROLINX_API_TOKEN}}
-      SSO_USERNAME: sdk-js-github-ci-tests
-      SSO_GENERIC_TOKEN: ${{secrets.SSO_GENERIC_TOKEN}}
-      TEST_SERVER_URL: https://test-ssl.acrolinx.com
+      # Using a different secret name for the URL to harmonize secrets
+      # between integrations
+      TEST_SERVER_URL:       ${{ secrets.ACROLINX_URL }}
+      ACROLINX_API_USERNAME: ${{ secrets.ACROLINX_API_USERNAME }}
+      ACROLINX_API_TOKEN:    ${{ secrets.ACROLINX_API_TOKEN}}
+      SSO_GENERIC_TOKEN:     ${{ secrets.ACROLINX_API_SSO_TOKEN }}
+      SSO_USERNAME:          sdk-js-github-ci-tests
 
     # TODO add timeout
     # TODO Provide Node & npm bin/ folder to PATH
