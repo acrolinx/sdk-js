@@ -30,10 +30,6 @@ jobs:
         # 12.x, , 15.x
         node: [12]
     env:
-      # ACROLINX_API_USERNAME: api-js-test-user
-      # TEST_SERVER_URL: https://unstable.acrolinx.com
-      # ACROLINX_API_USERNAME: sdk-js-github-ci-tests
-
       # Using a different secret name for the URL to harmonize secrets
       # between integrations
 
