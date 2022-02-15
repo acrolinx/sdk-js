@@ -365,7 +365,7 @@ describe('e2e - AcrolinxEndpoint', () => {
         expect(cancelResponse.data.id).toBe(check.data.id);
 
         // According to Heiko, cancelling may need some time. (See also DEV-17377)
-        await waitMs(1000);
+        // await waitMs(1000);
 
         await expectFailingPromise(api.pollForCheckResult(ACROLINX_API_TOKEN, check), ErrorType.CheckCancelled);
       });
