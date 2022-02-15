@@ -2,21 +2,19 @@ name: Build and Deploy
 
 on:
   push:
-    branches:
-      - build-migration
-      # tags:
-      #   - 'v*'
-
-# set to master branch
-# pull_request:
-#   # master
-#   branches:
-#     - build-migration
-# schedule:
-#   # TODO verify schedule
-#   - cron: "0 2 * * *"
-# # Allows you to run this workflow manually from the Actions tab
-# # workflow_dispatch:
+    branches: [build-migration]
+    tags:
+      - "v*.*.*"
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: "0 2 * * *" # Everyday at 2:00AM
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: "Trigger Comment (Optional)"
+        required: false
+        default: "Manual Workflow Run"
 
 jobs:
   build:
@@ -36,10 +34,10 @@ jobs:
     # TODO add timeout
     # TODO Provide Node & npm bin/ folder to PATH
     steps:
-      - name: checkout the code
+      - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: setup node.js
+      - name: Setup Node.JS
         uses: actions/setup-node@v2
         with:
           node-version: 14
@@ -48,3 +46,48 @@ jobs:
         run: |
           npm ci
           npm run ci
+          npm run docs
+
+      - name: Setup SonarCloud Scan
+        uses: sonarsource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONARCLOUD_TOKEN }}
+      
+      - name: Setup and Audit Source Code    
+        run: |
+          npm ci
+          npm audit --production --audit-level=moderate
+      
+      - name: Check For Suitable Licenses
+        run: |
+         export v=`node -p "require('./package.json').version"`
+         export n=`node -p "require('./package.json').name"`
+         npx license-checker --production --onlyAllow 'BSD;CC-PDDC;CC-BY-3.0;CC-BY-1.0;CC-BY-2.0;CC-BY-4.0;CC0-1.0;Apache;Artistic;MIT;MPL;ISC;Unlicense' --excludePackages "$n@$v$LICENSE_EXCLUDED_PACKAGES" --excludePrivatePackages
+      
+      - name: Archive Artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: dist
+          path: |
+            dist/**/*
+            tmp/reports/coverage/**/cobertura-coverage.xml
+
+      # - name: Publish To NPM
+      #   id: publish
+      #   uses: JS-DevTools/npm-publish@v1
+      #   with:
+      #     token: ${{ secrets.NPM_ACCESS_TOKEN }}
+      
+      # - name: Push Tag
+      #   uses: anothrNick/github-tag-action@1.36.0
+      #   if: steps.publish.outputs.type != 'none'
+      #   env:
+      #     CUSTOM_TAG: v${{ steps.publish.outputs.version }}
+      
+      # - name: Publish GitHub Pages 🚀
+      #   if: steps.publish.outputs.type != 'none'
+      #   uses: JamesIves/github-pages-deploy-action@4.1.5
+      #   with:
+      #     branch: gh-pages
+      #     folder: docs

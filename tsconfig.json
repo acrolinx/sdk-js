@@ -29,5 +29,13 @@
   "exclude": [
     "node_modules",
     "dist"
-  ]
+  ],
+  "typedocOptions": {
+    "theme": "default",
+    "readme": "none",
+    "excludePrivate": true,
+    "excludeProtected": true,
+    "excludeExternals": true,
+    "out": "./docs/pluginDoc/",
+  }
 }
