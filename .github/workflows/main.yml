@@ -1,8 +1,6 @@
-name: CI Acrolinx sdk-js
+name: Build and Deploy
 
 on:
-  # Triggers the workflow on push or pull request events
-  # but only for the master branch
   push:
     branches:
       - build-migration
@@ -21,14 +19,8 @@ on:
 # # workflow_dispatch:
 
 jobs:
-  test:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        # , macos-latest, windows-latest
-        os: [ubuntu-latest]
-        # 12.x, , 15.x
-        node: [12]
+  build:
+    runs-on: ubuntu-latest
     env:
       # Using a different secret name for the URL to harmonize secrets
       # between integrations
@@ -39,7 +31,7 @@ jobs:
       ACROLINX_API_USERNAME: ${{ secrets.ACROLINX_API_USERNAME }}
       ACROLINX_API_TOKEN:    ${{ secrets.ACROLINX_API_TOKEN }}
       SSO_GENERIC_TOKEN:     ${{ secrets.SSO_GENERIC_TOKEN }}
-      SSO_USERNAME:          sdk-js-github-ci-tests
+      SSO_USERNAME:          ${{ secrets.SSO_USERNAME }}
 
     # TODO add timeout
     # TODO Provide Node & npm bin/ folder to PATH
@@ -50,14 +42,9 @@ jobs:
       - name: setup node.js
         uses: actions/setup-node@v2
         with:
-          node-version: ${{ matrix.node }}
+          node-version: 14
 
-      - name: run the CI tests
+      - name: Build And Run Tests
         run: |
-          node -v
-          npm -v
           npm ci
-          echo TEST_SERVER_URL $TEST_SERVER_URL
-          # without test coverage which is currently failing
-          # npm run build && npm run lint && npm run test && npm run testMarkdown
           npm run ci
