@@ -43,7 +43,7 @@ import { DocumentDescriptor } from '../../src/document-descriptor';
 import { AcrolinxError, ValidationDetail } from '../../src/errors';
 import { AcrolinxEndpoint, isSigninSuccessResult, SigninSuccessResult } from '../../src/index';
 import { SigninLinksResult } from '../../src/signin';
-import { waitMs } from '../../src/utils/mixed-utils';
+// import { waitMs } from '../../src/utils/mixed-utils';
 import * as checkResultSchema from '../schemas/check-result.json';
 import * as termHarvestingReportSchema from '../schemas/term-harvesting-report.json';
 import { describeIf, expectFailingPromise, testIf } from '../test-utils/utils';
