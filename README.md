@@ -1,5 +1,4 @@
 # Acrolinx JavaScript SDK
-https://github.com/acrolinx/sdk-js/actions/workflows/main.yml/badge.svg
 
 [![Build](https://github.com/acrolinx/sdk-js/actions/workflows/main.yml/badge.svg)](https://github.com/acrolinx/sdk-js/actions/workflows/main.yml)
 
