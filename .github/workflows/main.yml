@@ -2,9 +2,7 @@ name: Build and Deploy
 
 on:
   push:
-    branches: [build-migration]
-    tags:
-      - "v*.*.*"
+    branches: [main]
   pull_request:
     branches: [main]
   schedule:
