@@ -1,6 +1,7 @@
 # Acrolinx JavaScript SDK
 
 [![Build](https://github.com/acrolinx/sdk-js/actions/workflows/main.yml/badge.svg)](https://github.com/acrolinx/sdk-js/actions/workflows/main.yml)
+[![Matrix](https://github.com/acrolinx/sdk-js/actions/workflows/matrix.yml/badge.svg)](https://github.com/acrolinx/sdk-js/actions/workflows/matrix.yml)
 
 This library is meant to be used to interact with the [Acrolinx](https://www.acrolinx.com/) Platform API in JavaScript integrations.
 It does NOT offer an interface to work with the Acrolinx Sidebar (see [Sidebar JavaScript SDK](https://github.com/acrolinx/sidebar-sdk-js)).
