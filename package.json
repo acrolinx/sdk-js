@@ -37,7 +37,7 @@
     "tscWatch": "tsc -w",
     "lint": "eslint . --ext .ts",
     "lintFix": "eslint . --ext .ts --fix",
-    "docs": "typedoc --mode file --out docs src"
+    "docs": "typedoc --out ./docs/pluginDoc/ src/"
   },
   "devDependencies": {
     "@types/co-body": "^5.1.0",

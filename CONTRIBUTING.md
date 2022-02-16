@@ -18,7 +18,7 @@
 3. Please add new features using the `master` branch, or submit a pull request. To install dependencies, build, and test the project, run:
 
      ```bash
-    npm i
+    npm ci
     npm run ci
     ```
 
