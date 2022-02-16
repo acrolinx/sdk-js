@@ -47,12 +47,6 @@ jobs:
           npm ci
           npm run ci
           npm run docs
-
-      - name: Setup SonarCloud Scan
-        uses: sonarsource/sonarcloud-github-action@master
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SONAR_TOKEN: ${{ secrets.SONARCLOUD_TOKEN }}
       
       - name: Setup and Audit Source Code    
         run: |
