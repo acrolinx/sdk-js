@@ -15,7 +15,7 @@
     ACROLINX_API_USERNAME|Username to sign in to Acrolinx Platform|
     </br>
 
-3. Please add new features using the `master` branch, or submit a pull request. To install dependencies, build, and test the project, run:
+3. Please add new features using the `main` branch, or submit a pull request. To install dependencies, build, and test the project, run:
 
      ```bash
     npm ci
