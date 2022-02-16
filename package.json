@@ -9,7 +9,7 @@
   "main": "dist/src/index.js",
   "types": "dist/src/index.d.ts",
   "engines": {
-    "node": ">=8.9.4"
+    "node": ">=14.0.0"
   },
   "scripts": {
     "ci": "npm run build && npm run lint && npm run testCoverage && npm run testMarkdown",
