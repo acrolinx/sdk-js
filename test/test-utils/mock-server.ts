@@ -202,7 +202,7 @@ export class AcrolinxServerMock {
 
     console.log(`FakeServer can not handle url "${url}"`, opts);
     return this.createAcrolinxApiErrorResponse({status: 404});
-  }
+  };
 
   public deleteSigninPollUrl(url: string) {
     const signinId = url.substr(url.lastIndexOf('/') + 1);
