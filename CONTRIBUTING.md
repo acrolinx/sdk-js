@@ -29,3 +29,12 @@
     ```bash
     npm run test
     ```
+
+## Releasing
+
+Update version in package.json and push. Actions workflow will do the following:
+
+1. Build and Test
+2. Publish to NPM
+3. Push a tag
+4. Publish docs to GitHub pages
