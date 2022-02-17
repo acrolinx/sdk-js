@@ -48,6 +48,7 @@ export interface ExternalContent {
   textReplacements?: ExternalContentField[];
   entities?: ExternalContentField[];
   ditaReferences?: ExternalContentField[];
+  xincludeReferences? : ExternalContentField[];
 }
 
 export interface CheckRequest {
