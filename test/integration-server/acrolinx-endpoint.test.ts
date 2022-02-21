@@ -358,6 +358,33 @@ describe('e2e - AcrolinxEndpoint', () => {
         expect(checkResult.goals.length).toBeGreaterThan(0);
       }, 10000);
 
+      it('can check with xinclude external content set', async () => {
+        const text =
+        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+        "<book xmlns:xi=\"http://www.w3.org/2001/XInclude\">" +
+        "<title>Subject Books</title>" +
+        "<xi:include href=\"math.xml\"/>" +
+        "<xi:include href=\"spanish.xml\"/>" +
+        "</book>";
+        const checkResult = await checkAndWaitForResult({
+          content: text,
+          document: {
+            reference: 'subjects.xml'
+          },
+          externalContent: {
+            xincludeReferences: [{
+              id: 'math.xml',
+              content: "<?xml version=\"1.0\" encoding=\"UTF-8\"?><math><title>Mathemaatics Grade 1</title></math>"
+            },
+            {
+              id: 'spanish.xml',
+              content: "<?xml version=\"1.0\" encoding=\"UTF-8\"?><spanish><title>Spaanish Grade 2</title></spanish>"
+            }]
+          }
+        });
+        expect(checkResult.goals.length).toBeGreaterThan(0);
+      }, 10000);
+
       it.skip('can cancel check', async () => {
         const check = await createDummyCheck();
 
