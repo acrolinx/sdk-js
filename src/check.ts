@@ -194,6 +194,22 @@ export interface Match {
   originalPart: string;
   originalBegin: number;
   originalEnd: number;
+  externalContentMatches?: ExternalContentMatch[];
+}
+
+export interface ExternalContentMatch {
+  id: string;
+  type: ExternalContentType;
+  originalBegin: number;
+  originalEnd: number;
+  externalContentMatches: ExternalContentMatch[]
+}
+
+export enum ExternalContentType {
+  entities = 'entities',
+  textReplacements = 'textReplacements',
+  ditaReferences = 'ditaReferences',
+  xincludeReferences = 'xincludeReferences'
 }
 
 export interface Suggestion {
