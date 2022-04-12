@@ -1,8 +1,8 @@
-name: Build and Deploy
+name: Build
 
 on:
   push:
-    branches: [main, DEV-29518]
+    branches: [DEV-29518]
   schedule:
     - cron: "0 2 * * *" # Everyday at 2:00AM
   workflow_dispatch:
@@ -64,22 +64,3 @@ jobs:
           path: |
             dist/**/*
             tmp/reports/coverage/**/cobertura-coverage.xml
-
-      - name: Publish To NPM
-        id: publish
-        uses: JS-DevTools/npm-publish@v1
-        with:
-          token: ${{ secrets.NPM_ACCESS_TOKEN }}
-      
-      - name: Push Tag
-        uses: anothrNick/github-tag-action@1.36.0
-        if: steps.publish.outputs.type != 'none'
-        env:
-          CUSTOM_TAG: v${{ steps.publish.outputs.version }}
-      
-      - name: Publish GitHub Pages 🚀
-        if: steps.publish.outputs.type != 'none'
-        uses: JamesIves/github-pages-deploy-action@4.1.5
-        with:
-          branch: gh-pages
-          folder: docs/pluginDoc
