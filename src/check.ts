@@ -199,17 +199,10 @@ export interface Match {
 
 export interface ExternalContentMatch {
   id: string;
-  type: ExternalContentType;
+  type: string;
   originalBegin: number;
   originalEnd: number;
-  externalContentMatches: ExternalContentMatch[]
-}
-
-export enum ExternalContentType {
-  entities = 'entities',
-  textReplacements = 'textReplacements',
-  ditaReferences = 'ditaReferences',
-  xincludeReferences = 'xincludeReferences'
+  externalContentMatches?: ExternalContentMatch[]
 }
 
 export interface Suggestion {
