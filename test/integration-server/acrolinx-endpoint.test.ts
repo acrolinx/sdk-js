@@ -50,10 +50,10 @@ import { describeIf, expectFailingPromise, testIf } from '../test-utils/utils';
 
 dotenv.config();
 
-const TEST_SERVER_URL = process.env.TEST_SERVER_URL; /* Add here your own test server URL */
+const TEST_SERVER_URL = process.env.TEST_SERVER_URL || ''; /* Add here your own test server URL */
 const SSO_USERNAME = process.env.SSO_USERNAME;
 const SSO_GENERIC_TOKEN = process.env.SSO_GENERIC_TOKEN;
-const ACROLINX_API_TOKEN = process.env.ACROLINX_API_TOKEN;
+const ACROLINX_API_TOKEN = process.env.ACROLINX_API_TOKEN || '';
 const ACROLINX_API_USERNAME = process.env.ACROLINX_API_USERNAME || 'api-js-test-user';
 
 const ajv = new Ajv({ allErrors: true });
