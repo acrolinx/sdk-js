@@ -1,6 +1,6 @@
 {
   "name": "@acrolinx/sdk",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "description": "Acrolinx JavaScript SDK for the Acrolinx API",
   "license": "Apache-2.0",
   "author": "Acrolinx",
