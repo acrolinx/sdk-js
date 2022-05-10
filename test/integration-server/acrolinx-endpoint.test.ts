@@ -50,7 +50,7 @@ import { describeIf, expectFailingPromise, testIf } from '../test-utils/utils';
 
 dotenv.config();
 
-const TEST_SERVER_URL = process.env.TEST_SERVER_URL || 'https://unstable.acrolinx.com';
+const TEST_SERVER_URL = process.env.TEST_SERVER_URL || ''; /* Add here your own test server URL */
 const SSO_USERNAME = process.env.SSO_USERNAME;
 const SSO_GENERIC_TOKEN = process.env.SSO_GENERIC_TOKEN;
 const ACROLINX_API_TOKEN = process.env.ACROLINX_API_TOKEN || '';

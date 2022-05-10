@@ -27,6 +27,7 @@ jobs:
       SSO_GENERIC_TOKEN:     ${{ secrets.SSO_GENERIC_TOKEN }}
       SSO_USERNAME:          ${{ secrets.SSO_USERNAME }}
       GITHUB_TOKEN:          ${{ secrets.GITHUB_TOKEN }}
+      ACROLINX_DEV_SIGNATURE: ${{ secrets.ACROLINX_DEV_SIGNATURE}}
 
     # TODO add timeout
     # TODO Provide Node & npm bin/ folder to PATH

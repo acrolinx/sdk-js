@@ -14,6 +14,7 @@ jobs:
       ACROLINX_API_TOKEN:    ${{ secrets.ACROLINX_API_TOKEN }}
       SSO_GENERIC_TOKEN:     ${{ secrets.SSO_GENERIC_TOKEN }}
       SSO_USERNAME:          ${{ secrets.SSO_USERNAME }}
+      ACROLINX_DEV_SIGNATURE: ${{ secrets.ACROLINX_DEV_SIGNATURE}}
 
     strategy:
       matrix:

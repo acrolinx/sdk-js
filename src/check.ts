@@ -194,6 +194,15 @@ export interface Match {
   originalPart: string;
   originalBegin: number;
   originalEnd: number;
+  externalContentMatches?: ExternalContentMatch[];
+}
+
+export interface ExternalContentMatch {
+  id: string;
+  type: string;
+  originalBegin: number;
+  originalEnd: number;
+  externalContentMatches?: ExternalContentMatch[]
 }
 
 export interface Suggestion {
