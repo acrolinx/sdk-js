@@ -16,7 +16,7 @@
 
 import {DEVELOPMENT_SIGNATURE} from '../../src';
 import {AcrolinxEndpoint} from '../../src/index';
-import {ACROLINX_DEV_SIGNATURE} from '../integration-server/acrolinx-endpoint.test'
+import {ACROLINX_DEV_SIGNATURE} from '../integration-server/acrolinx-endpoint.test';
 
 function createEndpoint(acrolinxUrl: string) {
   return new AcrolinxEndpoint({
