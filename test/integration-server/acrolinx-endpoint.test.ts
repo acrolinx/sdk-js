@@ -55,6 +55,7 @@ const SSO_USERNAME = process.env.SSO_USERNAME;
 const SSO_GENERIC_TOKEN = process.env.SSO_GENERIC_TOKEN;
 const ACROLINX_API_TOKEN = process.env.ACROLINX_API_TOKEN || '';
 const ACROLINX_API_USERNAME = process.env.ACROLINX_API_USERNAME || 'api-js-test-user';
+export const ACROLINX_DEV_SIGNATURE = process.env.ACROLINX_DEV_SIGNATURE;
 
 const ajv = new Ajv({ allErrors: true });
 
@@ -63,7 +64,7 @@ function createEndpoint(acrolinxUrl: string) {
     acrolinxUrl,
     enableHttpLogging: true,
     client: {
-      signature: DEVELOPMENT_SIGNATURE,
+      signature: ACROLINX_DEV_SIGNATURE || DEVELOPMENT_SIGNATURE,
       version: '1.2.3.666'
     }
   });
