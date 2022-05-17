@@ -64,7 +64,7 @@ function createEndpoint(acrolinxUrl: string) {
     acrolinxUrl,
     enableHttpLogging: true,
     client: {
-      signature: DEVELOPMENT_SIGNATURE || ACROLINX_DEV_SIGNATURE,
+      signature: ACROLINX_DEV_SIGNATURE || DEVELOPMENT_SIGNATURE,
       version: '1.2.3.666'
     }
   });
