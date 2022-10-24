@@ -59,6 +59,22 @@ export interface CheckRequest {
   externalContent?: ExternalContent;
 }
 
+export interface ReuseSearchRequest {
+  requestId: string
+  prefix: string;
+  targetId?: string,
+  language: string,
+}
+
+export interface ReuseSuggestion {
+  preferredPhrase: string,
+  description: string
+}
+export interface ReuseSearchResponse {
+  requestId: string,
+  results: ReuseSuggestion[]
+}
+
 export interface CheckOptions {
   guidanceProfileId?: GuidanceProfileId;
   reportTypes?: ReportType[];

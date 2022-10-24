@@ -41,7 +41,9 @@ import {
   HasTermHarvestingReport,
   KeyValuePair,
   Report,
-  TermHarvestingReport
+  TermHarvestingReport,
+  ReuseSearchRequest,
+  ReuseSearchResponse
 } from './check';
 import {
   AccessToken,
@@ -302,6 +304,10 @@ export class AcrolinxEndpoint {
 
   public async check(accessToken: AccessToken, req: CheckRequest): Promise<CheckResponse> {
     return this.post<CheckResponse>('/api/v1/checking/checks', req, {}, accessToken);
+  }
+
+  public async getReuseSuggestions(accessToken: AccessToken, req: ReuseSearchRequest): Promise<ReuseSearchResponse> {
+    return this.getJsonFromPath(`/reuse-service/api/v1/phrases/preferred/with-description?language=${req.language}&prefix=${req.prefix}&requestId=${req.requestId}`, accessToken);
   }
 
   public checkAndGetResult(
