@@ -307,7 +307,8 @@ export class AcrolinxEndpoint {
   }
 
   public async getReuseSuggestions(accessToken: AccessToken, req: ReuseSearchRequest): Promise<ReuseSearchResponse> {
-    return this.getJsonFromPath(`/reuse-service/api/v1/phrases/preferred/with-description?requestId=${req.requestId}&language=${req.language}&prefix=${req.prefix}`, accessToken);
+    return this.getJsonFromPath('/reuse-service/api/v1/phrases/preferred/with-description?requestId=' + encodeURIComponent(req.requestId) 
+    + '&language=' + encodeURIComponent(req.language) + '&prefix=' + encodeURIComponent(req.prefix), accessToken);
   }
 
   public checkAndGetResult(
