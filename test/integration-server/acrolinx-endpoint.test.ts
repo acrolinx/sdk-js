@@ -482,6 +482,20 @@ describe('e2e - AcrolinxEndpoint', () => {
       });
     });
 
+    describe('reusePrefixSearch', () => {
+      it.skip('should get suggestions for a prefix search', async () => {
+        const reuseRequest = {
+          requestId: 'abc1-Request',
+          prefix: 'The',
+          language: 'en'
+        };
+        const reuseSearchResult = await api.getReuseSuggestions(ACROLINX_API_TOKEN, reuseRequest);
+        expect(reuseSearchResult.requestId).toEqual(reuseRequest.requestId);
+        expect(reuseSearchResult.results.length).toBeGreaterThan(0);
+      });
+    });
+
+
     describe('getContentAnalysisDashboard', () => {
       it('it works also without any checks', async () => {
         const urlString = await api.getContentAnalysisDashboard(ACROLINX_API_TOKEN, 'dummyId');

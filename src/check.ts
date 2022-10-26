@@ -62,8 +62,7 @@ export interface CheckRequest {
 export interface ReuseSearchRequest {
   requestId: string
   prefix: string;
-  targetId?: string,
-  language: string,
+  language: string
 }
 
 export interface ReuseSuggestion {
