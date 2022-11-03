@@ -60,9 +60,9 @@ export interface CheckRequest {
 }
 
 export interface ReuseSearchRequest {
-  requestId: string
-  prefix: string;
-  language: string
+  'request-id': string;
+  target: string;
+  phrase: string;
 }
 
 export interface ReuseSuggestion {

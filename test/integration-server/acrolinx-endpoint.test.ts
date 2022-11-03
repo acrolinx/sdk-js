@@ -485,12 +485,12 @@ describe('e2e - AcrolinxEndpoint', () => {
     describe('reusePrefixSearch', () => {
       it.skip('should get suggestions for a prefix search', async () => {
         const reuseRequest = {
-          requestId: 'abc1-Request',
-          prefix: 'The',
-          language: 'en'
+          'request-id': 'abc1-Request',
+          phrase: 'phrase from the document',
+          target: '123454321'
         };
         const reuseSearchResult = await api.getReuseSuggestions(ACROLINX_API_TOKEN, reuseRequest);
-        expect(reuseSearchResult.requestId).toEqual(reuseRequest.requestId);
+        expect(reuseSearchResult.requestId).toEqual(reuseRequest['request-id']);
         expect(reuseSearchResult.results.length).toBeGreaterThan(0);
       });
     });
