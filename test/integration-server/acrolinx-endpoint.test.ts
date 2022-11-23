@@ -482,16 +482,24 @@ describe('e2e - AcrolinxEndpoint', () => {
       });
     });
 
+    //Reuse feature needs to be enabled for the following test case 
     describe('reusePrefixSearch', () => {
       it.skip('should get suggestions for a prefix search', async () => {
         const reuseRequest = {
           'request-id': 'abc1-Request',
           phrase: 'phrase from the document',
-          target: '123454321'
+          target: '79ec4ac3-a9e3-4532-9d01-ae6141aefea2'
         };
         const reuseSearchResult = await api.getReuseSuggestions(ACROLINX_API_TOKEN, reuseRequest);
         expect(reuseSearchResult.requestId).toEqual(reuseRequest['request-id']);
-        expect(reuseSearchResult.results.length).toBeGreaterThan(0);
+        expect(reuseSearchResult.results).toBeTruthy();
+      });
+    });
+
+    describe('Checking capabilities for reuse', () => {
+      it.skip('Checking capabilities should have an additional quicksuggest flag', async () => {
+        const capabilities = await api.getCheckingCapabilities(ACROLINX_API_TOKEN);
+        expect(typeof capabilities.guidanceProfiles[0].quickSuggest).toBe('boolean');
       });
     });
 
