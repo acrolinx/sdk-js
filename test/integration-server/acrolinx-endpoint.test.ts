@@ -482,24 +482,24 @@ describe('e2e - AcrolinxEndpoint', () => {
       });
     });
 
-    //Reuse feature needs to be enabled for the following test case 
-    describe('reusePrefixSearch', () => {
-      it.skip('should get suggestions for a prefix search', async () => {
-        const reuseRequest = {
+    //Acrolinx Live target needs to be assigned for the following test case 
+    describe('liveSearch', () => {
+      it.skip('should get suggestions for a live search', async () => {
+        const liveRequest = {
           'request-id': 'abc1-Request',
           phrase: 'phrase from the document',
           target: '79ec4ac3-a9e3-4532-9d01-ae6141aefea2'
         };
-        const reuseSearchResult = await api.getReuseSuggestions(ACROLINX_API_TOKEN, reuseRequest);
-        expect(reuseSearchResult.requestId).toEqual(reuseRequest['request-id']);
-        expect(reuseSearchResult.results).toBeTruthy();
+        const liveSearchResult = await api.getLiveSuggestions(ACROLINX_API_TOKEN, liveRequest);
+        expect(liveSearchResult.requestId).toEqual(liveRequest['request-id']);
+        expect(liveSearchResult.results).toBeTruthy();
       });
     });
 
-    describe('Checking capabilities for reuse', () => {
-      it.skip('Checking capabilities should have an additional quicksuggest flag', async () => {
+    describe('Checking capabilities for Acrolinx Live supported targets', () => {
+      it.skip('Checking capabilities should have an additional acrolinxLive flag', async () => {
         const capabilities = await api.getCheckingCapabilities(ACROLINX_API_TOKEN);
-        expect(typeof capabilities.guidanceProfiles[0].quickSuggest).toBe('boolean');
+        expect(typeof capabilities.guidanceProfiles[0].acrolinxLive).toBe('boolean');
       });
     });
 

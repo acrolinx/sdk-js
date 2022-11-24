@@ -42,8 +42,8 @@ import {
   KeyValuePair,
   Report,
   TermHarvestingReport,
-  ReuseSearchRequest,
-  ReuseSearchResponse
+  LiveSearchRequest,
+  LiveSearchResponse
 } from './check';
 import {
   AccessToken,
@@ -306,8 +306,8 @@ export class AcrolinxEndpoint {
     return this.post<CheckResponse>('/api/v1/checking/checks', req, {}, accessToken);
   }
 
-  public async getReuseSuggestions(accessToken: AccessToken, req: ReuseSearchRequest): Promise<ReuseSearchResponse> {
-    return this.post<ReuseSearchResponse>('/reuse-service/api/v1/phrases/preferred/with-description', req, {}, accessToken);
+  public async getLiveSuggestions(accessToken: AccessToken, req: LiveSearchRequest): Promise<LiveSearchResponse> {
+    return this.post<LiveSearchResponse>('/reuse-service/api/v1/phrases/preferred/with-description', req, {}, accessToken);
   }
 
   public checkAndGetResult(

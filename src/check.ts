@@ -59,19 +59,19 @@ export interface CheckRequest {
   externalContent?: ExternalContent;
 }
 
-export interface ReuseSearchRequest {
+export interface LiveSearchRequest {
   'request-id': string;
   target: string;
   phrase: string;
 }
 
-export interface ReuseSuggestion {
+export interface LiveSuggestion {
   preferredPhrase: string,
   description: string
 }
-export interface ReuseSearchResponse {
+export interface LiveSearchResponse {
   requestId: string,
-  results: ReuseSuggestion[]
+  results: LiveSuggestion[]
 }
 
 export interface CheckOptions {
