@@ -53,9 +53,10 @@ import 'cross-fetch/polyfill'; // Use a fetch polyfill, when you target Node.js 
 import assert from 'assert';
 import {AcrolinxEndpoint, DEVELOPMENT_SIGNATURE} from '@acrolinx/sdk';
 
+const TEST_SERVER_URL = process.env.TEST_SERVER_URL || ''; /* Add here your own test server URL */
 const acrolinxEndpoint = new AcrolinxEndpoint({
   client: {version: '1.2.3.666', signature: DEVELOPMENT_SIGNATURE},
-  acrolinxUrl: 'https://test-ssl.acrolinx.com',
+  acrolinxUrl: TEST_SERVER_URL,
 });
 
 acrolinxEndpoint.getPlatformInformation().then(info => {
