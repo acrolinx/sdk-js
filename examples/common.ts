@@ -15,7 +15,7 @@
  */
 
 import {AcrolinxEndpointProps, DEVELOPMENT_SIGNATURE} from '../src';
-import {TEST_SERVER_URL} from '../test/integration-server/acrolinx-endpoint.test'
+import {TEST_SERVER_URL} from '../src/index'
 
 export const EXAMPLE_ACROLINX_ENDPOINT_PROPS: AcrolinxEndpointProps = {
   client: {

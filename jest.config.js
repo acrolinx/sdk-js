@@ -38,7 +38,7 @@ module.exports = {
       "statements": 93.5,
       "branches": 81,
       "functions": 86,
-      "lines": 93.70,
+      "lines": 93.75,
     }
   },
   "reporters": [
