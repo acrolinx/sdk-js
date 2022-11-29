@@ -59,6 +59,21 @@ export interface CheckRequest {
   externalContent?: ExternalContent;
 }
 
+export interface LiveSearchRequest {
+  'request-id': string;
+  target: string;
+  phrase: string;
+}
+
+export interface LiveSuggestion {
+  preferredPhrase: string,
+  description: string
+}
+export interface LiveSearchResponse {
+  requestId: string,
+  results: LiveSuggestion[]
+}
+
 export interface CheckOptions {
   guidanceProfileId?: GuidanceProfileId;
   reportTypes?: ReportType[];

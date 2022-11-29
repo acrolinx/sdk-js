@@ -41,7 +41,7 @@ import {
 import { CheckOptions } from '../../src/check';
 import { DocumentDescriptor } from '../../src/document-descriptor';
 import { AcrolinxError, ValidationDetail } from '../../src/errors';
-import { AcrolinxEndpoint, isSigninSuccessResult, SigninSuccessResult } from '../../src/index';
+import { AcrolinxEndpoint, isSigninSuccessResult, SigninSuccessResult, TEST_SERVER_URL } from '../../src/index';
 import { SigninLinksResult } from '../../src/signin';
 import { waitMs } from '../../src/utils/mixed-utils';
 import * as checkResultSchema from '../schemas/check-result.json';
@@ -50,7 +50,6 @@ import { describeIf, expectFailingPromise, testIf } from '../test-utils/utils';
 
 dotenv.config();
 
-const TEST_SERVER_URL = process.env.TEST_SERVER_URL || ''; /* Add here your own test server URL */
 const SSO_USERNAME = process.env.SSO_USERNAME;
 const SSO_GENERIC_TOKEN = process.env.SSO_GENERIC_TOKEN;
 const ACROLINX_API_TOKEN = process.env.ACROLINX_API_TOKEN || '';
@@ -481,6 +480,36 @@ describe('e2e - AcrolinxEndpoint', () => {
         expect(error).toBeInstanceOf(CheckCanceledByClientError);
       });
     });
+
+    //At least one target with Acrolinx Live support needs to be assigned for the following test case 
+    describe('liveSearch', () => {
+      it.skip('should get suggestions for a live search', async () => {
+        const capabilities = await api.getCheckingCapabilities(ACROLINX_API_TOKEN);
+        let reuseTarget = capabilities.guidanceProfiles[0].id;
+        for(const guidanceProfile of capabilities.guidanceProfiles) {
+          if(guidanceProfile.acrolinxLive) {
+            reuseTarget = guidanceProfile.id;
+            break;
+          }
+        }
+        const liveRequest = {
+          'request-id': 'abc1-Request',
+          phrase: 'phrase from the document',
+          target: reuseTarget
+        };
+        const liveSearchResult = await api.getLiveSuggestions(ACROLINX_API_TOKEN, liveRequest);
+        expect(liveSearchResult.requestId).toEqual(liveRequest['request-id']);
+        expect(liveSearchResult.results).toBeTruthy();
+      });
+    });
+
+    describe('Checking capabilities for Acrolinx Live supported targets', () => {
+      it.skip('Checking capabilities should have an additional acrolinxLive flag', async () => {
+        const capabilities = await api.getCheckingCapabilities(ACROLINX_API_TOKEN);
+        expect(typeof capabilities.guidanceProfiles[0].acrolinxLive).toBe('boolean');
+      });
+    });
+
 
     describe('getContentAnalysisDashboard', () => {
       it('it works also without any checks', async () => {

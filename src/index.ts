@@ -41,7 +41,9 @@ import {
   HasTermHarvestingReport,
   KeyValuePair,
   Report,
-  TermHarvestingReport
+  TermHarvestingReport,
+  LiveSearchRequest,
+  LiveSearchResponse
 } from './check';
 import {
   AccessToken,
@@ -127,6 +129,7 @@ export * from './notifications';
 // You'll get the clientSignature for your integration after a successful certification meeting.
 // See: https://support.acrolinx.com/hc/en-us/articles/205687652-Getting-Started-with-Custom-Integrations
 export const DEVELOPMENT_SIGNATURE = 'SW50ZWdyYXRpb25EZXZlbG9wbWVudERlbW9Pbmx5';
+export const TEST_SERVER_URL = process.env.TEST_SERVER_URL || ''; /* Add here your own test server URL */
 
 /* tslint:disable-next-line:max-line-length*/
 export const DEVELOPMENT_APP_SIGNATURE = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJuYW1lIjoiS2lsbGVyIEFwcCIsImlkIjoiNGVlZDM3NjctMGYzMS00ZDVmLWI2MjktYzg2MWFiM2VkODUyIiwidHlwZSI6IkFQUCIsImlhdCI6MTU2MTE4ODI5M30.zlVJuGITMjAJ2p4nl-qtpj4N0p_8e4tenr-4dkrGdXg';
@@ -302,6 +305,10 @@ export class AcrolinxEndpoint {
 
   public async check(accessToken: AccessToken, req: CheckRequest): Promise<CheckResponse> {
     return this.post<CheckResponse>('/api/v1/checking/checks', req, {}, accessToken);
+  }
+
+  public async getLiveSuggestions(accessToken: AccessToken, req: LiveSearchRequest): Promise<LiveSearchResponse> {
+    return this.post<LiveSearchResponse>('/reuse-service/api/v1/phrases/preferred/with-description', req, {}, accessToken);
   }
 
   public checkAndGetResult(

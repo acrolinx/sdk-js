@@ -24,6 +24,7 @@ export interface GuidanceProfile {
   id: GuidanceProfileId;
   displayName: string;
   language: Language;
+  acrolinxLive?: boolean;
   goals: Goal[];
   termSets: TermSet[];
   status: GuidanceProfileStatus;

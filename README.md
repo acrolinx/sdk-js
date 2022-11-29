@@ -51,11 +51,11 @@ See [`Check.ts`](examples/check.ts) for more examples.
 ```javascript
 import 'cross-fetch/polyfill'; // Use a fetch polyfill, when you target Node.js or IE11
 import assert from 'assert';
-import {AcrolinxEndpoint, DEVELOPMENT_SIGNATURE} from '@acrolinx/sdk';
+import {AcrolinxEndpoint, DEVELOPMENT_SIGNATURE, TEST_SERVER_URL} from '@acrolinx/sdk';
 
 const acrolinxEndpoint = new AcrolinxEndpoint({
   client: {version: '1.2.3.666', signature: DEVELOPMENT_SIGNATURE},
-  acrolinxUrl: 'https://test-ssl.acrolinx.com',
+  acrolinxUrl: TEST_SERVER_URL,
 });
 
 acrolinxEndpoint.getPlatformInformation().then(info => {
