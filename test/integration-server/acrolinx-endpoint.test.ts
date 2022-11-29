@@ -482,13 +482,21 @@ describe('e2e - AcrolinxEndpoint', () => {
       });
     });
 
-    //Acrolinx Live target needs to be assigned for the following test case 
+    //At least one target with Acrolinx Live support needs to be assigned for the following test case 
     describe('liveSearch', () => {
       it.skip('should get suggestions for a live search', async () => {
+        const capabilities = await api.getCheckingCapabilities(ACROLINX_API_TOKEN);
+        let reuseTarget = capabilities.guidanceProfiles[0].id;
+        for(const guidanceProfile of capabilities.guidanceProfiles) {
+          if(guidanceProfile.acrolinxLive) {
+            reuseTarget = guidanceProfile.id;
+            break;
+          }
+        }
         const liveRequest = {
           'request-id': 'abc1-Request',
           phrase: 'phrase from the document',
-          target: '79ec4ac3-a9e3-4532-9d01-ae6141aefea2'
+          target: reuseTarget
         };
         const liveSearchResult = await api.getLiveSuggestions(ACROLINX_API_TOKEN, liveRequest);
         expect(liveSearchResult.requestId).toEqual(liveRequest['request-id']);
