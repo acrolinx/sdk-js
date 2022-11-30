@@ -493,12 +493,12 @@ describe('e2e - AcrolinxEndpoint', () => {
           }
         }
         const liveRequest = {
-          'request-id': 'abc1-Request',
+          requestId: 'abc1-Request',
           phrase: 'phrase from the document',
           target: reuseTarget
         };
         const liveSearchResult = await api.getLiveSuggestions(ACROLINX_API_TOKEN, liveRequest);
-        expect(liveSearchResult.requestId).toEqual(liveRequest['request-id']);
+        expect(liveSearchResult.requestId).toEqual(liveRequest.requestId);
         expect(liveSearchResult.results).toBeTruthy();
       });
     });

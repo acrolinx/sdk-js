@@ -60,7 +60,7 @@ export interface CheckRequest {
 }
 
 export interface LiveSearchRequest {
-  'request-id': string;
+  requestId: string;
   target: string;
   phrase: string;
 }
