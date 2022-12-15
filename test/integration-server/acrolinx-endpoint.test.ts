@@ -41,7 +41,7 @@ import {
 import { CheckOptions } from '../../src/check';
 import { DocumentDescriptor } from '../../src/document-descriptor';
 import { AcrolinxError, ValidationDetail } from '../../src/errors';
-import { AcrolinxEndpoint, isSigninSuccessResult, SigninSuccessResult, TEST_SERVER_URL } from '../../src/index';
+import { AcrolinxEndpoint, isSigninSuccessResult, SigninSuccessResult } from '../../src/index';
 import { SigninLinksResult } from '../../src/signin';
 import { waitMs } from '../../src/utils/mixed-utils';
 import * as checkResultSchema from '../schemas/check-result.json';
@@ -50,6 +50,7 @@ import { describeIf, expectFailingPromise, testIf } from '../test-utils/utils';
 
 dotenv.config();
 
+const TEST_SERVER_URL = process.env.TEST_SERVER_URL || ''; /* Add here your own test server URL */
 const SSO_USERNAME = process.env.SSO_USERNAME;
 const SSO_GENERIC_TOKEN = process.env.SSO_GENERIC_TOKEN;
 const ACROLINX_API_TOKEN = process.env.ACROLINX_API_TOKEN || '';
