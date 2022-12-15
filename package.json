@@ -12,7 +12,7 @@
     "node": ">=14.0.0"
   },
   "scripts": {
-    "ci": "npm run build && npm run lint && npm run testCoverage && npm run testMarkdown",
+    "ci": "npm run build && npm run lint && npm run testCoverage",
     "ciWithoutIntegrationServerTest": "npm run build && npm run lint && npm run testUnitCoverage && npm run testMarkdown",
     "clean": "rm -rf dist",
     "prepare": "npm run generateSchemas && tsc",
