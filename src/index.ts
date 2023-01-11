@@ -213,12 +213,17 @@ const VALIDATE_APP_ACCESS_TOKEN_PATH = '/api/v1/apps/whoami';
 
 export class AcrolinxEndpoint {
   public readonly props: AcrolinxEndpointProps;
+  public statusCode: number | undefined;
+  private retryAfter: string;
+  private attemptCount: number | undefined;
 
   constructor(props: AcrolinxEndpointProps) {
     this.props = {
       ...props,
       acrolinxUrl: props.acrolinxUrl.trim().replace(/\/$/, '')
     };
+    this.statusCode = undefined;
+    this.retryAfter = "1000";
   }
 
   public setClientLocale(clientLocale: string) {
@@ -498,12 +503,23 @@ export class AcrolinxEndpoint {
       runningCheck = await asyncStartedProcessPromise;
       handlePotentialCancellation();
 
+      this.attemptCount = 1;
+
       let checkResultOrProgress: AsyncApiResponse<Result>;
       do {
         checkResultOrProgress = await this.pollForAsyncResult(accessToken, runningCheck, opts);
         handlePotentialCancellation();
 
-        if (isProgressResponse(checkResultOrProgress)) {
+
+        if(this.statusCode == 429 && this.attemptCount <= 5){
+          console.log('Caught 429 error, retrying again..');
+          const interval = Number(this.retryAfter) * 1000;
+          const retryInterval = interval * Math.pow(2, this.attemptCount);
+          await waitMs(retryInterval);
+          handlePotentialCancellation();
+          this.attemptCount++;
+        }
+        else if (isProgressResponse(checkResultOrProgress) && this.statusCode != 429) {
           if (opts.onProgress) {
             opts.onProgress(checkResultOrProgress.progress);
           }
@@ -511,7 +527,14 @@ export class AcrolinxEndpoint {
           await waitMs(checkResultOrProgress.progress.retryAfter * 1000);
           handlePotentialCancellation();
         }
-      } while (isProgressResponse(checkResultOrProgress));
+        else if(this.statusCode == 429 && this.attemptCount > 5){
+          throw new AcrolinxError({
+            type: ErrorType.HttpErrorStatus,
+            title: 'Too many 429 responses coming from the server',
+            detail: `Got too many 429 responses from the server, and tried for 5 times but the HTTP response is consistent.`
+          });
+        }
+      } while (isProgressResponse(checkResultOrProgress) || (this.attemptCount <= 5 && this.statusCode == 429));
 
       return checkResultOrProgress.data;
     };
@@ -612,6 +635,8 @@ export class AcrolinxEndpoint {
         console.log('Fetch', input, init, this.props.additionalFetchProperties);
         const result = await fetchFunction(input, fetchProps);
         console.log('Fetched Result', result.status);
+        this.retryAfter = result.headers.get("retry-after") || result.headers.get("Retry-After") || result.headers.get("RETRY-AFTER") || "1000";
+        this.statusCode = result.status;
         return result;
       } catch (error) {
         console.error('Fetch Error', error);
