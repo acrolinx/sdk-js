@@ -482,9 +482,9 @@ describe('e2e - AcrolinxEndpoint', () => {
       });
     });
 
-    //At least one target with Acrolinx Live support needs to be assigned for the following test case 
+    //At least one target with Acrolinx Live support needs to be assigned for the following test case
     describe('liveSearch', () => {
-      it.skip('should get suggestions for a live search', async () => {
+      it('should get suggestions for a live search', async () => {
         const capabilities = await api.getCheckingCapabilities(ACROLINX_API_TOKEN);
         let reuseTarget = capabilities.guidanceProfiles[0].id;
         for(const guidanceProfile of capabilities.guidanceProfiles) {
