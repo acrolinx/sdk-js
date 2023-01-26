@@ -70,6 +70,7 @@ import {
   AcrolinxError,
   CheckCanceledByClientError,
   ErrorType,
+  HttpRequest,
   wrapFetchError,
 } from "./errors";
 import { AnalysisRequest, ExtractionResult } from "./extraction";
@@ -242,17 +243,12 @@ const VALIDATE_APP_ACCESS_TOKEN_PATH = "/api/v1/apps/whoami";
 
 export class AcrolinxEndpoint {
   public readonly props: AcrolinxEndpointProps;
-  public statusCode: number | undefined;
-  private retryAfter: string;
-  private attemptCount: number | undefined;
 
   constructor(props: AcrolinxEndpointProps) {
     this.props = {
       ...props,
       acrolinxUrl: props.acrolinxUrl.trim().replace(/\/$/, ""),
     };
-    this.statusCode = undefined;
-    this.retryAfter = "1000";
   }
 
   public setClientLocale(clientLocale: string) {
@@ -645,36 +641,49 @@ export class AcrolinxEndpoint {
     const poll = async (): Promise<Result> => {
       runningCheck = await asyncStartedProcessPromise;
       handlePotentialCancellation();
+      const url: string = runningCheck.links.result;
+      const requestInit: RequestInit = {
+        headers: { ...this.getCommonHeaders(accessToken), ...opts.headers },
+      };
+      const httpRequest: HttpRequest = {
+        url,
+        method: requestInit.method || "GET",
+      };
+      let attemptCount = 1;
+      let result: AsyncApiResponse<Result>;
+      let statusCode = 0;
+      let retryAfter = "1000";
 
-      this.attemptCount = 1;
-
-      let checkResultOrProgress: AsyncApiResponse<Result>;
       do {
-        checkResultOrProgress = await this.pollForAsyncResult(
-          accessToken,
-          runningCheck,
-          opts
+        result = await this.fetch(url, requestInit).then(
+          (res) => {
+            retryAfter =
+              res.headers.get("retry-after") ||
+              res.headers.get("Retry-After") ||
+              res.headers.get("RETRY-AFTER") ||
+              "1000";
+            statusCode = Number(res.status);
+            return handleExpectedJsonResponse(httpRequest, res);
+          },
+          (error) => wrapFetchError(httpRequest, error)
         );
         handlePotentialCancellation();
 
-        if (this.statusCode == 429 && this.attemptCount <= 5) {
+        if (statusCode == 429 && attemptCount <= 5) {
           console.log("Caught 429 error, retrying again..");
-          const interval = Number(this.retryAfter) * 1000;
-          const retryInterval = interval * Math.pow(2, this.attemptCount);
+          const interval = Number(retryAfter) * 1000;
+          const retryInterval = interval * Math.pow(2, attemptCount);
           await waitMs(retryInterval);
           handlePotentialCancellation();
-          this.attemptCount++;
-        } else if (
-          isProgressResponse(checkResultOrProgress) &&
-          this.statusCode != 429
-        ) {
+          attemptCount++;
+        } else if (isProgressResponse(result) && statusCode != 429) {
           if (opts.onProgress) {
-            opts.onProgress(checkResultOrProgress.progress);
+            opts.onProgress(result.progress);
           }
 
-          await waitMs(checkResultOrProgress.progress.retryAfter * 1000);
+          await waitMs(result.progress.retryAfter * 1000);
           handlePotentialCancellation();
-        } else if (this.statusCode == 429 && this.attemptCount > 5) {
+        } else if (statusCode == 429 && attemptCount > 5) {
           throw new AcrolinxError({
             type: ErrorType.HttpErrorStatus,
             title: "Too many 429 responses coming from the server",
@@ -682,11 +691,11 @@ export class AcrolinxEndpoint {
           });
         }
       } while (
-        isProgressResponse(checkResultOrProgress) ||
-        (this.attemptCount <= 5 && this.statusCode == 429)
+        isProgressResponse(result) ||
+        (attemptCount <= 5 && statusCode == 429)
       );
 
-      return checkResultOrProgress.data;
+      return result.data;
     };
 
     return {
@@ -808,12 +817,6 @@ export class AcrolinxEndpoint {
         console.log("Fetch", input, init, this.props.additionalFetchProperties);
         const result = await fetchFunction(input, fetchProps);
         console.log("Fetched Result", result.status);
-        this.retryAfter =
-          result.headers.get("retry-after") ||
-          result.headers.get("Retry-After") ||
-          result.headers.get("RETRY-AFTER") ||
-          "1000";
-        this.statusCode = result.status;
         return result;
       } catch (error) {
         console.error("Fetch Error", error);
