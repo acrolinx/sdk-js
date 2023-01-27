@@ -669,6 +669,7 @@ export class AcrolinxEndpoint {
         );
         handlePotentialCancellation();
 
+        // TODO: add unit test for this
         if (statusCode == 429 && attemptCount <= 5) {
           console.log("Caught 429 error, retrying again..");
           const interval = Number(retryAfter) * 1000;
