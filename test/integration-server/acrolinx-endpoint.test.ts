@@ -18,7 +18,6 @@ import Ajv from 'ajv';
 import 'cross-fetch/polyfill';
 import * as dotenv from 'dotenv';
 import * as _ from 'lodash';
-import { SoftwareComponentCategory } from '../../src/integration';
 import {
   AnalysisType,
   AppAccessTokenValidationResult,
