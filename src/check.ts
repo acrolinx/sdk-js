@@ -33,6 +33,7 @@ import {
 } from './common-types';
 import {DictionaryScope} from './dictionary';
 import {DocumentDescriptor} from './document-descriptor';
+import { Integration } from './integration';
 
 export interface CheckRange {
   begin: number;
@@ -57,6 +58,7 @@ export interface CheckRequest {
   checkOptions?: CheckOptions;
   document?: DocumentDescriptorRequest;
   externalContent?: ExternalContent;
+  integration?: Integration;
 }
 
 export interface LiveSearchRequest {
