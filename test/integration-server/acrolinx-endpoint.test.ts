@@ -396,7 +396,7 @@ describe('e2e - AcrolinxEndpoint', () => {
               id: 'com.acrolinx.sdk',
               name: 'Acrolinx SDK JS',
               version: '0.0.1',
-              category: SoftwareComponentCategory.MAIN
+              category: 'MAIN'
             }]
           }
         });
