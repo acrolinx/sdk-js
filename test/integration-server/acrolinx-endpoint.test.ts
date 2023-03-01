@@ -386,6 +386,22 @@ describe('e2e - AcrolinxEndpoint', () => {
         expect(checkResult.goals.length).toBeGreaterThan(0);
       }, 10000);
 
+      it('can check with integration field set', async () => {
+        const text = 'Sample content to test integration field in check request';
+        const checkResult = await checkAndWaitForResult({
+          content: text,
+          integration: {
+            components: [{
+              id: 'com.acrolinx.sdk',
+              name: 'Acrolinx SDK JS',
+              version: '0.0.1',
+              category: 'MAIN'
+            }]
+          }
+        });
+        expect(checkResult.quality.score).toBeGreaterThan(0);
+      }, 10000);
+
       it.skip('can cancel check', async () => {
         const check = await createDummyCheck();
 
