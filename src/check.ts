@@ -106,6 +106,11 @@ export interface ScoreByGoal {
   score: number
 }
 
+export interface Metric {
+  id: string,
+  score: number
+}
+
 export interface CheckResult {
   id: CheckId;
   checkOptions: CheckOptions;
@@ -115,6 +120,7 @@ export interface CheckResult {
     score: number;
     status: DocumentQualityStatus;
     scoresByGoal?: ScoreByGoal[];
+    metrics?: Metric[];
   }
   counts: {
     sentences: number;
