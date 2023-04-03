@@ -29,6 +29,10 @@ jobs:
       GITHUB_TOKEN:          ${{ secrets.GITHUB_TOKEN }}
       ACROLINX_DEV_SIGNATURE: ${{ secrets.ACROLINX_DEV_SIGNATURE}}
 
+    # Write permission for "contents" required for gh-pages deployment action
+    permissions:
+     contents: write
+
     # TODO add timeout
     # TODO Provide Node & npm bin/ folder to PATH
     steps:
@@ -79,7 +83,7 @@ jobs:
       
       - name: Publish GitHub Pages 🚀
         if: steps.publish.outputs.type != 'none'
-        uses: JamesIves/github-pages-deploy-action@4.1.5
+        uses: JamesIves/github-pages-deploy-action@4.4.1
         with:
           branch: gh-pages
           folder: docs/pluginDoc
