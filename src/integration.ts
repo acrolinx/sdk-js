@@ -19,9 +19,9 @@ export interface Integration {
 }
 
 /**
-   * Provides information about your integration and other client software components for the about dialog and
-   * analytics.
-   */
+ * Provides information about your integration and other client software components for the about dialog and
+ * analytics.
+ */
 export interface SoftwareComponent {
   /**
    * The id of the software component.

@@ -15,13 +15,13 @@
  */
 
 import * as _ from 'lodash';
-import {CheckingCapabilities} from '../../src';
-import {CheckId, CheckRequest, CheckResponse, CheckResultResponse} from '../../src/check';
-import {SuccessResponse, URL} from '../../src/common-types';
-import {AcrolinxApiError} from '../../src/errors';
-import {Route} from './common-mocking';
-import {DUMMY_CAPABILITIES, DUMMY_CHECK_RESULT} from './dummy-data';
-import {NOT_FOUND_CHECK_ID} from './mocked-errors';
+import { CheckingCapabilities } from '../../src';
+import { CheckId, CheckRequest, CheckResponse, CheckResultResponse } from '../../src/check';
+import { SuccessResponse, URL } from '../../src/common-types';
+import { AcrolinxApiError } from '../../src/errors';
+import { Route } from './common-mocking';
+import { DUMMY_CAPABILITIES, DUMMY_CHECK_RESULT } from './dummy-data';
+import { NOT_FOUND_CHECK_ID } from './mocked-errors';
 
 const CHECK_TIME_MS = 10 * 1000;
 
@@ -29,27 +29,24 @@ export class Check {
   public id: CheckId = _.uniqueId('check-id-');
   private startTime = Date.now();
 
-  constructor(public request: CheckRequest) {
-  }
+  constructor(public request: CheckRequest) {}
 
   public getCheckingResult(acrolinxUrl: URL): CheckResultResponse {
     const elapsedTimeMs = Date.now() - this.startTime;
     if (elapsedTimeMs < CHECK_TIME_MS) {
-      const percent = Math.min(elapsedTimeMs / CHECK_TIME_MS * 100, 100);
+      const percent = Math.min((elapsedTimeMs / CHECK_TIME_MS) * 100, 100);
       return {
         progress: {
           percent,
           message: `Still working ${percent}%`,
-          retryAfter: 1
+          retryAfter: 1,
         },
         links: {
-          poll: `${acrolinxUrl}/api/v1/checking/checks/${this.id}`
-
-        }
+          poll: `${acrolinxUrl}/api/v1/checking/checks/${this.id}`,
+        },
       };
     } else {
-      return {data: {...DUMMY_CHECK_RESULT, id: this.id}, links: {}};
-
+      return { data: { ...DUMMY_CHECK_RESULT, id: this.id }, links: {} };
     }
   }
 }
@@ -57,8 +54,7 @@ export class Check {
 export class CheckServiceMock {
   public checks: Check[] = [];
 
-  constructor(private acrolinxUrl: URL) {
-  }
+  constructor(private acrolinxUrl: URL) {}
 
   public getRoutes(): Route[] {
     return [
@@ -81,11 +77,11 @@ export class CheckServiceMock {
   }
 
   public getCheckingCapabilities(): SuccessResponse<CheckingCapabilities> {
-    return {data: DUMMY_CAPABILITIES, links: {}};
+    return { data: DUMMY_CAPABILITIES, links: {} };
   }
 
   public getCheckResult(checkId: CheckId): CheckResultResponse | AcrolinxApiError {
-    const check = _.find(this.checks, {id: checkId});
+    const check = _.find(this.checks, { id: checkId });
     if (!check) {
       return NOT_FOUND_CHECK_ID;
     }
@@ -96,11 +92,11 @@ export class CheckServiceMock {
     const check = new Check(JSON.parse(opts.body as string));
     this.checks.push(check);
     return {
-      data: {id: check.id},
+      data: { id: check.id },
       links: {
         result: this.acrolinxUrl + `/api/v1/checking/checks/${check.id}`,
-        cancel: this.acrolinxUrl + `/api/v1/checking/checks/${check.id}`
-      }
+        cancel: this.acrolinxUrl + `/api/v1/checking/checks/${check.id}`,
+      },
     };
   }
 }

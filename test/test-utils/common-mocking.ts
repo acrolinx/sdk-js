@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import {MockResponseObject} from 'fetch-mock';
-import {AcrolinxApiError} from '../../src/errors';
+import { MockResponseObject } from 'fetch-mock';
+import { AcrolinxApiError } from '../../src/errors';
 
 export interface MockResponseObjectOf<T> extends MockResponseObject {
   body: T;

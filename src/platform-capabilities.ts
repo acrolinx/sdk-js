@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import {CheckingCapabilities} from './capabilities';
-import {CustomField} from './custom-fields';
+import { CheckingCapabilities } from './capabilities';
+import { CustomField } from './custom-fields';
 
 export interface PlatformCapabilities {
   checking: CheckingCapabilities;

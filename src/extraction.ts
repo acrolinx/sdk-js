@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-import {ContentFormatId} from './capabilities';
-import {CheckOptions, DocumentDescriptorRequest} from './check';
-import {LanguageId, UrlString} from './common-types';
+import { ContentFormatId } from './capabilities';
+import { CheckOptions, DocumentDescriptorRequest } from './check';
+import { LanguageId, UrlString } from './common-types';
 
 export enum AnalysisType {
   extractedText = 'extractedText',
-  offsets = 'offsets'
+  offsets = 'offsets',
 }
 
 export interface AnalysisRequestOptions extends CheckOptions {

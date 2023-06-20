@@ -36,7 +36,7 @@ import {
   PollMoreResult,
   ReportType,
   SuccessResponse,
-  User
+  User,
 } from '../../src';
 import { CheckOptions } from '../../src/check';
 import { DocumentDescriptor } from '../../src/document-descriptor';
@@ -65,11 +65,10 @@ function createEndpoint(acrolinxUrl: string) {
     enableHttpLogging: true,
     client: {
       signature: ACROLINX_DEV_SIGNATURE || DEVELOPMENT_SIGNATURE,
-      version: '1.2.3.666'
-    }
+      version: '1.2.3.666',
+    },
   });
 }
-
 
 function assertDictionaryScopes(scopes: DictionaryScope[]) {
   expect(scopes.length).toBeGreaterThanOrEqual(2);
@@ -95,19 +94,30 @@ describe('e2e - AcrolinxEndpoint', () => {
       expect.hasAssertions();
     });
 
-    it('should return an failing promise for non existing server', async () => {
-      const api = createEndpoint('http://non-extisting-server');
-      await expectFailingPromise(api.getJsonFromPath(DUMMY_PATH), ErrorType.HttpConnectionProblem,
-        { method: 'GET', url: 'http://non-extisting-server' + DUMMY_PATH });
-    }, LONG_TIME_OUT_MS);
+    it(
+      'should return an failing promise for non existing server',
+      async () => {
+        const api = createEndpoint('http://non-extisting-server');
+        await expectFailingPromise(api.getJsonFromPath(DUMMY_PATH), ErrorType.HttpConnectionProblem, {
+          method: 'GET',
+          url: 'http://non-extisting-server' + DUMMY_PATH,
+        });
+      },
+      LONG_TIME_OUT_MS,
+    );
 
-    it('should return an failing promise for invalid URLS', async () => {
-      const invalidAcrolinxUrl = 'http://non-ext!::?isting-server';
-      const api = createEndpoint(invalidAcrolinxUrl);
-      await expectFailingPromise(api.getJsonFromPath(DUMMY_PATH), ErrorType.HttpConnectionProblem,
-        { method: 'GET', url: invalidAcrolinxUrl + DUMMY_PATH });
-
-    }, LONG_TIME_OUT_MS);
+    it(
+      'should return an failing promise for invalid URLS',
+      async () => {
+        const invalidAcrolinxUrl = 'http://non-ext!::?isting-server';
+        const api = createEndpoint(invalidAcrolinxUrl);
+        await expectFailingPromise(api.getJsonFromPath(DUMMY_PATH), ErrorType.HttpConnectionProblem, {
+          method: 'GET',
+          url: invalidAcrolinxUrl + DUMMY_PATH,
+        });
+      },
+      LONG_TIME_OUT_MS,
+    );
   });
 
   describe('signin', () => {
@@ -118,20 +128,20 @@ describe('e2e - AcrolinxEndpoint', () => {
     });
 
     it('should return the signin links', async () => {
-      const result = await api.signin() as SigninLinksResult;
+      const result = (await api.signin()) as SigninLinksResult;
       expect(result.links.interactive).toContain(TEST_SERVER_URL);
       expect(result.data.interactiveLinkTimeout).toBeGreaterThan(100);
     });
 
     describeIf(ACROLINX_API_TOKEN, 'Signin with valid token', () => {
       it('should return the provided API-Token', async () => {
-        const result = await api.signin({ accessToken: ACROLINX_API_TOKEN }) as SigninSuccessResult;
+        const result = (await api.signin({ accessToken: ACROLINX_API_TOKEN })) as SigninSuccessResult;
         expect(result.data.accessToken).toBe(ACROLINX_API_TOKEN);
         expect(result.data.user.username).toBe(ACROLINX_API_USERNAME);
       });
 
       it('should return client properties', async () => {
-        const result = await api.signin({ accessToken: ACROLINX_API_TOKEN }) as SigninSuccessResult;
+        const result = (await api.signin({ accessToken: ACROLINX_API_TOKEN })) as SigninSuccessResult;
         expect(Object.keys(result.data.integration.properties).length).toBeGreaterThan(0);
       });
     });
@@ -141,32 +151,26 @@ describe('e2e - AcrolinxEndpoint', () => {
         data: { interactiveLinkTimeout: 0 },
         links: {
           interactive: 'dummy',
-          poll: TEST_SERVER_URL + '/api/v1/auth/sign-ins/0ddece9c-464a-442b-8a5d-d2f242d54c81'
-        }
+          poll: TEST_SERVER_URL + '/api/v1/auth/sign-ins/0ddece9c-464a-442b-8a5d-d2f242d54c81',
+        },
       });
       await expectFailingPromise(signinPollResultPromise, ErrorType.SigninTimedOut);
     });
 
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
     testIf(SSO_USERNAME && SSO_GENERIC_TOKEN, 'signin with sso', async () => {
-      const result = await api.signin({
+      const result = (await api.signin({
         genericToken: SSO_GENERIC_TOKEN!,
         username: SSO_USERNAME!,
-      }
-      ) as SigninSuccessResult;
+      })) as SigninSuccessResult;
       expect(result.data.user.username).toContain(SSO_USERNAME);
     });
 
     it('signInWithSSO throws SSO Error', async () =>
-      expectFailingPromise(
-        api.signInWithSSO('invalidGenericToken', 'dummyUsername'),
-        ErrorType.SSO
-      )
-    );
-
+      expectFailingPromise(api.signInWithSSO('invalidGenericToken', 'dummyUsername'), ErrorType.SSO));
 
     it('poll for signin', async () => {
-      const result = await api.signin() as SigninLinksResult;
+      const result = (await api.signin()) as SigninLinksResult;
       const pollResult = await api.pollForSignin(result);
       expect(isSigninSuccessResult(pollResult)).toBeFalsy();
       expect((pollResult as PollMoreResult).progress.retryAfter).toBeGreaterThan(0);
@@ -187,8 +191,9 @@ describe('e2e - AcrolinxEndpoint', () => {
 
     async function getGuidanceProfileId(guidanceProfilePrefix = 'en'): Promise<string> {
       const capabilities = await api.getCheckingCapabilities(ACROLINX_API_TOKEN);
-      const guidanceProfile = _.find(capabilities.guidanceProfiles, a =>
-        _.startsWith(a.displayName, guidanceProfilePrefix))!;
+      const guidanceProfile = _.find(capabilities.guidanceProfiles, (a) =>
+        _.startsWith(a.displayName, guidanceProfilePrefix),
+      )!;
       expect(guidanceProfile).toBeDefined();
       return guidanceProfile.id;
     }
@@ -199,7 +204,7 @@ describe('e2e - AcrolinxEndpoint', () => {
       if (!checkRequest.checkOptions || !checkRequest.checkOptions.guidanceProfileId) {
         checkRequest.checkOptions = {
           guidanceProfileId: await getGuidanceProfileId(),
-          ...checkRequest.checkOptions
+          ...checkRequest.checkOptions,
         };
       }
 
@@ -250,22 +255,24 @@ describe('e2e - AcrolinxEndpoint', () => {
       const DEPARTMENT_KEY = 'Department';
 
       beforeEach(async () => {
-        const result = await api.signin({ accessToken: ACROLINX_API_TOKEN }) as SigninSuccessResult;
+        const result = (await api.signin({ accessToken: ACROLINX_API_TOKEN })) as SigninSuccessResult;
         user = await api.getUserData(ACROLINX_API_TOKEN, result.data.user.id);
       });
 
       test('should return user data with custom fields', () => {
         expect(user.username).toBeDefined();
-        const departmentCustomField = _.find(user.customFields, cf => cf.key === DEPARTMENT_KEY);
+        const departmentCustomField = _.find(user.customFields, (cf) => cf.key === DEPARTMENT_KEY);
         expect(departmentCustomField).toBeDefined();
         expect(departmentCustomField!.type).toEqual(CustomFieldType.TYPE_LIST);
       });
 
       test('should set user custom fields', async () => {
-        const updatedUser = await api.setUserCustomFields(ACROLINX_API_TOKEN, user.id, [{
-          key: DEPARTMENT_KEY,
-          value: 'Example Department'
-        }]);
+        const updatedUser = await api.setUserCustomFields(ACROLINX_API_TOKEN, user.id, [
+          {
+            key: DEPARTMENT_KEY,
+            value: 'Example Department',
+          },
+        ]);
 
         expect(updatedUser).toBeDefined();
       });
@@ -299,16 +306,18 @@ describe('e2e - AcrolinxEndpoint', () => {
       });
 
       it('post notifications privilege validation', async () => {
-        await expectFailingPromise<AcrolinxError>(api.postServerNotifications(ACROLINX_API_TOKEN, {
-          title: 'dummyTitle',
-          body: 'dummyBody',
-          start: Date.now(),
-          end: Date.now() + 1000 * 60
-        }), ErrorType.InsufficientPrivileges,
-          { method: 'POST', url: TEST_SERVER_URL + '/api/v1/broadcasts/platform-notifications/' });
+        await expectFailingPromise<AcrolinxError>(
+          api.postServerNotifications(ACROLINX_API_TOKEN, {
+            title: 'dummyTitle',
+            body: 'dummyBody',
+            start: Date.now(),
+            end: Date.now() + 1000 * 60,
+          }),
+          ErrorType.InsufficientPrivileges,
+          { method: 'POST', url: TEST_SERVER_URL + '/api/v1/broadcasts/platform-notifications/' },
+        );
       });
     });
-
 
     describe('check', () => {
       it('can check', async () => {
@@ -316,13 +325,16 @@ describe('e2e - AcrolinxEndpoint', () => {
 
         const features = await api.getFeatures(ACROLINX_API_TOKEN);
         if (features.enableTargetService) {
-          expect(checkResult.goals.every(goal => goal.scoring! in GoalScoring)).toBeTruthy();
+          expect(checkResult.goals.every((goal) => goal.scoring! in GoalScoring)).toBeTruthy();
         }
 
         expect(checkResult.goals.length).toBeGreaterThan(0);
         assertDictionaryScopes(checkResult.dictionaryScopes);
 
-        const spellingIssue = _.find(checkResult.issues, issue => issue.goalId === 'SPELLING' || issue.goalId === 'CORRECTNESS')!;
+        const spellingIssue = _.find(
+          checkResult.issues,
+          (issue) => issue.goalId === 'SPELLING' || issue.goalId === 'CORRECTNESS',
+        )!;
         expect(spellingIssue).toBeDefined();
         expect(spellingIssue.canAddToDictionary).toBe(true);
 
@@ -338,8 +350,7 @@ describe('e2e - AcrolinxEndpoint', () => {
       }, 10000);
 
       it('can check with external content set', async () => {
-        const text =
-          `<?xml version='1.0' encoding='UTF-8'?>
+        const text = `<?xml version='1.0' encoding='UTF-8'?>
 <!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "topic.dtd">
 <topic id="copyright">
     <title>Copyright</title>
@@ -350,38 +361,42 @@ describe('e2e - AcrolinxEndpoint', () => {
         const checkResult = await checkAndWaitForResult({
           content: text,
           externalContent: {
-            ditaReferences: [{
-              id: '#Link_zur_ID',
-              content: 'This is the actual great content, that is supposed to show up...'
-            }]
-          }
+            ditaReferences: [
+              {
+                id: '#Link_zur_ID',
+                content: 'This is the actual great content, that is supposed to show up...',
+              },
+            ],
+          },
         });
         expect(checkResult.goals.length).toBeGreaterThan(0);
       }, 10000);
 
       it('can check with xinclude external content set', async () => {
         const text =
-        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
-        "<book xmlns:xi=\"http://www.w3.org/2001/XInclude\">" +
-        "<title>Subject Books</title>" +
-        "<xi:include href=\"math.xml\"/>" +
-        "<xi:include href=\"spanish.xml\"/>" +
-        "</book>";
+          '<?xml version="1.0" encoding="UTF-8"?>' +
+          '<book xmlns:xi="http://www.w3.org/2001/XInclude">' +
+          '<title>Subject Books</title>' +
+          '<xi:include href="math.xml"/>' +
+          '<xi:include href="spanish.xml"/>' +
+          '</book>';
         const checkResult = await checkAndWaitForResult({
           content: text,
           document: {
-            reference: 'subjects.xml'
+            reference: 'subjects.xml',
           },
           externalContent: {
-            xincludeReferences: [{
-              id: 'math.xml',
-              content: "<?xml version=\"1.0\" encoding=\"UTF-8\"?><math><title>Mathemaatics Grade 1</title></math>"
-            },
-            {
-              id: 'spanish.xml',
-              content: "<?xml version=\"1.0\" encoding=\"UTF-8\"?><spanish><title>Spaanish Grade 2</title></spanish>"
-            }]
-          }
+            xincludeReferences: [
+              {
+                id: 'math.xml',
+                content: '<?xml version="1.0" encoding="UTF-8"?><math><title>Mathemaatics Grade 1</title></math>',
+              },
+              {
+                id: 'spanish.xml',
+                content: '<?xml version="1.0" encoding="UTF-8"?><spanish><title>Spaanish Grade 2</title></spanish>',
+              },
+            ],
+          },
         });
         expect(checkResult.goals.length).toBeGreaterThan(0);
       }, 10000);
@@ -391,13 +406,15 @@ describe('e2e - AcrolinxEndpoint', () => {
         const checkResult = await checkAndWaitForResult({
           content: text,
           integration: {
-            components: [{
-              id: 'com.acrolinx.sdk',
-              name: 'Acrolinx SDK JS',
-              version: '0.0.1',
-              category: 'MAIN'
-            }]
-          }
+            components: [
+              {
+                id: 'com.acrolinx.sdk',
+                name: 'Acrolinx SDK JS',
+                version: '0.0.1',
+                category: 'MAIN',
+              },
+            ],
+          },
         });
         expect(checkResult.quality.score).toBeGreaterThan(0);
       }, 10000);
@@ -416,29 +433,40 @@ describe('e2e - AcrolinxEndpoint', () => {
 
       it('cancel needs correct auth token', async () => {
         const check = await createDummyCheck();
-        await expectFailingPromise(api.cancelCheck('invalid token', check), ErrorType.Auth,
-          { method: 'DELETE', url: check.links.cancel });
+        await expectFailingPromise(api.cancelCheck('invalid token', check), ErrorType.Auth, {
+          method: 'DELETE',
+          url: check.links.cancel,
+        });
       });
 
       it.skip('exception if partialCheckRanges are invalid', async () => {
-        await expectFailingPromise(createDummyCheck({
-          checkOptions: {
-            partialCheckRanges: [{
-              begin: 0,
-              end: 1e9
-            }]
-          }
-        }), ErrorType.Client);
+        await expectFailingPromise(
+          createDummyCheck({
+            checkOptions: {
+              partialCheckRanges: [
+                {
+                  begin: 0,
+                  end: 1e9,
+                },
+              ],
+            },
+          }),
+          ErrorType.Client,
+        );
       });
 
       it('exception GuidanceProfileDoesNotExist for unknown id', async () => {
-        await expectFailingPromise(checkAndWaitUntilFinished({ guidanceProfileId: '12345-invalid' }),
-          ErrorType.GuidanceProfileDoesNotExist);
+        await expectFailingPromise(
+          checkAndWaitUntilFinished({ guidanceProfileId: '12345-invalid' }),
+          ErrorType.GuidanceProfileDoesNotExist,
+        );
       });
 
       it('exception GuidanceProfileDoesNotExist for invalid uuid', async () => {
-        await expectFailingPromise(checkAndWaitUntilFinished({ guidanceProfileId: 'invalid!uuid' }),
-          ErrorType.GuidanceProfileDoesNotExist);
+        await expectFailingPromise(
+          checkAndWaitUntilFinished({ guidanceProfileId: 'invalid!uuid' }),
+          ErrorType.GuidanceProfileDoesNotExist,
+        );
       });
 
       it('can request the termHarvesting report', async () => {
@@ -447,9 +475,9 @@ describe('e2e - AcrolinxEndpoint', () => {
         const checkResult = await checkAndWaitForResult({
           checkOptions: {
             guidanceProfileId: guidanceProfileIdWithTermHarvesting,
-            reportTypes: [ReportType.termHarvesting]
+            reportTypes: [ReportType.termHarvesting],
           },
-          content: 'NewTerm'
+          content: 'NewTerm',
         });
         expect(hasTermHarvestingReport(checkResult.reports)).toEqual(true);
         const reports: HasTermHarvestingReport = checkResult.reports as HasTermHarvestingReport;
@@ -478,15 +506,17 @@ describe('e2e - AcrolinxEndpoint', () => {
       });
 
       it('should return the check id even in case of some kind of errors', async () => {
-        const checkProcess = api.checkAndGetResult(ACROLINX_API_TOKEN, await createDummyCheckRequest({
-          content: '<tag>test</wrong>',
-          checkOptions: { contentFormat: 'XML' }
-        }));
+        const checkProcess = api.checkAndGetResult(
+          ACROLINX_API_TOKEN,
+          await createDummyCheckRequest({
+            content: '<tag>test</wrong>',
+            checkOptions: { contentFormat: 'XML' },
+          }),
+        );
 
         await expectFailingPromise<AcrolinxError>(checkProcess.promise, ErrorType.CheckFailed);
         expect(checkProcess.getId()).toBeTruthy();
       });
-
 
       it('can be canceled', async () => {
         const currentCheck = api.checkAndGetResult(ACROLINX_API_TOKEN, await createDummyCheckRequest());
@@ -498,13 +528,13 @@ describe('e2e - AcrolinxEndpoint', () => {
       });
     });
 
-    //At least one target with Acrolinx Live support needs to be assigned for the following test case 
+    //At least one target with Acrolinx Live support needs to be assigned for the following test case
     describe('liveSearch', () => {
       it.skip('should get suggestions for a live search', async () => {
         const capabilities = await api.getCheckingCapabilities(ACROLINX_API_TOKEN);
         let reuseTarget = capabilities.guidanceProfiles[0].id;
-        for(const guidanceProfile of capabilities.guidanceProfiles) {
-          if(guidanceProfile.acrolinxLive) {
+        for (const guidanceProfile of capabilities.guidanceProfiles) {
+          if (guidanceProfile.acrolinxLive) {
             reuseTarget = guidanceProfile.id;
             break;
           }
@@ -512,7 +542,7 @@ describe('e2e - AcrolinxEndpoint', () => {
         const liveRequest = {
           requestId: 'abc1-Request',
           phrase: 'phrase from the document',
-          target: reuseTarget
+          target: reuseTarget,
         };
         const liveSearchResult = await api.getLiveSuggestions(ACROLINX_API_TOKEN, liveRequest);
         expect(liveSearchResult.requestId).toEqual(liveRequest.requestId);
@@ -527,7 +557,6 @@ describe('e2e - AcrolinxEndpoint', () => {
       });
     });
 
-
     describe('getContentAnalysisDashboard', () => {
       it('it works also without any checks', async () => {
         const urlString = await api.getContentAnalysisDashboard(ACROLINX_API_TOKEN, 'dummyId');
@@ -539,17 +568,23 @@ describe('e2e - AcrolinxEndpoint', () => {
 
       it('works with real checks', async () => {
         const batchId = 'batch' + Date.now();
-        await api.checkAndGetResult(ACROLINX_API_TOKEN, await createDummyCheckRequest({
-          content: 'This text is nice.',
-          checkOptions: { batchId },
-          document: { reference: 'nice.txt' }
-        })).promise;
+        await api.checkAndGetResult(
+          ACROLINX_API_TOKEN,
+          await createDummyCheckRequest({
+            content: 'This text is nice.',
+            checkOptions: { batchId },
+            document: { reference: 'nice.txt' },
+          }),
+        ).promise;
 
-        await api.checkAndGetResult(ACROLINX_API_TOKEN, await createDummyCheckRequest({
-          content: 'Thiss textt iss stupidd',
-          checkOptions: { batchId },
-          document: { reference: 'stupid.txt' }
-        })).promise;
+        await api.checkAndGetResult(
+          ACROLINX_API_TOKEN,
+          await createDummyCheckRequest({
+            content: 'Thiss textt iss stupidd',
+            checkOptions: { batchId },
+            document: { reference: 'stupid.txt' },
+          }),
+        ).promise;
 
         const urlString = await api.getContentAnalysisDashboard(ACROLINX_API_TOKEN, batchId);
         const url = new URL(urlString);
@@ -565,9 +600,9 @@ describe('e2e - AcrolinxEndpoint', () => {
           content: inputText,
           options: {
             contentFormat: 'TEXT',
-            analysisTypes: [AnalysisType.extractedText, AnalysisType.offsets]
+            analysisTypes: [AnalysisType.extractedText, AnalysisType.offsets],
           },
-          appSignature: DEVELOPMENT_APP_SIGNATURE
+          appSignature: DEVELOPMENT_APP_SIGNATURE,
         }).promise;
 
         expect(result.options.languageId).toEqual('en');
@@ -585,8 +620,9 @@ describe('e2e - AcrolinxEndpoint', () => {
 
         // Verify offsets
         expect(new URL(result.offsets!.link)).toBeTruthy();
-        const offsets = (await api.getJsonFromUrl<SuccessResponse<OffsetReport>>(
-          result.offsets!.link, ACROLINX_API_TOKEN)).data;
+        const offsets = (
+          await api.getJsonFromUrl<SuccessResponse<OffsetReport>>(result.offsets!.link, ACROLINX_API_TOKEN)
+        ).data;
 
         const firstRange = offsets.ranges[0];
         expect(firstRange.changed).toEqual(false);
@@ -604,9 +640,9 @@ describe('e2e - AcrolinxEndpoint', () => {
           content: inputText,
           options: {
             contentFormat: 'HTML',
-            analysisTypes: [AnalysisType.extractedText, AnalysisType.offsets]
+            analysisTypes: [AnalysisType.extractedText, AnalysisType.offsets],
           },
-          appSignature: DEVELOPMENT_APP_SIGNATURE
+          appSignature: DEVELOPMENT_APP_SIGNATURE,
         }).promise;
 
         expect(result.options.languageId).toEqual('en');
@@ -624,19 +660,33 @@ describe('e2e - AcrolinxEndpoint', () => {
 
         // Verify offsets
         expect(new URL(result.offsets!.link)).toBeTruthy();
-        const offsets = (await api.getJsonFromUrl<SuccessResponse<OffsetReport>>(
-          result.offsets!.link, ACROLINX_API_TOKEN)).data;
+        const offsets = (
+          await api.getJsonFromUrl<SuccessResponse<OffsetReport>>(result.offsets!.link, ACROLINX_API_TOKEN)
+        ).data;
 
         expect(offsets).toEqual({
-          ranges: [{
-            original: { begin: 0, end: 1 }, extracted: { begin: 0, end: 1 }, changed: false
-          }, {
-            original: { begin: 4, end: 10 }, extracted: { begin: 1, end: 2 }, changed: true
-          }, {
-            original: { begin: 10, end: 11 }, extracted: { begin: 2, end: 3 }, changed: false
-          }, {
-            original: { begin: 15, end: 18 }, extracted: { begin: 3, end: 6 }, changed: false
-          }]
+          ranges: [
+            {
+              original: { begin: 0, end: 1 },
+              extracted: { begin: 0, end: 1 },
+              changed: false,
+            },
+            {
+              original: { begin: 4, end: 10 },
+              extracted: { begin: 1, end: 2 },
+              changed: true,
+            },
+            {
+              original: { begin: 10, end: 11 },
+              extracted: { begin: 2, end: 3 },
+              changed: false,
+            },
+            {
+              original: { begin: 15, end: 18 },
+              extracted: { begin: 3, end: 6 },
+              changed: false,
+            },
+          ],
         });
       });
 
@@ -646,9 +696,9 @@ describe('e2e - AcrolinxEndpoint', () => {
             content: 'This is text',
             options: {
               contentFormat: 'TEXT',
-              analysisTypes: [AnalysisType.extractedText, AnalysisType.offsets]
+              analysisTypes: [AnalysisType.extractedText, AnalysisType.offsets],
             },
-            appSignature
+            appSignature,
           }).promise;
         }
 
@@ -660,7 +710,7 @@ describe('e2e - AcrolinxEndpoint', () => {
         it('should not work with broken signature', async () => {
           const error = await expectFailingPromise<AcrolinxError>(
             analyzeAndPollWithSignature('brokenAppSignature'),
-            ErrorType.AppSignatureRejected
+            ErrorType.AppSignatureRejected,
           );
 
           expect(error.status).toEqual(403);
@@ -671,7 +721,7 @@ describe('e2e - AcrolinxEndpoint', () => {
         it('should return response headers in case of error', async () => {
           const error = await expectFailingPromise<AcrolinxError>(
             analyzeAndPollWithSignature('brokenAppSignature'),
-            ErrorType.AppSignatureRejected
+            ErrorType.AppSignatureRejected,
           );
 
           expect(error.status).toEqual(403);
@@ -680,16 +730,17 @@ describe('e2e - AcrolinxEndpoint', () => {
 
         it('should only work with signature type "APP"', async () => {
           /* tslint:disable-next-line:max-line-length*/
-          const appSignatureWithInvalidType = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJuYW1lIjoiS2FqYSBBbm91ayBTdGFobCIsImlkIjoiNGVlZDM3NjctMGYzMS00ZDVmLWI2MjktYzg2MWFiM2VkODUyIiwidHlwZSI6IktBSkEiLCJpYXQiOjE1NjExODgyOTN9.XaCSr2piA0u-JZLjRlO4QtuhsRgDOuurbhsvTFmCv1w';
+          const appSignatureWithInvalidType =
+            'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJuYW1lIjoiS2FqYSBBbm91ayBTdGFobCIsImlkIjoiNGVlZDM3NjctMGYzMS00ZDVmLWI2MjktYzg2MWFiM2VkODUyIiwidHlwZSI6IktBSkEiLCJpYXQiOjE1NjExODgyOTN9.XaCSr2piA0u-JZLjRlO4QtuhsRgDOuurbhsvTFmCv1w';
           const error = await expectFailingPromise<AcrolinxError>(
             analyzeAndPollWithSignature(appSignatureWithInvalidType),
-            ErrorType.AppSignatureRejected
+            ErrorType.AppSignatureRejected,
           );
 
           expect(error.status).toEqual(403);
           // These strings might change in the future, that's fine.
           expect(error.title).toEqual('App signature rejected');
-          expect(error.detail).toEqual('JWT Token type \'KAJA\' is not known.');
+          expect(error.detail).toEqual("JWT Token type 'KAJA' is not known.");
         });
       });
     });
@@ -710,9 +761,10 @@ describe('e2e - AcrolinxEndpoint', () => {
       const tokenVerificationResult = await api.validateAppAccessToken(appTokenResult.appAccessToken);
       expect(tokenVerificationResult.user).toEqual(appTokenResult.user);
 
-      const tokenVerificationResult2: SuccessResponse<AppAccessTokenValidationResult> =
-        await fetch(appTokenResult.validationRequest.url, { headers: appTokenResult.validationRequest.headers })
-          .then(r => r.json());
+      const tokenVerificationResult2: SuccessResponse<AppAccessTokenValidationResult> = await fetch(
+        appTokenResult.validationRequest.url,
+        { headers: appTokenResult.validationRequest.headers },
+      ).then((r) => r.json());
 
       expect(tokenVerificationResult2.data.user).toEqual(tokenVerificationResult.user);
 
@@ -742,8 +794,8 @@ describe('e2e - AcrolinxEndpoint', () => {
         const documentInfo2 = await api.setDocumentCustomFields(ACROLINX_API_TOKEN, document.id, [
           {
             key: 'List Field',
-            value: 'List Item 2'
-          } as any
+            value: 'List Item 2',
+          } as any,
         ]);
 
         expect(documentInfo2.id).toEqual(document.id);
@@ -762,7 +814,7 @@ describe('e2e - AcrolinxEndpoint', () => {
           const result = await api.addToDictionary(ACROLINX_API_TOKEN, {
             surface: 'TestSurface',
             scope: DictionaryScope.language,
-            languageId: 'en'
+            languageId: 'en',
           });
 
           expect(result.surface).toEqual('TestSurface');
@@ -776,7 +828,7 @@ describe('e2e - AcrolinxEndpoint', () => {
           const result = await api.addToDictionary(ACROLINX_API_TOKEN, {
             surface: 'TestSurface',
             scope: DictionaryScope.guidanceProfile,
-            guidanceProfileId: guidanceProfile.id
+            guidanceProfileId: guidanceProfile.id,
           });
 
           expect(result.surface).toEqual('TestSurface');
@@ -793,11 +845,14 @@ describe('e2e - AcrolinxEndpoint', () => {
         }
 
         it('validation error for invalid scope', async () => {
-          const error = await expectFailingPromise<AcrolinxError>(api.addToDictionary(ACROLINX_API_TOKEN, {
-            surface: 'TestSurface',
-            scope: 'invalidScope' as any,
-            languageId: 'en',
-          }), ErrorType.Validation);
+          const error = await expectFailingPromise<AcrolinxError>(
+            api.addToDictionary(ACROLINX_API_TOKEN, {
+              surface: 'TestSurface',
+              scope: 'invalidScope' as any,
+              languageId: 'en',
+            }),
+            ErrorType.Validation,
+          );
 
           const validationDetails = error.validationDetails!;
 
@@ -810,14 +865,16 @@ describe('e2e - AcrolinxEndpoint', () => {
           expect(Array.isArray(validationDetail.possibleValues)).toBeTruthy();
         });
 
-
         it('validation error for invalid klingon language code', async () => {
           const invalidLanguageId = 'thl';
-          const error = await expectFailingPromise<AcrolinxError>(api.addToDictionary(ACROLINX_API_TOKEN, {
-            surface: 'TestSurface',
-            scope: DictionaryScope.language,
-            languageId: invalidLanguageId,
-          }), ErrorType.Validation);
+          const error = await expectFailingPromise<AcrolinxError>(
+            api.addToDictionary(ACROLINX_API_TOKEN, {
+              surface: 'TestSurface',
+              scope: DictionaryScope.language,
+              languageId: invalidLanguageId,
+            }),
+            ErrorType.Validation,
+          );
 
           const validationDetails = error.validationDetails!;
 
@@ -831,11 +888,14 @@ describe('e2e - AcrolinxEndpoint', () => {
         });
 
         it.skip('validation error for invalid guidanceProfile id', async () => {
-          const error = await expectFailingPromise<AcrolinxError>(api.addToDictionary(ACROLINX_API_TOKEN, {
-            surface: 'TestSurface',
-            scope: DictionaryScope.guidanceProfile,
-            guidanceProfileId: 'thisGuidanceProfileDoesReallyNotExist',
-          }), ErrorType.Validation);
+          const error = await expectFailingPromise<AcrolinxError>(
+            api.addToDictionary(ACROLINX_API_TOKEN, {
+              surface: 'TestSurface',
+              scope: DictionaryScope.guidanceProfile,
+              guidanceProfileId: 'thisGuidanceProfileDoesReallyNotExist',
+            }),
+            ErrorType.Validation,
+          );
 
           const validationDetails = error.validationDetails!;
 

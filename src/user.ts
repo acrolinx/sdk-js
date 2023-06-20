@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import {CustomField} from './custom-fields';
+import { CustomField } from './custom-fields';
 
 export interface User {
   id: string;
@@ -26,4 +26,3 @@ export interface User {
   };
   customFields: CustomField[];
 }
-

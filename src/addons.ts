@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import {StringMap, UserId, Username} from './common-types';
+import { StringMap, UserId, Username } from './common-types';
 
 export type AddonId = string;
 export type AppAccessToken = string;
@@ -38,7 +38,6 @@ export interface AppAccessTokenApiResult {
   user: AppUser;
   appId: AddonId;
 }
-
 
 export interface AppAccessTokenResult extends AppAccessTokenApiResult {
   validationRequest: HttpGetRequest;

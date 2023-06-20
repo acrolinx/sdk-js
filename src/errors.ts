@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import {DocumentId} from './document-descriptor';
+import { DocumentId } from './document-descriptor';
 
 /**
  * See also https://github.com/acrolinx/server-api-spec/blob/master/apiary.apib
@@ -42,7 +42,7 @@ export enum ErrorType {
   InvalidBaseUrl = 'invalidBaseUrl',
   NoGuidanceProfileConfigured = 'noGuidanceProfileConfigured',
   AppSignatureRejected = 'appSignatureRejected',
-  LicenseLimitExceeded = 'licenseLimitExceeded'
+  LicenseLimitExceeded = 'licenseLimitExceeded',
 }
 
 export interface AcrolinxErrorProps {
@@ -92,7 +92,6 @@ export class AcrolinxError extends Error implements AcrolinxErrorProps {
   public readonly validationDetails?: ValidationDetail[];
   public readonly documentId?: DocumentId;
 
-
   public constructor(props: AcrolinxErrorProps) {
     super(props.title);
     this.type = props.type;
@@ -100,10 +99,12 @@ export class AcrolinxError extends Error implements AcrolinxErrorProps {
     this.responseHeaders = props.responseHeaders;
 
     // Copy only known props, to avoid accidental leaking of stuff.
-    this.httpRequest = props.httpRequest ? {
-      url: props.httpRequest.url,
-      method: props.httpRequest.method
-    } : undefined;
+    this.httpRequest = props.httpRequest
+      ? {
+          url: props.httpRequest.url,
+          method: props.httpRequest.method,
+        }
+      : undefined;
 
     this.title = props.title;
     this.detail = props.detail;
@@ -117,7 +118,7 @@ export class AcrolinxError extends Error implements AcrolinxErrorProps {
 export function createErrorFromFetchResponse(
   req: HttpRequest,
   res: Response,
-  jsonBody: any | AcrolinxApiError
+  jsonBody: any | AcrolinxApiError,
 ): AcrolinxError {
   if (jsonBody.type) {
     return new AcrolinxError({
@@ -142,14 +143,13 @@ export function createErrorFromFetchResponse(
   }
 }
 
-
 export function wrapFetchError(httpRequest: HttpRequest, error: Error): Promise<any> {
   throw new AcrolinxError({
     detail: `${error.message} (${error.name}, URL: ${httpRequest.url}, Method: ${httpRequest.method})`,
     title: 'Http Connection Problem',
     httpRequest,
     type: ErrorType.HttpConnectionProblem,
-    cause: error
+    cause: error,
   });
 }
 
@@ -160,7 +160,7 @@ export class CheckCanceledByClientError extends AcrolinxError {
   }
 }
 
-function setCorrectErrorPrototype<T>(self: T, clazz: new(...args: any[]) => T) {
+function setCorrectErrorPrototype<T>(self: T, clazz: new (...args: any[]) => T) {
   // https://github.com/Microsoft/TypeScript/wiki/Breaking-Changes#extending-built-ins-like-error-array-and-map-may-no-longer-work
   // eslint-disable-next-line @typescript-eslint/no-unsafe-call
   (Object as any).setPrototypeOf(self, clazz.prototype);

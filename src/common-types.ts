@@ -22,8 +22,8 @@ export type Username = string;
 export type AccessToken = string;
 
 export interface Progress {
-  percent: number;  // TODO: optional?
-  message: string;  // TODO: optional?
+  percent: number; // TODO: optional?
+  message: string; // TODO: optional?
 
   /**
    * Duration in seconds
@@ -39,7 +39,7 @@ export interface SuccessResponse<Data, Links = {}> {
 export interface ProgressResponse {
   progress: Progress;
   links: {
-    poll: URL;  // TODO: optional? empty?
+    poll: URL; // TODO: optional? empty?
   };
 }
 

@@ -14,25 +14,20 @@
  * limitations under the License.
  */
 
-import {Addon, AddonId} from './addons';
+import { Addon, AddonId } from './addons';
 import {
   CheckType,
   ContentEncoding,
   ContentFormatId,
   Goal,
-  GoalId, GoalScoring,
+  GoalId,
+  GoalScoring,
   GuidanceProfileId,
   ReportType,
 } from './capabilities';
-import {
-  AsyncApiResponse,
-  AsyncStartedProcessLinks,
-  LanguageId,
-  SuccessResponse,
-  URL
-} from './common-types';
-import {DictionaryScope} from './dictionary';
-import {DocumentDescriptor} from './document-descriptor';
+import { AsyncApiResponse, AsyncStartedProcessLinks, LanguageId, SuccessResponse, URL } from './common-types';
+import { DictionaryScope } from './dictionary';
+import { DocumentDescriptor } from './document-descriptor';
 import { Integration } from './integration';
 
 export interface CheckRange {
@@ -49,7 +44,7 @@ export interface ExternalContent {
   textReplacements?: ExternalContentField[];
   entities?: ExternalContentField[];
   ditaReferences?: ExternalContentField[];
-  xincludeReferences? : ExternalContentField[];
+  xincludeReferences?: ExternalContentField[];
 }
 
 export interface CheckRequest {
@@ -68,12 +63,12 @@ export interface LiveSearchRequest {
 }
 
 export interface LiveSuggestion {
-  preferredPhrase: string,
-  description: string
+  preferredPhrase: string;
+  description: string;
 }
 export interface LiveSearchResponse {
-  requestId: string,
-  results: LiveSuggestion[]
+  requestId: string;
+  results: LiveSuggestion[];
 }
 
 export interface CheckOptions {
@@ -102,13 +97,13 @@ export type CheckResponse = SuccessResponse<CheckResponseData, AsyncStartedProce
 export type CheckResultResponse = AsyncApiResponse<CheckResult>;
 
 export interface ScoreByGoal {
-  id: string,
-  score: number
+  id: string;
+  score: number;
 }
 
 export interface Metric {
-  id: string,
-  score: number
+  id: string;
+  score: number;
 }
 
 export interface CheckResult {
@@ -121,7 +116,7 @@ export interface CheckResult {
     status: DocumentQualityStatus;
     scoresByGoal?: ScoreByGoal[];
     metrics?: Metric[];
-  }
+  };
   counts: {
     sentences: number;
     words: number;
@@ -157,10 +152,9 @@ export interface KeyValuePair {
   value: string;
 }
 
-
 type AggregatedReport = {
-  reportType: string
-  link: URL
+  reportType: string;
+  link: URL;
 };
 
 export interface AggregatedReportLinkResult {
@@ -168,8 +162,8 @@ export interface AggregatedReportLinkResult {
 }
 
 type ContentAnalysisDashboardLink = {
-  linkType: string
-  link: URL
+  linkType: string;
+  link: URL;
 };
 
 export interface ContentAnalysisDashboardResult {
@@ -199,10 +193,9 @@ export interface DiscoveredKeyword extends Keyword {
   warnings?: KeywordWarning[];
 }
 
-
 export enum KeywordWarningType {
   RankMismatch = 'rankMismatch',
-  Occurrence = 'occurrence'
+  Occurrence = 'occurrence',
 }
 
 export interface KeywordWarning {
@@ -225,7 +218,7 @@ export interface ExternalContentMatch {
   type: string;
   originalBegin: number;
   originalEnd: number;
-  externalContentMatches?: ExternalContentMatch[]
+  externalContentMatches?: ExternalContentMatch[];
 }
 
 export interface Suggestion {
@@ -237,7 +230,7 @@ export interface Suggestion {
 
 export enum SuggestionIconId {
   admitted = 'admitted',
-  preferred = 'preferred'
+  preferred = 'preferred',
 }
 
 export interface CommonIssue {
@@ -265,7 +258,7 @@ export interface CommonIssue {
    * Since Acrolinx platform 2021.4
    * Only available if the server runs in Targets mode.
    */
-  scoring?: GoalScoring
+  scoring?: GoalScoring;
 }
 
 export interface PositionalInformation {
@@ -275,7 +268,7 @@ export interface PositionalInformation {
 
 export enum IssueType {
   analytical = 'analytical',
-  actionable = 'actionable'
+  actionable = 'actionable',
 }
 
 export interface Issue extends CommonIssue {
@@ -301,14 +294,12 @@ export interface TermContributionLinks {
   termContributionInteractive?: URL;
 }
 
-
 export interface IssueLinks extends TermContributionLinks {
   help?: URL;
   addToDictionary?: URL;
 
   [linkId: string]: URL | undefined;
 }
-
 
 export type Html = string;
 
@@ -319,7 +310,7 @@ export interface GoalWithIssueCount extends Goal {
 export enum DocumentQualityStatus {
   red = 'red',
   yellow = 'yellow',
-  green = 'green'
+  green = 'green',
 }
 
 export interface CancelCheckResponseData {
