@@ -18,7 +18,7 @@ import {AcrolinxError, createErrorFromFetchResponse, ErrorType, HttpRequest} fro
 
 // TODO: Simplify as soon as all API Urls wrap the error
 export async function handleExpectedJsonResponse<T>(req: HttpRequest, res: Response): Promise<T> {
-  if (200 <= res.status && res.status < 300) {
+  if (200 <= res.status && res.status < 300 || res.status === 429) {
     const jsonResult = await toJson<any>(req, res);
     if (jsonResult.error) {
       throw createErrorFromFetchResponse(req, res, jsonResult.error);
