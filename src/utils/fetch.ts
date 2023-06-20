@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import {AcrolinxError, createErrorFromFetchResponse, ErrorType, HttpRequest} from '../errors';
+import { AcrolinxError, createErrorFromFetchResponse, ErrorType, HttpRequest } from '../errors';
 
 // TODO: Simplify as soon as all API Urls wrap the error
 export async function handleExpectedJsonResponse<T>(req: HttpRequest, res: Response): Promise<T> {
@@ -53,7 +53,7 @@ async function createErrorFromResponse(req: HttpRequest, res: Response): Promise
 }
 
 export function toJson<T>(httpRequest: HttpRequest, res: Response): T | Promise<T> {
-  return res.json().catch(e => {
+  return res.json().catch((e) => {
     throw new AcrolinxError({
       detail: e.message,
       httpRequest,

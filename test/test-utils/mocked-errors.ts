@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import {ErrorType} from '../../src/errors';
+import { ErrorType } from '../../src/errors';
 
 export const SIGNIN_URL_EXPIRED_ERROR = {
   detail: 'The sign-in URL does not exists or is expired. Please start a new sign-in process.',
@@ -22,7 +22,6 @@ export const SIGNIN_URL_EXPIRED_ERROR = {
   title: 'Sign-in URL is not available.',
   type: ErrorType.Client,
 };
-
 
 export const CLIENT_SIGNATURE_MISSING = {
   detail: 'Please provide a valid signature in the X-Acrolinx-Client header.',

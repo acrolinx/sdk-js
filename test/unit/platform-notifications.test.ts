@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-import {AcrolinxEndpoint} from '../../src/index';
-import {DUMMY_ACCESS_TOKEN, mockAcrolinxServer, restoreOriginalFetch} from '../test-utils/mock-server';
-import {DUMMY_ENDPOINT_PROPS, DUMMY_SERVER_URL} from './common';
+import { AcrolinxEndpoint } from '../../src/index';
+import { DUMMY_ACCESS_TOKEN, mockAcrolinxServer, restoreOriginalFetch } from '../test-utils/mock-server';
+import { DUMMY_ENDPOINT_PROPS, DUMMY_SERVER_URL } from './common';
 
 describe('platform-notifications', () => {
   let endpoint: AcrolinxEndpoint;

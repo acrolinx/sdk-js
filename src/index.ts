@@ -19,7 +19,7 @@ import {
   AppAccessToken,
   AppAccessTokenApiResult,
   AppAccessTokenResult,
-  AppAccessTokenValidationResult
+  AppAccessTokenValidationResult,
 } from './addons';
 import {
   CheckingCapabilities,
@@ -27,7 +27,7 @@ import {
   ContentEncoding,
   ContentFormat,
   GuidanceProfile,
-  ReportType
+  ReportType,
 } from './capabilities';
 import {
   AggregatedReportLinkResult,
@@ -43,7 +43,7 @@ import {
   Report,
   TermHarvestingReport,
   LiveSearchRequest,
-  LiveSearchResponse
+  LiveSearchResponse,
 } from './check';
 import {
   AccessToken,
@@ -54,22 +54,22 @@ import {
   Progress,
   StringMap,
   SuccessResponse,
-  UserId
+  UserId,
 } from './common-types';
-import {AddToDictionaryRequest, AddToDictionaryResponse, DictionaryCapabilities} from './dictionary';
-import {DocumentDescriptor, DocumentId, sanitizeDocumentDescriptor} from './document-descriptor';
-import {AcrolinxError, CheckCanceledByClientError, ErrorType, wrapFetchError} from './errors';
-import {AnalysisRequest, ExtractionResult} from './extraction';
-import {PlatformFeatures, PlatformFeaturesResponse} from './features';
+import { AddToDictionaryRequest, AddToDictionaryResponse, DictionaryCapabilities } from './dictionary';
+import { DocumentDescriptor, DocumentId, sanitizeDocumentDescriptor } from './document-descriptor';
+import { AcrolinxError, CheckCanceledByClientError, ErrorType, wrapFetchError } from './errors';
+import { AnalysisRequest, ExtractionResult } from './extraction';
+import { PlatformFeatures, PlatformFeaturesResponse } from './features';
 import {
   HEADER_X_ACROLINX_APP_SIGNATURE,
   HEADER_X_ACROLINX_AUTH,
   HEADER_X_ACROLINX_BASE_URL,
   HEADER_X_ACROLINX_CLIENT,
-  HEADER_X_ACROLINX_CLIENT_LOCALE
+  HEADER_X_ACROLINX_CLIENT_LOCALE,
 } from './headers';
-import {ServerNotificationPost, ServerNotificationResponse} from './notifications';
-import {PlatformCapabilities} from './platform-capabilities';
+import { ServerNotificationPost, ServerNotificationResponse } from './notifications';
+import { PlatformCapabilities } from './platform-capabilities';
 import {
   isSigninLinksResult,
   isSigninSuccessResult,
@@ -78,19 +78,19 @@ import {
   SigninPollResult,
   SigninResult,
   SigninSuccessData,
-  SigninSuccessResult
+  SigninSuccessResult,
 } from './signin';
-import {User} from './user';
-import {handleExpectedJsonResponse, handleExpectedTextResponse} from './utils/fetch';
+import { User } from './user';
+import { handleExpectedJsonResponse, handleExpectedTextResponse } from './utils/fetch';
 import * as logging from './utils/logging';
-import {waitMs} from './utils/mixed-utils';
+import { waitMs } from './utils/mixed-utils';
 
 export * from './dictionary';
 export * from './extraction';
-export {isSigninSuccessResult, AuthorizationType} from './signin';
-export {AcrolinxApiError} from './errors';
-export {setLoggingEnabled} from './utils/logging';
-export {SigninSuccessResult, isSigninLinksResult, PollMoreResult, SigninResult, SigninLinksResult};
+export { isSigninSuccessResult, AuthorizationType } from './signin';
+export { AcrolinxApiError } from './errors';
+export { setLoggingEnabled } from './utils/logging';
+export { SigninSuccessResult, isSigninLinksResult, PollMoreResult, SigninResult, SigninLinksResult };
 export {
   AcrolinxError,
   AccessToken,
@@ -112,10 +112,10 @@ export {
   CheckResultResponse,
   CheckResponse,
   Report,
-  PlatformFeatures
+  PlatformFeatures,
 };
 
-export {HEADER_X_ACROLINX_APP_SIGNATURE};
+export { HEADER_X_ACROLINX_APP_SIGNATURE };
 
 export * from './check';
 export * from './capabilities';
@@ -131,7 +131,8 @@ export * from './notifications';
 export const DEVELOPMENT_SIGNATURE = 'SW50ZWdyYXRpb25EZXZlbG9wbWVudERlbW9Pbmx5';
 
 /* tslint:disable-next-line:max-line-length*/
-export const DEVELOPMENT_APP_SIGNATURE = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJuYW1lIjoiS2lsbGVyIEFwcCIsImlkIjoiNGVlZDM3NjctMGYzMS00ZDVmLWI2MjktYzg2MWFiM2VkODUyIiwidHlwZSI6IkFQUCIsImlhdCI6MTU2MTE4ODI5M30.zlVJuGITMjAJ2p4nl-qtpj4N0p_8e4tenr-4dkrGdXg';
+export const DEVELOPMENT_APP_SIGNATURE =
+  'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJuYW1lIjoiS2lsbGVyIEFwcCIsImlkIjoiNGVlZDM3NjctMGYzMS00ZDVmLWI2MjktYzg2MWFiM2VkODUyIiwidHlwZSI6IkFQUCIsImlhdCI6MTU2MTE4ODI5M30.zlVJuGITMjAJ2p4nl-qtpj4N0p_8e4tenr-4dkrGdXg';
 
 export interface Server {
   version: string;
@@ -192,8 +193,7 @@ export interface AdditionalRequestOptions {
   headers?: StringMap;
 }
 
-export interface CancelablePollLoopOptions extends CheckAndGetResultOptions, AdditionalRequestOptions {
-}
+export interface CancelablePollLoopOptions extends CheckAndGetResultOptions, AdditionalRequestOptions {}
 
 export interface CancelablePromiseWrapper<T> {
   promise: Promise<T>;
@@ -217,7 +217,7 @@ export class AcrolinxEndpoint {
   constructor(props: AcrolinxEndpointProps) {
     this.props = {
       ...props,
-      acrolinxUrl: props.acrolinxUrl.trim().replace(/\/$/, '')
+      acrolinxUrl: props.acrolinxUrl.trim().replace(/\/$/, ''),
     };
   }
 
@@ -225,13 +225,12 @@ export class AcrolinxEndpoint {
     this.props.clientLocale = clientLocale;
   }
 
-
   public async getPlatformInformation(): Promise<PlatformInformation> {
     return getData<PlatformInformation>(this.getJsonFromPath('/api/v1/'));
   }
 
   public async signInWithSSO(genericToken: string, username: string) {
-    const signinResult = await this.signin({genericToken, username});
+    const signinResult = await this.signin({ genericToken, username });
     if (isSigninSuccessResult(signinResult)) {
       return signinResult;
     } else {
@@ -244,7 +243,7 @@ export class AcrolinxEndpoint {
   }
 
   public async singInInteractive(opts: SignInInteractiveOptions): Promise<SigninSuccessData> {
-    const signinResult = await this.signin({accessToken: opts.accessToken});
+    const signinResult = await this.signin({ accessToken: opts.accessToken });
 
     if (isSigninSuccessResult(signinResult)) {
       return signinResult.data;
@@ -259,8 +258,10 @@ export class AcrolinxEndpoint {
     return this.post<SigninResult>('/api/v1/auth/sign-ins', {}, getSigninRequestHeaders(options));
   }
 
-  public async pollForSignin(signinLinks: SigninLinksResult,
-                             lastPollResult?: PollMoreResult): Promise<SigninPollResult> {
+  public async pollForSignin(
+    signinLinks: SigninLinksResult,
+    lastPollResult?: PollMoreResult,
+  ): Promise<SigninPollResult> {
     if (lastPollResult && lastPollResult.progress.retryAfter) {
       logging.log('Waiting before retry', lastPollResult.progress.retryAfter);
       await waitMs(lastPollResult.progress.retryAfter * 1000);
@@ -270,7 +271,7 @@ export class AcrolinxEndpoint {
 
   public async getAppAccessToken(accessToken: AccessToken, appId: AddonId): Promise<AppAccessTokenResult> {
     const tokenApiResult = await getData<AppAccessTokenApiResult>(
-      this.post('/api/v1/apps/accessToken/' + appId, {}, undefined, accessToken)
+      this.post('/api/v1/apps/accessToken/' + appId, {}, undefined, accessToken),
     );
     return {
       ...tokenApiResult,
@@ -279,9 +280,9 @@ export class AcrolinxEndpoint {
         headers: {
           'Content-Type': 'application/json',
           [HEADER_X_ACROLINX_CLIENT]: this.getAcrolinxClientHttpHeader(),
-          [HEADER_X_ACROLINX_AUTH]: tokenApiResult.appAccessToken
-        }
-      }
+          [HEADER_X_ACROLINX_AUTH]: tokenApiResult.appAccessToken,
+        },
+      },
     };
   }
 
@@ -294,7 +295,9 @@ export class AcrolinxEndpoint {
   }
 
   public async getFeatures(accessToken: AccessToken): Promise<PlatformFeatures> {
-    const responsePromise = await getData<PlatformFeaturesResponse>(this.getJsonFromPath('/api/v1/configuration/features', accessToken));
+    const responsePromise = await getData<PlatformFeaturesResponse>(
+      this.getJsonFromPath('/api/v1/configuration/features', accessToken),
+    );
     return responsePromise.features;
   }
 
@@ -307,13 +310,18 @@ export class AcrolinxEndpoint {
   }
 
   public async getLiveSuggestions(accessToken: AccessToken, req: LiveSearchRequest): Promise<LiveSearchResponse> {
-    return this.post<LiveSearchResponse>('/reuse-service/api/v1/phrases/preferred/with-description', req, {}, accessToken);
+    return this.post<LiveSearchResponse>(
+      '/reuse-service/api/v1/phrases/preferred/with-description',
+      req,
+      {},
+      accessToken,
+    );
   }
 
   public checkAndGetResult(
     accessToken: AccessToken,
     req: CheckRequest,
-    opts: CheckAndGetResultOptions = {}
+    opts: CheckAndGetResultOptions = {},
   ): CancelablePromiseWrapper<CheckResult> {
     return this.startCancelablePollLoop(accessToken, this.check(accessToken, req), opts);
   }
@@ -321,12 +329,16 @@ export class AcrolinxEndpoint {
   public analyzeAndPoll(
     accessToken: AccessToken,
     req: AnalysisRequest,
-    opts: CheckAndGetResultOptions = {}
+    opts: CheckAndGetResultOptions = {},
   ): CancelablePromiseWrapper<ExtractionResult> {
-    const headers = {[HEADER_X_ACROLINX_APP_SIGNATURE]: req.appSignature};
-    const asyncStartedProcessPromise = this.post<AsyncStartedProcess>('/api/v1/apps/analyses', req, headers,
-      accessToken);
-    return this.startCancelablePollLoop(accessToken, asyncStartedProcessPromise, {...opts, headers});
+    const headers = { [HEADER_X_ACROLINX_APP_SIGNATURE]: req.appSignature };
+    const asyncStartedProcessPromise = this.post<AsyncStartedProcess>(
+      '/api/v1/apps/analyses',
+      req,
+      headers,
+      accessToken,
+    );
+    return this.startCancelablePollLoop(accessToken, asyncStartedProcessPromise, { ...opts, headers });
   }
 
   public async cancelCheck(accessToken: AccessToken, check: CheckResponse): Promise<CancelCheckResponse> {
@@ -337,8 +349,10 @@ export class AcrolinxEndpoint {
     return this.pollForAsyncResult<CheckResultResponse>(accessToken, check);
   }
 
-  public async getTermHarvestingReport(accessToken: AccessToken,
-                                       reports: HasTermHarvestingReport): Promise<TermHarvestingReport> {
+  public async getTermHarvestingReport(
+    accessToken: AccessToken,
+    reports: HasTermHarvestingReport,
+  ): Promise<TermHarvestingReport> {
     return getData(this.getJsonFromUrl<ApiResponse<TermHarvestingReport>>(reports.termHarvesting.link, accessToken));
   }
 
@@ -347,32 +361,45 @@ export class AcrolinxEndpoint {
    */
   public async getLinkToAggregatedReport(
     accessToken: AccessToken,
-    batchId: string
+    batchId: string,
   ): Promise<AggregatedReportLinkResult> {
-    return this.getJsonFromPath<AggregatedReportLinkResult>('/api/v1/checking/aggregation/'
-      + encodeURIComponent(batchId), accessToken);
+    return this.getJsonFromPath<AggregatedReportLinkResult>(
+      '/api/v1/checking/aggregation/' + encodeURIComponent(batchId),
+      accessToken,
+    );
   }
 
-  public async getContentAnalysisDashboard(
-    accessToken: AccessToken,
-    batchId: string
-  ): Promise<string> {
-    const serviceResult = await getData(this.getJsonFromPath<SuccessResponse<ContentAnalysisDashboardResult>>(
-      `/api/v1/checking/${encodeURIComponent(batchId)}/contentanalysis`, accessToken));
-    const shortWithoutAccessToken = serviceResult.links.filter(link => link.linkType === 'shortWithoutAccessToken')[0];
+  public async getContentAnalysisDashboard(accessToken: AccessToken, batchId: string): Promise<string> {
+    const serviceResult = await getData(
+      this.getJsonFromPath<SuccessResponse<ContentAnalysisDashboardResult>>(
+        `/api/v1/checking/${encodeURIComponent(batchId)}/contentanalysis`,
+        accessToken,
+      ),
+    );
+    const shortWithoutAccessToken = serviceResult.links.filter(
+      (link) => link.linkType === 'shortWithoutAccessToken',
+    )[0];
     return shortWithoutAccessToken.link;
   }
 
-  public async getServerNotifications(accessToken: AccessToken,
-                                      sinceTimeStamp: number): Promise<ServerNotificationResponse> {
+  public async getServerNotifications(
+    accessToken: AccessToken,
+    sinceTimeStamp: number,
+  ): Promise<ServerNotificationResponse> {
     return this.getJsonFromPath<any>('/api/v1/broadcasts/platform-notifications/' + sinceTimeStamp, accessToken);
   }
 
   // TODO (marco) Review! Added this method to test DEV-17460
-  public async postServerNotifications(accessToken: AccessToken,
-                                       notification: ServerNotificationPost): Promise<ServerNotificationResponse> {
-    return this.post<ServerNotificationResponse>('/api/v1/broadcasts/platform-notifications/',
-      notification, {}, accessToken);
+  public async postServerNotifications(
+    accessToken: AccessToken,
+    notification: ServerNotificationPost,
+  ): Promise<ServerNotificationResponse> {
+    return this.post<ServerNotificationResponse>(
+      '/api/v1/broadcasts/platform-notifications/',
+      notification,
+      {},
+      accessToken,
+    );
   }
 
   public getDictionaryCapabilities(accessToken: AccessToken): Promise<DictionaryCapabilities> {
@@ -388,19 +415,22 @@ export class AcrolinxEndpoint {
   }
 
   public setUserCustomFields(accessToken: AccessToken, id: UserId, customFieldValues: KeyValuePair[]): Promise<User> {
-    const requestBody = {id, customFields: customFieldValues};
+    const requestBody = { id, customFields: customFieldValues };
     return getData(this.put('/api/v1/user/' + id, requestBody, {}, accessToken));
   }
 
   public getDocumentDescriptor(accessToken: AccessToken, id: DocumentId): Promise<DocumentDescriptor> {
-    return getData<DocumentDescriptor>(this.getJsonFromPath('/api/v1/document/' + id, accessToken))
-      .then(sanitizeDocumentDescriptor);
+    return getData<DocumentDescriptor>(this.getJsonFromPath('/api/v1/document/' + id, accessToken)).then(
+      sanitizeDocumentDescriptor,
+    );
   }
 
-  public setDocumentCustomFields(accessToken: AccessToken,
-                                 documentId: DocumentId,
-                                 customFieldValues: KeyValuePair[]): Promise<DocumentDescriptor> {
-    const requestBody = {id: documentId, customFields: customFieldValues};
+  public setDocumentCustomFields(
+    accessToken: AccessToken,
+    documentId: DocumentId,
+    customFieldValues: KeyValuePair[],
+  ): Promise<DocumentDescriptor> {
+    const requestBody = { id: documentId, customFields: customFieldValues };
     return getData(this.put('/api/v1/document/' + documentId, requestBody, {}, accessToken));
   }
 
@@ -411,24 +441,24 @@ export class AcrolinxEndpoint {
   public async getJsonFromUrl<T>(
     url: string,
     accessToken?: AccessToken,
-    opts: AdditionalRequestOptions = {}
+    opts: AdditionalRequestOptions = {},
   ): Promise<T> {
     return this.fetchJson(url, {
-      headers: {...this.getCommonHeaders(accessToken), ...opts.headers},
+      headers: { ...this.getCommonHeaders(accessToken), ...opts.headers },
     });
   }
 
   public async getTextFromUrl(
     url: string,
     accessToken?: AccessToken,
-    opts: AdditionalRequestOptions = {}
+    opts: AdditionalRequestOptions = {},
   ): Promise<string> {
-    const httpRequest = {url, method: 'GET'};
+    const httpRequest = { url, method: 'GET' };
     return this.fetch(url, {
-      headers: {...this.getCommonHeaders(accessToken), ...opts.headers},
+      headers: { ...this.getCommonHeaders(accessToken), ...opts.headers },
     }).then(
-      res => handleExpectedTextResponse(httpRequest, res),
-      error => wrapFetchError(httpRequest, error)
+      (res) => handleExpectedTextResponse(httpRequest, res),
+      (error) => wrapFetchError(httpRequest, error),
     );
   }
 
@@ -438,7 +468,7 @@ export class AcrolinxEndpoint {
 
   private async pollForInteractiveSignIn(
     signinLinksResult: SigninLinksResult,
-    timeoutMs: number
+    timeoutMs: number,
   ): Promise<SigninSuccessData> {
     const startTime = Date.now();
     let pollResult;
@@ -450,17 +480,16 @@ export class AcrolinxEndpoint {
     }
 
     throw new AcrolinxError({
-        type: ErrorType.SigninTimedOut,
-        title: 'Interactive sign-in time out',
-        detail: `Interactive sign-in has timed out by client (${Date.now() - startTime} > ${timeoutMs} ms).`
-      }
-    );
+      type: ErrorType.SigninTimedOut,
+      title: 'Interactive sign-in time out',
+      detail: `Interactive sign-in has timed out by client (${Date.now() - startTime} > ${timeoutMs} ms).`,
+    });
   }
 
   private startCancelablePollLoop<Result>(
     accessToken: AccessToken,
     asyncStartedProcessPromise: Promise<AsyncStartedProcess>,
-    opts: CancelablePollLoopOptions = {}
+    opts: CancelablePollLoopOptions = {},
   ): CancelablePromiseWrapper<Result> {
     let canceledByClient = false;
     let requestedCanceledOnServer = false;
@@ -521,15 +550,14 @@ export class AcrolinxEndpoint {
       getId(): string | undefined {
         return runningCheck?.data.id;
       },
-      cancel
+      cancel,
     };
   }
-
 
   private async pollForAsyncResult<R>(
     accessToken: AccessToken,
     check: AsyncStartedProcess,
-    opts: AdditionalRequestOptions = {}
+    opts: AdditionalRequestOptions = {},
   ): Promise<R> {
     return this.getJsonFromUrl<R>(check.links.result, accessToken, opts);
   }
@@ -537,7 +565,7 @@ export class AcrolinxEndpoint {
   private async cancelAsyncStartedProcess<CancelResponse>(
     accessToken: AccessToken,
     process: AsyncStartedProcess,
-    opts: AdditionalRequestOptions = {}
+    opts: AdditionalRequestOptions = {},
   ): Promise<CancelResponse> {
     return this.deleteUrl<CancelResponse>(process.links.cancel, accessToken, opts);
   }
@@ -569,33 +597,36 @@ export class AcrolinxEndpoint {
     return this.send<T>('PUT', path, body, headers, accessToken);
   }
 
-  private async send<T>(method: 'POST' | 'PUT',
-                        path: string,
-                        body: {},
-                        headers: StringMap = {},
-                        accessToken?: AccessToken): Promise<T> {
+  private async send<T>(
+    method: 'POST' | 'PUT',
+    path: string,
+    body: {},
+    headers: StringMap = {},
+    accessToken?: AccessToken,
+  ): Promise<T> {
     return this.fetchJson(this.getUrlOfPath(path), {
       body: JSON.stringify(body),
-      headers: {...this.getCommonHeaders(accessToken), ...headers},
+      headers: { ...this.getCommonHeaders(accessToken), ...headers },
       method,
     });
   }
 
   private async deleteUrl<T>(url: string, accessToken: AccessToken, opts: AdditionalRequestOptions = {}): Promise<T> {
     return this.fetchJson(url, {
-      headers: {...this.getCommonHeaders(accessToken), ...opts.headers},
+      headers: { ...this.getCommonHeaders(accessToken), ...opts.headers },
       method: 'DELETE',
     });
   }
 
-
   private async fetchJson<T>(url: string, init: RequestInit = {}): Promise<T> {
     const httpRequest = {
       url,
-      method: init.method || 'GET'
+      method: init.method || 'GET',
     };
-    return this.fetch(url, init).then((res) => handleExpectedJsonResponse(httpRequest, res),
-      error => wrapFetchError(httpRequest, error));
+    return this.fetch(url, init).then(
+      (res) => handleExpectedJsonResponse(httpRequest, res),
+      (error) => wrapFetchError(httpRequest, error),
+    );
   }
 
   /* tslint:disable:no-console */
@@ -605,7 +636,7 @@ export class AcrolinxEndpoint {
       ...init,
       // Ensure credentials: 'same-origin' in old browsers: https://github.com/github/fetch#sending-cookies
       credentials: this.props.corsWithCredentials ? 'include' : 'same-origin',
-      ...(this.props.additionalFetchProperties || {})
+      ...(this.props.additionalFetchProperties || {}),
     };
     if (this.props.enableHttpLogging) {
       try {
@@ -626,12 +657,12 @@ export class AcrolinxEndpoint {
 }
 
 function getData<T>(promise: Promise<SuccessResponse<T>>): Promise<T> {
-  return promise.then(r => r.data);
+  return promise.then((r) => r.data);
 }
 
 function getSigninRequestHeaders(options: SigninOptions = {}): StringMap {
   if ('accessToken' in options && options.accessToken) {
-    return {[HEADER_X_ACROLINX_AUTH]: options.accessToken};
+    return { [HEADER_X_ACROLINX_AUTH]: options.accessToken };
   } else if (isSsoSigninOption(options)) {
     return {
       username: options.username,
@@ -647,6 +678,6 @@ function createCheckCanceledByClientError() {
     detail: 'The check was canceled. No result is available.',
     type: ErrorType.CheckCanceled,
     title: 'Check canceled',
-    status: 400
+    status: 400,
   });
 }

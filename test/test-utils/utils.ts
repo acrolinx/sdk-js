@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import {ErrorType, HttpRequest} from '../../src/errors';
+import { ErrorType, HttpRequest } from '../../src/errors';
 
 export function testIf(condition: boolean | string | undefined, testName: string, test: (done: () => void) => void) {
   if (condition) {
@@ -35,7 +35,7 @@ export function describeIf(condition: boolean | string | undefined, testName: st
 export async function expectFailingPromise<E = any>(
   promise: Promise<any>,
   expectedErrorType: ErrorType,
-  expectedHttpRequest?: HttpRequest
+  expectedHttpRequest?: HttpRequest,
 ): Promise<E> {
   let unexpectedSuccessfulResult: any;
   try {
@@ -48,5 +48,5 @@ export async function expectFailingPromise<E = any>(
     return e;
   }
 
-  throw(new Error('Unexpected success ' + JSON.stringify(unexpectedSuccessfulResult)));
+  throw new Error('Unexpected success ' + JSON.stringify(unexpectedSuccessfulResult));
 }

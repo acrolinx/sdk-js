@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import {CustomField} from './custom-fields';
+import { CustomField } from './custom-fields';
 
 export type DocumentId = string;
 
@@ -28,5 +28,5 @@ export interface DocumentDescriptor {
 
 // TODO: Might be unnecessary in the near future
 export function sanitizeDocumentDescriptor(d: DocumentDescriptor): DocumentDescriptor {
-  return {...d, customFields: d.customFields || []};
+  return { ...d, customFields: d.customFields || [] };
 }

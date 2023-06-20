@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-import {GuidanceProfileId} from './capabilities';
-import {LanguageId} from './common-types';
-import {DocumentId} from './document-descriptor';
+import { GuidanceProfileId } from './capabilities';
+import { LanguageId } from './common-types';
+import { DocumentId } from './document-descriptor';
 
 export enum DictionaryScope {
   language = 'language',
@@ -50,10 +50,9 @@ export interface AddToDictionaryDocumentRequest extends CommonAddToDictionaryReq
 }
 
 export type AddToDictionaryRequest =
-  AddToDictionaryGuidanceProfileRequest
+  | AddToDictionaryGuidanceProfileRequest
   | AddToDictionaryLanguageRequest
   | AddToDictionaryDocumentRequest;
-
 
 export interface AddToDictionaryResponse extends CommonAddToDictionaryRequest {
   scope: DictionaryScope;

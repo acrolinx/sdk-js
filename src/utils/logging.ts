@@ -42,4 +42,3 @@ export function error(...args: any[]) {
 export function setLoggingEnabled(enabled: boolean) {
   LOGGING_ENABLED = enabled;
 }
-

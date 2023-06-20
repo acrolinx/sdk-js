@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import {SuccessResponse} from './common-types';
+import { SuccessResponse } from './common-types';
 
 export enum ServerNotificationImportance {
   Normal = 'normal',

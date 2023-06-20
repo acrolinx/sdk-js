@@ -16,25 +16,25 @@
 
 /* tslint:disable:no-console object-literal-sort-keys */
 import * as fetchMock from 'fetch-mock';
-import {MockResponseObject} from 'fetch-mock';
+import { MockResponseObject } from 'fetch-mock';
 import * as _ from 'lodash';
-import {SuccessResponse} from '../../src/common-types';
-import {AcrolinxApiError, AcrolinxError, ErrorType} from '../../src/errors';
-import {HEADER_X_ACROLINX_AUTH, HEADER_X_ACROLINX_BASE_URL, HEADER_X_ACROLINX_CLIENT} from '../../src/headers';
-import {DEVELOPMENT_SIGNATURE} from '../../src/index';
-import {ServerNotificationResponseData} from '../../src/notifications';
-import {AuthorizationType, SigninPollResult, SigninResult, SigninSuccessResult} from '../../src/signin';
-import {MockResponseObjectOf, Route} from './common-mocking';
-import {CheckServiceMock} from './mock-server-checking';
+import { SuccessResponse } from '../../src/common-types';
+import { AcrolinxApiError, AcrolinxError, ErrorType } from '../../src/errors';
+import { HEADER_X_ACROLINX_AUTH, HEADER_X_ACROLINX_BASE_URL, HEADER_X_ACROLINX_CLIENT } from '../../src/headers';
+import { DEVELOPMENT_SIGNATURE } from '../../src/index';
+import { ServerNotificationResponseData } from '../../src/notifications';
+import { AuthorizationType, SigninPollResult, SigninResult, SigninSuccessResult } from '../../src/signin';
+import { MockResponseObjectOf, Route } from './common-mocking';
+import { CheckServiceMock } from './mock-server-checking';
 import {
   AUTH_TOKEN_INVALID,
   AUTH_TOKEN_MISSING,
   CLIENT_SIGNATURE_INVALID,
   CLIENT_SIGNATURE_MISSING,
-  SIGNIN_URL_EXPIRED_ERROR
+  SIGNIN_URL_EXPIRED_ERROR,
 } from './mocked-errors';
 
-export {SIGNIN_URL_EXPIRED_ERROR};
+export { SIGNIN_URL_EXPIRED_ERROR };
 
 export const DUMMY_SIGNIN_LINK_PATH_INTERACTIVE = '/signin-ui/';
 const DUMMY_SIGNIN_LINK_PATH_POLL = '/api/v1/auth/sign-ins/';
@@ -60,7 +60,7 @@ export interface StringMap {
 }
 
 function isMockResponseObject(o: MockResponseObject | {}): o is MockResponseObject {
-  return !!((o as MockResponseObject).body);
+  return !!(o as MockResponseObject).body;
 }
 
 function isAcrolinxApiError(o: AcrolinxApiError | {}): o is AcrolinxApiError {
@@ -73,17 +73,17 @@ interface SigninState {
 }
 
 export enum SsoMockMode {
-  none= 'none',
+  none = 'none',
 
   /**
    * Used by to simulate a proxy that add credentials automatically (eg. for the Sidebar).
    */
-  proxy= 'proxy',
+  proxy = 'proxy',
 
   /**
    * Used to simulate an Acrolinx server that requires the correct generic password and a username for SSO.
    */
-  direct= 'direct',
+  direct = 'direct',
 }
 
 export class AcrolinxServerMock {
@@ -131,7 +131,7 @@ export class AcrolinxServerMock {
         method: 'GET',
         path: /api\/v1\/broadcasts\/platform-notifications\/(.*)$/,
       },
-      ...this.checkService.getRoutes()
+      ...this.checkService.getRoutes(),
     ];
 
     this.signinIds.dummy = {};
@@ -153,23 +153,22 @@ export class AcrolinxServerMock {
 
   // eslint-disable-next-line sonarjs/cognitive-complexity
   public handleFetchRequest = (url: string, optsArg: RequestInit = {}): MockResponseObject => {
-    const opts = {method: 'GET', ...optsArg, headers: ((optsArg.headers || {}) as StringMap)};
+    const opts = { method: 'GET', ...optsArg, headers: (optsArg.headers || {}) as StringMap };
 
-    this.requests.push({opts, url});
+    this.requests.push({ opts, url });
 
     const acrolinxClientHeader = getHeader(optsArg, HEADER_X_ACROLINX_CLIENT);
     if (acrolinxClientHeader) {
-      const [signature, version] = acrolinxClientHeader.split(';').map(s => s.trim());
+      const [signature, version] = acrolinxClientHeader.split(';').map((s) => s.trim());
       if (!signature || !version) {
         return this.createAcrolinxApiErrorResponse(CLIENT_SIGNATURE_MISSING);
       }
       if (!_.includes(ALLOWED_CLIENT_SIGNATURES, signature)) {
-        return this.createAcrolinxApiErrorResponse({...CLIENT_SIGNATURE_INVALID, title: signature});
+        return this.createAcrolinxApiErrorResponse({ ...CLIENT_SIGNATURE_INVALID, title: signature });
       }
     } else if (_.includes(url, 'api')) {
       return this.createAcrolinxApiErrorResponse(CLIENT_SIGNATURE_MISSING);
     }
-
 
     if (_.includes(url, '/api/') && !_.includes(url, '/auth/')) {
       const token = getHeader(opts, HEADER_X_ACROLINX_AUTH);
@@ -190,18 +189,18 @@ export class AcrolinxServerMock {
           if (isMockResponseObject(handlerResult)) {
             return handlerResult;
           } else if (isAcrolinxApiError(handlerResult)) {
-            return {body: handlerResult, status: handlerResult.status};
+            return { body: handlerResult, status: handlerResult.status };
           } else {
             return this.returnResponse(handlerResult);
           }
         } catch (error) {
-          return {body: {error}, status: 500};
+          return { body: { error }, status: 500 };
         }
       }
     }
 
     console.log(`FakeServer can not handle url "${url}"`, opts);
-    return this.createAcrolinxApiErrorResponse({status: 404});
+    return this.createAcrolinxApiErrorResponse({ status: 404 });
   };
 
   public deleteSigninPollUrl(url: string) {
@@ -209,8 +208,10 @@ export class AcrolinxServerMock {
     this.deleteSignin(signinId);
   }
 
-  public pollForSignin(signinId: string,
-                       _opts: RequestInit): MockResponseObjectOf<SigninPollResult | AcrolinxApiError> {
+  public pollForSignin(
+    signinId: string,
+    _opts: RequestInit,
+  ): MockResponseObjectOf<SigninPollResult | AcrolinxApiError> {
     const signinState = this.signinIds[signinId];
     if (!signinState) {
       return this.createAcrolinxApiErrorResponse(SIGNIN_URL_EXPIRED_ERROR);
@@ -223,8 +224,8 @@ export class AcrolinxServerMock {
       };
     } else {
       return {
-        body: {progress: {percent: 0, message: 'bla', retryAfter: this.retryAfter}, links: {poll: 'dummmy'}},
-        headers: {'retry-after': '' + this.retryAfter},
+        body: { progress: { percent: 0, message: 'bla', retryAfter: this.retryAfter }, links: { poll: 'dummmy' } },
+        headers: { 'retry-after': '' + this.retryAfter },
         status: 202,
       };
     }
@@ -235,12 +236,14 @@ export class AcrolinxServerMock {
   }
 
   private returnResponse(body: {}) {
-    return {body};
+    return { body };
   }
 
-  private getPlatformNotifications(_sinceTimeStamp: string,
-                                   _opts: RequestInit): SuccessResponse<ServerNotificationResponseData> {
-    return {data: {platformNotifications: [], requestTimeInMilliseconds: Date.now()}, links: {}};
+  private getPlatformNotifications(
+    _sinceTimeStamp: string,
+    _opts: RequestInit,
+  ): SuccessResponse<ServerNotificationResponseData> {
+    return { data: { platformNotifications: [], requestTimeInMilliseconds: Date.now() }, links: {} };
   }
 
   private signin(opts: RequestInit): SigninResult {
@@ -251,7 +254,7 @@ export class AcrolinxServerMock {
     switch (this.ssoMockMode) {
       case SsoMockMode.direct:
         if (getHeader(opts, 'password') !== SSO_GENERIC_TOKEN) {
-          throw new AcrolinxError({type: ErrorType.SSO, title: 'SSO Error Title', detail: 'SSO Error Details'});
+          throw new AcrolinxError({ type: ErrorType.SSO, title: 'SSO Error Title', detail: 'SSO Error Details' });
         }
         return this.createLoginSuccessResult(AuthorizationType.ACROLINX_SSO, getHeader(opts, 'username'));
       case SsoMockMode.proxy:
@@ -261,17 +264,16 @@ export class AcrolinxServerMock {
 
     if (getHeader(opts, HEADER_X_ACROLINX_AUTH) === DUMMY_ACCESS_TOKEN) {
       return this.createLoginSuccessResult(AuthorizationType.ACROLINX_TOKEN);
-
     }
     const baseUrl = getHeader(opts, HEADER_X_ACROLINX_BASE_URL) || this.acrolinxUrl;
     const id = _.uniqueId('signin-id-');
     this.signinIds[id] = {};
     return {
-      data: {interactiveLinkTimeout: DUMMY_INTERACTIVE_LINK_TIMEOUT},
+      data: { interactiveLinkTimeout: DUMMY_INTERACTIVE_LINK_TIMEOUT },
       links: {
         interactive: baseUrl + DUMMY_SIGNIN_LINK_PATH_INTERACTIVE + id,
         poll: baseUrl + DUMMY_SIGNIN_LINK_PATH_POLL + id,
-      }
+      },
     };
   }
 
@@ -281,17 +283,17 @@ export class AcrolinxServerMock {
       status: 400,
       title: 'DummyErrorTitle',
       type: 'DummyErrorType',
-      ...apiError
+      ...apiError,
     };
     return {
       body: fullApiError,
-      status: fullApiError.status
+      status: fullApiError.status,
     };
   }
 
   private createLoginSuccessResult(
     authorizedUsing: AuthorizationType,
-    username = DUMMY_USER_NAME
+    username = DUMMY_USER_NAME,
   ): SigninSuccessResult {
     return {
       data: {
@@ -300,15 +302,14 @@ export class AcrolinxServerMock {
         links: {},
         user: {
           id: DUMMY_USER_ID,
-          username
+          username,
         },
         integration: {
           properties: {},
-          addons: []
-        }
-
+          addons: [],
+        },
       },
-      links: {}
+      links: {},
     };
   }
 
@@ -331,14 +332,14 @@ export class AcrolinxServerMock {
       </html>
       `,
       headers: {
-        'Content-Type': 'text/html'
-      }
+        'Content-Type': 'text/html',
+      },
     };
   }
 
   private returnConfirmSigninPage(signinId: string, opts: RequestInit) {
     if (!this.signinIds[signinId]) {
-      return {status: 404, body: {message: 'Unknown signinId ' + signinId}};
+      return { status: 404, body: { message: 'Unknown signinId ' + signinId } };
     }
     this.fakeSignIn(AuthorizationType.ACROLINX_SIGN_IN, signinId);
     return this.pollForSignin(signinId, opts);
@@ -346,7 +347,7 @@ export class AcrolinxServerMock {
 
   private returnSigninDeletedPage(signinId: string, _opts: RequestInit) {
     this.deleteSignin(signinId);
-    return {message: `${signinId} is deleted`};
+    return { message: `${signinId} is deleted` };
   }
 }
 
@@ -354,8 +355,9 @@ function getHeader(requestOpts: RequestInit, headerKey: string): string | undefi
   if (!requestOpts.headers) {
     return undefined;
   }
-  return _.find(requestOpts.headers as Record<string, string>,
-    (_val, key) => key.toLowerCase() === headerKey.toLowerCase()
+  return _.find(
+    requestOpts.headers as Record<string, string>,
+    (_val, key) => key.toLowerCase() === headerKey.toLowerCase(),
   );
 }
 
@@ -367,12 +369,10 @@ export function mockAcrolinxServer(url: string): AcrolinxServerMock {
 
 export function mockBrokenJsonServer(url: string) {
   fetchMock.mock('begin:' + url, (_url: string, _opts: RequestInit): MockResponseObject => {
-      return {body: 'This isn\'t the json you are looking for'};
-    }
-  );
+    return { body: "This isn't the json you are looking for" };
+  });
 }
 
 export function restoreOriginalFetch() {
   fetchMock.restore();
 }
-

@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-import {DictionaryScope, IssueType, SuggestionIconId} from '../../src';
+import { DictionaryScope, IssueType, SuggestionIconId } from '../../src';
 import {
   CheckingCapabilities,
   CheckType,
   ContentEncoding,
   GuidanceProfileStatus,
-  ReportType
+  ReportType,
 } from '../../src/capabilities';
-import {CheckResult, DocumentQualityStatus} from '../../src/check';
+import { CheckResult, DocumentQualityStatus } from '../../src/check';
 
 const GOAL_VOICE_ID = 'voice.readability';
 const GOAL_TERM_ID = 'term.unsuitable';
@@ -40,33 +40,33 @@ export const DUMMY_CAPABILITIES: CheckingCapabilities = {
         {
           id: 'spelling',
           displayName: 'Spelling',
-          color: '#f21'
+          color: '#f21',
         },
         {
           id: GOAL_VOICE_ID,
           displayName: 'Clarity',
-          color: '#f22'
+          color: '#f22',
         },
         {
           id: GOAL_TERM_ID,
           displayName: 'Unsuitable Term',
-          color: '#f23'
+          color: '#f23',
         },
         {
           id: 'term.admitted',
           displayName: 'Use with caution',
-          color: '#f24'
-        }
+          color: '#f24',
+        },
       ],
       termSets: [
         {
-          displayName: 'Switches'
+          displayName: 'Switches',
         },
         {
-          displayName: 'Acrolinx'
-        }
+          displayName: 'Acrolinx',
+        },
       ],
-      status: GuidanceProfileStatus.ready
+      status: GuidanceProfileStatus.ready,
     },
     {
       id: 'aud-2',
@@ -75,19 +75,21 @@ export const DUMMY_CAPABILITIES: CheckingCapabilities = {
         displayName: 'German',
         id: 'en',
       },
-      goals: [{
-        id: 'spelling',
-        displayName: 'Spelling',
-        color: '#f21'
-      }],
+      goals: [
+        {
+          id: 'spelling',
+          displayName: 'Spelling',
+          color: '#f21',
+        },
+      ],
       termSets: [],
-      status: GuidanceProfileStatus.loading
-    }
+      status: GuidanceProfileStatus.loading,
+    },
   ],
   contentFormats: [
     {
       id: 'auto',
-      displayName: 'Automatic Detection',   // TODO: what do we do with this again?
+      displayName: 'Automatic Detection', // TODO: what do we do with this again?
     },
     {
       id: 'text',
@@ -104,14 +106,13 @@ export const DUMMY_CAPABILITIES: CheckingCapabilities = {
     {
       id: 'word_xml',
       displayName: 'XML (MS Word 2003)',
-    }
+    },
   ],
   contentEncodings: ['none', 'zip,base64', 'base64'] as ContentEncoding[],
   checkTypes: ['batch', 'partial', 'interactive'] as CheckType[],
   reportTypes: [ReportType.scorecard, ReportType.extractedText, ReportType.termHarvesting],
-  referencePattern: 'someRegex'
+  referencePattern: 'someRegex',
 };
-
 
 const ENVIRONMENT_HASH = 'XVYQZVyCoFOr1TDeyXuMgg==';
 
@@ -120,58 +121,56 @@ export const DUMMY_CHECK_RESULT: CheckResult = {
   dictionaryScopes: [DictionaryScope.language, DictionaryScope.guidanceProfile, DictionaryScope.document],
   checkOptions: {
     guidanceProfileId: 'aud_1',
-    reportTypes: [
-      ReportType.termHarvesting
-    ],
+    reportTypes: [ReportType.termHarvesting],
     contentFormat: 'word_xml',
     checkType: CheckType.interactive,
     partialCheckRanges: [
       {
         begin: 10,
-        end: 20
+        end: 20,
       },
       {
         begin: 40,
-        end: 70
-      }
-    ]
+        end: 70,
+      },
+    ],
   },
   document: {
     id: '283ab1e075f21a',
     displayInfo: {
-      reference: 'abc.docx'
+      reference: 'abc.docx',
     },
-    customFields: []
+    customFields: [],
   },
   quality: {
     score: 57,
-    status: DocumentQualityStatus.red
+    status: DocumentQualityStatus.red,
     // TODO: which values are allowed?
   },
   counts: {
     sentences: 10,
     words: 121,
-    issues: 15
+    issues: 15,
   },
   goals: [
     {
       id: 'spelling',
       displayName: 'Spelling',
       color: '#f21',
-      issues: 13
+      issues: 13,
     },
     {
       id: GOAL_VOICE_ID,
       displayName: 'Clarity',
       color: '#f22',
-      issues: 2
+      issues: 2,
     },
     {
       id: GOAL_TERM_ID,
       displayName: 'Unsuitable Term',
       color: '#f23',
-      issues: 0
-    }
+      issues: 0,
+    },
   ],
   issues: [
     {
@@ -193,7 +192,7 @@ export const DUMMY_CHECK_RESULT: CheckResult = {
           // but issue hash just groups internalName+extractedSurface
           issue: 'BhKh3iaGBjB7Cw6M/GwrLQ==',
           environment: 'vJ9eCVViEpIdM76h+5K/nA==',
-          index: 'hjlRLT0K+LlvlslKdNUlhw==1'
+          index: 'hjlRLT0K+LlvlslKdNUlhw==1',
         },
         matches: [
           {
@@ -202,7 +201,7 @@ export const DUMMY_CHECK_RESULT: CheckResult = {
             extractedEnd: 33,
             originalPart: 'zen',
             originalBegin: 19247,
-            originalEnd: 19255
+            originalEnd: 19255,
           },
           {
             extractedPart: 'te',
@@ -210,7 +209,7 @@ export const DUMMY_CHECK_RESULT: CheckResult = {
             extractedEnd: 35,
             originalPart: '&te;',
             originalBegin: 19250,
-            originalEnd: 19254
+            originalEnd: 19254,
           },
           {
             extractedPart: 'nse',
@@ -218,9 +217,9 @@ export const DUMMY_CHECK_RESULT: CheckResult = {
             extractedEnd: 38,
             originalPart: 'nse',
             originalBegin: 19254,
-            originalEnd: 19257
-          }
-        ]
+            originalEnd: 19257,
+          },
+        ],
       },
       readOnly: true,
       issueLocations: [
@@ -228,22 +227,22 @@ export const DUMMY_CHECK_RESULT: CheckResult = {
           locationId: 'pageLocation',
           displayName: 'Page 4',
           values: {
-            page: '4'
-          }
-        }
+            page: '4',
+          },
+        },
       ],
       suggestions: [
         {
           surface: 'sentence',
           groupId: 'sentence',
-          replacements: ['sen', null, 'nce']
-        }
+          replacements: ['sen', null, 'nce'],
+        },
       ],
       links: {
         help: 'https://www.help.org',
         termContribution: 'https://tenant.acrolinx.cloud/terminology/v7/rest/contribute',
-        addToDictionary: 'https://tenant.acrolinx.cloud/api/v1/dictionary/submit'
-      }
+        addToDictionary: 'https://tenant.acrolinx.cloud/api/v1/dictionary/submit',
+      },
     },
     {
       canAddToDictionary: true,
@@ -259,7 +258,7 @@ export const DUMMY_CHECK_RESULT: CheckResult = {
         hashes: {
           issue: '3qyt/AVxwNTOUQSuMA7brw==',
           environment: 'TiwIFBwA6X920mDAezJTyQ==',
-          index: 'Lm9PqBGGm+tj21rt3pkpjA==1'
+          index: 'Lm9PqBGGm+tj21rt3pkpjA==1',
         },
         matches: [
           {
@@ -268,9 +267,9 @@ export const DUMMY_CHECK_RESULT: CheckResult = {
             extractedEnd: 772,
             originalPart: 'Please',
             originalBegin: 28223,
-            originalEnd: 28229
-          }
-        ]
+            originalEnd: 28229,
+          },
+        ],
       },
       readOnly: false,
       issueLocations: [],
@@ -279,22 +278,18 @@ export const DUMMY_CHECK_RESULT: CheckResult = {
           surface: 'blablub',
           iconId: SuggestionIconId.preferred,
           groupId: '2653',
-          replacements: ['blablub']
-        }
+          replacements: ['blablub'],
+        },
       ],
       debug: {
         term: {
           surface: 'please',
           status: 'DEPRECATED',
-          termSets: [
-            'RA-Terms'
-          ],
-          domains: [
-            'RA-Terms'
-          ],
-          variant: 'legalVariantIllegal'
-        }
-      }
+          termSets: ['RA-Terms'],
+          domains: ['RA-Terms'],
+          variant: 'legalVariantIllegal',
+        },
+      },
     },
     {
       canAddToDictionary: true,
@@ -308,7 +303,7 @@ export const DUMMY_CHECK_RESULT: CheckResult = {
         hashes: {
           issue: 'E3OxJ3bFcfWLyAisUxufAA==',
           environment: ENVIRONMENT_HASH,
-          index: 'accsS0dbn/3rafcbT9NJGw==1'
+          index: 'accsS0dbn/3rafcbT9NJGw==1',
         },
         matches: [
           {
@@ -317,7 +312,7 @@ export const DUMMY_CHECK_RESULT: CheckResult = {
             extractedEnd: 1367,
             originalPart: 'Reports',
             originalBegin: 33173,
-            originalEnd: 33180
+            originalEnd: 33180,
           },
           {
             extractedPart: 'length',
@@ -325,15 +320,15 @@ export const DUMMY_CHECK_RESULT: CheckResult = {
             extractedEnd: 1755,
             originalPart: 'length',
             originalBegin: 33562,
-            originalEnd: 33568
-          }
-        ]
+            originalEnd: 33568,
+          },
+        ],
       },
       suggestions: [],
       issueLocations: [],
       readOnly: false,
       debug: {
-        penalty: 1234.0967741949999
+        penalty: 1234.0967741949999,
       },
       subIssues: [
         {
@@ -342,14 +337,15 @@ export const DUMMY_CHECK_RESULT: CheckResult = {
           issueType: IssueType.actionable,
           internalName: 'phenomenon_embedded_or_complex_sentence',
           displayNameHtml: 'Try to split up this sentence.',
-          guidanceHtml: "<p>This sentence doesn't seem to flow smoothly. We found a few embedded phrases in there " +
+          guidanceHtml:
+            "<p>This sentence doesn't seem to flow smoothly. We found a few embedded phrases in there " +
             'that could be messing with your flow somehow.</p>',
           displaySurface: 'Reports ... length',
           positionalInformation: {
             hashes: {
               issue: '7s1nqUN96X+P6VY4FlfSQQ==',
               environment: ENVIRONMENT_HASH,
-              index: '++0c1Z/OQu1Mwzt0KpkYYA==1'
+              index: '++0c1Z/OQu1Mwzt0KpkYYA==1',
             },
             matches: [
               {
@@ -358,7 +354,7 @@ export const DUMMY_CHECK_RESULT: CheckResult = {
                 extractedEnd: 1367,
                 originalPart: 'Reports',
                 originalBegin: 33173,
-                originalEnd: 33180
+                originalEnd: 33180,
               },
               {
                 extractedPart: 'length',
@@ -366,16 +362,16 @@ export const DUMMY_CHECK_RESULT: CheckResult = {
                 extractedEnd: 1755,
                 originalPart: 'length',
                 originalBegin: 33562,
-                originalEnd: 33568
-              }
-            ]
+                originalEnd: 33568,
+              },
+            ],
           },
           suggestions: [],
           issueLocations: [],
           readOnly: false,
           debug: {
-            penalty: 320.0
-          }
+            penalty: 320.0,
+          },
         },
         {
           canAddToDictionary: true,
@@ -383,14 +379,15 @@ export const DUMMY_CHECK_RESULT: CheckResult = {
           issueType: IssueType.actionable,
           internalName: 'phenomenon_passive',
           displayNameHtml: 'The active voice is usually clearer.',
-          guidanceHtml: "<p>This one could do with a bit of pep. It's probably because it feels kind of passive. " +
+          guidanceHtml:
+            "<p>This one could do with a bit of pep. It's probably because it feels kind of passive. " +
             "We love it when you're assertive.</p>",
           displaySurface: 'was first seen',
           positionalInformation: {
             hashes: {
               issue: 'dg+ih1XodWeL7lJ/wo17QQ==',
               environment: ENVIRONMENT_HASH,
-              index: 'fOJLASZHiwnwcJWcfbkXnw==1'
+              index: 'fOJLASZHiwnwcJWcfbkXnw==1',
             },
             matches: [
               {
@@ -399,26 +396,28 @@ export const DUMMY_CHECK_RESULT: CheckResult = {
                 extractedEnd: 1367,
                 originalPart: 'Reports',
                 originalBegin: 33173,
-                originalEnd: 33180
-              }
-            ]
+                originalEnd: 33180,
+              },
+            ],
           },
           suggestions: [],
           issueLocations: [],
           readOnly: false,
           debug: {
-            penalty: 40.0
-          }
-        }
-      ]
-    }
+            penalty: 40.0,
+          },
+        },
+      ],
+    },
   ],
   keywords: {
     links: {
-      getTargetKeywords: 'https://tenant.acrolinx.cloud/services/v1/rest/findability/targetKeywords?' +
+      getTargetKeywords:
+        'https://tenant.acrolinx.cloud/services/v1/rest/findability/targetKeywords?' +
         'contextId=C%3A%5CUsers%5Cgrabowski%5CDesktop%5Ccloud-linguistic-smoketest.docx',
-      putTargetKeywords: 'https://tenant.acrolinx.cloud/services/v1/rest/findability/targetKeywords?' +
-        'contextId=C%3A%5CUsers%5Cgrabowski%5CDesktop%5Ccloud-linguistic-smoketest.docx'
+      putTargetKeywords:
+        'https://tenant.acrolinx.cloud/services/v1/rest/findability/targetKeywords?' +
+        'contextId=C%3A%5CUsers%5Cgrabowski%5CDesktop%5Ccloud-linguistic-smoketest.docx',
     },
     discovered: [
       {
@@ -427,17 +426,15 @@ export const DUMMY_CHECK_RESULT: CheckResult = {
         density: 0.2546269436736127,
         count: 4,
         prominence: 0.0,
-      }
+      },
     ],
-    target: []
+    target: [],
   },
-  reports:
-    {
-      scorecard: {
-        linkAuthenticated: 'https://tenant.acrolinx.cloud/output/en/abcdef_1_report.html',
-        link: 'https://tenant.acrolinx.cloud/output/en/abcdef_1_report.html'
-      }
+  reports: {
+    scorecard: {
+      linkAuthenticated: 'https://tenant.acrolinx.cloud/output/en/abcdef_1_report.html',
+      link: 'https://tenant.acrolinx.cloud/output/en/abcdef_1_report.html',
     },
-  addons: []
+  },
+  addons: [],
 };
-

@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-import {DEVELOPMENT_SIGNATURE} from '../../src';
-import {AcrolinxEndpoint} from '../../src/index';
-import {ACROLINX_DEV_SIGNATURE} from '../integration-server/acrolinx-endpoint.test';
+import { DEVELOPMENT_SIGNATURE } from '../../src';
+import { AcrolinxEndpoint } from '../../src/index';
+import { ACROLINX_DEV_SIGNATURE } from '../integration-server/acrolinx-endpoint.test';
 
 function createEndpoint(acrolinxUrl: string) {
   return new AcrolinxEndpoint({
@@ -24,8 +24,8 @@ function createEndpoint(acrolinxUrl: string) {
     enableHttpLogging: true,
     client: {
       signature: ACROLINX_DEV_SIGNATURE || DEVELOPMENT_SIGNATURE,
-      version: '1.2.3.666'
-    }
+      version: '1.2.3.666',
+    },
   });
 }
 

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import {Addon} from './addons';
+import { Addon } from './addons';
 import {
   AccessToken,
   ApiResponse,
@@ -22,7 +22,7 @@ import {
   ProgressResponse,
   StringMap,
   UserId,
-  Username
+  Username,
 } from './common-types';
 
 export type PollMoreResult = ProgressResponse;
@@ -30,11 +30,12 @@ export type PollMoreResult = ProgressResponse;
 export type SigninPollResult = AsyncApiResponse<SigninSuccessData>;
 
 export function isSigninLinksResult(signinResult: SigninResult): signinResult is SigninLinksResult {
-  return !!((signinResult as SigninLinksResult).links.interactive);
+  return !!(signinResult as SigninLinksResult).links.interactive;
 }
 
 export function isSigninSuccessResult(
-  signinResult: SigninResult | SigninPollResult): signinResult is SigninSuccessResult {
+  signinResult: SigninResult | SigninPollResult,
+): signinResult is SigninSuccessResult {
   const asSigninSuccessResult = signinResult as SigninSuccessResult;
   return !!(asSigninSuccessResult && asSigninSuccessResult.data && asSigninSuccessResult.data.accessToken);
 }
@@ -55,14 +56,13 @@ export interface SigninLinksResult extends ApiResponse<SigninLinksData> {
   };
 }
 
-
 export enum AuthorizationType {
   ACROLINX_SSO = 'ACROLINX_SSO',
   ACROLINX_SIGN_IN = 'ACROLINX_SIGN_IN',
-  ACROLINX_TOKEN = 'ACROLINX_TOKEN'
+  ACROLINX_TOKEN = 'ACROLINX_TOKEN',
 }
 
-export type SigninSuccessResult =  ApiResponse<SigninSuccessData>;
+export type SigninSuccessResult = ApiResponse<SigninSuccessData>;
 
 export interface SigninSuccessData {
   accessToken: AccessToken;
@@ -71,8 +71,8 @@ export interface SigninSuccessData {
     username: Username;
   };
   integration: {
-    properties: StringMap,
-    addons: Addon[]
+    properties: StringMap;
+    addons: Addon[];
   };
   authorizedUsing: AuthorizationType;
   links: {};

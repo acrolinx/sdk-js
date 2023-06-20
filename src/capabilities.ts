@@ -33,7 +33,7 @@ export interface GuidanceProfile {
 export enum GuidanceProfileStatus {
   ready = 'ready',
   loading = 'loading',
-  unavailable = 'unavailable'
+  unavailable = 'unavailable',
 }
 
 export interface Language {
@@ -50,7 +50,7 @@ export interface Goal {
    * New since Acrolinx platform API 2021.2.
    * Only available if the server runs in Targets mode.
    */
-  scoring?: GoalScoring
+  scoring?: GoalScoring;
 }
 
 export enum GoalScoring {
@@ -71,7 +71,7 @@ export enum CheckType {
   batch = 'batch',
   interactive = 'interactive',
   baseline = 'baseline',
-  automated = 'automated'
+  automated = 'automated',
 }
 
 export enum ContentEncoding {
@@ -89,7 +89,7 @@ export enum ReportType {
    */
   request_text = 'extractedText',
   linguisticDebugInfo = 'linguisticDebugInfo',
-  contentAnalysisDashboard = 'contentAnalysisDashboard'
+  contentAnalysisDashboard = 'contentAnalysisDashboard',
 }
 
 export interface CheckingCapabilities {
@@ -100,4 +100,3 @@ export interface CheckingCapabilities {
   reportTypes: ReportType[];
   referencePattern: string;
 }
-

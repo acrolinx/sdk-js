@@ -34,11 +34,11 @@ export type CustomField = CustomFieldList | CustomFieldText;
 
 export enum CustomFieldType {
   TYPE_LIST = 'list',
-  TYPE_TEXT = 'text'
+  TYPE_TEXT = 'text',
 }
 
 export enum CustomFieldInputType {
   REQUIRED = 'required',
   EXTERNALLY_PROVIDED = 'externally_provided',
-  OPTIONAL = 'optional'
+  OPTIONAL = 'optional',
 }
