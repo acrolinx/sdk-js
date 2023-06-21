@@ -97,10 +97,10 @@ describe('e2e - AcrolinxEndpoint', () => {
     it(
       'should return an failing promise for non existing server',
       async () => {
-        const api = createEndpoint('http://non-extisting-server');
+        const api = createEndpoint('https://non-extisting-server');
         await expectFailingPromise(api.getJsonFromPath(DUMMY_PATH), ErrorType.HttpConnectionProblem, {
           method: 'GET',
-          url: 'http://non-extisting-server' + DUMMY_PATH,
+          url: 'https://non-extisting-server' + DUMMY_PATH,
         });
       },
       LONG_TIME_OUT_MS,
