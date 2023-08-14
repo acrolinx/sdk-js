@@ -15,3 +15,6 @@ coverage
 docs
 
 testdocs
+
+# Eclipse
+.project
