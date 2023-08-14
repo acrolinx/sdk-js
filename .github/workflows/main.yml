@@ -83,7 +83,7 @@ jobs:
       
       - name: Publish GitHub Pages 🚀
         if: steps.publish.outputs.type != 'none'
-        uses: JamesIves/github-pages-deploy-action@v4.4.1
+        uses: JamesIves/github-pages-deploy-action@v4.4.3
         with:
           branch: gh-pages
           folder: docs/pluginDoc
