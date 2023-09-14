@@ -62,6 +62,7 @@ import { AcrolinxError, CheckCanceledByClientError, ErrorType, wrapFetchError } 
 import { AnalysisRequest, ExtractionResult } from './extraction';
 import { PlatformFeatures, PlatformFeaturesResponse } from './features';
 import {
+  HEADER_AUTHORIZATION,
   HEADER_X_ACROLINX_APP_SIGNATURE,
   HEADER_X_ACROLINX_AUTH,
   HEADER_X_ACROLINX_BASE_URL,
@@ -157,6 +158,11 @@ export interface AcrolinxEndpointProps {
    * @ignore
    */
   enableHttpLogging?: boolean;
+
+  /*
+   * Available in Acrolinx One
+   */
+  setTokenAsAuthHeader?: boolean;
 }
 
 export interface ClientInformation {
@@ -580,7 +586,9 @@ export class AcrolinxEndpoint {
       headers[HEADER_X_ACROLINX_CLIENT_LOCALE] = this.props.clientLocale;
     }
     if (accessToken) {
-      headers[HEADER_X_ACROLINX_AUTH] = accessToken;
+      this.props.setTokenAsAuthHeader
+        ? (headers[HEADER_AUTHORIZATION] = `Bearer ${accessToken}`)
+        : (headers[HEADER_X_ACROLINX_AUTH] = accessToken);
     }
     return headers;
   }
