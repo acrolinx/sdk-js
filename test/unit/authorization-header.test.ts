@@ -43,7 +43,7 @@ describe('Authorization header', () => {
   describe('Test API using Auth Header', () => {
     let endpoint: AcrolinxEndpoint;
     beforeEach(() => {
-      const m = mockAcrolinxServer(DUMMY_SERVER_URL);
+      mockAcrolinxServer(DUMMY_SERVER_URL);
       endpoint = createEndpoint(true);
     });
 
