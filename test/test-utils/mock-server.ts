@@ -20,7 +20,12 @@ import { MockResponseObject } from 'fetch-mock';
 import * as _ from 'lodash';
 import { SuccessResponse } from '../../src/common-types';
 import { AcrolinxApiError, AcrolinxError, ErrorType } from '../../src/errors';
-import { HEADER_X_ACROLINX_AUTH, HEADER_X_ACROLINX_BASE_URL, HEADER_X_ACROLINX_CLIENT } from '../../src/headers';
+import {
+  HEADER_AUTHORIZATION,
+  HEADER_X_ACROLINX_AUTH,
+  HEADER_X_ACROLINX_BASE_URL,
+  HEADER_X_ACROLINX_CLIENT,
+} from '../../src/headers';
 import { DEVELOPMENT_SIGNATURE } from '../../src/index';
 import { ServerNotificationResponseData } from '../../src/notifications';
 import { AuthorizationType, SigninPollResult, SigninResult, SigninSuccessResult } from '../../src/signin';
@@ -171,11 +176,11 @@ export class AcrolinxServerMock {
     }
 
     if (_.includes(url, '/api/') && !_.includes(url, '/auth/')) {
-      const token = getHeader(opts, HEADER_X_ACROLINX_AUTH);
+      const token = getHeader(opts, HEADER_X_ACROLINX_AUTH) || getHeader(opts, HEADER_AUTHORIZATION);
       if (!token) {
         console.error('Missing Token', token);
         return this.createAcrolinxApiErrorResponse(AUTH_TOKEN_MISSING);
-      } else if (token !== DUMMY_ACCESS_TOKEN) {
+      } else if (!token.includes(DUMMY_ACCESS_TOKEN)) {
         console.error('Invalid Token', token);
         return this.createAcrolinxApiErrorResponse(AUTH_TOKEN_INVALID);
       }

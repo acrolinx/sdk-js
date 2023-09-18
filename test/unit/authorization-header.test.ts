@@ -14,19 +14,14 @@
  * limitations under the License.
  */
 
-import { DEVELOPMENT_SIGNATURE } from '../../src';
+import { DUMMY_ACCESS_TOKEN, mockAcrolinxServer, restoreOriginalFetch } from '../test-utils/mock-server';
 import { AcrolinxEndpoint } from '../../src/index';
-import { ACROLINX_DEV_SIGNATURE } from '../integration-server/acrolinx-endpoint.test';
+import { DUMMY_SERVER_URL, DUMMY_ENDPOINT_PROPS } from './common';
 
-function createEndpoint(setTokenAsAuthHeader?: boolean) {
+function createEndpoint(useTokenAsAuthHeader?: boolean) {
   return new AcrolinxEndpoint({
-    acrolinxUrl: 'http://host/',
-    enableHttpLogging: true,
-    client: {
-      signature: ACROLINX_DEV_SIGNATURE || DEVELOPMENT_SIGNATURE,
-      version: '1.2.3.666',
-    },
-    useTokenAsAuthHeader: setTokenAsAuthHeader,
+    ...DUMMY_ENDPOINT_PROPS,
+    useTokenAsAuthHeader: useTokenAsAuthHeader,
   });
 }
 
@@ -42,6 +37,29 @@ describe('Authorization header', () => {
 
     it('set enabled', () => {
       expect(createEndpoint(true).props.useTokenAsAuthHeader).toBe(true);
+    });
+  });
+
+  describe('Test API using Auth Header', () => {
+    let endpoint: AcrolinxEndpoint;
+    beforeEach(() => {
+      const m = mockAcrolinxServer(DUMMY_SERVER_URL);
+      endpoint = createEndpoint(true);
+    });
+
+    afterEach(() => {
+      restoreOriginalFetch();
+    });
+    it('capabilities using Auth header', async () => {
+      const capabilities = await endpoint.getCheckingCapabilities(DUMMY_ACCESS_TOKEN);
+      expect(capabilities.guidanceProfiles.length).toBeGreaterThan(0);
+    });
+
+    it('check using Auth header', async () => {
+      const checkResponse = await endpoint.check(DUMMY_ACCESS_TOKEN, {
+        content: 'text content',
+      });
+      expect(checkResponse).toBeDefined();
     });
   });
 });
