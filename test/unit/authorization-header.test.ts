@@ -41,7 +41,7 @@ describe('Authorization header', () => {
     });
 
     it('set enabled', () => {
-      expect(createEndpoint(false).props.useTokenAsAuthHeader).toBe(true);
+      expect(createEndpoint(true).props.useTokenAsAuthHeader).toBe(true);
     });
   });
 });
