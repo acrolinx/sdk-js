@@ -26,22 +26,22 @@ function createEndpoint(setTokenAsAuthHeader?: boolean) {
       signature: ACROLINX_DEV_SIGNATURE || DEVELOPMENT_SIGNATURE,
       version: '1.2.3.666',
     },
-    setTokenAsAuthHeader,
+    useTokenAsAuthHeader: setTokenAsAuthHeader,
   });
 }
 
 describe('Authorization header', () => {
   describe('set Authorization header props', () => {
     it('not defined', () => {
-      expect(createEndpoint().props.setTokenAsAuthHeader).toBeUndefined();
+      expect(createEndpoint().props.useTokenAsAuthHeader).toBeUndefined();
     });
 
     it('set disabled', () => {
-      expect(createEndpoint(false).props.setTokenAsAuthHeader).toBe(false);
+      expect(createEndpoint(false).props.useTokenAsAuthHeader).toBe(false);
     });
 
     it('set enabled', () => {
-      expect(createEndpoint(false).props.setTokenAsAuthHeader).toBe(true);
+      expect(createEndpoint(false).props.useTokenAsAuthHeader).toBe(true);
     });
   });
 });

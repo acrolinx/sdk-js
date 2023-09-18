@@ -162,7 +162,7 @@ export interface AcrolinxEndpointProps {
   /*
    * Available in Acrolinx One
    */
-  setTokenAsAuthHeader?: boolean;
+  useTokenAsAuthHeader?: boolean;
 }
 
 export interface ClientInformation {
@@ -586,7 +586,7 @@ export class AcrolinxEndpoint {
       headers[HEADER_X_ACROLINX_CLIENT_LOCALE] = this.props.clientLocale;
     }
     if (accessToken) {
-      this.props.setTokenAsAuthHeader
+      this.props.useTokenAsAuthHeader
         ? (headers[HEADER_AUTHORIZATION] = `Bearer ${accessToken}`)
         : (headers[HEADER_X_ACROLINX_AUTH] = accessToken);
     }
