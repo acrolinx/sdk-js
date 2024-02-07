@@ -174,6 +174,7 @@ export const DUMMY_CHECK_RESULT: CheckResult = {
   ],
   issues: [
     {
+      aiRephraseHint: "",
       canAddToDictionary: true,
       goalId: 'spelling',
       issueType: IssueType.actionable,
@@ -245,6 +246,7 @@ export const DUMMY_CHECK_RESULT: CheckResult = {
       },
     },
     {
+      aiRephraseHint: "",
       canAddToDictionary: true,
       goalId: GOAL_TERM_ID,
       issueType: IssueType.actionable,
@@ -292,6 +294,7 @@ export const DUMMY_CHECK_RESULT: CheckResult = {
       },
     },
     {
+      aiRephraseHint: "",
       canAddToDictionary: true,
       goalId: GOAL_VOICE_ID,
       issueType: IssueType.actionable,
@@ -332,6 +335,7 @@ export const DUMMY_CHECK_RESULT: CheckResult = {
       },
       subIssues: [
         {
+          aiRephraseHint: "",
           canAddToDictionary: true,
           goalId: GOAL_VOICE_ID,
           issueType: IssueType.actionable,
@@ -374,6 +378,7 @@ export const DUMMY_CHECK_RESULT: CheckResult = {
           },
         },
         {
+          aiRephraseHint: "",
           canAddToDictionary: true,
           goalId: GOAL_VOICE_ID,
           issueType: IssueType.actionable,
