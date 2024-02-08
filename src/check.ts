@@ -259,7 +259,7 @@ export interface CommonIssue {
    * Only available if the server runs in Targets mode.
    */
   scoring?: GoalScoring;
-  aiRephraseHint: string;
+  aiRephraseHint?: string;
 }
 
 export interface PositionalInformation {
