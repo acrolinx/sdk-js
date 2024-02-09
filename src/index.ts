@@ -80,6 +80,14 @@ import {
   SigninSuccessData,
   SigninSuccessResult,
 } from './signin';
+import {
+  DeviceGrantUserActionInfo,
+  DeviceGrantUserActionInfoRaw,
+  MultTenantLoginInfo,
+  SignInDeviceGrant,
+  SignInDeviceGrantOptions,
+  SignInMultiTenantSuccessResultRaw,
+} from './signin-device-grant';
 import { User } from './user';
 import { handleExpectedJsonResponse, handleExpectedTextResponse } from './utils/fetch';
 import * as logging from './utils/logging';
@@ -203,7 +211,7 @@ export interface CancelablePromiseWrapper<T> {
   cancel(): void;
 }
 
-interface SignInInteractiveOptions {
+export interface SignInInteractiveOptions {
   onSignInUrl: (url: string) => void;
   accessToken?: string;
   timeoutMs?: number;
@@ -252,6 +260,115 @@ export class AcrolinxEndpoint {
     opts.onSignInUrl(signinResult.links.interactive);
 
     return this.pollForInteractiveSignIn(signinResult, opts.timeoutMs || 60 * 60 * 1000);
+  }
+
+  private async fetchLoginInfo(tenantId: string): Promise<MultTenantLoginInfo> {
+    return await this.fetchJson(this.getUrlOfPath(`/content-cube/api/auth/keycloak/login-url?tenant=${tenantId}`), {
+      method: 'POST',
+    });
+  }
+
+  private async fetchDeviceGrantUserAction(
+    deviceGrantUrl: string,
+    clientId: string,
+  ): Promise<DeviceGrantUserActionInfoRaw> {
+    return await this.fetchJson(deviceGrantUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: new URLSearchParams({
+        client_id: clientId,
+      }),
+    });
+  }
+
+  public async signInDeviceGrant(opts: SignInDeviceGrantOptions): Promise<SignInDeviceGrant> {
+    const url = new URL(this.props.acrolinxUrl);
+    const tenantId = url.host.split('.')[0];
+
+    const response: MultTenantLoginInfo = await this.fetchLoginInfo(tenantId);
+    const loginUrl = new URL(response.loginUrl);
+    const deviceAuth = `${loginUrl.protocol}//${loginUrl.hostname}/realms/${tenantId}/protocol/openid-connect/auth/device`;
+    const clientId = opts.clientId || 'device-sign-in';
+
+    const verificationResultRaw: DeviceGrantUserActionInfoRaw = await this.fetchDeviceGrantUserAction(
+      deviceAuth,
+      clientId,
+    );
+
+    //TODO: error handling
+
+    const verificationResult: DeviceGrantUserActionInfo = {
+      deviceCode: verificationResultRaw.device_code,
+      expiresInMs: verificationResultRaw.expires_in,
+      pollingIntervalInSeconds: verificationResultRaw.interval,
+      userCode: verificationResultRaw.user_code,
+      verificationUrl: verificationResultRaw.verification_uri,
+      verificationUrlComplete: verificationResultRaw.verification_uri_complete,
+      pollingUrl: `${loginUrl.protocol}//${loginUrl.hostname}/realms/${tenantId}/protocol/openid-connect/token`,
+    };
+
+    opts.onDeviceGrantUserAction(verificationResult);
+
+    const startTime = Date.now();
+    while (Date.now() < startTime + verificationResult.expiresInMs) {
+      const signInResult = await this.pollSignInDeviceGrant(clientId, verificationResult);
+      if (signInResult) {
+        return signInResult;
+      }
+    }
+
+    throw new AcrolinxError({
+      type: ErrorType.SigninTimedOut,
+      title: 'Interactive device grant sign-in time out',
+      detail: `Interactive device grant sign-in has timed out by client (${Date.now() - startTime} > ${
+        verificationResult.expiresInMs
+      } ms).`,
+    });
+  }
+
+  private async fetchTokenForDeviceGrant(
+    verificationResult: DeviceGrantUserActionInfo,
+    clientId: string,
+  ): Promise<SignInMultiTenantSuccessResultRaw> {
+    return await this.fetchJson(verificationResult.pollingUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: new URLSearchParams({
+        grant_type: 'urn:ietf:params:oauth:grant-type:device_code',
+        device_code: verificationResult.deviceCode,
+        client_id: clientId,
+      }),
+    });
+  }
+
+  public async pollSignInDeviceGrant(
+    clientId: string,
+    verificationResult: DeviceGrantUserActionInfo,
+  ): Promise<SignInDeviceGrant> {
+    await waitMs(verificationResult.pollingIntervalInSeconds * 1000);
+
+    const response: SignInMultiTenantSuccessResultRaw = await this.fetchTokenForDeviceGrant(
+      verificationResult,
+      clientId,
+    );
+
+    //TODO: error handling
+
+    const signInMultiTenantResponse: SignInDeviceGrant = {
+      accessToken: response.access_token,
+      accessTokenExpiryInSeconds: response.expires_in,
+      refreshToken: response.refresh_token,
+      refreshTokenExpiryInSeconds: response.refresh_expires_in,
+      scope: response.scope,
+      sessionState: response.session_state,
+      tokenType: response.token_type,
+    };
+
+    return signInMultiTenantResponse;
   }
 
   public async signin(options: SigninOptions = {}): Promise<SigninResult> {
