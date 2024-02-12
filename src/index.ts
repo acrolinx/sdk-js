@@ -363,22 +363,7 @@ export class AcrolinxEndpoint {
     const verificationResult = result as DeviceGrantUserActionInfo;
 
     opts.onDeviceGrantUserAction(verificationResult);
-
-    const startTime = Date.now();
-    while (Date.now() < startTime + verificationResult.expiresInSeconds) {
-      const signInResult = await this.pollSignInDeviceGrant(clientId, verificationResult);
-      if (signInResult) {
-        return signInResult;
-      }
-    }
-
-    throw new AcrolinxError({
-      type: ErrorType.SigninTimedOut,
-      title: 'Interactive device grant sign-in time out',
-      detail: `Interactive device grant sign-in has timed out by client (${Date.now() - startTime} > ${
-        verificationResult.expiresInSeconds
-      } ms).`,
-    });
+    return await this.pollSignInDeviceGrant(clientId, verificationResult);
   }
 
   private async fetchTokenKeyCloak(
@@ -398,19 +383,37 @@ export class AcrolinxEndpoint {
     clientId: string,
     verificationResult: DeviceGrantUserActionInfo,
   ): Promise<SignInDeviceGrant> {
-    await waitMs(verificationResult.pollingIntervalInSeconds * 1000);
+    const startTime = Date.now();
+    while (Date.now() < startTime + verificationResult.expiresInSeconds) {
+      await waitMs(verificationResult.pollingIntervalInSeconds * 1000);
+      try {
+        const response: SignInMultiTenantSuccessResultRaw = await this.fetchTokenKeyCloak(
+          verificationResult.pollingUrl,
+          new URLSearchParams({
+            grant_type: 'urn:ietf:params:oauth:grant-type:device_code',
+            device_code: verificationResult.deviceCode,
+            client_id: clientId,
+          }),
+        );
 
-    const response: SignInMultiTenantSuccessResultRaw = await this.fetchTokenKeyCloak(
-      verificationResult.pollingUrl,
-      new URLSearchParams({
-        grant_type: 'urn:ietf:params:oauth:grant-type:device_code',
-        device_code: verificationResult.deviceCode,
-        client_id: clientId,
-      }),
-    );
+        return tidyKeyCloakSuccessResponse(response);
+      } catch (error: unknown) {
+        const acrolinxError = error as AcrolinxError;
+        if (acrolinxError.type === ErrorType.AuthorizationPending) {
+          console.log(acrolinxError.detail);
+          continue;
+        }
+        throw error;
+      }
+    }
 
-    //TODO: error handling
-    return tidyKeyCloakSuccessResponse(response);
+    throw new AcrolinxError({
+      type: ErrorType.SigninTimedOut,
+      title: 'Interactive device grant sign-in time out',
+      detail: `Interactive device grant sign-in has timed out by client (${Date.now() - startTime} > ${
+        verificationResult.expiresInSeconds
+      } ms).`,
+    });
   }
 
   public async signin(options: SigninOptions = {}): Promise<SigninResult> {
