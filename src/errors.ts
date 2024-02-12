@@ -43,6 +43,11 @@ export enum ErrorType {
   NoGuidanceProfileConfigured = 'noGuidanceProfileConfigured',
   AppSignatureRejected = 'appSignatureRejected',
   LicenseLimitExceeded = 'licenseLimitExceeded',
+  AuthorizationPending = 'authorization_pending',
+  InvalidClient = 'invalid_client',
+  RealmNotExist = 'Realm does not exist',
+  InvalidGrant = 'invalid_grant',
+  UnsuppotedGrantType = 'unsupported_grant_type',
 }
 
 export interface AcrolinxErrorProps {
@@ -132,6 +137,14 @@ export function createErrorFromFetchResponse(
       type: jsonBody.type,
       documentId: jsonBody.documentId,
     });
+  } else if (typeof jsonBody.error === 'string' && new RegExp(/realms\/.+?\/protocol\/openid-connect/).test(req.url)) {
+    return new AcrolinxError({
+      detail: jsonBody.error_description,
+      status: res.status,
+      httpRequest: req,
+      title: jsonBody.error,
+      type: getDeviceGrantErrorType(jsonBody.error),
+    });
   } else {
     return new AcrolinxError({
       detail: `${res.statusText}:${JSON.stringify(jsonBody)}`,
@@ -141,6 +154,10 @@ export function createErrorFromFetchResponse(
       type: ErrorType.HttpErrorStatus,
     });
   }
+}
+export function getDeviceGrantErrorType(error: string): ErrorType {
+  const errorType = ErrorType[error as keyof typeof ErrorType];
+  return errorType ? errorType : ErrorType.HttpErrorStatus;
 }
 
 export function wrapFetchError(httpRequest: HttpRequest, error: Error): Promise<any> {

@@ -41,7 +41,7 @@ async function createErrorFromResponse(req: HttpRequest, res: Response): Promise
   let error;
   try {
     const jsonError = await toJson<any>(req, res);
-    if (jsonError.error) {
+    if (jsonError.error && typeof jsonError.error === 'object') {
       error = createErrorFromFetchResponse(req, res, jsonError.error);
     } else {
       error = createErrorFromFetchResponse(req, res, jsonError);

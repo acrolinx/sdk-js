@@ -66,7 +66,7 @@ describe('Sign In With Device Grant', () => {
     fetchDeviceGrantUserActionMockSuccess();
     fetchTokenForDeviceGrantMockSuccess();
 
-    const response = await endpoint.signInDeviceGrant({
+    const response = await endpoint.signInDeviceGrantInteractive({
       onDeviceGrantUserAction: onDeviceGrantUserActionCallback,
       tenantId: 'test-tenant',
     });

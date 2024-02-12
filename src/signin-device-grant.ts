@@ -23,7 +23,7 @@ export type DeviceGrantUserActionInfo = {
   userCode: string;
   verificationUrl: string;
   verificationUrlComplete: string;
-  expiresInMs: number;
+  expiresInSeconds: number;
   pollingIntervalInSeconds: number;
   pollingUrl: string;
 };
@@ -38,12 +38,15 @@ export interface DeviceGrantUserActionInfoRaw {
 }
 
 export interface SignInDeviceGrantOptions {
-  tenantId: string;
-  onDeviceGrantUserAction: (deviceGrantUserAction: DeviceGrantUserActionInfo) => void;
+  tenantId?: string;
   accessToken?: string;
   refreshToken?: string;
   timeoutMs?: number;
   clientId?: string;
+}
+
+export interface SignInDeviceGrantOptionsInteractive extends SignInDeviceGrantOptions {
+  onDeviceGrantUserAction: (deviceGrantUserAction: DeviceGrantUserActionInfo) => void;
 }
 
 export type SignInMultiTenantSuccessResultRaw = {

@@ -86,6 +86,7 @@ import {
   MultTenantLoginInfo,
   SignInDeviceGrant,
   SignInDeviceGrantOptions,
+  SignInDeviceGrantOptionsInteractive,
   SignInMultiTenantSuccessResultRaw,
 } from './signin-device-grant';
 import { User } from './user';
@@ -283,9 +284,9 @@ export class AcrolinxEndpoint {
     });
   }
 
-  public async signInDeviceGrant(opts: SignInDeviceGrantOptions): Promise<SignInDeviceGrant> {
+  public async signInDeviceGrant(opts: SignInDeviceGrantOptions): Promise<DeviceGrantUserActionInfo> {
     const url = new URL(this.props.acrolinxUrl);
-    const tenantId = url.host.split('.')[0];
+    const tenantId = opts.tenantId || url.host.split('.')[0];
 
     const response: MultTenantLoginInfo = await this.fetchLoginInfo(tenantId);
     const loginUrl = new URL(response.loginUrl);
@@ -301,7 +302,7 @@ export class AcrolinxEndpoint {
 
     const verificationResult: DeviceGrantUserActionInfo = {
       deviceCode: verificationResultRaw.device_code,
-      expiresInMs: verificationResultRaw.expires_in,
+      expiresInSeconds: verificationResultRaw.expires_in,
       pollingIntervalInSeconds: verificationResultRaw.interval,
       userCode: verificationResultRaw.user_code,
       verificationUrl: verificationResultRaw.verification_uri,
@@ -309,10 +310,17 @@ export class AcrolinxEndpoint {
       pollingUrl: `${loginUrl.protocol}//${loginUrl.hostname}/realms/${tenantId}/protocol/openid-connect/token`,
     };
 
+    return verificationResult;
+  }
+
+  public async signInDeviceGrantInteractive(opts: SignInDeviceGrantOptionsInteractive): Promise<SignInDeviceGrant> {
+    const verificationResult = await this.signInDeviceGrant(opts);
+    const clientId = opts.clientId || 'device-sign-in';
+
     opts.onDeviceGrantUserAction(verificationResult);
 
     const startTime = Date.now();
-    while (Date.now() < startTime + verificationResult.expiresInMs) {
+    while (Date.now() < startTime + verificationResult.expiresInSeconds) {
       const signInResult = await this.pollSignInDeviceGrant(clientId, verificationResult);
       if (signInResult) {
         return signInResult;
@@ -323,7 +331,7 @@ export class AcrolinxEndpoint {
       type: ErrorType.SigninTimedOut,
       title: 'Interactive device grant sign-in time out',
       detail: `Interactive device grant sign-in has timed out by client (${Date.now() - startTime} > ${
-        verificationResult.expiresInMs
+        verificationResult.expiresInSeconds
       } ms).`,
     });
   }
