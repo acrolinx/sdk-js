@@ -28,6 +28,10 @@ jobs:
       SSO_USERNAME:          ${{ secrets.SSO_USERNAME }}
       GITHUB_TOKEN:          ${{ secrets.GITHUB_TOKEN }}
       ACROLINX_DEV_SIGNATURE: ${{ secrets.ACROLINX_DEV_SIGNATURE}}
+      ACROLINX_ONE_SERVER_URL: ${{ secrets.ACROLINX_ONE_SERVER_URL}}
+      KEYCLOAK_TENANT_ID: ${{ secrets.KEYCLOAK_TENANT_ID}}
+      KEYCLOAK_CLIENT_ID: ${{ secrets.KEYCLOAK_CLIENT_ID}}
+      KEYCLOAK_REFRESH_TOKEN: ${{ secrets.KEYCLOAK_REFRESH_TOKEN}}
 
     # Write permission for "contents" required for gh-pages deployment action
     permissions:
