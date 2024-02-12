@@ -88,6 +88,12 @@ import {
   SignInDeviceGrantOptions,
   SignInDeviceGrantOptionsInteractive,
   SignInMultiTenantSuccessResultRaw,
+  generateDeviceAuthUrl,
+  generateTokenUrl,
+  getClientId,
+  getTenantId,
+  isSignInDeviceGrantSuccess,
+  tidyKeyCloakSuccessResponse,
 } from './signin-device-grant';
 import { User } from './user';
 import { handleExpectedJsonResponse, handleExpectedTextResponse } from './utils/fetch';
@@ -284,17 +290,25 @@ export class AcrolinxEndpoint {
     });
   }
 
-  public async signInDeviceGrant(opts: SignInDeviceGrantOptions): Promise<DeviceGrantUserActionInfo> {
-    const url = new URL(this.props.acrolinxUrl);
-    const tenantId = opts.tenantId || url.host.split('.')[0];
+  public async signInDeviceGrant(
+    opts: SignInDeviceGrantOptions,
+  ): Promise<DeviceGrantUserActionInfo | SignInDeviceGrant> {
+    const tenantId = getTenantId(this.props.acrolinxUrl, opts);
+    const multTenantLoginInfo: MultTenantLoginInfo = await this.fetchLoginInfo(tenantId);
+    const clientId = getClientId(opts);
 
-    const response: MultTenantLoginInfo = await this.fetchLoginInfo(tenantId);
-    const loginUrl = new URL(response.loginUrl);
-    const deviceAuth = `${loginUrl.protocol}//${loginUrl.hostname}/realms/${tenantId}/protocol/openid-connect/auth/device`;
-    const clientId = opts.clientId || 'device-sign-in';
+    const tokenValidationResult = await this.verifyTokenIsValid(
+      generateTokenUrl(multTenantLoginInfo, tenantId),
+      clientId,
+      opts.refreshToken,
+    );
+
+    if (tokenValidationResult) {
+      return tokenValidationResult;
+    }
 
     const verificationResultRaw: DeviceGrantUserActionInfoRaw = await this.fetchDeviceGrantUserAction(
-      deviceAuth,
+      generateDeviceAuthUrl(multTenantLoginInfo, tenantId),
       clientId,
     );
 
@@ -307,15 +321,46 @@ export class AcrolinxEndpoint {
       userCode: verificationResultRaw.user_code,
       verificationUrl: verificationResultRaw.verification_uri,
       verificationUrlComplete: verificationResultRaw.verification_uri_complete,
-      pollingUrl: `${loginUrl.protocol}//${loginUrl.hostname}/realms/${tenantId}/protocol/openid-connect/token`,
+      pollingUrl: generateTokenUrl(multTenantLoginInfo, tenantId),
     };
 
     return verificationResult;
   }
 
+  private async verifyTokenIsValid(
+    url: string,
+    clientId: string,
+    refreshToken: string | undefined,
+  ): Promise<SignInDeviceGrant | undefined> {
+    try {
+      const response = await this.fetchTokenKeyCloak(
+        url,
+        new URLSearchParams({
+          grant_type: 'refresh_token',
+          client_id: clientId,
+          refresh_token: refreshToken || '',
+        }),
+      );
+      return tidyKeyCloakSuccessResponse(response);
+    } catch (error: unknown) {
+      const acrolinxError = error as AcrolinxError;
+      if (acrolinxError.type === ErrorType.InvalidGrant) {
+        console.log('Refresh token invalid, fetching new device code');
+        return undefined;
+      } else {
+        throw error;
+      }
+    }
+  }
+
   public async signInDeviceGrantInteractive(opts: SignInDeviceGrantOptionsInteractive): Promise<SignInDeviceGrant> {
-    const verificationResult = await this.signInDeviceGrant(opts);
+    const result = await this.signInDeviceGrant(opts);
     const clientId = opts.clientId || 'device-sign-in';
+
+    if (isSignInDeviceGrantSuccess(result)) {
+      return result as SignInDeviceGrant;
+    }
+    const verificationResult = result as DeviceGrantUserActionInfo;
 
     opts.onDeviceGrantUserAction(verificationResult);
 
@@ -336,20 +381,16 @@ export class AcrolinxEndpoint {
     });
   }
 
-  private async fetchTokenForDeviceGrant(
-    verificationResult: DeviceGrantUserActionInfo,
-    clientId: string,
+  private async fetchTokenKeyCloak(
+    url: string,
+    urlSearchParams: URLSearchParams,
   ): Promise<SignInMultiTenantSuccessResultRaw> {
-    return await this.fetchJson(verificationResult.pollingUrl, {
+    return await this.fetchJson(url, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
       },
-      body: new URLSearchParams({
-        grant_type: 'urn:ietf:params:oauth:grant-type:device_code',
-        device_code: verificationResult.deviceCode,
-        client_id: clientId,
-      }),
+      body: urlSearchParams,
     });
   }
 
@@ -359,24 +400,17 @@ export class AcrolinxEndpoint {
   ): Promise<SignInDeviceGrant> {
     await waitMs(verificationResult.pollingIntervalInSeconds * 1000);
 
-    const response: SignInMultiTenantSuccessResultRaw = await this.fetchTokenForDeviceGrant(
-      verificationResult,
-      clientId,
+    const response: SignInMultiTenantSuccessResultRaw = await this.fetchTokenKeyCloak(
+      verificationResult.pollingUrl,
+      new URLSearchParams({
+        grant_type: 'urn:ietf:params:oauth:grant-type:device_code',
+        device_code: verificationResult.deviceCode,
+        client_id: clientId,
+      }),
     );
 
     //TODO: error handling
-
-    const signInMultiTenantResponse: SignInDeviceGrant = {
-      accessToken: response.access_token,
-      accessTokenExpiryInSeconds: response.expires_in,
-      refreshToken: response.refresh_token,
-      refreshTokenExpiryInSeconds: response.refresh_expires_in,
-      scope: response.scope,
-      sessionState: response.session_state,
-      tokenType: response.token_type,
-    };
-
-    return signInMultiTenantResponse;
+    return tidyKeyCloakSuccessResponse(response);
   }
 
   public async signin(options: SigninOptions = {}): Promise<SigninResult> {

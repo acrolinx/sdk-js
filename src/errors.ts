@@ -143,7 +143,7 @@ export function createErrorFromFetchResponse(
       status: res.status,
       httpRequest: req,
       title: jsonBody.error,
-      type: getDeviceGrantErrorType(jsonBody.error),
+      type: jsonBody.error as ErrorType,
     });
   } else {
     return new AcrolinxError({
@@ -154,10 +154,6 @@ export function createErrorFromFetchResponse(
       type: ErrorType.HttpErrorStatus,
     });
   }
-}
-export function getDeviceGrantErrorType(error: string): ErrorType {
-  const errorType = ErrorType[error as keyof typeof ErrorType];
-  return errorType ? errorType : ErrorType.HttpErrorStatus;
 }
 
 export function wrapFetchError(httpRequest: HttpRequest, error: Error): Promise<any> {

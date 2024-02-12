@@ -69,3 +69,39 @@ export type SignInDeviceGrant = {
   sessionState: string;
   scope: string;
 };
+
+export const generateDeviceAuthUrl = (multiTenantLoginInfo: MultTenantLoginInfo, tenantId: string): string => {
+  const loginUrl = new URL(multiTenantLoginInfo.loginUrl);
+  return `${loginUrl.protocol}//${loginUrl.hostname}/realms/${tenantId}/protocol/openid-connect/auth/device`;
+};
+
+export const generateTokenUrl = (multiTenantLoginInfo: MultTenantLoginInfo, tenantId: string): string => {
+  const loginUrl = new URL(multiTenantLoginInfo.loginUrl);
+  return `${loginUrl.protocol}//${loginUrl.hostname}/realms/${tenantId}/protocol/openid-connect/token`;
+};
+
+export const getClientId = (opts: SignInDeviceGrantOptions) => {
+  return opts.clientId || 'device-sign-in';
+};
+
+export const getTenantId = (acrolinxUrl: string, opts: SignInDeviceGrantOptions) => {
+  const url = new URL(acrolinxUrl);
+  return opts.tenantId || url.host.split('.')[0];
+};
+
+export const tidyKeyCloakSuccessResponse = (rawResponse: SignInMultiTenantSuccessResultRaw): SignInDeviceGrant => {
+  return {
+    accessToken: rawResponse.access_token,
+    accessTokenExpiryInSeconds: rawResponse.expires_in,
+    refreshToken: rawResponse.refresh_token,
+    refreshTokenExpiryInSeconds: rawResponse.refresh_expires_in,
+    scope: rawResponse.scope,
+    sessionState: rawResponse.session_state,
+    tokenType: rawResponse.token_type,
+  };
+};
+
+export const isSignInDeviceGrantSuccess = (result: DeviceGrantUserActionInfo | SignInDeviceGrant): boolean => {
+  const asSignInDeviceGrant = result as SignInDeviceGrant;
+  return !!(asSignInDeviceGrant && asSignInDeviceGrant.accessToken && asSignInDeviceGrant.refreshToken);
+};

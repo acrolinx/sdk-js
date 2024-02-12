@@ -1,3 +1,4 @@
+import { DeviceGrantUserActionInfo } from '../../src/signin-device-grant';
 import { AcrolinxEndpoint, DEVELOPMENT_SIGNATURE } from '../../src';
 import * as dotenv from 'dotenv';
 
@@ -27,10 +28,10 @@ describe('Acrolinx One E2E Tests', () => {
   });
   describe('Sign in with device grant', () => {
     it('get device verification url', async () => {
-      const deviceGrantUserAction = await endpoint.signInDeviceGrant({
+      const deviceGrantUserAction = (await endpoint.signInDeviceGrant({
         tenantId: KEYCLOAK_TENANT_ID,
         clientId: KEYCLOAK_CLIENT_ID,
-      });
+      })) as DeviceGrantUserActionInfo;
       console.log(deviceGrantUserAction);
 
       expect(deviceGrantUserAction.verificationUrl).toBeDefined();
