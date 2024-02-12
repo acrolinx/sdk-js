@@ -51,7 +51,7 @@ describe('Acrolinx One E2E Tests', () => {
   });
   describe('Sign in with device grant', () => {
     it('get device verification url', async () => {
-      const deviceGrantUserAction = (await endpoint.signInDeviceGrant({
+      const deviceGrantUserAction = (await endpoint.deviceAuthSignIn({
         tenantId: KEYCLOAK_TENANT_ID,
         clientId: KEYCLOAK_CLIENT_ID,
       })) as DeviceGrantUserActionInfo;
@@ -61,7 +61,7 @@ describe('Acrolinx One E2E Tests', () => {
     });
 
     it('validate refresh token', async () => {
-      const signInDeviceGrant = (await endpoint.signInDeviceGrant({
+      const signInDeviceGrant = (await endpoint.deviceAuthSignIn({
         tenantId: KEYCLOAK_TENANT_ID,
         clientId: KEYCLOAK_CLIENT_ID,
         refreshToken: KEYCLOAK_REFRESH_TOKEN,
@@ -72,7 +72,7 @@ describe('Acrolinx One E2E Tests', () => {
     });
 
     it('invalid refresh token triggers new device grant', async () => {
-      const deviceGrantUserAction = (await endpoint.signInDeviceGrant({
+      const deviceGrantUserAction = (await endpoint.deviceAuthSignIn({
         tenantId: KEYCLOAK_TENANT_ID,
         clientId: KEYCLOAK_CLIENT_ID,
         refreshToken: 'invalid',
@@ -83,7 +83,7 @@ describe('Acrolinx One E2E Tests', () => {
     });
 
     it('poll for sign in result', async () => {
-      const deviceGrantUserAction = (await endpoint.signInDeviceGrant({
+      const deviceGrantUserAction = (await endpoint.deviceAuthSignIn({
         tenantId: KEYCLOAK_TENANT_ID,
         clientId: KEYCLOAK_CLIENT_ID,
       })) as DeviceGrantUserActionInfo;
@@ -92,7 +92,7 @@ describe('Acrolinx One E2E Tests', () => {
       verifyDeviceGrantUserActionInfo(deviceGrantUserAction);
 
       deviceGrantUserAction.expiresInSeconds = 10;
-      await expect(endpoint.pollSignInDeviceGrant(KEYCLOAK_CLIENT_ID, deviceGrantUserAction)).rejects.toThrow();
+      await expect(endpoint.pollDeviceSignInCompletion(KEYCLOAK_CLIENT_ID, deviceGrantUserAction)).rejects.toThrow();
     }, 30000);
   });
 });

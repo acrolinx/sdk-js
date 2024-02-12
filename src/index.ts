@@ -290,7 +290,7 @@ export class AcrolinxEndpoint {
     });
   }
 
-  public async signInDeviceGrant(
+  public async deviceAuthSignIn(
     opts: SignInDeviceGrantOptions,
   ): Promise<DeviceGrantUserActionInfo | SignInDeviceGrant> {
     const tenantId = getTenantId(this.props.acrolinxUrl, opts);
@@ -353,8 +353,8 @@ export class AcrolinxEndpoint {
     }
   }
 
-  public async signInDeviceGrantInteractive(opts: SignInDeviceGrantOptionsInteractive): Promise<SignInDeviceGrant> {
-    const result = await this.signInDeviceGrant(opts);
+  public async deviceAuthSignInInteractive(opts: SignInDeviceGrantOptionsInteractive): Promise<SignInDeviceGrant> {
+    const result = await this.deviceAuthSignIn(opts);
     const clientId = opts.clientId || 'device-sign-in';
 
     if (isSignInDeviceGrantSuccess(result)) {
@@ -363,7 +363,7 @@ export class AcrolinxEndpoint {
     const verificationResult = result as DeviceGrantUserActionInfo;
 
     opts.onDeviceGrantUserAction(verificationResult);
-    return await this.pollSignInDeviceGrant(clientId, verificationResult);
+    return await this.pollDeviceSignInCompletion(clientId, verificationResult);
   }
 
   private async fetchTokenKeyCloak(
@@ -379,7 +379,7 @@ export class AcrolinxEndpoint {
     });
   }
 
-  public async pollSignInDeviceGrant(
+  public async pollDeviceSignInCompletion(
     clientId: string,
     verificationResult: DeviceGrantUserActionInfo,
   ): Promise<SignInDeviceGrant> {
