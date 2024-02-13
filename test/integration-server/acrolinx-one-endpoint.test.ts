@@ -1,6 +1,7 @@
 import { DeviceAuthResponse, DeviceSignInSuccessResponse } from '../../src/signin-device-grant';
 import { AcrolinxEndpoint, DEVELOPMENT_SIGNATURE } from '../../src';
 import * as dotenv from 'dotenv';
+import 'cross-fetch/polyfill';
 
 dotenv.config();
 

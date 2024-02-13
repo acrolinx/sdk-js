@@ -94,6 +94,7 @@ import {
   getTenantId,
   isSignInDeviceGrantSuccess,
   tidyKeyCloakSuccessResponse,
+  tidyKeyCloakDeviceAuthResponse,
 } from './signin-device-grant';
 import { User } from './user';
 import { handleExpectedJsonResponse, handleExpectedTextResponse } from './utils/fetch';
@@ -302,24 +303,13 @@ export class AcrolinxEndpoint {
       return tokenValidationResult;
     }
 
-    const verificationResultRaw: DeviceAuthResponseRaw = await this.fetchDeviceGrantUserAction(
+    const deviceAuthResponse = await this.fetchDeviceGrantUserAction(
       generateDeviceAuthUrl(multTenantLoginInfo, tenantId),
       clientId,
     );
 
     //TODO: error handling
-
-    const verificationResult: DeviceAuthResponse = {
-      deviceCode: verificationResultRaw.device_code,
-      expiresInSeconds: verificationResultRaw.expires_in,
-      pollingIntervalInSeconds: verificationResultRaw.interval,
-      userCode: verificationResultRaw.user_code,
-      verificationUrl: verificationResultRaw.verification_uri,
-      verificationUrlComplete: verificationResultRaw.verification_uri_complete,
-      pollingUrl: generateTokenUrl(multTenantLoginInfo, tenantId),
-    };
-
-    return verificationResult;
+    return tidyKeyCloakDeviceAuthResponse(generateTokenUrl(multTenantLoginInfo, tenantId), deviceAuthResponse);
   }
 
   private async verifyTokenIsValid(

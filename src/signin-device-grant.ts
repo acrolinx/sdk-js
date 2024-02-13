@@ -101,6 +101,18 @@ export const tidyKeyCloakSuccessResponse = (rawResponse: DeviceSignInSuccessResp
   };
 };
 
+export const tidyKeyCloakDeviceAuthResponse = (pollingUrl: string, response: DeviceAuthResponseRaw) => {
+  return {
+    deviceCode: response.device_code,
+    expiresInSeconds: response.expires_in,
+    pollingIntervalInSeconds: response.interval,
+    userCode: response.user_code,
+    verificationUrl: response.verification_uri,
+    verificationUrlComplete: response.verification_uri_complete,
+    pollingUrl: pollingUrl,
+  };
+};
+
 export const isSignInDeviceGrantSuccess = (result: DeviceAuthResponse | DeviceSignInSuccessResponse): boolean => {
   const asSignInDeviceGrant = result as DeviceSignInSuccessResponse;
   return !!(asSignInDeviceGrant && asSignInDeviceGrant.accessToken && asSignInDeviceGrant.refreshToken);
