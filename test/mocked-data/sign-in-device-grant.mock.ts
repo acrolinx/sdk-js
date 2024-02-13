@@ -1,8 +1,9 @@
-import { AcrolinxError, ErrorType } from '../../src';
+import { AcrolinxEndpoint, AcrolinxError, ErrorType } from '../../src';
 import {
   DeviceAuthResponseRaw,
   MultTenantLoginInfo,
   DeviceSignInSuccessResponseRaw,
+  DeviceAuthResponse,
 } from '../../src/signin-device-grant';
 
 export const deviceGrantUserActionInfo: DeviceAuthResponseRaw = {
@@ -12,6 +13,16 @@ export const deviceGrantUserActionInfo: DeviceAuthResponseRaw = {
   verification_uri_complete: 'https://comapny.acrolinx.cloud/realms/test-tenant-01/device?user_code=VJGF-LQOP',
   expires_in: 600,
   interval: 0.5,
+};
+
+export const deviceAuthResponse: DeviceAuthResponse = {
+  deviceCode: 'kXn1FPdnEYmKYXaswtwJyiM02bqQF59pER-Y9fMZ1wg',
+  expiresInSeconds: 600,
+  pollingIntervalInSeconds: 0.5,
+  pollingUrl: 'https://auth.company.cloud/realms/tenant/protocol/openid-connect/token',
+  userCode: 'VJGF-LQOP',
+  verificationUrl: 'https://comapny.acrolinx.cloud/realms/test-tenant-01/device',
+  verificationUrlComplete: 'https://comapny.acrolinx.cloud/realms/test-tenant-01/device?user_code=VJGF-LQOP',
 };
 
 export const multTenantLoginInfo: MultTenantLoginInfo = {
@@ -60,3 +71,47 @@ export const unsupportedGrantType = new AcrolinxError({
   title: 'unsupported_grant_type',
   type: ErrorType.UnsuppotedGrantType,
 });
+
+const fetchLoginInfoMock = jest.spyOn(AcrolinxEndpoint.prototype as any, 'fetchLoginInfo');
+const fetchDeviceGrantUserActionMock = jest.spyOn(AcrolinxEndpoint.prototype as any, 'fetchDeviceGrantUserAction');
+const fetchTokenForDeviceGrantMock = jest.spyOn(AcrolinxEndpoint.prototype as any, 'fetchTokenKeyCloak');
+
+export const fetchLoginInfoMockSuccess = () => {
+  fetchLoginInfoMock.mockImplementation(async () => {
+    return new Promise((res, _rej) => {
+      res(multTenantLoginInfo);
+    });
+  });
+};
+
+export const fetchDeviceGrantUserActionMockSuccess = () => {
+  fetchDeviceGrantUserActionMock.mockImplementation(async () => {
+    return new Promise((res, _rej) => {
+      res(deviceGrantUserActionInfo);
+    });
+  });
+};
+
+export const fetchDeviceGrantUserActionMockFailure = (error: AcrolinxError) => {
+  fetchDeviceGrantUserActionMock.mockImplementation(async () => {
+    return new Promise((_res, rej) => {
+      rej(error);
+    });
+  });
+};
+
+export const fetchTokenForDeviceGrantMockSuccess = () => {
+  fetchTokenForDeviceGrantMock.mockImplementation(async () => {
+    return new Promise((res, _rej) => {
+      res(signInMultiTenantSuccessResultRaw);
+    });
+  });
+};
+
+export const fetchTokenForDeviceGrantMockFailure = () => {
+  fetchTokenForDeviceGrantMock.mockImplementation(async () => {
+    return new Promise((_res, rej) => {
+      rej(invalidGrantError);
+    });
+  });
+};

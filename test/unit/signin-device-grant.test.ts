@@ -14,67 +14,23 @@
  * limitations under the License.
  */
 
-import { AcrolinxEndpoint, AcrolinxError, ErrorType } from '../../src/index';
+import { AcrolinxEndpoint, ErrorType } from '../../src/index';
 import { DUMMY_ENDPOINT_PROPS } from './common';
 import {
-  deviceGrantUserActionInfo,
+  deviceAuthResponse,
+  fetchDeviceGrantUserActionMockFailure,
+  fetchDeviceGrantUserActionMockSuccess,
+  fetchLoginInfoMockSuccess,
+  fetchTokenForDeviceGrantMockFailure,
+  fetchTokenForDeviceGrantMockSuccess,
   invalidClientError,
-  invalidGrantError,
   invalidRealmError,
-  multTenantLoginInfo,
   signInMultiTenantSuccessResultRaw,
   unsupportedGrantType,
 } from '../mocked-data/sign-in-device-grant.mock';
-import { DeviceAuthResponse } from '../../src/signin-device-grant';
 
 describe('Sign In With Device Grant', () => {
-  const onDeviceGrantUserActionCallback = (deviceGrantUserAction: DeviceAuthResponse) => {
-    console.log(deviceGrantUserAction);
-  };
-
-  const fetchLoginInfoMock = jest.spyOn(AcrolinxEndpoint.prototype as any, 'fetchLoginInfo');
-  const fetchDeviceGrantUserActionMock = jest.spyOn(AcrolinxEndpoint.prototype as any, 'fetchDeviceGrantUserAction');
-  const fetchTokenForDeviceGrantMock = jest.spyOn(AcrolinxEndpoint.prototype as any, 'fetchTokenKeyCloak');
-
-  const fetchLoginInfoMockSuccess = () => {
-    fetchLoginInfoMock.mockImplementation(async () => {
-      return new Promise((res, _rej) => {
-        res(multTenantLoginInfo);
-      });
-    });
-  };
-
-  const fetchDeviceGrantUserActionMockSuccess = () => {
-    fetchDeviceGrantUserActionMock.mockImplementation(async () => {
-      return new Promise((res, _rej) => {
-        res(deviceGrantUserActionInfo);
-      });
-    });
-  };
-
-  const fetchDeviceGrantUserActionMockFailure = (error: AcrolinxError) => {
-    fetchDeviceGrantUserActionMock.mockImplementation(async () => {
-      return new Promise((_res, rej) => {
-        rej(error);
-      });
-    });
-  };
-
-  const fetchTokenForDeviceGrantMockSuccess = () => {
-    fetchTokenForDeviceGrantMock.mockImplementation(async () => {
-      return new Promise((res, _rej) => {
-        res(signInMultiTenantSuccessResultRaw);
-      });
-    });
-  };
-
-  const fetchTokenForDeviceGrantMockFailure = () => {
-    fetchTokenForDeviceGrantMock.mockImplementation(async () => {
-      return new Promise((_res, rej) => {
-        rej(invalidGrantError);
-      });
-    });
-  };
+  const onDeviceGrantUserActionCallback = jest.fn();
 
   let endpoint: AcrolinxEndpoint;
   beforeEach(() => {
@@ -144,5 +100,20 @@ describe('Sign In With Device Grant', () => {
         clientId: 'valid-client',
       }),
     ).rejects.toThrowError(ErrorType.UnsuppotedGrantType);
+  });
+
+  it('should call device sign in callback function', async () => {
+    fetchLoginInfoMockSuccess();
+    fetchDeviceGrantUserActionMockSuccess();
+    fetchTokenForDeviceGrantMockFailure();
+
+    await expect(
+      endpoint.deviceAuthSignInInteractive({
+        onDeviceGrantUserAction: onDeviceGrantUserActionCallback,
+        tenantId: 'tenant',
+      }),
+    ).rejects.toThrow();
+    expect(onDeviceGrantUserActionCallback).toHaveBeenCalledTimes(1);
+    expect(onDeviceGrantUserActionCallback).toHaveBeenCalledWith(deviceAuthResponse);
   });
 });
