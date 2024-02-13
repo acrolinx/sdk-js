@@ -30,7 +30,7 @@ describe('Sign In With Device Grant', () => {
 
   const fetchLoginInfoMock = jest.spyOn(AcrolinxEndpoint.prototype as any, 'fetchLoginInfo');
   const fetchDeviceGrantUserActionMock = jest.spyOn(AcrolinxEndpoint.prototype as any, 'fetchDeviceGrantUserAction');
-  const fetchTokenForDeviceGrantMock = jest.spyOn(AcrolinxEndpoint.prototype as any, 'fetchTokenForDeviceGrant');
+  const fetchTokenForDeviceGrantMock = jest.spyOn(AcrolinxEndpoint.prototype as any, 'fetchTokenKeyCloak');
 
   const fetchLoginInfoMockSuccess = () => {
     fetchLoginInfoMock.mockImplementation(async () => {
