@@ -21,10 +21,10 @@ import {
   multTenantLoginInfo,
   signInMultiTenantSuccessResultRaw,
 } from '../mocked-data/sign-in-device-grant.mock';
-import { DeviceGrantUserActionInfo } from '../../src/signin-device-grant';
+import { DeviceAuthResponse } from '../../src/signin-device-grant';
 
 describe('Sign In With Device Grant', () => {
-  const onDeviceGrantUserActionCallback = (deviceGrantUserAction: DeviceGrantUserActionInfo) => {
+  const onDeviceGrantUserActionCallback = (deviceGrantUserAction: DeviceAuthResponse) => {
     console.log(deviceGrantUserAction);
   };
 

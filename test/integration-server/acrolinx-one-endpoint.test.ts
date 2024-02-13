@@ -1,4 +1,4 @@
-import { DeviceGrantUserActionInfo, SignInDeviceGrant } from '../../src/signin-device-grant';
+import { DeviceAuthResponse, DeviceSignInSuccessResponse } from '../../src/signin-device-grant';
 import { AcrolinxEndpoint, DEVELOPMENT_SIGNATURE } from '../../src';
 import * as dotenv from 'dotenv';
 
@@ -24,7 +24,7 @@ function createEndpoint(acrolinxUrl: string) {
 describe('Acrolinx One E2E Tests', () => {
   let endpoint: AcrolinxEndpoint;
 
-  const verifyDeviceGrantUserActionInfo = (deviceGrantUserAction: DeviceGrantUserActionInfo) => {
+  const verifyDeviceGrantUserActionInfo = (deviceGrantUserAction: DeviceAuthResponse) => {
     expect(deviceGrantUserAction.verificationUrl).toBeDefined();
     expect(deviceGrantUserAction.verificationUrlComplete).toBeDefined();
     expect(deviceGrantUserAction.userCode).toBeDefined();
@@ -34,7 +34,7 @@ describe('Acrolinx One E2E Tests', () => {
     expect(deviceGrantUserAction.pollingIntervalInSeconds).toBeDefined();
   };
 
-  const verifySignInDeviceGrantSuccess = (signInDeviceGrant: SignInDeviceGrant) => {
+  const verifySignInDeviceGrantSuccess = (signInDeviceGrant: DeviceSignInSuccessResponse) => {
     expect(signInDeviceGrant.accessToken).toBeDefined();
     expect(signInDeviceGrant.refreshToken).toBeDefined();
     expect(signInDeviceGrant.refreshToken).not.toEqual(KEYCLOAK_REFRESH_TOKEN);
@@ -54,7 +54,7 @@ describe('Acrolinx One E2E Tests', () => {
       const deviceGrantUserAction = (await endpoint.deviceAuthSignIn({
         tenantId: KEYCLOAK_TENANT_ID,
         clientId: KEYCLOAK_CLIENT_ID,
-      })) as DeviceGrantUserActionInfo;
+      })) as DeviceAuthResponse;
       console.log(deviceGrantUserAction);
 
       verifyDeviceGrantUserActionInfo(deviceGrantUserAction);
@@ -65,7 +65,7 @@ describe('Acrolinx One E2E Tests', () => {
         tenantId: KEYCLOAK_TENANT_ID,
         clientId: KEYCLOAK_CLIENT_ID,
         refreshToken: KEYCLOAK_REFRESH_TOKEN,
-      })) as SignInDeviceGrant;
+      })) as DeviceSignInSuccessResponse;
 
       console.log(signInDeviceGrant);
       verifySignInDeviceGrantSuccess(signInDeviceGrant);
@@ -76,7 +76,7 @@ describe('Acrolinx One E2E Tests', () => {
         tenantId: KEYCLOAK_TENANT_ID,
         clientId: KEYCLOAK_CLIENT_ID,
         refreshToken: 'invalid',
-      })) as DeviceGrantUserActionInfo;
+      })) as DeviceAuthResponse;
       console.log(deviceGrantUserAction);
 
       verifyDeviceGrantUserActionInfo(deviceGrantUserAction);
@@ -86,7 +86,7 @@ describe('Acrolinx One E2E Tests', () => {
       const deviceGrantUserAction = (await endpoint.deviceAuthSignIn({
         tenantId: KEYCLOAK_TENANT_ID,
         clientId: KEYCLOAK_CLIENT_ID,
-      })) as DeviceGrantUserActionInfo;
+      })) as DeviceAuthResponse;
       console.log(deviceGrantUserAction);
 
       verifyDeviceGrantUserActionInfo(deviceGrantUserAction);

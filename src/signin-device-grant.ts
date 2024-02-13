@@ -18,7 +18,7 @@ export type MultTenantLoginInfo = {
   loginUrl: string;
 };
 
-export type DeviceGrantUserActionInfo = {
+export type DeviceAuthResponse = {
   deviceCode: string;
   userCode: string;
   verificationUrl: string;
@@ -28,7 +28,7 @@ export type DeviceGrantUserActionInfo = {
   pollingUrl: string;
 };
 
-export interface DeviceGrantUserActionInfoRaw {
+export interface DeviceAuthResponseRaw {
   device_code: string;
   user_code: string;
   verification_uri: string;
@@ -37,7 +37,7 @@ export interface DeviceGrantUserActionInfoRaw {
   interval: number;
 }
 
-export interface SignInDeviceGrantOptions {
+export interface DeviceSignInOptions {
   tenantId?: string;
   accessToken?: string;
   refreshToken?: string;
@@ -45,11 +45,11 @@ export interface SignInDeviceGrantOptions {
   clientId?: string;
 }
 
-export interface SignInDeviceGrantOptionsInteractive extends SignInDeviceGrantOptions {
-  onDeviceGrantUserAction: (deviceGrantUserAction: DeviceGrantUserActionInfo) => void;
+export interface DeviceSignInOptionsInteractive extends DeviceSignInOptions {
+  onDeviceGrantUserAction: (deviceGrantUserAction: DeviceAuthResponse) => void;
 }
 
-export type SignInMultiTenantSuccessResultRaw = {
+export type DeviceSignInSuccessResponseRaw = {
   access_token: string;
   expires_in: number;
   refresh_expires_in: number;
@@ -60,7 +60,7 @@ export type SignInMultiTenantSuccessResultRaw = {
   scope: string;
 };
 
-export type SignInDeviceGrant = {
+export type DeviceSignInSuccessResponse = {
   accessToken: string;
   accessTokenExpiryInSeconds: number;
   refreshTokenExpiryInSeconds: number;
@@ -80,16 +80,16 @@ export const generateTokenUrl = (multiTenantLoginInfo: MultTenantLoginInfo, tena
   return `${loginUrl.protocol}//${loginUrl.hostname}/realms/${tenantId}/protocol/openid-connect/token`;
 };
 
-export const getClientId = (opts: SignInDeviceGrantOptions) => {
+export const getClientId = (opts: DeviceSignInOptions) => {
   return opts.clientId || 'device-sign-in';
 };
 
-export const getTenantId = (acrolinxUrl: string, opts: SignInDeviceGrantOptions) => {
+export const getTenantId = (acrolinxUrl: string, opts: DeviceSignInOptions) => {
   const url = new URL(acrolinxUrl);
   return opts.tenantId || url.host.split('.')[0];
 };
 
-export const tidyKeyCloakSuccessResponse = (rawResponse: SignInMultiTenantSuccessResultRaw): SignInDeviceGrant => {
+export const tidyKeyCloakSuccessResponse = (rawResponse: DeviceSignInSuccessResponseRaw): DeviceSignInSuccessResponse => {
   return {
     accessToken: rawResponse.access_token,
     accessTokenExpiryInSeconds: rawResponse.expires_in,
@@ -101,7 +101,7 @@ export const tidyKeyCloakSuccessResponse = (rawResponse: SignInMultiTenantSucces
   };
 };
 
-export const isSignInDeviceGrantSuccess = (result: DeviceGrantUserActionInfo | SignInDeviceGrant): boolean => {
-  const asSignInDeviceGrant = result as SignInDeviceGrant;
+export const isSignInDeviceGrantSuccess = (result: DeviceAuthResponse | DeviceSignInSuccessResponse): boolean => {
+  const asSignInDeviceGrant = result as DeviceSignInSuccessResponse;
   return !!(asSignInDeviceGrant && asSignInDeviceGrant.accessToken && asSignInDeviceGrant.refreshToken);
 };

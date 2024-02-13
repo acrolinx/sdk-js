@@ -1,10 +1,10 @@
 import {
-  DeviceGrantUserActionInfoRaw,
+  DeviceAuthResponseRaw,
   MultTenantLoginInfo,
-  SignInMultiTenantSuccessResultRaw,
+  DeviceSignInSuccessResponseRaw,
 } from 'src/signin-device-grant';
 
-export const deviceGrantUserActionInfo: DeviceGrantUserActionInfoRaw = {
+export const deviceGrantUserActionInfo: DeviceAuthResponseRaw = {
   device_code: 'kXn1FPdnEYmKYXaswtwJyiM02bqQF59pER-Y9fMZ1wg',
   user_code: 'VJGF-LQOP',
   verification_uri: 'https://comapny.acrolinx.cloud/realms/test-tenant-01/device',
@@ -17,7 +17,7 @@ export const multTenantLoginInfo: MultTenantLoginInfo = {
   loginUrl: 'https://auth.company.cloud/some-path/we-dont-care',
 };
 
-export const signInMultiTenantSuccessResultRaw: SignInMultiTenantSuccessResultRaw = {
+export const signInMultiTenantSuccessResultRaw: DeviceSignInSuccessResponseRaw = {
   access_token: 'eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiS...',
   expires_in: 259200,
   refresh_expires_in: 679922,

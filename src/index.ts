@@ -81,13 +81,13 @@ import {
   SigninSuccessResult,
 } from './signin';
 import {
-  DeviceGrantUserActionInfo,
-  DeviceGrantUserActionInfoRaw,
+  DeviceAuthResponse,
+  DeviceAuthResponseRaw,
   MultTenantLoginInfo,
-  SignInDeviceGrant,
-  SignInDeviceGrantOptions,
-  SignInDeviceGrantOptionsInteractive,
-  SignInMultiTenantSuccessResultRaw,
+  DeviceSignInSuccessResponse,
+  DeviceSignInOptions,
+  DeviceSignInOptionsInteractive,
+  DeviceSignInSuccessResponseRaw,
   generateDeviceAuthUrl,
   generateTokenUrl,
   getClientId,
@@ -278,7 +278,7 @@ export class AcrolinxEndpoint {
   private async fetchDeviceGrantUserAction(
     deviceGrantUrl: string,
     clientId: string,
-  ): Promise<DeviceGrantUserActionInfoRaw> {
+  ): Promise<DeviceAuthResponseRaw> {
     return await this.fetchJson(deviceGrantUrl, {
       method: 'POST',
       headers: {
@@ -291,8 +291,8 @@ export class AcrolinxEndpoint {
   }
 
   public async deviceAuthSignIn(
-    opts: SignInDeviceGrantOptions,
-  ): Promise<DeviceGrantUserActionInfo | SignInDeviceGrant> {
+    opts: DeviceSignInOptions,
+  ): Promise<DeviceAuthResponse | DeviceSignInSuccessResponse> {
     const tenantId = getTenantId(this.props.acrolinxUrl, opts);
     const multTenantLoginInfo: MultTenantLoginInfo = await this.fetchLoginInfo(tenantId);
     const clientId = getClientId(opts);
@@ -307,14 +307,14 @@ export class AcrolinxEndpoint {
       return tokenValidationResult;
     }
 
-    const verificationResultRaw: DeviceGrantUserActionInfoRaw = await this.fetchDeviceGrantUserAction(
+    const verificationResultRaw: DeviceAuthResponseRaw = await this.fetchDeviceGrantUserAction(
       generateDeviceAuthUrl(multTenantLoginInfo, tenantId),
       clientId,
     );
 
     //TODO: error handling
 
-    const verificationResult: DeviceGrantUserActionInfo = {
+    const verificationResult: DeviceAuthResponse = {
       deviceCode: verificationResultRaw.device_code,
       expiresInSeconds: verificationResultRaw.expires_in,
       pollingIntervalInSeconds: verificationResultRaw.interval,
@@ -331,7 +331,7 @@ export class AcrolinxEndpoint {
     url: string,
     clientId: string,
     refreshToken: string | undefined,
-  ): Promise<SignInDeviceGrant | undefined> {
+  ): Promise<DeviceSignInSuccessResponse | undefined> {
     try {
       const response = await this.fetchTokenKeyCloak(
         url,
@@ -353,14 +353,14 @@ export class AcrolinxEndpoint {
     }
   }
 
-  public async deviceAuthSignInInteractive(opts: SignInDeviceGrantOptionsInteractive): Promise<SignInDeviceGrant> {
+  public async deviceAuthSignInInteractive(opts: DeviceSignInOptionsInteractive): Promise<DeviceSignInSuccessResponse> {
     const result = await this.deviceAuthSignIn(opts);
     const clientId = opts.clientId || 'device-sign-in';
 
     if (isSignInDeviceGrantSuccess(result)) {
-      return result as SignInDeviceGrant;
+      return result as DeviceSignInSuccessResponse;
     }
-    const verificationResult = result as DeviceGrantUserActionInfo;
+    const verificationResult = result as DeviceAuthResponse;
 
     opts.onDeviceGrantUserAction(verificationResult);
     return await this.pollDeviceSignInCompletion(clientId, verificationResult);
@@ -369,7 +369,7 @@ export class AcrolinxEndpoint {
   private async fetchTokenKeyCloak(
     url: string,
     urlSearchParams: URLSearchParams,
-  ): Promise<SignInMultiTenantSuccessResultRaw> {
+  ): Promise<DeviceSignInSuccessResponseRaw> {
     return await this.fetchJson(url, {
       method: 'POST',
       headers: {
@@ -381,13 +381,13 @@ export class AcrolinxEndpoint {
 
   public async pollDeviceSignInCompletion(
     clientId: string,
-    verificationResult: DeviceGrantUserActionInfo,
-  ): Promise<SignInDeviceGrant> {
+    verificationResult: DeviceAuthResponse,
+  ): Promise<DeviceSignInSuccessResponse> {
     const startTime = Date.now();
     while (Date.now() < startTime + verificationResult.expiresInSeconds) {
       await waitMs(verificationResult.pollingIntervalInSeconds * 1000);
       try {
-        const response: SignInMultiTenantSuccessResultRaw = await this.fetchTokenKeyCloak(
+        const response: DeviceSignInSuccessResponseRaw = await this.fetchTokenKeyCloak(
           verificationResult.pollingUrl,
           new URLSearchParams({
             grant_type: 'urn:ietf:params:oauth:grant-type:device_code',
