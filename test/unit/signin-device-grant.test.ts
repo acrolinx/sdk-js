@@ -31,6 +31,8 @@ import {
 
 describe('Sign In With Device Grant', () => {
   const onDeviceGrantUserActionCallback = jest.fn();
+  const dummyTenantId = 'tenant';
+  const dummyClientId = 'test-client';
 
   let endpoint: AcrolinxEndpoint;
   beforeEach(() => {
@@ -44,7 +46,7 @@ describe('Sign In With Device Grant', () => {
 
     const response = await endpoint.deviceAuthSignInInteractive({
       onDeviceGrantUserAction: onDeviceGrantUserActionCallback,
-      tenantId: 'test-tenant',
+      tenantId: dummyTenantId,
     });
 
     expect(response).toBeDefined();
@@ -60,6 +62,19 @@ describe('Sign In With Device Grant', () => {
     expect(response).toHaveProperty('scope', signInMultiTenantSuccessResultRaw.scope);
   });
 
+  it('should return correct device auth response', async () => {
+    fetchLoginInfoMockSuccess();
+    fetchDeviceGrantUserActionMockSuccess();
+    fetchTokenForDeviceGrantMockFailure();
+
+    const response = await endpoint.deviceAuthSignIn({
+      tenantId: dummyTenantId,
+    });
+
+    expect(response).toBeDefined();
+    expect(response).toEqual(deviceAuthResponse);
+  });
+
   it('should throw if client is invalid', async () => {
     fetchLoginInfoMockSuccess();
     fetchTokenForDeviceGrantMockFailure();
@@ -68,8 +83,8 @@ describe('Sign In With Device Grant', () => {
     await expect(
       endpoint.deviceAuthSignInInteractive({
         onDeviceGrantUserAction: onDeviceGrantUserActionCallback,
-        tenantId: 'test-tenant',
-        clientId: 'invalid',
+        tenantId: dummyTenantId,
+        clientId: dummyClientId,
       }),
     ).rejects.toThrowError(ErrorType.InvalidClient);
   });
@@ -83,7 +98,7 @@ describe('Sign In With Device Grant', () => {
       endpoint.deviceAuthSignInInteractive({
         onDeviceGrantUserAction: onDeviceGrantUserActionCallback,
         tenantId: 'invalid-realm',
-        clientId: 'valid-client',
+        clientId: dummyClientId,
       }),
     ).rejects.toThrowError(ErrorType.RealmNotExist);
   });
@@ -97,7 +112,7 @@ describe('Sign In With Device Grant', () => {
       endpoint.deviceAuthSignInInteractive({
         onDeviceGrantUserAction: onDeviceGrantUserActionCallback,
         tenantId: 'valid-realm',
-        clientId: 'valid-client',
+        clientId: dummyClientId,
       }),
     ).rejects.toThrowError(ErrorType.UnsuppotedGrantType);
   });
