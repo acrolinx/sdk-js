@@ -78,40 +78,30 @@ const fetchTokenForDeviceGrantMock = jest.spyOn(AcrolinxEndpoint.prototype as an
 
 export const fetchLoginInfoMockSuccess = () => {
   fetchLoginInfoMock.mockImplementation(async () => {
-    return new Promise((res, _rej) => {
-      res(multTenantLoginInfo);
-    });
+    return Promise.resolve(multTenantLoginInfo);
   });
 };
 
 export const fetchDeviceGrantUserActionMockSuccess = () => {
   fetchDeviceGrantUserActionMock.mockImplementation(async () => {
-    return new Promise((res, _rej) => {
-      res(deviceGrantUserActionInfo);
-    });
+    return Promise.resolve(deviceGrantUserActionInfo);
   });
 };
 
 export const fetchDeviceGrantUserActionMockFailure = (error: AcrolinxError) => {
   fetchDeviceGrantUserActionMock.mockImplementation(async () => {
-    return new Promise((_res, rej) => {
-      rej(error);
-    });
+    return Promise.reject(error);
   });
 };
 
 export const fetchTokenForDeviceGrantMockSuccess = () => {
   fetchTokenForDeviceGrantMock.mockImplementation(async () => {
-    return new Promise((res, _rej) => {
-      res(signInMultiTenantSuccessResultRaw);
-    });
+    return Promise.resolve(signInMultiTenantSuccessResultRaw);
   });
 };
 
 export const fetchTokenForDeviceGrantMockFailure = () => {
   fetchTokenForDeviceGrantMock.mockImplementation(async () => {
-    return new Promise((_res, rej) => {
-      rej(invalidGrantError);
-    });
+    return Promise.reject(invalidGrantError);
   });
 };

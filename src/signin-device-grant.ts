@@ -81,12 +81,12 @@ export const generateTokenUrl = (multiTenantLoginInfo: MultTenantLoginInfo, tena
 };
 
 export const getClientId = (opts: DeviceSignInOptions) => {
-  return opts.clientId || 'device-sign-in';
+  return opts.clientId ?? 'device-sign-in';
 };
 
 export const getTenantId = (acrolinxUrl: string, opts: DeviceSignInOptions) => {
   const url = new URL(acrolinxUrl);
-  return opts.tenantId || url.host.split('.')[0];
+  return opts.tenantId ?? url.host.split('.')[0];
 };
 
 export const tidyKeyCloakSuccessResponse = (

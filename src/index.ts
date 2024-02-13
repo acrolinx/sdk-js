@@ -322,7 +322,7 @@ export class AcrolinxEndpoint {
         new URLSearchParams({
           grant_type: 'refresh_token',
           client_id: clientId,
-          refresh_token: refreshToken || '',
+          refresh_token: refreshToken ?? '',
         }),
       );
       return tidyKeyCloakSuccessResponse(response);
@@ -339,7 +339,7 @@ export class AcrolinxEndpoint {
 
   public async deviceAuthSignInInteractive(opts: DeviceSignInOptionsInteractive): Promise<DeviceSignInSuccessResponse> {
     const result = await this.deviceAuthSignIn(opts);
-    const clientId = opts.clientId || 'device-sign-in';
+    const clientId = opts.clientId ?? 'device-sign-in';
 
     if (isSignInDeviceGrantSuccess(result)) {
       return result as DeviceSignInSuccessResponse;
