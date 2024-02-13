@@ -308,7 +308,6 @@ export class AcrolinxEndpoint {
       clientId,
     );
 
-    //TODO: error handling
     return tidyKeyCloakDeviceAuthResponse(generateTokenUrl(multTenantLoginInfo, tenantId), deviceAuthResponse);
   }
 
