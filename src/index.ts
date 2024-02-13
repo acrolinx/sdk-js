@@ -275,10 +275,7 @@ export class AcrolinxEndpoint {
     });
   }
 
-  private async fetchDeviceGrantUserAction(
-    deviceGrantUrl: string,
-    clientId: string,
-  ): Promise<DeviceAuthResponseRaw> {
+  private async fetchDeviceGrantUserAction(deviceGrantUrl: string, clientId: string): Promise<DeviceAuthResponseRaw> {
     return await this.fetchJson(deviceGrantUrl, {
       method: 'POST',
       headers: {
@@ -290,9 +287,7 @@ export class AcrolinxEndpoint {
     });
   }
 
-  public async deviceAuthSignIn(
-    opts: DeviceSignInOptions,
-  ): Promise<DeviceAuthResponse | DeviceSignInSuccessResponse> {
+  public async deviceAuthSignIn(opts: DeviceSignInOptions): Promise<DeviceAuthResponse | DeviceSignInSuccessResponse> {
     const tenantId = getTenantId(this.props.acrolinxUrl, opts);
     const multTenantLoginInfo: MultTenantLoginInfo = await this.fetchLoginInfo(tenantId);
     const clientId = getClientId(opts);
