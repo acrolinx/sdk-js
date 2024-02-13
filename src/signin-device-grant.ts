@@ -89,7 +89,9 @@ export const getTenantId = (acrolinxUrl: string, opts: DeviceSignInOptions) => {
   return opts.tenantId || url.host.split('.')[0];
 };
 
-export const tidyKeyCloakSuccessResponse = (rawResponse: DeviceSignInSuccessResponseRaw): DeviceSignInSuccessResponse => {
+export const tidyKeyCloakSuccessResponse = (
+  rawResponse: DeviceSignInSuccessResponseRaw,
+): DeviceSignInSuccessResponse => {
   return {
     accessToken: rawResponse.access_token,
     accessTokenExpiryInSeconds: rawResponse.expires_in,

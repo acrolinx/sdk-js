@@ -14,12 +14,16 @@
  * limitations under the License.
  */
 
-import { AcrolinxEndpoint } from '../../src/index';
+import { AcrolinxEndpoint, AcrolinxError, ErrorType } from '../../src/index';
 import { DUMMY_ENDPOINT_PROPS } from './common';
 import {
   deviceGrantUserActionInfo,
+  invalidClientError,
+  invalidGrantError,
+  invalidRealmError,
   multTenantLoginInfo,
   signInMultiTenantSuccessResultRaw,
+  unsupportedGrantType,
 } from '../mocked-data/sign-in-device-grant.mock';
 import { DeviceAuthResponse } from '../../src/signin-device-grant';
 
@@ -48,10 +52,26 @@ describe('Sign In With Device Grant', () => {
     });
   };
 
+  const fetchDeviceGrantUserActionMockFailure = (error: AcrolinxError) => {
+    fetchDeviceGrantUserActionMock.mockImplementation(async () => {
+      return new Promise((_res, rej) => {
+        rej(error);
+      });
+    });
+  };
+
   const fetchTokenForDeviceGrantMockSuccess = () => {
     fetchTokenForDeviceGrantMock.mockImplementation(async () => {
       return new Promise((res, _rej) => {
         res(signInMultiTenantSuccessResultRaw);
+      });
+    });
+  };
+
+  const fetchTokenForDeviceGrantMockFailure = () => {
+    fetchTokenForDeviceGrantMock.mockImplementation(async () => {
+      return new Promise((_res, rej) => {
+        rej(invalidGrantError);
       });
     });
   };
@@ -82,5 +102,47 @@ describe('Sign In With Device Grant', () => {
     expect(response).toHaveProperty('sessionState', signInMultiTenantSuccessResultRaw.session_state);
     expect(response).toHaveProperty('tokenType', signInMultiTenantSuccessResultRaw.token_type);
     expect(response).toHaveProperty('scope', signInMultiTenantSuccessResultRaw.scope);
+  });
+
+  it('should throw if client is invalid', async () => {
+    fetchLoginInfoMockSuccess();
+    fetchTokenForDeviceGrantMockFailure();
+    fetchDeviceGrantUserActionMockFailure(invalidClientError);
+
+    await expect(
+      endpoint.deviceAuthSignInInteractive({
+        onDeviceGrantUserAction: onDeviceGrantUserActionCallback,
+        tenantId: 'test-tenant',
+        clientId: 'invalid',
+      }),
+    ).rejects.toThrowError(ErrorType.InvalidClient);
+  });
+
+  it('should throw if realm is invalid', async () => {
+    fetchLoginInfoMockSuccess();
+    fetchTokenForDeviceGrantMockFailure();
+    fetchDeviceGrantUserActionMockFailure(invalidRealmError);
+
+    await expect(
+      endpoint.deviceAuthSignInInteractive({
+        onDeviceGrantUserAction: onDeviceGrantUserActionCallback,
+        tenantId: 'invalid-realm',
+        clientId: 'valid-client',
+      }),
+    ).rejects.toThrowError(ErrorType.RealmNotExist);
+  });
+
+  it('should throw if grant type is unsupported', async () => {
+    fetchLoginInfoMockSuccess();
+    fetchTokenForDeviceGrantMockFailure();
+    fetchDeviceGrantUserActionMockFailure(unsupportedGrantType);
+
+    await expect(
+      endpoint.deviceAuthSignInInteractive({
+        onDeviceGrantUserAction: onDeviceGrantUserActionCallback,
+        tenantId: 'valid-realm',
+        clientId: 'valid-client',
+      }),
+    ).rejects.toThrowError(ErrorType.UnsuppotedGrantType);
   });
 });

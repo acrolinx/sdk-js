@@ -48,6 +48,7 @@ export enum ErrorType {
   RealmNotExist = 'Realm does not exist',
   InvalidGrant = 'invalid_grant',
   UnsuppotedGrantType = 'unsupported_grant_type',
+  InavlidRequest = 'invalid_request',
 }
 
 export interface AcrolinxErrorProps {
@@ -139,7 +140,7 @@ export function createErrorFromFetchResponse(
     });
   } else if (typeof jsonBody.error === 'string' && new RegExp(/realms\/.+?\/protocol\/openid-connect/).test(req.url)) {
     return new AcrolinxError({
-      detail: jsonBody.error_description,
+      detail: jsonBody.error_description || 'Unknown Auth Error',
       status: res.status,
       httpRequest: req,
       title: jsonBody.error,
