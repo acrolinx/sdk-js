@@ -80,6 +80,22 @@ import {
   SigninSuccessData,
   SigninSuccessResult,
 } from './signin';
+import {
+  DeviceAuthResponse,
+  DeviceAuthResponseRaw,
+  MultTenantLoginInfo,
+  DeviceSignInSuccessResponse,
+  DeviceSignInOptions,
+  DeviceSignInOptionsInteractive,
+  DeviceSignInSuccessResponseRaw,
+  generateDeviceAuthUrl,
+  generateTokenUrl,
+  getClientId,
+  getTenantId,
+  isSignInDeviceGrantSuccess,
+  tidyKeyCloakSuccessResponse,
+  tidyKeyCloakDeviceAuthResponse,
+} from './signin-device-grant';
 import { User } from './user';
 import { handleExpectedJsonResponse, handleExpectedTextResponse } from './utils/fetch';
 import * as logging from './utils/logging';
@@ -203,7 +219,7 @@ export interface CancelablePromiseWrapper<T> {
   cancel(): void;
 }
 
-interface SignInInteractiveOptions {
+export interface SignInInteractiveOptions {
   onSignInUrl: (url: string) => void;
   accessToken?: string;
   timeoutMs?: number;
@@ -252,6 +268,136 @@ export class AcrolinxEndpoint {
     opts.onSignInUrl(signinResult.links.interactive);
 
     return this.pollForInteractiveSignIn(signinResult, opts.timeoutMs || 60 * 60 * 1000);
+  }
+
+  private async fetchLoginInfo(tenantId: string): Promise<MultTenantLoginInfo> {
+    return await this.fetchJson(this.getUrlOfPath(`/content-cube/api/auth/keycloak/login-url?tenant=${tenantId}`), {
+      method: 'POST',
+    });
+  }
+
+  private async fetchDeviceGrantUserAction(deviceGrantUrl: string, clientId: string): Promise<DeviceAuthResponseRaw> {
+    return await this.fetchJson(deviceGrantUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: new URLSearchParams({
+        client_id: clientId,
+      }),
+    });
+  }
+
+  public async deviceAuthSignIn(opts: DeviceSignInOptions): Promise<DeviceAuthResponse | DeviceSignInSuccessResponse> {
+    const tenantId = getTenantId(this.props.acrolinxUrl, opts);
+    const multTenantLoginInfo: MultTenantLoginInfo = await this.fetchLoginInfo(tenantId);
+    const clientId = getClientId(opts);
+
+    const tokenValidationResult = await this.verifyTokenIsValid(
+      generateTokenUrl(multTenantLoginInfo, tenantId),
+      clientId,
+      opts.refreshToken,
+    );
+
+    if (tokenValidationResult) {
+      return tokenValidationResult;
+    }
+
+    const deviceAuthResponse = await this.fetchDeviceGrantUserAction(
+      generateDeviceAuthUrl(multTenantLoginInfo, tenantId),
+      clientId,
+    );
+
+    return tidyKeyCloakDeviceAuthResponse(generateTokenUrl(multTenantLoginInfo, tenantId), deviceAuthResponse);
+  }
+
+  private async verifyTokenIsValid(
+    url: string,
+    clientId: string,
+    refreshToken: string | undefined,
+  ): Promise<DeviceSignInSuccessResponse | undefined> {
+    try {
+      const response = await this.fetchTokenKeyCloak(
+        url,
+        new URLSearchParams({
+          grant_type: 'refresh_token',
+          client_id: clientId,
+          refresh_token: refreshToken ?? '',
+        }),
+      );
+      return tidyKeyCloakSuccessResponse(response);
+    } catch (error: unknown) {
+      const acrolinxError = error as AcrolinxError;
+      if (acrolinxError.type === ErrorType.InvalidGrant) {
+        console.log('Refresh token invalid, fetching new device code');
+        return undefined;
+      } else {
+        throw error;
+      }
+    }
+  }
+
+  public async deviceAuthSignInInteractive(opts: DeviceSignInOptionsInteractive): Promise<DeviceSignInSuccessResponse> {
+    const result = await this.deviceAuthSignIn(opts);
+    const clientId = opts.clientId ?? 'device-sign-in';
+
+    if (isSignInDeviceGrantSuccess(result)) {
+      return result as DeviceSignInSuccessResponse;
+    }
+    const verificationResult = result as DeviceAuthResponse;
+
+    opts.onDeviceGrantUserAction(verificationResult);
+    return await this.pollDeviceSignInCompletion(clientId, verificationResult);
+  }
+
+  private async fetchTokenKeyCloak(
+    url: string,
+    urlSearchParams: URLSearchParams,
+  ): Promise<DeviceSignInSuccessResponseRaw> {
+    return await this.fetchJson(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: urlSearchParams,
+    });
+  }
+
+  public async pollDeviceSignInCompletion(
+    clientId: string,
+    verificationResult: DeviceAuthResponse,
+  ): Promise<DeviceSignInSuccessResponse> {
+    const startTime = Date.now();
+    while (Date.now() < startTime + verificationResult.expiresInSeconds) {
+      await waitMs(verificationResult.pollingIntervalInSeconds * 1000);
+      try {
+        const response: DeviceSignInSuccessResponseRaw = await this.fetchTokenKeyCloak(
+          verificationResult.pollingUrl,
+          new URLSearchParams({
+            grant_type: 'urn:ietf:params:oauth:grant-type:device_code',
+            device_code: verificationResult.deviceCode,
+            client_id: clientId,
+          }),
+        );
+
+        return tidyKeyCloakSuccessResponse(response);
+      } catch (error: unknown) {
+        const acrolinxError = error as AcrolinxError;
+        if (acrolinxError.type === ErrorType.AuthorizationPending) {
+          console.log(acrolinxError.detail);
+          continue;
+        }
+        throw error;
+      }
+    }
+
+    throw new AcrolinxError({
+      type: ErrorType.SigninTimedOut,
+      title: 'Interactive device grant sign-in time out',
+      detail: `Interactive device grant sign-in has timed out by client (${Date.now() - startTime} > ${
+        verificationResult.expiresInSeconds
+      } ms).`,
+    });
   }
 
   public async signin(options: SigninOptions = {}): Promise<SigninResult> {
