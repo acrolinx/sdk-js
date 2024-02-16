@@ -11,6 +11,9 @@
   "engines": {
     "node": ">=14.0.0"
   },
+  "publishConfig": {
+    "tag": "alpha"
+  },
   "scripts": {
     "ci": "npm run build && npm run lint && npm run testCoverage",
     "ciWithoutIntegrationServerTest": "npm run build && npm run lint && npm run testUnitCoverage && npm run testMarkdown",
