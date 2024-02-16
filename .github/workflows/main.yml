@@ -81,6 +81,7 @@ jobs:
       
       - name: Publish GitHub Pages 🚀
         uses: JamesIves/github-pages-deploy-action@v4
+        if: github.ref == 'refs/heads/main' && steps.publish.outputs.type
         with:
           branch: gh-pages
           folder: docs/pluginDoc
