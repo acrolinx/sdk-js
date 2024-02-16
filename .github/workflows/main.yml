@@ -5,6 +5,8 @@ on:
     branches: [main]
   schedule:
     - cron: "0 2 * * *" # Everyday at 2:00AM
+  pull_request:
+    branches: [main]
   workflow_dispatch:
     inputs:
       reason:
@@ -67,18 +69,18 @@ jobs:
       - name: Publish To NPM
         id: publish
         uses: JS-DevTools/npm-publish@v3
+        if: github.ref == 'refs/heads/main'
         with:
           token: ${{ secrets.NPM_ACCESS_TOKEN }}
       
       - name: Push Tag
         uses: anothrNick/github-tag-action@1.64.0
-        if: steps.publish.outputs.type
+        if: github.ref == 'refs/heads/main' && steps.publish.outputs.type
         env:
           CUSTOM_TAG: v${{ steps.publish.outputs.version }}
       
       - name: Publish GitHub Pages 🚀
-        if: steps.publish.outputs.type
-        uses: JamesIves/github-pages-deploy-action@v4.4.1
+        uses: JamesIves/github-pages-deploy-action@v4
         with:
           branch: gh-pages
           folder: docs/pluginDoc
