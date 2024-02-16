@@ -61,7 +61,8 @@ describe('Acrolinx One E2E Tests', () => {
       verifyDeviceGrantUserActionInfo(deviceGrantUserAction);
     });
 
-    it('validate refresh token', async () => {
+    // This test requires valid refresh token
+    it.skip('validate refresh token', async () => {
       const signInDeviceGrant = (await endpoint.deviceAuthSignIn({
         tenantId: KEYCLOAK_TENANT_ID,
         clientId: KEYCLOAK_CLIENT_ID,

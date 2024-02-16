@@ -80,8 +80,8 @@ export const generateTokenUrl = (multiTenantLoginInfo: MultTenantLoginInfo, tena
   return `${loginUrl.protocol}//${loginUrl.hostname}/realms/${tenantId}/protocol/openid-connect/token`;
 };
 
-export const getClientId = (opts: DeviceSignInOptions) => {
-  return opts.clientId ?? 'device-sign-in';
+export const getClientId = (opts?: DeviceSignInOptions) => {
+  return opts?.clientId ?? 'device-sign-in';
 };
 
 export const getTenantId = (acrolinxUrl: string, opts: DeviceSignInOptions) => {
@@ -115,7 +115,16 @@ export const tidyKeyCloakDeviceAuthResponse = (pollingUrl: string, response: Dev
   };
 };
 
-export const isSignInDeviceGrantSuccess = (result: DeviceAuthResponse | DeviceSignInSuccessResponse): boolean => {
+export const isSignInDeviceGrantSuccess = (
+  result: DeviceAuthResponse | DeviceSignInSuccessResponse,
+): result is DeviceSignInSuccessResponse => {
   const asSignInDeviceGrant = result as DeviceSignInSuccessResponse;
   return !!(asSignInDeviceGrant && asSignInDeviceGrant.accessToken && asSignInDeviceGrant.refreshToken);
 };
+
+export function isDeviceAuthResponse(
+  result: DeviceAuthResponse | DeviceSignInSuccessResponse,
+): result is DeviceAuthResponse {
+  const asDeviceAuthResponse = result as DeviceAuthResponse;
+  return !!asDeviceAuthResponse.verificationUrlComplete;
+}

@@ -167,6 +167,7 @@ export interface AcrolinxEndpointProps {
 
   corsWithCredentials?: boolean;
   additionalFetchProperties?: any;
+  additionalHeaders?: StringMap;
   fetch?: typeof fetch;
 
   /**
@@ -342,12 +343,10 @@ export class AcrolinxEndpoint {
     const clientId = opts.clientId ?? 'device-sign-in';
 
     if (isSignInDeviceGrantSuccess(result)) {
-      return result as DeviceSignInSuccessResponse;
+      return result;
     }
-    const verificationResult = result as DeviceAuthResponse;
-
-    opts.onDeviceGrantUserAction(verificationResult);
-    return await this.pollDeviceSignInCompletion(clientId, verificationResult);
+    opts.onDeviceGrantUserAction(result);
+    return await this.pollDeviceSignInCompletion(clientId, result);
   }
 
   private async fetchTokenKeyCloak(
@@ -368,7 +367,7 @@ export class AcrolinxEndpoint {
     verificationResult: DeviceAuthResponse,
   ): Promise<DeviceSignInSuccessResponse> {
     const startTime = Date.now();
-    while (Date.now() < startTime + verificationResult.expiresInSeconds) {
+    while (Date.now() < startTime + verificationResult.expiresInSeconds * 1000) {
       await waitMs(verificationResult.pollingIntervalInSeconds * 1000);
       try {
         const response: DeviceSignInSuccessResponseRaw = await this.fetchTokenKeyCloak(
@@ -590,7 +589,7 @@ export class AcrolinxEndpoint {
     opts: AdditionalRequestOptions = {},
   ): Promise<T> {
     return this.fetchJson(url, {
-      headers: { ...this.getCommonHeaders(accessToken), ...opts.headers },
+      headers: { ...this.getCommonHeaders(accessToken), ...opts.headers, ...this.props.additionalHeaders },
     });
   }
 
@@ -601,7 +600,7 @@ export class AcrolinxEndpoint {
   ): Promise<string> {
     const httpRequest = { url, method: 'GET' };
     return this.fetch(url, {
-      headers: { ...this.getCommonHeaders(accessToken), ...opts.headers },
+      headers: { ...this.getCommonHeaders(accessToken), ...opts.headers, ...this.props.additionalHeaders },
     }).then(
       (res) => handleExpectedTextResponse(httpRequest, res),
       (error) => wrapFetchError(httpRequest, error),
@@ -752,14 +751,14 @@ export class AcrolinxEndpoint {
   ): Promise<T> {
     return this.fetchJson(this.getUrlOfPath(path), {
       body: JSON.stringify(body),
-      headers: { ...this.getCommonHeaders(accessToken), ...headers },
+      headers: { ...this.getCommonHeaders(accessToken), ...headers, ...this.props.additionalHeaders },
       method,
     });
   }
 
   private async deleteUrl<T>(url: string, accessToken: AccessToken, opts: AdditionalRequestOptions = {}): Promise<T> {
     return this.fetchJson(url, {
-      headers: { ...this.getCommonHeaders(accessToken), ...opts.headers },
+      headers: { ...this.getCommonHeaders(accessToken), ...opts.headers, ...this.props.additionalHeaders },
       method: 'DELETE',
     });
   }
