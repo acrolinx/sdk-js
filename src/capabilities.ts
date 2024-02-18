@@ -83,11 +83,6 @@ export enum ReportType {
   termHarvesting = 'termHarvesting',
   scorecard = 'scorecard',
   extractedText = 'extractedText',
-  /**
-   * TODO: Remove doubled enum value
-   * @Deprecated Use extractedText
-   */
-  request_text = 'extractedText',
   linguisticDebugInfo = 'linguisticDebugInfo',
   contentAnalysisDashboard = 'contentAnalysisDashboard',
 }

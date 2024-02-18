@@ -84,6 +84,8 @@ export interface HttpRequest {
 
 export interface AcrolinxApiError extends AcrolinxErrorProps {
   status: number;
+  error_description?: string;
+  error?: string;
 }
 
 export class AcrolinxError extends Error implements AcrolinxErrorProps {
@@ -124,7 +126,7 @@ export class AcrolinxError extends Error implements AcrolinxErrorProps {
 export function createErrorFromFetchResponse(
   req: HttpRequest,
   res: Response,
-  jsonBody: any | AcrolinxApiError,
+  jsonBody: AcrolinxApiError,
 ): AcrolinxError {
   if (jsonBody.type) {
     return new AcrolinxError({

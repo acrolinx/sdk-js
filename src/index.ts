@@ -329,7 +329,7 @@ export class AcrolinxEndpoint {
       return tidyKeyCloakSuccessResponse(response);
     } catch (error: unknown) {
       const acrolinxError = error as AcrolinxError;
-      if (acrolinxError.type === ErrorType.InvalidGrant) {
+      if ((acrolinxError.type as ErrorType) === ErrorType.InvalidGrant) {
         console.log('Refresh token invalid, fetching new device code');
         return undefined;
       } else {
@@ -382,7 +382,7 @@ export class AcrolinxEndpoint {
         return tidyKeyCloakSuccessResponse(response);
       } catch (error: unknown) {
         const acrolinxError = error as AcrolinxError;
-        if (acrolinxError.type === ErrorType.AuthorizationPending) {
+        if ((acrolinxError.type as ErrorType) === ErrorType.AuthorizationPending) {
           console.log(acrolinxError.detail);
           continue;
         }
