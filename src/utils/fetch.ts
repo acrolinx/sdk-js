@@ -47,7 +47,7 @@ async function createErrorFromResponse(req: HttpRequest, res: Response): Promise
       error = createErrorFromFetchResponse(req, res, jsonError);
     }
   } catch {
-    error = createErrorFromFetchResponse(req, res, {});
+    error = createErrorFromFetchResponse(req, res, undefined);
   }
   return error;
 }

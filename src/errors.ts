@@ -126,9 +126,9 @@ export class AcrolinxError extends Error implements AcrolinxErrorProps {
 export function createErrorFromFetchResponse(
   req: HttpRequest,
   res: Response,
-  jsonBody: AcrolinxApiError,
+  jsonBody: AcrolinxApiError | undefined,
 ): AcrolinxError {
-  if (jsonBody.type) {
+  if (jsonBody && jsonBody.type) {
     return new AcrolinxError({
       detail: jsonBody.detail || 'Unknown HTTP Error',
       status: jsonBody.status || res.status,
@@ -140,7 +140,11 @@ export function createErrorFromFetchResponse(
       type: jsonBody.type,
       documentId: jsonBody.documentId,
     });
-  } else if (typeof jsonBody.error === 'string' && new RegExp(/realms\/.+?\/protocol\/openid-connect/).test(req.url)) {
+  } else if (
+    jsonBody &&
+    typeof jsonBody.error === 'string' &&
+    new RegExp(/realms\/.+?\/protocol\/openid-connect/).test(req.url)
+  ) {
     return new AcrolinxError({
       detail: jsonBody.error_description || 'Unknown Auth Error',
       status: res.status,
