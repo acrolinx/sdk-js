@@ -1,4 +1,4 @@
-import { AcrolinxEndpoint, AcrolinxError, ErrorType } from '../../src';
+import { AcrolinxEndpoint, AcrolinxError, AuthorizationType, ErrorType, SigninSuccessResult } from '../../src';
 import {
   DeviceAuthResponseRaw,
   MultTenantLoginInfo,
@@ -72,9 +72,30 @@ export const unsupportedGrantType = new AcrolinxError({
   type: ErrorType.UnsuppotedGrantType,
 });
 
+export const signInSuccesResult: SigninSuccessResult = {
+  data: {
+    accessToken: 'eyJhbGciOiJIUzI1NiIsInR5cCI6...',
+    user: {
+      id: '29f2dbd9-random-429e-random-3745170467bf',
+      username: 'user@acrolinx.com',
+    },
+    authorizedUsing: AuthorizationType.ACROLINX_SSO,
+    integration: {
+      properties: {
+        'ca.filter': 'some_filters',
+        doNotStoreAccessToken: 'false',
+      },
+      addons: [],
+    },
+    links: {},
+  },
+  links: {},
+};
+
 const fetchLoginInfoMock = jest.spyOn(AcrolinxEndpoint.prototype as any, 'fetchLoginInfo');
 const fetchDeviceGrantUserActionMock = jest.spyOn(AcrolinxEndpoint.prototype as any, 'fetchDeviceGrantUserAction');
 const fetchTokenForDeviceGrantMock = jest.spyOn(AcrolinxEndpoint.prototype as any, 'fetchTokenKeyCloak');
+const signInWithHeadersMock = jest.spyOn(AcrolinxEndpoint.prototype as any, 'signin');
 
 export const fetchLoginInfoMockSuccess = () => {
   fetchLoginInfoMock.mockImplementation(async () => {
@@ -103,5 +124,11 @@ export const fetchTokenForDeviceGrantMockSuccess = () => {
 export const fetchTokenForDeviceGrantMockFailure = () => {
   fetchTokenForDeviceGrantMock.mockImplementation(async () => {
     return Promise.reject(invalidGrantError);
+  });
+};
+
+export const signInSingleTenantWithKeycloakAccessToken = () => {
+  signInWithHeadersMock.mockImplementation(async () => {
+    return Promise.resolve(signInSuccesResult);
   });
 };

@@ -259,6 +259,26 @@ export class AcrolinxEndpoint {
     }
   }
 
+  public async signInWithHeaders(): Promise<SigninSuccessResult> {
+    if (!this.props.additionalHeaders) {
+      throw new AcrolinxError({
+        type: ErrorType.SSO,
+        title: 'Headers missing',
+        detail: 'Additional headers must be provided',
+      });
+    }
+    const signinResult = await this.signin();
+    if (isSigninSuccessResult(signinResult)) {
+      return signinResult;
+    } else {
+      throw new AcrolinxError({
+        type: ErrorType.SSO,
+        title: 'SSO Error',
+        detail: 'Sign-In by SSO failed.',
+      });
+    }
+  }
+
   public async singInInteractive(opts: SignInInteractiveOptions): Promise<SigninSuccessData> {
     const signinResult = await this.signin({ accessToken: opts.accessToken });
 
