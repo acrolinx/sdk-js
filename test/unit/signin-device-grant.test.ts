@@ -26,6 +26,8 @@ import {
   invalidClientError,
   invalidRealmError,
   signInMultiTenantSuccessResultRaw,
+  signInSingleTenantWithKeycloakAccessToken,
+  signInSuccesResult,
   unsupportedGrantType,
 } from '../mocked-data/sign-in-device-grant.mock';
 
@@ -130,5 +132,23 @@ describe('Sign In With Device Grant', () => {
     ).rejects.toThrow();
     expect(onDeviceGrantUserActionCallback).toHaveBeenCalledTimes(1);
     expect(onDeviceGrantUserActionCallback).toHaveBeenCalledWith(deviceAuthResponse);
+  });
+
+  it('should get single tenant access token from keycloak tokne', async () => {
+    signInSingleTenantWithKeycloakAccessToken();
+    const acrolinxEndpint = new AcrolinxEndpoint({
+      ...DUMMY_ENDPOINT_PROPS,
+      additionalHeaders: {
+        Authorization: 'Bearer random-token',
+      },
+    });
+    const result = await acrolinxEndpint.signInWithHeaders();
+    expect(result).toBeDefined();
+    expect(result).toEqual(signInSuccesResult);
+  });
+
+  it('should throw SSO error if additional headers not set', async () => {
+    signInSingleTenantWithKeycloakAccessToken();
+    await expect(endpoint.signInWithHeaders()).rejects.toThrow();
   });
 });

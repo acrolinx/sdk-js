@@ -1,5 +1,5 @@
 import { DeviceAuthResponse, DeviceSignInSuccessResponse } from '../../src/signin-device-grant';
-import { AcrolinxEndpoint, DEVELOPMENT_SIGNATURE } from '../../src';
+import { AcrolinxEndpoint, DEVELOPMENT_SIGNATURE, StringMap } from '../../src';
 import * as dotenv from 'dotenv';
 import 'cross-fetch/polyfill';
 
@@ -9,9 +9,11 @@ const ACROLINX_ONE_SERVER_URL = process.env.ACROLINX_ONE_SERVER_URL || '';
 const KEYCLOAK_TENANT_ID = process.env.KEYCLOAK_TENANT_ID;
 const KEYCLOAK_CLIENT_ID = process.env.KEYCLOAK_CLIENT_ID || '';
 const KEYCLOAK_REFRESH_TOKEN = process.env.KEYCLOAK_REFRESH_TOKEN;
+const KEYCLOAK_ACCESS_TOKEN = process.env.KEYCLOAK_ACCESS_TOKEN;
+const KEYCLOAK_COOKIE = process.env.KEYCLOAK_COOKIE;
 export const ACROLINX_DEV_SIGNATURE = process.env.ACROLINX_DEV_SIGNATURE;
 
-function createEndpoint(acrolinxUrl: string) {
+function createEndpoint(acrolinxUrl: string, headers?: StringMap) {
   return new AcrolinxEndpoint({
     acrolinxUrl,
     enableHttpLogging: true,
@@ -19,6 +21,7 @@ function createEndpoint(acrolinxUrl: string) {
       signature: ACROLINX_DEV_SIGNATURE || DEVELOPMENT_SIGNATURE,
       version: '1.2.3.666',
     },
+    additionalHeaders: headers,
   });
 }
 
@@ -96,5 +99,18 @@ describe('Acrolinx One E2E Tests', () => {
       deviceGrantUserAction.expiresInSeconds = 10;
       await expect(endpoint.pollDeviceSignInCompletion(KEYCLOAK_CLIENT_ID, deviceGrantUserAction)).rejects.toThrow();
     }, 30000);
+
+    // This test requires valid keycloak access token
+    it.skip('sign-in with auth header', async () => {
+      const headers: StringMap = {
+        Authorization: `Bearer ${KEYCLOAK_ACCESS_TOKEN!}`,
+        Cookie: KEYCLOAK_COOKIE!,
+      };
+      const ep = createEndpoint(ACROLINX_ONE_SERVER_URL, headers);
+      const result = await ep.signInWithHeaders();
+
+      expect(result).toBeDefined();
+      expect(result.data.accessToken).toBeDefined();
+    });
   });
 });
