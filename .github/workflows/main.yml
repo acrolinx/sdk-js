@@ -5,22 +5,21 @@ on:
     branches: [main]
   schedule:
     - cron: "0 2 * * *" # Everyday at 2:00AM
+  pull_request:
+    branches: [main]
   workflow_dispatch:
     inputs:
       reason:
         description: "Trigger Comment (Optional)"
         required: false
         default: "Manual Workflow Run"
+permissions:
+  contents: write
 
 jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      # Using a different secret name for the URL to harmonize secrets
-      # between integrations
-
-      # TODO Are these env variables used or directly the secrets env?
-
       TEST_SERVER_URL:       ${{ secrets.TEST_SERVER_URL }}
       ACROLINX_API_USERNAME: ${{ secrets.ACROLINX_API_USERNAME }}
       ACROLINX_API_TOKEN:    ${{ secrets.ACROLINX_API_TOKEN }}
@@ -33,20 +32,14 @@ jobs:
       KEYCLOAK_CLIENT_ID: ${{ secrets.KEYCLOAK_CLIENT_ID}}
       KEYCLOAK_REFRESH_TOKEN: ${{ secrets.KEYCLOAK_REFRESH_TOKEN}}
 
-    # Write permission for "contents" required for gh-pages deployment action
-    permissions:
-     contents: write
-
-    # TODO add timeout
-    # TODO Provide Node & npm bin/ folder to PATH
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Setup Node.JS
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v4
         with:
-          node-version: 16
+          node-version: 20
 
       - name: Build And Run Tests
         run: |
@@ -66,7 +59,7 @@ jobs:
          npx license-checker --production --onlyAllow 'BSD;CC-PDDC;CC-BY-3.0;CC-BY-1.0;CC-BY-2.0;CC-BY-4.0;CC0-1.0;Apache;Artistic;MIT;MPL;ISC;Unlicense' --excludePackages "$n@$v$LICENSE_EXCLUDED_PACKAGES" --excludePrivatePackages
       
       - name: Archive Artifacts
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: dist
           path: |
@@ -75,19 +68,20 @@ jobs:
 
       - name: Publish To NPM
         id: publish
-        uses: JS-DevTools/npm-publish@v1
+        uses: JS-DevTools/npm-publish@v3
+        if: github.ref == 'refs/heads/main'
         with:
           token: ${{ secrets.NPM_ACCESS_TOKEN }}
       
       - name: Push Tag
-        uses: anothrNick/github-tag-action@1.36.0
-        if: steps.publish.outputs.type != 'none'
+        uses: anothrNick/github-tag-action@1.64.0
+        if: github.ref == 'refs/heads/main' && steps.publish.outputs.type
         env:
           CUSTOM_TAG: v${{ steps.publish.outputs.version }}
       
       - name: Publish GitHub Pages 🚀
-        if: steps.publish.outputs.type != 'none'
-        uses: JamesIves/github-pages-deploy-action@v4.4.1
+        uses: JamesIves/github-pages-deploy-action@v4
+        if: github.ref == 'refs/heads/main' && steps.publish.outputs.type
         with:
           branch: gh-pages
           folder: docs/pluginDoc
