@@ -134,7 +134,7 @@ describe('Sign In With Device Grant', () => {
     expect(onDeviceGrantUserActionCallback).toHaveBeenCalledWith(deviceAuthResponse);
   });
 
-  it('should get single tenant access token from keycloak tokne', async () => {
+  it('should get single tenant access token from keycloak token', async () => {
     signInSingleTenantWithKeycloakAccessToken();
     const acrolinxEndpint = new AcrolinxEndpoint({
       ...DUMMY_ENDPOINT_PROPS,
