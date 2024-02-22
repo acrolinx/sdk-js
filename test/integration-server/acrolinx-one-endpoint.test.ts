@@ -113,4 +113,34 @@ describe('Acrolinx One E2E Tests', () => {
       expect(result.data.accessToken).toBeDefined();
     });
   });
+
+  // This test requires valid keycloak access token
+  it.skip('check if the ai service is activated', async () => {
+    const headers: StringMap = {
+      Authorization: `Bearer ${KEYCLOAK_ACCESS_TOKEN!}`,
+      'X-Acrolinx-Base-Url': '',
+      'X-Acrolinx-Client': '',
+    };
+    const ep = createEndpoint(ACROLINX_ONE_SERVER_URL, headers);
+
+    const aiResult = await ep.getAIEnabled();
+    expect(aiResult.tenant).toBeDefined();
+    expect(aiResult.value).toBeDefined();
+  });
+
+  // This test requires valid keycloak access token
+  it.skip('get a chat completion from the ai service', async () => {
+    const headers: StringMap = {
+      Authorization: `Bearer ${KEYCLOAK_ACCESS_TOKEN!}`,
+      'X-Acrolinx-Base-Url': '',
+      'X-Acrolinx-Client': '',
+    };
+    const ep = createEndpoint(ACROLINX_ONE_SERVER_URL, headers);
+    const aiResult = await ep.getAIChatCompletion(
+      '[{"role": "system", "content": "Rewrite this content so that it mentions between 3 and 5 of the seven dwarfs"}]',
+      1,
+      'simplify',
+    );
+    expect(aiResult.response).toBeDefined();
+  }, 100000);
 });
