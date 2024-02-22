@@ -160,6 +160,11 @@ export interface PlatformInformation {
   locales: string[];
 }
 
+export interface AIEnabledInformation {
+  tenant: string;
+  value: boolean;
+}
+
 export interface AcrolinxEndpointProps {
   client: ClientInformation;
   clientLocale?: string;
@@ -244,6 +249,24 @@ export class AcrolinxEndpoint {
 
   public async getPlatformInformation(): Promise<PlatformInformation> {
     return getData<PlatformInformation>(this.getJsonFromPath('/api/v1/'));
+  }
+
+  public async getAIEnabled(): Promise<AIEnabledInformation> {
+    return this.getJsonFromPath('/ai-service/api/v1/tenants/feature/ai-enabled');
+  }
+  public async getAIChatCompletion(
+    prompt: string,
+    count: number,
+    issueInternalName: string,
+  ): Promise<{ response: string }> {
+    return this.fetchJson(
+      this.getUrlOfPath(`/ai-service/api/v1/ai/chat-completions?count=${count}&issueInternalName=${issueInternalName}`),
+      {
+        method: 'POST',
+        body: JSON.stringify({ prompt }),
+        headers: { ...this.getCommonHeaders(), ...this.props.additionalHeaders },
+      },
+    );
   }
 
   public async signInWithSSO(genericToken: string, username: string) {
@@ -789,8 +812,14 @@ export class AcrolinxEndpoint {
       method: init.method || 'GET',
     };
     return this.fetch(url, init).then(
-      (res) => handleExpectedJsonResponse(httpRequest, res),
-      (error) => wrapFetchError(httpRequest, error),
+      (res) => {
+        console.log(res);
+        return handleExpectedJsonResponse(httpRequest, res);
+      },
+      (error) => {
+        console.log(error);
+        return wrapFetchError(httpRequest, error);
+      },
     );
   }
 
@@ -814,7 +843,7 @@ export class AcrolinxEndpoint {
         throw error;
       }
     } else {
-      return fetchFunction(input, fetchProps);
+      return fetch(input, fetchProps);
     }
   }
 
