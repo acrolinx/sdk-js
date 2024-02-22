@@ -160,6 +160,10 @@ export interface PlatformInformation {
   locales: string[];
 }
 
+export interface WriteResponse {
+  response: string;
+}
+
 export interface AIEnabledInformation {
   tenant: string;
   value: boolean;
@@ -254,17 +258,17 @@ export class AcrolinxEndpoint {
   public async getAIEnabled(): Promise<AIEnabledInformation> {
     return this.getJsonFromPath('/ai-service/api/v1/tenants/feature/ai-enabled');
   }
-  public async getAIChatCompletion(
-    prompt: string,
-    count: number,
-    issueInternalName: string,
-  ): Promise<{ response: string }> {
+
+  public async getAIChatCompletion(prompt: string, count: number, issueInternalName: string): Promise<WriteResponse> {
     return this.fetchJson(
       this.getUrlOfPath(`/ai-service/api/v1/ai/chat-completions?count=${count}&issueInternalName=${issueInternalName}`),
       {
         method: 'POST',
         body: JSON.stringify({ prompt }),
-        headers: { ...this.getCommonHeaders(), ...this.props.additionalHeaders },
+        headers: {
+          ...this.getCommonHeaders(),
+          ...this.props.additionalHeaders,
+        },
       },
     );
   }
