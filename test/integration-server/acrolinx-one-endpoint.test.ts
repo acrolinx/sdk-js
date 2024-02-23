@@ -10,7 +10,6 @@ const KEYCLOAK_TENANT_ID = process.env.KEYCLOAK_TENANT_ID;
 const KEYCLOAK_CLIENT_ID = process.env.KEYCLOAK_CLIENT_ID || '';
 const KEYCLOAK_REFRESH_TOKEN = process.env.KEYCLOAK_REFRESH_TOKEN;
 const KEYCLOAK_ACCESS_TOKEN = process.env.KEYCLOAK_ACCESS_TOKEN;
-const KEYCLOAK_COOKIE = process.env.KEYCLOAK_COOKIE;
 export const ACROLINX_DEV_SIGNATURE = process.env.ACROLINX_DEV_SIGNATURE;
 
 function createEndpoint(acrolinxUrl: string, headers?: StringMap) {
@@ -104,7 +103,6 @@ describe('Acrolinx One E2E Tests', () => {
     it.skip('sign-in with auth header', async () => {
       const headers: StringMap = {
         Authorization: `Bearer ${KEYCLOAK_ACCESS_TOKEN!}`,
-        Cookie: KEYCLOAK_COOKIE!,
       };
       const ep = createEndpoint(ACROLINX_ONE_SERVER_URL, headers);
       const result = await ep.signInWithHeaders();
@@ -118,8 +116,6 @@ describe('Acrolinx One E2E Tests', () => {
   it.skip('check if the ai service is activated', async () => {
     const headers: StringMap = {
       Authorization: `Bearer ${KEYCLOAK_ACCESS_TOKEN!}`,
-      'X-Acrolinx-Base-Url': '',
-      'X-Acrolinx-Client': '',
     };
     const ep = createEndpoint(ACROLINX_ONE_SERVER_URL, headers);
 
@@ -132,8 +128,6 @@ describe('Acrolinx One E2E Tests', () => {
   it.skip('get a chat completion from the ai service', async () => {
     const headers: StringMap = {
       Authorization: `Bearer ${KEYCLOAK_ACCESS_TOKEN!}`,
-      'X-Acrolinx-Base-Url': '',
-      'X-Acrolinx-Client': '',
     };
     const ep = createEndpoint(ACROLINX_ONE_SERVER_URL, headers);
     const aiResult = await ep.getAIChatCompletion(
