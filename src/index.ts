@@ -847,7 +847,7 @@ export class AcrolinxEndpoint {
         throw error;
       }
     } else {
-      return fetch(input, fetchProps);
+      return fetchFunction(input, fetchProps);
     }
   }
 
