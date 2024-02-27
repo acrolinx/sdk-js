@@ -44,6 +44,7 @@ import {
   TermHarvestingReport,
   LiveSearchRequest,
   LiveSearchResponse,
+  CommonIssue,
 } from './check';
 import {
   AccessToken,
@@ -164,10 +165,16 @@ export interface WriteResponse {
   response: string;
 }
 
-export interface AIEnabledInformation {
+export interface IsAIEnabledInformation {
   tenant: string;
   value: boolean;
+  userHasPrivilege: boolean;
 }
+
+export type getAIChatCompletionParams = {
+  issue: CommonIssue;
+  count: number;
+};
 
 export interface AcrolinxEndpointProps {
   client: ClientInformation;
@@ -255,18 +262,30 @@ export class AcrolinxEndpoint {
     return getData<PlatformInformation>(this.getJsonFromPath('/api/v1/'));
   }
 
-  public async getAIEnabled(): Promise<AIEnabledInformation> {
-    return this.getJsonFromPath('/ai-service/api/v1/tenants/feature/ai-enabled');
+  public async getAIEnabled(accessToken: string): Promise<IsAIEnabledInformation> {
+    return this.getJsonFromPath('/ai-service/api/v1/tenants/feature/ai-enabled?privilege=generate', accessToken);
   }
 
-  public async getAIChatCompletion(prompt: string, count: number, issueInternalName: string): Promise<WriteResponse> {
+  public async isAIEnabled(accessToken: string): Promise<boolean> {
+    try {
+      const repsonse = await this.getAIEnabled(accessToken);
+      return repsonse.value && repsonse.userHasPrivilege;
+    } catch {
+      return false;
+    }
+  }
+
+  public async getAIChatCompletion(params: getAIChatCompletionParams, accessToken: string): Promise<WriteResponse> {
+    const { aiRephraseHint: prompt, internalName } = params.issue;
     return this.fetchJson(
-      this.getUrlOfPath(`/ai-service/api/v1/ai/chat-completions?count=${count}&issueInternalName=${issueInternalName}`),
+      this.getUrlOfPath(
+        `/ai-service/api/v1/ai/chat-completions?count=${params.count}&issueInternalName=${internalName}`,
+      ),
       {
         method: 'POST',
         body: JSON.stringify({ prompt }),
         headers: {
-          ...this.getCommonHeaders(),
+          ...this.getCommonHeaders(accessToken),
           ...this.props.additionalHeaders,
         },
       },
