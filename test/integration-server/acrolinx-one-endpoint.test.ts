@@ -1,5 +1,5 @@
 import { DeviceAuthResponse, DeviceSignInSuccessResponse } from '../../src/signin-device-grant';
-import { AcrolinxEndpoint, DEVELOPMENT_SIGNATURE, StringMap } from '../../src';
+import { AcrolinxEndpoint, CommonIssue, DEVELOPMENT_SIGNATURE, StringMap } from '../../src';
 import * as dotenv from 'dotenv';
 import 'cross-fetch/polyfill';
 
@@ -119,7 +119,7 @@ describe('Acrolinx One E2E Tests', () => {
     };
     const ep = createEndpoint(ACROLINX_ONE_SERVER_URL, headers);
 
-    const aiResult = await ep.getAIEnabled();
+    const aiResult = await ep.getAIEnabled(KEYCLOAK_ACCESS_TOKEN!);
     expect(aiResult.tenant).toBeDefined();
     expect(aiResult.value).toBeDefined();
   });
@@ -131,9 +131,15 @@ describe('Acrolinx One E2E Tests', () => {
     };
     const ep = createEndpoint(ACROLINX_ONE_SERVER_URL, headers);
     const aiResult = await ep.getAIChatCompletion(
-      '[{"role": "system", "content": "Rewrite this content so that it mentions between 3 and 5 of the seven dwarfs"}]',
-      1,
-      'simplify',
+      {
+        issue: {
+          aiRephraseHint:
+            '[{"role": "system", "content": "Rewrite this content so that it mentions between 3 and 5 of the seven dwarfs"}]',
+          internalName: 'simplify',
+        } as unknown as CommonIssue,
+        count: 1,
+      },
+      KEYCLOAK_ACCESS_TOKEN!,
     );
     expect(aiResult.response).toBeDefined();
   }, 100000);
