@@ -122,6 +122,7 @@ describe('Acrolinx One E2E Tests', () => {
     const aiResult = await ep.getAIEnabled(KEYCLOAK_ACCESS_TOKEN!);
     expect(aiResult.tenant).toBeDefined();
     expect(aiResult.value).toBeDefined();
+    expect(aiResult.userHasPrivilege).toBeDefined();
   });
 
   // This test requires valid keycloak access token
