@@ -63,6 +63,7 @@ import { AcrolinxError, CheckCanceledByClientError, ErrorType, wrapFetchError } 
 import { AnalysisRequest, ExtractionResult } from './extraction';
 import { PlatformFeatures, PlatformFeaturesResponse } from './features';
 import {
+  HEADER_ACROLINX_ONE_AUTH,
   HEADER_X_ACROLINX_APP_SIGNATURE,
   HEADER_X_ACROLINX_AUTH,
   HEADER_X_ACROLINX_BASE_URL,
@@ -792,6 +793,7 @@ export class AcrolinxEndpoint {
     }
     if (accessToken) {
       headers[HEADER_X_ACROLINX_AUTH] = accessToken;
+      headers[HEADER_ACROLINX_ONE_AUTH] = `Bearer ${accessToken}`;
     }
     return headers;
   }
