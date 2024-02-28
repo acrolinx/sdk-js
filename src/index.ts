@@ -269,8 +269,8 @@ export class AcrolinxEndpoint {
 
   public async isAIEnabled(accessToken: string): Promise<boolean> {
     try {
-      const repsonse = await this.getAIEnabled(accessToken);
-      return repsonse.value && repsonse.userHasPrivilege;
+      const response = await this.getAIEnabled(accessToken);
+      return response.value && response.userHasPrivilege;
     } catch {
       return false;
     }
