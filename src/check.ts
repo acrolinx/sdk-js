@@ -260,6 +260,7 @@ export interface CommonIssue {
    */
   scoring?: GoalScoring;
   aiRephraseHint?: string;
+  rewriteContext?: string;
 }
 
 export interface PositionalInformation {

@@ -85,6 +85,7 @@ describe('AI-service', () => {
       const count = 1;
       const internalName = 'simplefy';
       const aiRephraseHint = 'some hint';
+      const rewriteContext = 'some context';
       const response = 'some responds';
       mockFetch.mock(getGetAIChatCompletionMatcher(count, internalName), {
         status: 200,
@@ -95,6 +96,7 @@ describe('AI-service', () => {
           issue: {
             internalName,
             aiRephraseHint,
+            rewriteContext,
           } as unknown as Issue,
           count,
         },
@@ -107,6 +109,7 @@ describe('AI-service', () => {
       const count = 1;
       const internalName = 'simplefy';
       const aiRephraseHint = 'some hint';
+      const rewriteContext = 'some context';
 
       mockFetch.mock(getGetAIChatCompletionMatcher(count, internalName), {
         status: 401,
@@ -122,6 +125,7 @@ describe('AI-service', () => {
             issue: {
               internalName,
               aiRephraseHint,
+              rewriteContext,
             } as unknown as Issue,
             count,
           },
