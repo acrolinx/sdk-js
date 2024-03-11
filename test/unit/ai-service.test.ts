@@ -85,6 +85,7 @@ describe('AI-service', () => {
       const count = 1;
       const internalName = 'simplefy';
       const aiRephraseHint = 'some hint';
+      const targetUuid = '123e4567-e89b-12d3-a456-426614174000';
       const response = 'some responds';
       mockFetch.mock(getGetAIChatCompletionMatcher(count, internalName), {
         status: 200,
@@ -97,6 +98,7 @@ describe('AI-service', () => {
             aiRephraseHint,
           } as unknown as Issue,
           count,
+          targetUuid,
         },
         DUMMY_ACCESS_TOKEN,
       );
@@ -107,6 +109,7 @@ describe('AI-service', () => {
       const count = 1;
       const internalName = 'simplefy';
       const aiRephraseHint = 'some hint';
+      const targetUuid = '123e4567-e89b-12d3-a456-426614174000';
 
       mockFetch.mock(getGetAIChatCompletionMatcher(count, internalName), {
         status: 401,
@@ -124,6 +127,7 @@ describe('AI-service', () => {
               aiRephraseHint,
             } as unknown as Issue,
             count,
+            targetUuid,
           },
           DUMMY_ACCESS_TOKEN,
         ),

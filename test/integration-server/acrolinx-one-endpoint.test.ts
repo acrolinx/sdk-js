@@ -149,6 +149,7 @@ describe('Acrolinx One E2E Tests', () => {
           internalName: 'simplify',
         } as unknown as CommonIssue,
         count: 1,
+        targetUuid: '123e4567-e89b-12d3-a456-426614174000',
       },
       KEYCLOAK_ACCESS_TOKEN!,
     );

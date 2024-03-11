@@ -180,6 +180,7 @@ export interface IsAIEnabledInformation {
 export type getAIChatCompletionParams = {
   issue: CommonIssue;
   count: number;
+  targetUuid: string;
 };
 
 export interface AcrolinxEndpointProps {
@@ -287,13 +288,16 @@ export class AcrolinxEndpoint {
 
   public async getAIChatCompletion(params: getAIChatCompletionParams, accessToken: string): Promise<WriteResponse> {
     const { aiRephraseHint: prompt, internalName } = params.issue;
+    const { targetUuid } = params;
+
     return this.fetchJson(
-      this.getUrlOfPath(
-        `/ai-service/api/v1/ai/chat-completions?count=${params.count}&issueInternalName=${internalName}`,
-      ),
+      this.getUrlOfPath(`/ai-service/api/v1/ai/chat-completions?count=${params.count}&issueInternalName=${internalName}`),
       {
         method: 'POST',
-        body: JSON.stringify({ prompt }),
+        body: JSON.stringify({
+          prompt,
+          targetUuid,
+        }),
         headers: {
           ...this.getCommonHeaders(accessToken),
           ...this.props.additionalHeaders,
