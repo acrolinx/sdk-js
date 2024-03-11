@@ -166,6 +166,11 @@ export interface WriteResponse {
   response: string;
 }
 
+export interface AiFeatures {
+  ai: boolean;
+  aiAssistant: boolean;
+}
+
 export interface IsAIEnabledInformation {
   tenant: string;
   value: boolean;
@@ -261,6 +266,10 @@ export class AcrolinxEndpoint {
 
   public async getPlatformInformation(): Promise<PlatformInformation> {
     return getData<PlatformInformation>(this.getJsonFromPath('/api/v1/'));
+  }
+
+  public async getAiFeatures(accessToken: string): Promise<AiFeatures> {
+    return this.getJsonFromPath<AiFeatures>('/ai-service/api/v1/tenants/features/ai', accessToken);
   }
 
   public async getAIEnabled(accessToken: string): Promise<IsAIEnabledInformation> {
