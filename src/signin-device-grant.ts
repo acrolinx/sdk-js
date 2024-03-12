@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-export type MultTenantLoginInfo = {
-  loginUrl: string;
+export type IntServiceDiscovery = {
+  auth: string;
 };
 
 export type DeviceAuthResponse = {
@@ -70,14 +70,14 @@ export type DeviceSignInSuccessResponse = {
   scope: string;
 };
 
-export const generateDeviceAuthUrl = (multiTenantLoginInfo: MultTenantLoginInfo, tenantId: string): string => {
-  const loginUrl = new URL(multiTenantLoginInfo.loginUrl);
-  return `${loginUrl.protocol}//${loginUrl.hostname}/realms/${tenantId}/protocol/openid-connect/auth/device`;
+export const generateDeviceAuthUrl = (intServiceDiscovery: IntServiceDiscovery, tenantId: string): string => {
+  const authUrl = new URL(intServiceDiscovery.auth);
+  return `${authUrl.protocol}//${authUrl.hostname}/realms/${tenantId}/protocol/openid-connect/auth/device`;
 };
 
-export const generateTokenUrl = (multiTenantLoginInfo: MultTenantLoginInfo, tenantId: string): string => {
-  const loginUrl = new URL(multiTenantLoginInfo.loginUrl);
-  return `${loginUrl.protocol}//${loginUrl.hostname}/realms/${tenantId}/protocol/openid-connect/token`;
+export const generateTokenUrl = (intServiceDiscovery: IntServiceDiscovery, tenantId: string): string => {
+  const authUrl = new URL(intServiceDiscovery.auth);
+  return `${authUrl.protocol}//${authUrl.hostname}/realms/${tenantId}/protocol/openid-connect/token`;
 };
 
 export const getClientId = (opts?: DeviceSignInOptions) => {

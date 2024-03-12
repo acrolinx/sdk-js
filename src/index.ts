@@ -85,7 +85,7 @@ import {
 import {
   DeviceAuthResponse,
   DeviceAuthResponseRaw,
-  MultTenantLoginInfo,
+  IntServiceDiscovery,
   DeviceSignInSuccessResponse,
   DeviceSignInOptions,
   DeviceSignInOptionsInteractive,
@@ -351,9 +351,9 @@ export class AcrolinxEndpoint {
     return this.pollForInteractiveSignIn(signinResult, opts.timeoutMs || 60 * 60 * 1000);
   }
 
-  private async fetchLoginInfo(tenantId: string): Promise<MultTenantLoginInfo> {
-    return await this.fetchJson(this.getUrlOfPath(`/content-cube/api/auth/keycloak/login-url?tenant=${tenantId}`), {
-      method: 'POST',
+  private async fetchLoginInfo(): Promise<IntServiceDiscovery> {
+    return await this.fetchJson(this.getUrlOfPath('/int-service/api/v1/discovery'), {
+      method: 'GET',
     });
   }
 
@@ -371,11 +371,11 @@ export class AcrolinxEndpoint {
 
   public async deviceAuthSignIn(opts: DeviceSignInOptions): Promise<DeviceAuthResponse | DeviceSignInSuccessResponse> {
     const tenantId = getTenantId(this.props.acrolinxUrl, opts);
-    const multTenantLoginInfo: MultTenantLoginInfo = await this.fetchLoginInfo(tenantId);
+    const intSeriveDiscovery: IntServiceDiscovery = await this.fetchLoginInfo();
     const clientId = getClientId(opts);
 
     const tokenValidationResult = await this.verifyTokenIsValid(
-      generateTokenUrl(multTenantLoginInfo, tenantId),
+      generateTokenUrl(intSeriveDiscovery, tenantId),
       clientId,
       opts.refreshToken,
     );
@@ -385,11 +385,11 @@ export class AcrolinxEndpoint {
     }
 
     const deviceAuthResponse = await this.fetchDeviceGrantUserAction(
-      generateDeviceAuthUrl(multTenantLoginInfo, tenantId),
+      generateDeviceAuthUrl(intSeriveDiscovery, tenantId),
       clientId,
     );
 
-    return tidyKeyCloakDeviceAuthResponse(generateTokenUrl(multTenantLoginInfo, tenantId), deviceAuthResponse);
+    return tidyKeyCloakDeviceAuthResponse(generateTokenUrl(intSeriveDiscovery, tenantId), deviceAuthResponse);
   }
 
   private async verifyTokenIsValid(
