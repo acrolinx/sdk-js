@@ -17,6 +17,7 @@ import * as mockFetch from 'fetch-mock';
 import { AcrolinxEndpoint, Issue } from '../../src/index';
 import { DUMMY_ACCESS_TOKEN } from '../test-utils/mock-server';
 import { DUMMY_ENDPOINT_PROPS } from './common';
+import { DUMMY_AI_REWRITE_CONTEXT } from '../test-utils/dummy-data';
 
 describe('AI-service', () => {
   let endpoint: AcrolinxEndpoint = new AcrolinxEndpoint(DUMMY_ENDPOINT_PROPS);
@@ -86,7 +87,7 @@ describe('AI-service', () => {
       const internalName = 'simplefy';
       const aiRephraseHint = 'some hint';
       const targetUuid = '123e4567-e89b-12d3-a456-426614174000';
-      const rewriteContext = 'some context';
+      const aiRewriteContext = DUMMY_AI_REWRITE_CONTEXT;
       const response = 'some responds';
       mockFetch.mock(getGetAIChatCompletionMatcher(count, internalName), {
         status: 200,
@@ -97,7 +98,7 @@ describe('AI-service', () => {
           issue: {
             internalName,
             aiRephraseHint,
-            rewriteContext,
+            aiRewriteContext,
           } as unknown as Issue,
           count,
           targetUuid,
@@ -112,7 +113,7 @@ describe('AI-service', () => {
       const internalName = 'simplefy';
       const aiRephraseHint = 'some hint';
       const targetUuid = '123e4567-e89b-12d3-a456-426614174000';
-      const rewriteContext = 'some context';
+      const aiRewriteContext = DUMMY_AI_REWRITE_CONTEXT;
 
       mockFetch.mock(getGetAIChatCompletionMatcher(count, internalName), {
         status: 401,
@@ -128,7 +129,7 @@ describe('AI-service', () => {
             issue: {
               internalName,
               aiRephraseHint,
-              rewriteContext,
+              aiRewriteContext,
             } as unknown as Issue,
             count,
             targetUuid,
