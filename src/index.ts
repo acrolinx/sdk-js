@@ -177,7 +177,7 @@ export interface IsAIEnabledInformation {
   userHasPrivilege: boolean;
 }
 
-export type getAIChatCompletionParams = {
+export type ChatCompletionRequest = {
   issue: CommonIssue;
   count: number;
   targetUuid: string;
@@ -286,7 +286,7 @@ export class AcrolinxEndpoint {
     }
   }
 
-  public async getAIChatCompletion(params: getAIChatCompletionParams, accessToken: string): Promise<WriteResponse> {
+  public async getAIChatCompletion(params: ChatCompletionRequest, accessToken: string): Promise<WriteResponse> {
     const { aiRephraseHint: prompt, internalName } = params.issue;
     const { targetUuid } = params;
 
