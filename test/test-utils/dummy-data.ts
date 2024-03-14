@@ -27,6 +27,43 @@ import { CheckResult, DocumentQualityStatus } from '../../src/check';
 const GOAL_VOICE_ID = 'voice.readability';
 const GOAL_TERM_ID = 'term.unsuitable';
 
+export const DUMMY_AI_REWRITE_CONTEXT = [
+  {
+    sourceId: '123',
+    sourceType: 'text',
+    part: 'The beginning of the story',
+    begin: 0,
+    end: 25,
+    externalContent: [
+      {
+        sourceId: '124',
+        sourceType: 'quote',
+        part: 'A quote inside the story',
+        begin: 5,
+        end: 27,
+        externalContent: [
+          {
+            sourceId: '125',
+            sourceType: 'text',
+            part: 'A nested quote detail',
+            begin: 10,
+            end: 30,
+            externalContent: [],
+          },
+        ],
+      },
+    ],
+  },
+  {
+    sourceId: '126',
+    sourceType: 'text',
+    part: 'The conclusion of the story',
+    begin: 26,
+    end: 52,
+    externalContent: [],
+  },
+];
+
 export const DUMMY_CAPABILITIES: CheckingCapabilities = {
   guidanceProfiles: [
     {
@@ -174,43 +211,8 @@ export const DUMMY_CHECK_RESULT: CheckResult = {
   ],
   issues: [
     {
-      aiRephraseHint: "",
-      aiRewriteContext: [
-        {
-          sourceId: '123',
-          sourceType: 'text',
-          part: 'The beginning of the story',
-          begin: 0,
-          end: 25,
-          externalContent: [
-            {
-              sourceId: '124',
-              sourceType: 'quote',
-              part: 'A quote inside the story',
-              begin: 5,
-              end: 27,
-              externalContent: [
-                {
-                  sourceId: '125',
-                  sourceType: 'text',
-                  part: 'A nested quote detail',
-                  begin: 10,
-                  end: 30,
-                  externalContent: []
-                }
-              ]
-            }
-          ]
-        },
-        {
-          sourceId: '126',
-          sourceType: 'text',
-          part: 'The conclusion of the story',
-          begin: 26,
-          end: 52,
-          externalContent: []
-        }
-      ],
+      aiRephraseHint: '',
+      aiRewriteContext: DUMMY_AI_REWRITE_CONTEXT,
       canAddToDictionary: true,
       goalId: 'spelling',
       issueType: IssueType.actionable,
@@ -282,43 +284,8 @@ export const DUMMY_CHECK_RESULT: CheckResult = {
       },
     },
     {
-      aiRephraseHint: "",
-      aiRewriteContext: [
-        {
-          sourceId: '123',
-          sourceType: 'text',
-          part: 'The beginning of the story',
-          begin: 0,
-          end: 25,
-          externalContent: [
-            {
-              sourceId: '124',
-              sourceType: 'quote',
-              part: 'A quote inside the story',
-              begin: 5,
-              end: 27,
-              externalContent: [
-                {
-                  sourceId: '125',
-                  sourceType: 'text',
-                  part: 'A nested quote detail',
-                  begin: 10,
-                  end: 30,
-                  externalContent: []
-                }
-              ]
-            }
-          ]
-        },
-        {
-          sourceId: '126',
-          sourceType: 'text',
-          part: 'The conclusion of the story',
-          begin: 26,
-          end: 52,
-          externalContent: []
-        }
-      ],
+      aiRephraseHint: '',
+      aiRewriteContext: DUMMY_AI_REWRITE_CONTEXT,
       canAddToDictionary: true,
       goalId: GOAL_TERM_ID,
       issueType: IssueType.actionable,
@@ -366,43 +333,8 @@ export const DUMMY_CHECK_RESULT: CheckResult = {
       },
     },
     {
-      aiRephraseHint: "",
-      aiRewriteContext: [
-        {
-          sourceId: '123',
-          sourceType: 'text',
-          part: 'The beginning of the story',
-          begin: 0,
-          end: 25,
-          externalContent: [
-            {
-              sourceId: '124',
-              sourceType: 'quote',
-              part: 'A quote inside the story',
-              begin: 5,
-              end: 27,
-              externalContent: [
-                {
-                  sourceId: '125',
-                  sourceType: 'text',
-                  part: 'A nested quote detail',
-                  begin: 10,
-                  end: 30,
-                  externalContent: []
-                }
-              ]
-            }
-          ]
-        },
-        {
-          sourceId: '126',
-          sourceType: 'text',
-          part: 'The conclusion of the story',
-          begin: 26,
-          end: 52,
-          externalContent: []
-        }
-      ],
+      aiRephraseHint: '',
+      aiRewriteContext: DUMMY_AI_REWRITE_CONTEXT,
       canAddToDictionary: true,
       goalId: GOAL_VOICE_ID,
       issueType: IssueType.actionable,
@@ -443,43 +375,8 @@ export const DUMMY_CHECK_RESULT: CheckResult = {
       },
       subIssues: [
         {
-          aiRephraseHint: "",
-          aiRewriteContext: [
-            {
-              sourceId: '123',
-              sourceType: 'text',
-              part: 'The beginning of the story',
-              begin: 0,
-              end: 25,
-              externalContent: [
-                {
-                  sourceId: '124',
-                  sourceType: 'quote',
-                  part: 'A quote inside the story',
-                  begin: 5,
-                  end: 27,
-                  externalContent: [
-                    {
-                      sourceId: '125',
-                      sourceType: 'text',
-                      part: 'A nested quote detail',
-                      begin: 10,
-                      end: 30,
-                      externalContent: []
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              sourceId: '126',
-              sourceType: 'text',
-              part: 'The conclusion of the story',
-              begin: 26,
-              end: 52,
-              externalContent: []
-            }
-          ],
+          aiRephraseHint: '',
+          aiRewriteContext: DUMMY_AI_REWRITE_CONTEXT,
           canAddToDictionary: true,
           goalId: GOAL_VOICE_ID,
           issueType: IssueType.actionable,
@@ -522,43 +419,8 @@ export const DUMMY_CHECK_RESULT: CheckResult = {
           },
         },
         {
-          aiRephraseHint: "",
-          aiRewriteContext: [
-            {
-              sourceId: '123',
-              sourceType: 'text',
-              part: 'The beginning of the story',
-              begin: 0,
-              end: 25,
-              externalContent: [
-                {
-                  sourceId: '124',
-                  sourceType: 'quote',
-                  part: 'A quote inside the story',
-                  begin: 5,
-                  end: 27,
-                  externalContent: [
-                    {
-                      sourceId: '125',
-                      sourceType: 'text',
-                      part: 'A nested quote detail',
-                      begin: 10,
-                      end: 30,
-                      externalContent: []
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              sourceId: '126',
-              sourceType: 'text',
-              part: 'The conclusion of the story',
-              begin: 26,
-              end: 52,
-              externalContent: []
-            }
-          ],
+          aiRephraseHint: '',
+          aiRewriteContext: DUMMY_AI_REWRITE_CONTEXT,
           canAddToDictionary: true,
           goalId: GOAL_VOICE_ID,
           issueType: IssueType.actionable,
