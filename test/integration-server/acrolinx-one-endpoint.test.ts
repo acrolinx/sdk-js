@@ -113,6 +113,16 @@ describe('Acrolinx One E2E Tests', () => {
   });
 
   // This test requires valid keycloak access token
+  it.skip('getAiFeatures returns whether certain AI features are enabled', async () => {
+    const ep = createEndpoint(ACROLINX_ONE_SERVER_URL);
+
+    const aiFeatures = await ep.getAiFeatures(KEYCLOAK_ACCESS_TOKEN!);
+
+    expect(typeof aiFeatures.ai).toEqual('boolean');
+    expect(typeof aiFeatures.aiAssistant).toEqual('boolean');
+  });
+
+  // This test requires valid keycloak access token
   it.skip('check if the ai service is activated', async () => {
     const headers: StringMap = {
       Authorization: `Bearer ${KEYCLOAK_ACCESS_TOKEN!}`,
@@ -139,6 +149,7 @@ describe('Acrolinx One E2E Tests', () => {
           internalName: 'simplify',
         } as unknown as CommonIssue,
         count: 1,
+        targetUuid: '123e4567-e89b-12d3-a456-426614174000',
       },
       KEYCLOAK_ACCESS_TOKEN!,
     );

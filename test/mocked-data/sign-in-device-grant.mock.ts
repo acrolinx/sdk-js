@@ -1,7 +1,7 @@
 import { AcrolinxEndpoint, AcrolinxError, AuthorizationType, ErrorType, SigninSuccessResult } from '../../src';
 import {
   DeviceAuthResponseRaw,
-  MultTenantLoginInfo,
+  IntServiceDiscovery,
   DeviceSignInSuccessResponseRaw,
   DeviceAuthResponse,
 } from '../../src/signin-device-grant';
@@ -25,8 +25,8 @@ export const deviceAuthResponse: DeviceAuthResponse = {
   verificationUrlComplete: 'https://comapny.acrolinx.cloud/realms/test-tenant-01/device?user_code=VJGF-LQOP',
 };
 
-export const multTenantLoginInfo: MultTenantLoginInfo = {
-  loginUrl: 'https://auth.company.cloud/some-path/we-dont-care',
+export const intServiceDiscovery: IntServiceDiscovery = {
+  auth: 'https://auth.company.cloud/some-path/we-dont-care',
 };
 
 export const signInMultiTenantSuccessResultRaw: DeviceSignInSuccessResponseRaw = {
@@ -99,7 +99,7 @@ const signInWithHeadersMock = jest.spyOn(AcrolinxEndpoint.prototype as any, 'sig
 
 export const fetchLoginInfoMockSuccess = () => {
   fetchLoginInfoMock.mockImplementation(async () => {
-    return Promise.resolve(multTenantLoginInfo);
+    return Promise.resolve(intServiceDiscovery);
   });
 };
 

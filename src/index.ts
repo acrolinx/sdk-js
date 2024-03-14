@@ -85,7 +85,7 @@ import {
 import {
   DeviceAuthResponse,
   DeviceAuthResponseRaw,
-  MultTenantLoginInfo,
+  IntServiceDiscovery,
   DeviceSignInSuccessResponse,
   DeviceSignInOptions,
   DeviceSignInOptionsInteractive,
@@ -166,15 +166,21 @@ export interface WriteResponse {
   response: string;
 }
 
+export interface AiFeatures {
+  ai: boolean;
+  aiAssistant: boolean;
+}
+
 export interface IsAIEnabledInformation {
   tenant: string;
   value: boolean;
   userHasPrivilege: boolean;
 }
 
-export type getAIChatCompletionParams = {
+export type ChatCompletionRequest = {
   issue: CommonIssue;
   count: number;
+  targetUuid: string;
 };
 
 export interface AcrolinxEndpointProps {
@@ -263,6 +269,10 @@ export class AcrolinxEndpoint {
     return getData<PlatformInformation>(this.getJsonFromPath('/api/v1/'));
   }
 
+  public async getAiFeatures(accessToken: string): Promise<AiFeatures> {
+    return this.getJsonFromPath<AiFeatures>('/ai-service/api/v1/tenants/features/ai', accessToken);
+  }
+
   public async getAIEnabled(accessToken: string): Promise<IsAIEnabledInformation> {
     return this.getJsonFromPath('/ai-service/api/v1/tenants/feature/ai-enabled?privilege=generate', accessToken);
   }
@@ -276,15 +286,18 @@ export class AcrolinxEndpoint {
     }
   }
 
-  public async getAIChatCompletion(params: getAIChatCompletionParams, accessToken: string): Promise<WriteResponse> {
+  public async getAIChatCompletion(params: ChatCompletionRequest, accessToken: string): Promise<WriteResponse> {
     const { aiRephraseHint: prompt, internalName } = params.issue;
+    const { targetUuid } = params;
+
     return this.fetchJson(
-      this.getUrlOfPath(
-        `/ai-service/api/v1/ai/chat-completions?count=${params.count}&issueInternalName=${internalName}`,
-      ),
+      this.getUrlOfPath(`/ai-service/api/v1/ai/chat-completions?count=${params.count}&issueInternalName=${internalName}`),
       {
         method: 'POST',
-        body: JSON.stringify({ prompt }),
+        body: JSON.stringify({
+          prompt,
+          targetUuid,
+        }),
         headers: {
           ...this.getCommonHeaders(accessToken),
           ...this.props.additionalHeaders,
@@ -338,9 +351,9 @@ export class AcrolinxEndpoint {
     return this.pollForInteractiveSignIn(signinResult, opts.timeoutMs || 60 * 60 * 1000);
   }
 
-  private async fetchLoginInfo(tenantId: string): Promise<MultTenantLoginInfo> {
-    return await this.fetchJson(this.getUrlOfPath(`/content-cube/api/auth/keycloak/login-url?tenant=${tenantId}`), {
-      method: 'POST',
+  private async fetchLoginInfo(): Promise<IntServiceDiscovery> {
+    return await this.fetchJson(this.getUrlOfPath('/int-service/api/v1/discovery'), {
+      method: 'GET',
     });
   }
 
@@ -358,11 +371,11 @@ export class AcrolinxEndpoint {
 
   public async deviceAuthSignIn(opts: DeviceSignInOptions): Promise<DeviceAuthResponse | DeviceSignInSuccessResponse> {
     const tenantId = getTenantId(this.props.acrolinxUrl, opts);
-    const multTenantLoginInfo: MultTenantLoginInfo = await this.fetchLoginInfo(tenantId);
+    const intSeriveDiscovery: IntServiceDiscovery = await this.fetchLoginInfo();
     const clientId = getClientId(opts);
 
     const tokenValidationResult = await this.verifyTokenIsValid(
-      generateTokenUrl(multTenantLoginInfo, tenantId),
+      generateTokenUrl(intSeriveDiscovery, tenantId),
       clientId,
       opts.refreshToken,
     );
@@ -372,11 +385,11 @@ export class AcrolinxEndpoint {
     }
 
     const deviceAuthResponse = await this.fetchDeviceGrantUserAction(
-      generateDeviceAuthUrl(multTenantLoginInfo, tenantId),
+      generateDeviceAuthUrl(intSeriveDiscovery, tenantId),
       clientId,
     );
 
-    return tidyKeyCloakDeviceAuthResponse(generateTokenUrl(multTenantLoginInfo, tenantId), deviceAuthResponse);
+    return tidyKeyCloakDeviceAuthResponse(generateTokenUrl(intSeriveDiscovery, tenantId), deviceAuthResponse);
   }
 
   private async verifyTokenIsValid(

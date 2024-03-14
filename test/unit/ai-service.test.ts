@@ -85,6 +85,7 @@ describe('AI-service', () => {
       const count = 1;
       const internalName = 'simplefy';
       const aiRephraseHint = 'some hint';
+      const targetUuid = '123e4567-e89b-12d3-a456-426614174000';
       const rewriteContext = 'some context';
       const response = 'some responds';
       mockFetch.mock(getGetAIChatCompletionMatcher(count, internalName), {
@@ -99,6 +100,7 @@ describe('AI-service', () => {
             rewriteContext,
           } as unknown as Issue,
           count,
+          targetUuid,
         },
         DUMMY_ACCESS_TOKEN,
       );
@@ -109,6 +111,7 @@ describe('AI-service', () => {
       const count = 1;
       const internalName = 'simplefy';
       const aiRephraseHint = 'some hint';
+      const targetUuid = '123e4567-e89b-12d3-a456-426614174000';
       const rewriteContext = 'some context';
 
       mockFetch.mock(getGetAIChatCompletionMatcher(count, internalName), {
@@ -128,6 +131,7 @@ describe('AI-service', () => {
               rewriteContext,
             } as unknown as Issue,
             count,
+            targetUuid,
           },
           DUMMY_ACCESS_TOKEN,
         ),
