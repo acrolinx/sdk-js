@@ -291,7 +291,9 @@ export class AcrolinxEndpoint {
     const { targetUuid } = params;
 
     return this.fetchJson(
-      this.getUrlOfPath(`/ai-service/api/v1/ai/chat-completions?count=${params.count}&issueInternalName=${internalName}`),
+      this.getUrlOfPath(
+        `/ai-service/api/v1/ai/chat-completions?count=${params.count}&issueInternalName=${internalName}`,
+      ),
       {
         method: 'POST',
         body: JSON.stringify({
