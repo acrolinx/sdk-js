@@ -233,6 +233,7 @@ export interface CheckAndGetResultOptions {
 
 export interface AdditionalRequestOptions {
   headers?: StringMap;
+  isAcrolinxOne?: boolean;
 }
 
 export interface CancelablePollLoopOptions extends CheckAndGetResultOptions, AdditionalRequestOptions {}
@@ -272,11 +273,11 @@ export class AcrolinxEndpoint {
   }
 
   public async getAiFeatures(accessToken: string): Promise<AiFeatures> {
-    return this.getJsonFromPath<AiFeatures>('/ai-service/api/v1/tenants/features/ai', accessToken);
+    return this.getJsonFromPath<AiFeatures>('/ai-service/api/v1/tenants/features/ai', accessToken, {isAcrolinxOne: true});
   }
 
   public async getAIEnabled(accessToken: string): Promise<IsAIEnabledInformation> {
-    return this.getJsonFromPath('/ai-service/api/v1/tenants/feature/ai-enabled?privilege=generate', accessToken);
+    return this.getJsonFromPath('/ai-service/api/v1/tenants/feature/ai-enabled?privilege=generate', accessToken, {isAcrolinxOne: true});
   }
 
   public async isAIEnabled(accessToken: string): Promise<boolean> {
@@ -303,7 +304,7 @@ export class AcrolinxEndpoint {
           targetUuid,
         }),
         headers: {
-          ...this.getCommonHeaders(accessToken),
+          ...this.getCommonHeaders(accessToken, true),
           ...this.props.additionalHeaders,
         },
       },
@@ -669,8 +670,8 @@ export class AcrolinxEndpoint {
     return getData(this.put('/api/v1/document/' + documentId, requestBody, {}, accessToken));
   }
 
-  public async getJsonFromPath<T>(path: string, accessToken?: AccessToken): Promise<T> {
-    return this.getJsonFromUrl<T>(this.getUrlOfPath(path), accessToken);
+  public async getJsonFromPath<T>(path: string, accessToken?: AccessToken, opts?: AdditionalRequestOptions): Promise<T> {
+    return this.getJsonFromUrl<T>(this.getUrlOfPath(path), accessToken, opts);
   }
 
   public async getJsonFromUrl<T>(
@@ -679,7 +680,7 @@ export class AcrolinxEndpoint {
     opts: AdditionalRequestOptions = {},
   ): Promise<T> {
     return this.fetchJson(url, {
-      headers: { ...this.getCommonHeaders(accessToken), ...opts.headers, ...this.props.additionalHeaders },
+      headers: { ...this.getCommonHeaders(accessToken, opts.isAcrolinxOne), ...opts.headers, ...this.props.additionalHeaders },
     });
   }
 
@@ -690,7 +691,7 @@ export class AcrolinxEndpoint {
   ): Promise<string> {
     const httpRequest = { url, method: 'GET' };
     return this.fetch(url, {
-      headers: { ...this.getCommonHeaders(accessToken), ...opts.headers, ...this.props.additionalHeaders },
+      headers: { ...this.getCommonHeaders(accessToken, opts.isAcrolinxOne), ...opts.headers, ...this.props.additionalHeaders },
     }).then(
       (res) => handleExpectedTextResponse(httpRequest, res),
       (error) => wrapFetchError(httpRequest, error),
@@ -805,18 +806,40 @@ export class AcrolinxEndpoint {
     return this.deleteUrl<CancelResponse>(process.links.cancel, accessToken, opts);
   }
 
-  private getCommonHeaders(accessToken?: AccessToken): StringMap {
+  private getCommonHeaders(accessToken?: AccessToken, isAcrolinxOne?: boolean): StringMap {
     const headers: StringMap = {
       'Content-Type': 'application/json',
-      [HEADER_X_ACROLINX_BASE_URL]: this.props.acrolinxUrl,
-      [HEADER_X_ACROLINX_CLIENT]: this.getAcrolinxClientHttpHeader(),
     };
+    if(isAcrolinxOne) {
+      return {
+        ...headers,
+        ...this.getHeaders(accessToken),
+      }
+    }
+
+    return {
+      ...headers,
+      ...this.getHeadersLegacy(accessToken)
+    }
+  }
+
+  private getHeaders(accessToken?: AccessToken): StringMap {
+    const headers: StringMap = {}
+    if (accessToken) {
+      headers[HEADER_ACROLINX_ONE_AUTH] = `Bearer ${accessToken}`;
+    }
+    return headers;
+  }
+
+  private getHeadersLegacy(accessToken?: AccessToken): StringMap {
+    const headers: StringMap = {}
+    headers[HEADER_X_ACROLINX_BASE_URL] =  this.props.acrolinxUrl;
+    headers[HEADER_X_ACROLINX_CLIENT] = this.getAcrolinxClientHttpHeader();
     if (this.props.clientLocale) {
       headers[HEADER_X_ACROLINX_CLIENT_LOCALE] = this.props.clientLocale;
     }
     if (accessToken) {
       headers[HEADER_X_ACROLINX_AUTH] = accessToken;
-      headers[HEADER_ACROLINX_ONE_AUTH] = `Bearer ${accessToken}`;
     }
     return headers;
   }
@@ -849,7 +872,7 @@ export class AcrolinxEndpoint {
 
   private async deleteUrl<T>(url: string, accessToken: AccessToken, opts: AdditionalRequestOptions = {}): Promise<T> {
     return this.fetchJson(url, {
-      headers: { ...this.getCommonHeaders(accessToken), ...opts.headers, ...this.props.additionalHeaders },
+      headers: { ...this.getCommonHeaders(accessToken, opts.isAcrolinxOne), ...opts.headers, ...this.props.additionalHeaders },
       method: 'DELETE',
     });
   }
