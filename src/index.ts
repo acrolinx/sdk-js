@@ -97,11 +97,13 @@ import {
   isSignInDeviceGrantSuccess,
   tidyKeyCloakSuccessResponse,
   tidyKeyCloakDeviceAuthResponse,
+  JWTAcrolinxPayload,
 } from './signin-device-grant';
 import { User } from './user';
 import { handleExpectedJsonResponse, handleExpectedTextResponse } from './utils/fetch';
 import * as logging from './utils/logging';
 import { waitMs } from './utils/mixed-utils';
+import { jwtDecode } from 'jwt-decode';
 
 export * from './dictionary';
 export * from './extraction';
@@ -329,16 +331,22 @@ export class AcrolinxEndpoint {
         detail: 'Additional headers must be provided',
       });
     }
-    const signinResult = await this.signin();
-    if (isSigninSuccessResult(signinResult)) {
-      return signinResult;
-    } else {
+
+    const authHeader = this.props.additionalHeaders['Authorization'];
+    if (!authHeader) {
       throw new AcrolinxError({
         type: ErrorType.SSO,
-        title: 'SSO Error',
-        detail: 'Sign-In by SSO failed.',
+        title: 'Headers missing',
+        detail: 'Additional headers must be provided',
       });
     }
+
+    const jwtToken = authHeader.split(" ")?.[1];
+    const decodedToken = jwtDecode<JWTAcrolinxPayload>(jwtToken);
+    const username = decodedToken.preferred_username;
+    const password = decodedToken.genericPassword;
+
+    return await this.signInWithSSO(username, password);
   }
 
   public async singInInteractive(opts: SignInInteractiveOptions): Promise<SigninSuccessData> {
