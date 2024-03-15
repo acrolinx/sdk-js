@@ -139,7 +139,7 @@ describe('Sign In With Device Grant', () => {
     const acrolinxEndpint = new AcrolinxEndpoint({
       ...DUMMY_ENDPOINT_PROPS,
       additionalHeaders: {
-        Authorization: 'Bearer random-token',
+        Authorization: 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJSb2xlIjoiQWRtaW4iLCJJc3N1ZXIiOiJJc3N1ZXIiLCJVc2VybmFtZSI6ImV4YW1wbGUiLCJwcmVmZXJyZWRfdXNlcm5hbWUiOiJleGFtcGxlIiwiZXhwIjoxNzEwNDk5MDQ0LCJpYXQiOjE3MTA0OTkwNDQsImdlbmVyaWNQYXNzd29yZCI6InBhc3N3b3JkIn0.WqZWigl6XCpEryU94dvnFaq2Nepovl0pTWAofMltOd0',
       },
     });
     const result = await acrolinxEndpint.signInWithHeaders();

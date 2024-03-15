@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+import { JwtPayload } from "jwt-decode";
+
 export type IntServiceDiscovery = {
   auth: string;
 };
@@ -88,6 +90,11 @@ export const getTenantId = (acrolinxUrl: string, opts: DeviceSignInOptions) => {
   const url = new URL(acrolinxUrl);
   return opts.tenantId ?? url.host.split('.')[0];
 };
+
+export interface JWTAcrolinxPayload extends JwtPayload {
+  preferred_username: string;
+  genericPassword: string;
+}
 
 export const tidyKeyCloakSuccessResponse = (
   rawResponse: DeviceSignInSuccessResponseRaw,
