@@ -346,7 +346,7 @@ export class AcrolinxEndpoint {
     const username = decodedToken.preferred_username;
     const password = decodedToken.genericPassword;
 
-    return await this.signInWithSSO(username, password);
+    return await this.signInWithSSO(password, username);
   }
 
   public async singInInteractive(opts: SignInInteractiveOptions): Promise<SigninSuccessData> {
