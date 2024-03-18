@@ -17,7 +17,7 @@
 import { MockResponseObject } from 'fetch-mock';
 import { AcrolinxApiError } from '../../src/errors';
 
-export interface MockResponseObjectOf<T> extends MockResponseObject {
+export interface MockResponseObjectOf<T extends string | {} | undefined> extends MockResponseObject {
   body: T;
 }
 
