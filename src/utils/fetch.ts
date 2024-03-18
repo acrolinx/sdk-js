@@ -138,7 +138,7 @@ export async function post<T>(
   accessToken?: AccessToken,
   serviceType?: ServiceType,
 ): Promise<T> {
-  return send<T>('POST', path, body, headers, props, serviceType, accessToken);
+  return send<T>('POST', path, body, headers, props, accessToken, serviceType);
 }
 
 export async function put<T>(
