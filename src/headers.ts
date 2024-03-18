@@ -28,7 +28,7 @@ export const HEADER_ACROLINX_ONE_AUTH = 'Authorization';
 export function getCommonHeaders(
   props: AcrolinxEndpointProps,
   accessToken?: AccessToken,
-  serviceType?: ServiceType,
+  serviceType: ServiceType = ServiceType.ACROLINX_CORE,
 ): StringMap {
   const headers: StringMap = {
     'Content-Type': 'application/json',
