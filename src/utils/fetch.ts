@@ -15,7 +15,7 @@
  */
 
 import { AcrolinxEndpointProps } from '../index';
-import { AcrolinxError, createErrorFromFetchResponse, ErrorType, HttpRequest } from '../errors';
+import { AcrolinxError, createErrorFromFetchResponse, ErrorType, HttpRequest, wrapFetchError } from '../errors';
 
 // TODO: Simplify as soon as all API Urls wrap the error
 export async function handleExpectedJsonResponse<T>(req: HttpRequest, res: Response): Promise<T> {
@@ -90,4 +90,21 @@ export async function fetchWithProps(
   } else {
     return fetchFunction(input, fetchProps);
   }
+}
+
+export async function fetchJson<T>(url: string, props: AcrolinxEndpointProps, init: RequestInit = {}): Promise<T> {
+  const httpRequest = {
+    url,
+    method: init.method || 'GET',
+  };
+  return fetchWithProps(url, props, init).then(
+    (res) => {
+      console.log(res);
+      return handleExpectedJsonResponse(httpRequest, res);
+    },
+    (error) => {
+      console.log(error);
+      return wrapFetchError(httpRequest, error);
+    },
+  );
 }
