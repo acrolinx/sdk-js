@@ -21,6 +21,7 @@ import {
   AppAccessTokenResult,
   AppAccessTokenValidationResult,
 } from './addons';
+import { AiFeatures, ChatCompletionRequest, IsAIEnabledInformation, WriteResponse } from './ai-service';
 import {
   CheckingCapabilities,
   CheckType,
@@ -44,7 +45,6 @@ import {
   TermHarvestingReport,
   LiveSearchRequest,
   LiveSearchResponse,
-  CommonIssue,
 } from './check';
 import {
   AccessToken,
@@ -165,27 +165,6 @@ export interface PlatformInformation {
   server: Server;
   locales: string[];
 }
-
-export interface WriteResponse {
-  response: string;
-}
-
-export interface AiFeatures {
-  ai: boolean;
-  aiAssistant: boolean;
-}
-
-export interface IsAIEnabledInformation {
-  tenant: string;
-  value: boolean;
-  userHasPrivilege: boolean;
-}
-
-export type ChatCompletionRequest = {
-  issue: CommonIssue;
-  count: number;
-  targetUuid: string;
-};
 
 export interface AcrolinxEndpointProps {
   client: ClientInformation;
