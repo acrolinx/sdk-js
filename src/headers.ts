@@ -33,16 +33,15 @@ export function getCommonHeaders(
   const headers: StringMap = {
     'Content-Type': 'application/json',
   };
-  if (serviceType === ServiceType.ACROLINX_ONE) {
+  if (serviceType === ServiceType.ACROLINX_CORE) {
     return {
       ...headers,
-      ...getHeaders(accessToken),
+      ...getHeadersLegacy(props, accessToken),
     };
   }
-
   return {
     ...headers,
-    ...getHeadersLegacy(props, accessToken),
+    ...getHeaders(accessToken),
   };
 }
 
