@@ -73,10 +73,12 @@ import {
 import { ServerNotificationPost, ServerNotificationResponse } from './notifications';
 import { PlatformCapabilities } from './platform-capabilities';
 import {
+  getSigninRequestHeaders,
   isSigninLinksResult,
   isSigninSuccessResult,
   PollMoreResult,
   SigninLinksResult,
+  SigninOptions,
   SigninPollResult,
   SigninResult,
   SigninSuccessData,
@@ -100,7 +102,7 @@ import {
   JWTAcrolinxPayload,
 } from './signin-device-grant';
 import { User } from './user';
-import { handleExpectedJsonResponse, handleExpectedTextResponse } from './utils/fetch';
+import { fetchWithProps, handleExpectedJsonResponse, handleExpectedTextResponse } from './utils/fetch';
 import * as logging from './utils/logging';
 import { waitMs } from './utils/mixed-utils';
 import { jwtDecode } from 'jwt-decode';
@@ -210,22 +212,6 @@ export interface ClientInformation {
    */
   version: string;
 }
-
-interface AccessTokenSigninOption {
-  accessToken?: string;
-}
-
-function isSsoSigninOption(signinOptions: SigninOptions): signinOptions is SsoSigninOption {
-  const potentialSsoOptions = signinOptions as SsoSigninOption;
-  return !!(potentialSsoOptions.genericToken && potentialSsoOptions.username);
-}
-
-export interface SsoSigninOption {
-  username: string;
-  genericToken: string;
-}
-
-export type SigninOptions = AccessTokenSigninOption | SsoSigninOption;
 
 export interface CheckAndGetResultOptions {
   onProgress?(progress: Progress): void;
@@ -702,13 +688,17 @@ export class AcrolinxEndpoint {
     opts: AdditionalRequestOptions = {},
   ): Promise<string> {
     const httpRequest = { url, method: 'GET' };
-    return this.fetch(url, {
-      headers: {
-        ...this.getCommonHeaders(accessToken, opts.isAcrolinxOne),
-        ...opts.headers,
-        ...this.props.additionalHeaders,
+    return fetchWithProps(
+      url,
+      {
+        headers: {
+          ...this.getCommonHeaders(accessToken, opts.isAcrolinxOne),
+          ...opts.headers,
+          ...this.props.additionalHeaders,
+        },
       },
-    }).then(
+      this.props,
+    ).then(
       (res) => handleExpectedTextResponse(httpRequest, res),
       (error) => wrapFetchError(httpRequest, error),
     );
@@ -902,7 +892,7 @@ export class AcrolinxEndpoint {
       url,
       method: init.method || 'GET',
     };
-    return this.fetch(url, init).then(
+    return fetchWithProps(url, init, this.props).then(
       (res) => {
         console.log(res);
         return handleExpectedJsonResponse(httpRequest, res);
@@ -914,48 +904,11 @@ export class AcrolinxEndpoint {
     );
   }
 
-  /* tslint:disable:no-console */
-  private async fetch(input: RequestInfo, init: RequestInit = {}): Promise<Response> {
-    const fetchFunction = this.props.fetch || fetch;
-    const fetchProps: RequestInit = {
-      ...init,
-      // Ensure credentials: 'same-origin' in old browsers: https://github.com/github/fetch#sending-cookies
-      credentials: this.props.corsWithCredentials ? 'include' : 'same-origin',
-      ...(this.props.additionalFetchProperties || {}),
-    };
-    if (this.props.enableHttpLogging) {
-      try {
-        console.log('Fetch', input, init, this.props.additionalFetchProperties);
-        const result = await fetchFunction(input, fetchProps);
-        console.log('Fetched Result', result.status);
-        return result;
-      } catch (error) {
-        console.error('Fetch Error', error);
-        throw error;
-      }
-    } else {
-      return fetchFunction(input, fetchProps);
-    }
-  }
-
   /* tslint:enable:no-console */
 }
 
 function getData<T>(promise: Promise<SuccessResponse<T>>): Promise<T> {
   return promise.then((r) => r.data);
-}
-
-function getSigninRequestHeaders(options: SigninOptions = {}): StringMap {
-  if ('accessToken' in options && options.accessToken) {
-    return { [HEADER_X_ACROLINX_AUTH]: options.accessToken };
-  } else if (isSsoSigninOption(options)) {
-    return {
-      username: options.username,
-      password: options.genericToken,
-    };
-  } else {
-    return {};
-  }
 }
 
 function createCheckCanceledByClientError() {

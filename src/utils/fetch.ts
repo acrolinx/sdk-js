@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import { AcrolinxEndpointProps } from '../index';
 import { AcrolinxError, createErrorFromFetchResponse, ErrorType, HttpRequest } from '../errors';
 
 // TODO: Simplify as soon as all API Urls wrap the error
@@ -61,4 +62,32 @@ export function toJson<T>(httpRequest: HttpRequest, res: Response): T | Promise<
       type: ErrorType.InvalidJson,
     });
   });
+}
+
+/* tslint:disable:no-console */
+export async function fetchWithProps(
+  input: RequestInfo,
+  init: RequestInit = {},
+  props: AcrolinxEndpointProps,
+): Promise<Response> {
+  const fetchFunction = props.fetch || fetch;
+  const fetchProps: RequestInit = {
+    ...init,
+    // Ensure credentials: 'same-origin' in old browsers: https://github.com/github/fetch#sending-cookies
+    credentials: props.corsWithCredentials ? 'include' : 'same-origin',
+    ...(props.additionalFetchProperties || {}),
+  };
+  if (props.enableHttpLogging) {
+    try {
+      console.log('Fetch', input, init, props.additionalFetchProperties);
+      const result = await fetchFunction(input, fetchProps);
+      console.log('Fetched Result', result.status);
+      return result;
+    } catch (error) {
+      console.error('Fetch Error', error);
+      throw error;
+    }
+  } else {
+    return fetchFunction(input, fetchProps);
+  }
 }
