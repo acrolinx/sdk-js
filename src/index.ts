@@ -53,6 +53,7 @@ import {
   AsyncStartedProcess,
   isProgressResponse,
   Progress,
+  ServiceType,
   StringMap,
   SuccessResponse,
   UserId,
@@ -198,7 +199,7 @@ export interface CheckAndGetResultOptions {
 
 export interface AdditionalRequestOptions {
   headers?: StringMap;
-  isAcrolinxOne?: boolean;
+  serviceType?: ServiceType;
 }
 
 export interface CancelablePollLoopOptions extends CheckAndGetResultOptions, AdditionalRequestOptions {}
@@ -233,13 +234,13 @@ export class AcrolinxEndpoint {
 
   public async getAiFeatures(accessToken: string): Promise<AiFeatures> {
     return this.getJsonFromPath<AiFeatures>('/ai-service/api/v1/tenants/features/ai', accessToken, {
-      isAcrolinxOne: true,
+      serviceType: ServiceType.ACROLINX_ONE,
     });
   }
 
   public async getAIEnabled(accessToken: string): Promise<IsAIEnabledInformation> {
     return this.getJsonFromPath('/ai-service/api/v1/tenants/feature/ai-enabled?privilege=generate', accessToken, {
-      isAcrolinxOne: true,
+      serviceType: ServiceType.ACROLINX_ONE,
     });
   }
 
@@ -256,23 +257,16 @@ export class AcrolinxEndpoint {
     const { aiRephraseHint: prompt, internalName } = params.issue;
     const { targetUuid } = params;
 
-    return fetchJson(
-      getUrlOfPath(
-        this.props,
-        `/ai-service/api/v1/ai/chat-completions?count=${params.count}&issueInternalName=${internalName}`,
-      ),
-      this.props,
+    return post(
+      `/ai-service/api/v1/ai/chat-completions?count=${params.count}&issueInternalName=${internalName}`,
       {
-        method: 'POST',
-        body: JSON.stringify({
-          prompt,
-          targetUuid,
-        }),
-        headers: {
-          ...getCommonHeaders(this.props, accessToken, true),
-          ...this.props.additionalHeaders,
-        },
+        prompt,
+        targetUuid,
       },
+      {},
+      this.props,
+      accessToken,
+      ServiceType.ACROLINX_ONE,
     );
   }
 
@@ -653,7 +647,7 @@ export class AcrolinxEndpoint {
   ): Promise<T> {
     return fetchJson(url, this.props, {
       headers: {
-        ...getCommonHeaders(this.props, accessToken, opts.isAcrolinxOne),
+        ...getCommonHeaders(this.props, accessToken, opts.serviceType),
         ...opts.headers,
         ...this.props.additionalHeaders,
       },
@@ -668,7 +662,7 @@ export class AcrolinxEndpoint {
     const httpRequest = { url, method: 'GET' };
     return fetchWithProps(url, this.props, {
       headers: {
-        ...getCommonHeaders(this.props, accessToken, opts.isAcrolinxOne),
+        ...getCommonHeaders(this.props, accessToken, opts.serviceType),
         ...opts.headers,
         ...this.props.additionalHeaders,
       },
@@ -785,7 +779,7 @@ export class AcrolinxEndpoint {
   private async deleteUrl<T>(url: string, accessToken: AccessToken, opts: AdditionalRequestOptions = {}): Promise<T> {
     return fetchJson(url, this.props, {
       headers: {
-        ...getCommonHeaders(this.props, accessToken, opts.isAcrolinxOne),
+        ...getCommonHeaders(this.props, accessToken, opts.serviceType),
         ...opts.headers,
         ...this.props.additionalHeaders,
       },
