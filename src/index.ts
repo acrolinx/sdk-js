@@ -297,15 +297,20 @@ export class AcrolinxEndpoint {
     const { aiRephraseHint: prompt, internalName } = params.issue;
     const { targetUuid } = params;
 
-    return this.post<WriteResponse>(
-      `/ai-service/api/v1/ai/chat-completions?count=${params.count}&issueInternalName=${internalName}`,
+    return this.fetchJson(
+      this.getUrlOfPath(
+        `/ai-service/api/v1/ai/chat-completions?count=${params.count}&issueInternalName=${internalName}`,
+      ),
       {
-        prompt,
-        targetUuid,
-      },
-      {
-        ...this.getCommonHeaders(accessToken, true),
-        ...this.props.additionalHeaders,
+        method: 'POST',
+        body: JSON.stringify({
+          prompt,
+          targetUuid,
+        }),
+        headers: {
+          ...this.getCommonHeaders(accessToken, true),
+          ...this.props.additionalHeaders,
+        },
       },
     );
   }
