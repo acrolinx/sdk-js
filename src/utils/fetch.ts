@@ -16,7 +16,7 @@
 
 import { AccessToken, AcrolinxEndpointProps, StringMap } from '../index';
 import { AcrolinxError, createErrorFromFetchResponse, ErrorType, HttpRequest, wrapFetchError } from '../errors';
-import { getCommonHeaders } from 'src/headers';
+import { getCommonHeaders } from '../headers';
 
 // TODO: Simplify as soon as all API Urls wrap the error
 export async function handleExpectedJsonResponse<T>(req: HttpRequest, res: Response): Promise<T> {
