@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { AccessToken, AcrolinxEndpointProps, StringMap } from '../index';
+import { AccessToken, AcrolinxEndpointProps, ServiceType, StringMap } from '../index';
 import { AcrolinxError, createErrorFromFetchResponse, ErrorType, HttpRequest, wrapFetchError } from '../errors';
 import { getCommonHeaders } from '../headers';
 
@@ -117,10 +117,11 @@ export async function send<T>(
   headers: StringMap = {},
   props: AcrolinxEndpointProps,
   accessToken?: AccessToken,
+  serviceType?: ServiceType,
 ): Promise<T> {
   return fetchJson(getUrlOfPath(props, path), props, {
     body: JSON.stringify(body),
-    headers: { ...getCommonHeaders(props, accessToken), ...headers, ...props.additionalHeaders },
+    headers: { ...getCommonHeaders(props, accessToken, serviceType), ...headers, ...props.additionalHeaders },
     method,
   });
 }
@@ -135,8 +136,9 @@ export async function post<T>(
   headers: StringMap = {},
   props: AcrolinxEndpointProps,
   accessToken?: AccessToken,
+  serviceType?: ServiceType,
 ): Promise<T> {
-  return send<T>('POST', path, body, headers, props, accessToken);
+  return send<T>('POST', path, body, headers, props, serviceType, accessToken);
 }
 
 export async function put<T>(

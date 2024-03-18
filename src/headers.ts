@@ -15,7 +15,7 @@
  */
 
 import { AcrolinxEndpointProps } from 'src';
-import { AccessToken, StringMap } from './common-types';
+import { AccessToken, ServiceType, StringMap } from './common-types';
 
 export const HEADER_X_ACROLINX_CLIENT = 'X-Acrolinx-Client';
 export const HEADER_X_ACROLINX_AUTH = 'X-Acrolinx-Auth';
@@ -28,12 +28,12 @@ export const HEADER_ACROLINX_ONE_AUTH = 'Authorization';
 export function getCommonHeaders(
   props: AcrolinxEndpointProps,
   accessToken?: AccessToken,
-  isAcrolinxOne?: boolean,
+  serviceType?: ServiceType,
 ): StringMap {
   const headers: StringMap = {
     'Content-Type': 'application/json',
   };
-  if (isAcrolinxOne) {
+  if (serviceType === ServiceType.ACROLINX_ONE) {
     return {
       ...headers,
       ...getHeaders(accessToken),
