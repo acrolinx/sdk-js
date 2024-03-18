@@ -61,6 +61,12 @@ export interface SigninLinksData {
   interactiveLinkTimeout: number;
 }
 
+export interface SignInInteractiveOptions {
+  onSignInUrl: (url: string) => void;
+  accessToken?: string;
+  timeoutMs?: number;
+}
+
 export interface SigninLinksResult extends ApiResponse<SigninLinksData> {
   links: {
     interactive: string;

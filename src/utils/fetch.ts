@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-import { AcrolinxEndpointProps } from '../index';
+import { AccessToken, AcrolinxEndpointProps, StringMap } from '../index';
 import { AcrolinxError, createErrorFromFetchResponse, ErrorType, HttpRequest, wrapFetchError } from '../errors';
+import { getCommonHeaders } from 'src/headers';
 
 // TODO: Simplify as soon as all API Urls wrap the error
 export async function handleExpectedJsonResponse<T>(req: HttpRequest, res: Response): Promise<T> {
@@ -107,4 +108,43 @@ export async function fetchJson<T>(url: string, props: AcrolinxEndpointProps, in
       return wrapFetchError(httpRequest, error);
     },
   );
+}
+
+export async function send<T>(
+  method: 'POST' | 'PUT',
+  path: string,
+  body: {},
+  headers: StringMap = {},
+  props: AcrolinxEndpointProps,
+  accessToken?: AccessToken,
+): Promise<T> {
+  return fetchJson(getUrlOfPath(props, path), props, {
+    body: JSON.stringify(body),
+    headers: { ...getCommonHeaders(props, accessToken), ...headers, ...props.additionalHeaders },
+    method,
+  });
+}
+
+export function getUrlOfPath(props: AcrolinxEndpointProps, path: string) {
+  return props.acrolinxUrl + path;
+}
+
+export async function post<T>(
+  path: string,
+  body: {},
+  headers: StringMap = {},
+  props: AcrolinxEndpointProps,
+  accessToken?: AccessToken,
+): Promise<T> {
+  return send<T>('POST', path, body, headers, props, accessToken);
+}
+
+export async function put<T>(
+  path: string,
+  body: {},
+  headers: StringMap = {},
+  props: AcrolinxEndpointProps,
+  accessToken?: AccessToken,
+): Promise<T> {
+  return send<T>('PUT', path, body, headers, props, accessToken);
 }
