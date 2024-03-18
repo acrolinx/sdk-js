@@ -67,8 +67,8 @@ export function toJson<T>(httpRequest: HttpRequest, res: Response): T | Promise<
 /* tslint:disable:no-console */
 export async function fetchWithProps(
   input: RequestInfo,
-  init: RequestInit = {},
   props: AcrolinxEndpointProps,
+  init: RequestInit = {},
 ): Promise<Response> {
   const fetchFunction = props.fetch || fetch;
   const fetchProps: RequestInit = {

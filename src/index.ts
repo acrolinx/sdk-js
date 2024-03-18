@@ -688,17 +688,13 @@ export class AcrolinxEndpoint {
     opts: AdditionalRequestOptions = {},
   ): Promise<string> {
     const httpRequest = { url, method: 'GET' };
-    return fetchWithProps(
-      url,
-      {
-        headers: {
-          ...this.getCommonHeaders(accessToken, opts.isAcrolinxOne),
-          ...opts.headers,
-          ...this.props.additionalHeaders,
-        },
+    return fetchWithProps(url, this.props, {
+      headers: {
+        ...this.getCommonHeaders(accessToken, opts.isAcrolinxOne),
+        ...opts.headers,
+        ...this.props.additionalHeaders,
       },
-      this.props,
-    ).then(
+    }).then(
       (res) => handleExpectedTextResponse(httpRequest, res),
       (error) => wrapFetchError(httpRequest, error),
     );
@@ -892,7 +888,7 @@ export class AcrolinxEndpoint {
       url,
       method: init.method || 'GET',
     };
-    return fetchWithProps(url, init, this.props).then(
+    return fetchWithProps(url, this.props, init).then(
       (res) => {
         console.log(res);
         return handleExpectedJsonResponse(httpRequest, res);
