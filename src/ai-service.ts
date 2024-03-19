@@ -47,7 +47,7 @@ export interface AIServiceError {
 export enum AIServiceErrorTypes {
   AI_PROVIDER_ERROR = 'AI_PROVIDER_ERROR',
   INVALID_USER_INPUT = 'INVALID_USER_INPUT',
-  BUDGET_EXCEEDED = 'BUDGET_EXCEEDED'
+  BUDGET_EXCEEDED = 'BUDGET_EXCEEDED',
 }
 
 export function isAIServiceError(error: any): error is AIServiceError {
@@ -57,5 +57,5 @@ export function isAIServiceError(error: any): error is AIServiceError {
     Object.values(AIServiceErrorTypes).includes(error.errorId) &&
     typeof error.errorName === 'string' &&
     typeof error.errorDescription === 'string'
-  )
+  );
 }
