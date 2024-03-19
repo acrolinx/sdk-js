@@ -118,10 +118,8 @@ describe('AI-service', () => {
       mockFetch.mock(getGetAIChatCompletionMatcher(count, internalName), {
         status: 500,
         body: {
-          httpErrorCode: 500,
-          errorId: 'AI_PROVIDER_ERROR',
-          errorName: 'Server unresponsive',
-          errorDescription: 'Server mainatainance window',
+          code: 500,
+          message: 'There was an error processing your request. It has been logged (ID bfa13a2ca31b9c49).',
         },
       });
 
@@ -138,7 +136,7 @@ describe('AI-service', () => {
           },
           DUMMY_ACCESS_TOKEN,
         ),
-      ).rejects.toThrow('Server unresponsive');
+      ).rejects.toThrow('There was an error processing your request. It has been logged (ID bfa13a2ca31b9c49).');
     });
   });
 });

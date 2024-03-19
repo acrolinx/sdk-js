@@ -15,7 +15,7 @@
  */
 
 import { DocumentId } from './document-descriptor';
-import { isAIServiceError } from './ai-service';
+import { AIServiceErrorTypes, isAIServiceError } from './ai-service';
 
 /**
  * See also https://github.com/acrolinx/server-api-spec/blob/master/apiary.apib
@@ -143,10 +143,10 @@ export function createErrorFromFetchResponse(
     });
   } else if (isAIServiceError(jsonBody)) {
     return new AcrolinxError({
-      detail: jsonBody.errorDescription,
-      status: jsonBody.httpErrorCode,
-      type: jsonBody.errorId,
-      title: jsonBody.errorName,
+      detail: jsonBody.message,
+      status: jsonBody.code,
+      type: AIServiceErrorTypes.AI_SERVICE_ERROR,
+      title: jsonBody.message,
       httpRequest: req,
     });
   } else if (
