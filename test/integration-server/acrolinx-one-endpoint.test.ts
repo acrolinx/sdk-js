@@ -112,31 +112,30 @@ describe('Acrolinx One E2E Tests', () => {
     });
   });
 
-
   describe.skip('AI Service Integration Tests', () => {
     // This tests requires valid keycloak access token
 
     it('getAiFeatures returns whether certain AI features are enabled', async () => {
       const ep = createEndpoint(ACROLINX_ONE_SERVER_URL);
-  
+
       const aiFeatures = await ep.getAiFeatures(KEYCLOAK_ACCESS_TOKEN!);
-  
+
       expect(typeof aiFeatures.ai).toEqual('boolean');
       expect(typeof aiFeatures.aiAssistant).toEqual('boolean');
     });
-  
+
     it('check if the ai service is activated', async () => {
       const headers: StringMap = {
         Authorization: `Bearer ${KEYCLOAK_ACCESS_TOKEN!}`,
       };
       const ep = createEndpoint(ACROLINX_ONE_SERVER_URL, headers);
-  
+
       const aiResult = await ep.getAIEnabled(KEYCLOAK_ACCESS_TOKEN!);
       expect(aiResult.tenant).toBeDefined();
       expect(aiResult.value).toBeDefined();
       expect(aiResult.userHasPrivilege).toBeDefined();
     });
-  
+
     it('get a chat completion from the ai service', async () => {
       const headers: StringMap = {
         Authorization: `Bearer ${KEYCLOAK_ACCESS_TOKEN!}`,
@@ -157,5 +156,4 @@ describe('Acrolinx One E2E Tests', () => {
       expect(aiResult.response).toBeDefined();
     }, 100000);
   });
-  
 });

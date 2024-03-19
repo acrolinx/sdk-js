@@ -18,6 +18,7 @@ import { AcrolinxEndpoint, Issue } from '../../src/index';
 import { DUMMY_ACCESS_TOKEN } from '../test-utils/mock-server';
 import { DUMMY_ENDPOINT_PROPS } from './common';
 import { DUMMY_AI_REWRITE_CONTEXT } from '../test-utils/dummy-data';
+import { WriteResponse } from 'src/ai-service';
 
 describe('AI-service', () => {
   let endpoint: AcrolinxEndpoint = new AcrolinxEndpoint(DUMMY_ENDPOINT_PROPS);
@@ -82,18 +83,50 @@ describe('AI-service', () => {
       `end:/ai-service/api/v1/ai/chat-completions?count=${count}&issueInternalName=${internalName}`;
 
     it('correct response', async () => {
+      const aiResponse = 'some responds';
+      const response = createDummyAIServiceRequest(500, {
+        status: 200,
+        body: { aiResponse },
+      });
+
+      expect((await response).response).toBe(response);
+    });
+    it('error response', async () => {
+      const response = createDummyAIServiceRequest(500, {
+        code: 500,
+        message: 'There was an error processing your request. It has been logged (ID some-random-id).',
+      });
+
+      await expect(response).rejects.toThrow(
+        'There was an error processing your request. It has been logged (ID some-random-id).',
+      );
+    });
+
+    it('should throw if response was filtered', async () => {
+      const response = createDummyAIServiceRequest(400, {
+        code: 400,
+        message: 'The response was filtered...bla bla',
+      });
+      await expect(response).rejects.toThrow('The response was filtered...bla bla');
+    });
+
+    const createDummyAIServiceRequest = async (
+      responseStatus: number,
+      dummyResponseBody: any,
+    ): Promise<WriteResponse> => {
       endpoint = new AcrolinxEndpoint(DUMMY_ENDPOINT_PROPS);
       const count = 1;
       const internalName = 'simplefy';
-      const aiRephraseHint = 'some hint';
+      const aiRephraseHint = 'some invalid data';
       const targetUuid = '123e4567-e89b-12d3-a456-426614174000';
       const aiRewriteContext = DUMMY_AI_REWRITE_CONTEXT;
-      const response = 'some responds';
+
       mockFetch.mock(getGetAIChatCompletionMatcher(count, internalName), {
-        status: 200,
-        body: { response },
+        status: responseStatus,
+        body: dummyResponseBody,
       });
-      const apiResponse = await endpoint.getAIChatCompletion(
+
+      return endpoint.getAIChatCompletion(
         {
           issue: {
             internalName,
@@ -105,70 +138,6 @@ describe('AI-service', () => {
         },
         DUMMY_ACCESS_TOKEN,
       );
-      expect(apiResponse.response).toBe(response);
-    });
-    it('error response', async () => {
-      endpoint = new AcrolinxEndpoint(DUMMY_ENDPOINT_PROPS);
-      const count = 1;
-      const internalName = 'simplefy';
-      const aiRephraseHint = 'some hint';
-      const targetUuid = '123e4567-e89b-12d3-a456-426614174000';
-      const aiRewriteContext = DUMMY_AI_REWRITE_CONTEXT;
-
-      mockFetch.mock(getGetAIChatCompletionMatcher(count, internalName), {
-        status: 500,
-        body: {
-          code: 500,
-          message: 'There was an error processing your request. It has been logged (ID some-random-id).',
-        },
-      });
-
-      await expect(
-        endpoint.getAIChatCompletion(
-          {
-            issue: {
-              internalName,
-              aiRephraseHint,
-              aiRewriteContext,
-            } as unknown as Issue,
-            count,
-            targetUuid,
-          },
-          DUMMY_ACCESS_TOKEN,
-        ),
-      ).rejects.toThrow('There was an error processing your request. It has been logged (ID some-random-id).');
-    });
-
-    it('should throw if response was filtered', async () => {
-      endpoint = new AcrolinxEndpoint(DUMMY_ENDPOINT_PROPS);
-      const count = 1;
-      const internalName = 'simplefy';
-      const aiRephraseHint = 'some invalid data';
-      const targetUuid = '123e4567-e89b-12d3-a456-426614174000';
-      const aiRewriteContext = DUMMY_AI_REWRITE_CONTEXT;
-
-      mockFetch.mock(getGetAIChatCompletionMatcher(count, internalName), {
-        status: 400,
-        body: {
-          code: 400,
-          message: 'The response was filtered...bla bla',
-        },
-      });
-
-      await expect(
-        endpoint.getAIChatCompletion(
-          {
-            issue: {
-              internalName,
-              aiRephraseHint,
-              aiRewriteContext,
-            } as unknown as Issue,
-            count,
-            targetUuid,
-          },
-          DUMMY_ACCESS_TOKEN,
-        ),
-      ).rejects.toThrow('The response was filtered...bla bla');
-    });
+    };
   });
 });
