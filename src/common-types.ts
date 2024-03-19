@@ -65,3 +65,8 @@ export interface AsyncStartedProcess {
   };
   links: AsyncStartedProcessLinks;
 }
+
+export enum ServiceType {
+  ACROLINX_ONE,
+  ACROLINX_CORE,
+}

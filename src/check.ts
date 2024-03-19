@@ -221,6 +221,15 @@ export interface ExternalContentMatch {
   externalContentMatches?: ExternalContentMatch[];
 }
 
+export interface RewriteContextPart {
+  sourceId?: string;
+  sourceType?: string;
+  part: string;
+  begin: number;
+  end: number;
+  externalContent?: RewriteContextPart[];
+}
+
 export interface Suggestion {
   surface: string;
   groupId: string;
@@ -260,6 +269,7 @@ export interface CommonIssue {
    */
   scoring?: GoalScoring;
   aiRephraseHint?: string;
+  aiRewriteContext?: RewriteContextPart[];
 }
 
 export interface PositionalInformation {

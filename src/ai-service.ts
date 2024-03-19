@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-present Acrolinx GmbH
+ * Copyright 2024-present Acrolinx GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,15 +14,25 @@
  * limitations under the License.
  */
 
-import { MockResponseObject } from 'fetch-mock';
-import { AcrolinxApiError } from '../../src/errors';
+import { CommonIssue } from './check';
 
-export interface MockResponseObjectOf<T extends string | {} | undefined> extends MockResponseObject {
-  body: T;
+export interface AiFeatures {
+  ai: boolean;
+  aiAssistant: boolean;
 }
 
-export interface Route {
-  handler: (args: string[], requestOpts: RequestInit) => MockResponseObject | AcrolinxApiError | {};
-  method: string;
-  path: RegExp;
+export interface IsAIEnabledInformation {
+  tenant: string;
+  value: boolean;
+  userHasPrivilege: boolean;
+}
+
+export type ChatCompletionRequest = {
+  issue: CommonIssue;
+  count: number;
+  targetUuid: string;
+};
+
+export interface WriteResponse {
+  response: string;
 }

@@ -21,6 +21,7 @@ import {
   AppAccessTokenResult,
   AppAccessTokenValidationResult,
 } from './addons';
+import { AiFeatures, ChatCompletionRequest, IsAIEnabledInformation, WriteResponse } from './ai-service';
 import {
   CheckingCapabilities,
   CheckType,
@@ -44,7 +45,6 @@ import {
   TermHarvestingReport,
   LiveSearchRequest,
   LiveSearchResponse,
-  CommonIssue,
 } from './check';
 import {
   AccessToken,
@@ -53,6 +53,7 @@ import {
   AsyncStartedProcess,
   isProgressResponse,
   Progress,
+  ServiceType,
   StringMap,
   SuccessResponse,
   UserId,
@@ -63,20 +64,22 @@ import { AcrolinxError, CheckCanceledByClientError, ErrorType, wrapFetchError } 
 import { AnalysisRequest, ExtractionResult } from './extraction';
 import { PlatformFeatures, PlatformFeaturesResponse } from './features';
 import {
-  HEADER_ACROLINX_ONE_AUTH,
   HEADER_X_ACROLINX_APP_SIGNATURE,
   HEADER_X_ACROLINX_AUTH,
-  HEADER_X_ACROLINX_BASE_URL,
   HEADER_X_ACROLINX_CLIENT,
-  HEADER_X_ACROLINX_CLIENT_LOCALE,
+  getAcrolinxClientHttpHeader,
+  getCommonHeaders,
 } from './headers';
 import { ServerNotificationPost, ServerNotificationResponse } from './notifications';
 import { PlatformCapabilities } from './platform-capabilities';
 import {
+  getSigninRequestHeaders,
   isSigninLinksResult,
   isSigninSuccessResult,
   PollMoreResult,
+  SignInInteractiveOptions,
   SigninLinksResult,
+  SigninOptions,
   SigninPollResult,
   SigninResult,
   SigninSuccessData,
@@ -97,11 +100,13 @@ import {
   isSignInDeviceGrantSuccess,
   tidyKeyCloakSuccessResponse,
   tidyKeyCloakDeviceAuthResponse,
+  JWTAcrolinxPayload,
 } from './signin-device-grant';
 import { User } from './user';
-import { handleExpectedJsonResponse, handleExpectedTextResponse } from './utils/fetch';
+import { fetchJson, fetchWithProps, getUrlOfPath, handleExpectedTextResponse, post, put } from './utils/fetch';
 import * as logging from './utils/logging';
 import { waitMs } from './utils/mixed-utils';
+import { jwtDecode } from 'jwt-decode';
 
 export * from './dictionary';
 export * from './extraction';
@@ -162,27 +167,6 @@ export interface PlatformInformation {
   locales: string[];
 }
 
-export interface WriteResponse {
-  response: string;
-}
-
-export interface AiFeatures {
-  ai: boolean;
-  aiAssistant: boolean;
-}
-
-export interface IsAIEnabledInformation {
-  tenant: string;
-  value: boolean;
-  userHasPrivilege: boolean;
-}
-
-export type ChatCompletionRequest = {
-  issue: CommonIssue;
-  count: number;
-  targetUuid: string;
-};
-
 export interface AcrolinxEndpointProps {
   client: ClientInformation;
   clientLocale?: string;
@@ -209,28 +193,13 @@ export interface ClientInformation {
   version: string;
 }
 
-interface AccessTokenSigninOption {
-  accessToken?: string;
-}
-
-function isSsoSigninOption(signinOptions: SigninOptions): signinOptions is SsoSigninOption {
-  const potentialSsoOptions = signinOptions as SsoSigninOption;
-  return !!(potentialSsoOptions.genericToken && potentialSsoOptions.username);
-}
-
-export interface SsoSigninOption {
-  username: string;
-  genericToken: string;
-}
-
-export type SigninOptions = AccessTokenSigninOption | SsoSigninOption;
-
 export interface CheckAndGetResultOptions {
   onProgress?(progress: Progress): void;
 }
 
 export interface AdditionalRequestOptions {
   headers?: StringMap;
+  serviceType?: ServiceType;
 }
 
 export interface CancelablePollLoopOptions extends CheckAndGetResultOptions, AdditionalRequestOptions {}
@@ -241,12 +210,6 @@ export interface CancelablePromiseWrapper<T> {
   getId(): string | undefined;
 
   cancel(): void;
-}
-
-export interface SignInInteractiveOptions {
-  onSignInUrl: (url: string) => void;
-  accessToken?: string;
-  timeoutMs?: number;
 }
 
 const VALIDATE_APP_ACCESS_TOKEN_PATH = '/api/v1/apps/whoami';
@@ -270,11 +233,15 @@ export class AcrolinxEndpoint {
   }
 
   public async getAiFeatures(accessToken: string): Promise<AiFeatures> {
-    return this.getJsonFromPath<AiFeatures>('/ai-service/api/v1/tenants/features/ai', accessToken);
+    return this.getJsonFromPath<AiFeatures>('/ai-service/api/v1/tenants/features/ai', accessToken, {
+      serviceType: ServiceType.ACROLINX_ONE,
+    });
   }
 
   public async getAIEnabled(accessToken: string): Promise<IsAIEnabledInformation> {
-    return this.getJsonFromPath('/ai-service/api/v1/tenants/feature/ai-enabled?privilege=generate', accessToken);
+    return this.getJsonFromPath('/ai-service/api/v1/tenants/feature/ai-enabled?privilege=generate', accessToken, {
+      serviceType: ServiceType.ACROLINX_ONE,
+    });
   }
 
   public async isAIEnabled(accessToken: string): Promise<boolean> {
@@ -290,19 +257,16 @@ export class AcrolinxEndpoint {
     const { aiRephraseHint: prompt, internalName } = params.issue;
     const { targetUuid } = params;
 
-    return this.fetchJson(
-      this.getUrlOfPath(`/ai-service/api/v1/ai/chat-completions?count=${params.count}&issueInternalName=${internalName}`),
+    return post(
+      `/ai-service/api/v1/ai/chat-completions?count=${params.count}&issueInternalName=${internalName}`,
       {
-        method: 'POST',
-        body: JSON.stringify({
-          prompt,
-          targetUuid,
-        }),
-        headers: {
-          ...this.getCommonHeaders(accessToken),
-          ...this.props.additionalHeaders,
-        },
+        prompt,
+        targetUuid,
       },
+      {},
+      this.props,
+      accessToken,
+      ServiceType.ACROLINX_ONE,
     );
   }
 
@@ -327,16 +291,22 @@ export class AcrolinxEndpoint {
         detail: 'Additional headers must be provided',
       });
     }
-    const signinResult = await this.signin();
-    if (isSigninSuccessResult(signinResult)) {
-      return signinResult;
-    } else {
+
+    const authHeader = this.props.additionalHeaders['Authorization'];
+    if (!authHeader) {
       throw new AcrolinxError({
         type: ErrorType.SSO,
-        title: 'SSO Error',
-        detail: 'Sign-In by SSO failed.',
+        title: 'Headers missing',
+        detail: 'Additional headers must be provided',
       });
     }
+
+    const jwtToken = authHeader.split(' ')?.[1];
+    const decodedToken = jwtDecode<JWTAcrolinxPayload>(jwtToken);
+    const username = decodedToken.preferred_username;
+    const password = decodedToken.genericPassword;
+
+    return await this.signInWithSSO(password, username);
   }
 
   public async singInInteractive(opts: SignInInteractiveOptions): Promise<SigninSuccessData> {
@@ -352,13 +322,13 @@ export class AcrolinxEndpoint {
   }
 
   private async fetchLoginInfo(): Promise<IntServiceDiscovery> {
-    return await this.fetchJson(this.getUrlOfPath('/int-service/api/v1/discovery'), {
+    return await fetchJson(getUrlOfPath(this.props, '/int-service/api/v1/discovery'), this.props, {
       method: 'GET',
     });
   }
 
   private async fetchDeviceGrantUserAction(deviceGrantUrl: string, clientId: string): Promise<DeviceAuthResponseRaw> {
-    return await this.fetchJson(deviceGrantUrl, {
+    return await fetchJson(deviceGrantUrl, this.props, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
@@ -433,7 +403,7 @@ export class AcrolinxEndpoint {
     url: string,
     urlSearchParams: URLSearchParams,
   ): Promise<DeviceSignInSuccessResponseRaw> {
-    return await this.fetchJson(url, {
+    return await fetchJson(url, this.props, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
@@ -480,7 +450,7 @@ export class AcrolinxEndpoint {
   }
 
   public async signin(options: SigninOptions = {}): Promise<SigninResult> {
-    return this.post<SigninResult>('/api/v1/auth/sign-ins', {}, getSigninRequestHeaders(options));
+    return post<SigninResult>('/api/v1/auth/sign-ins', {}, getSigninRequestHeaders(options), this.props);
   }
 
   public async pollForSignin(
@@ -496,15 +466,15 @@ export class AcrolinxEndpoint {
 
   public async getAppAccessToken(accessToken: AccessToken, appId: AddonId): Promise<AppAccessTokenResult> {
     const tokenApiResult = await getData<AppAccessTokenApiResult>(
-      this.post('/api/v1/apps/accessToken/' + appId, {}, undefined, accessToken),
+      post('/api/v1/apps/accessToken/' + appId, {}, undefined, this.props, accessToken),
     );
     return {
       ...tokenApiResult,
       validationRequest: {
-        url: this.getUrlOfPath(VALIDATE_APP_ACCESS_TOKEN_PATH),
+        url: getUrlOfPath(this.props, VALIDATE_APP_ACCESS_TOKEN_PATH),
         headers: {
           'Content-Type': 'application/json',
-          [HEADER_X_ACROLINX_CLIENT]: this.getAcrolinxClientHttpHeader(),
+          [HEADER_X_ACROLINX_CLIENT]: getAcrolinxClientHttpHeader(this.props),
           [HEADER_X_ACROLINX_AUTH]: tokenApiResult.appAccessToken,
         },
       },
@@ -531,14 +501,15 @@ export class AcrolinxEndpoint {
   }
 
   public async check(accessToken: AccessToken, req: CheckRequest): Promise<CheckResponse> {
-    return this.post<CheckResponse>('/api/v1/checking/checks', req, {}, accessToken);
+    return post<CheckResponse>('/api/v1/checking/checks', req, {}, this.props, accessToken);
   }
 
   public async getLiveSuggestions(accessToken: AccessToken, req: LiveSearchRequest): Promise<LiveSearchResponse> {
-    return this.post<LiveSearchResponse>(
+    return post<LiveSearchResponse>(
       '/reuse-service/api/v1/phrases/preferred/with-description',
       req,
       {},
+      this.props,
       accessToken,
     );
   }
@@ -557,10 +528,11 @@ export class AcrolinxEndpoint {
     opts: CheckAndGetResultOptions = {},
   ): CancelablePromiseWrapper<ExtractionResult> {
     const headers = { [HEADER_X_ACROLINX_APP_SIGNATURE]: req.appSignature };
-    const asyncStartedProcessPromise = this.post<AsyncStartedProcess>(
+    const asyncStartedProcessPromise = post<AsyncStartedProcess>(
       '/api/v1/apps/analyses',
       req,
       headers,
+      this.props,
       accessToken,
     );
     return this.startCancelablePollLoop(accessToken, asyncStartedProcessPromise, { ...opts, headers });
@@ -619,10 +591,11 @@ export class AcrolinxEndpoint {
     accessToken: AccessToken,
     notification: ServerNotificationPost,
   ): Promise<ServerNotificationResponse> {
-    return this.post<ServerNotificationResponse>(
+    return post<ServerNotificationResponse>(
       '/api/v1/broadcasts/platform-notifications/',
       notification,
       {},
+      this.props,
       accessToken,
     );
   }
@@ -632,7 +605,7 @@ export class AcrolinxEndpoint {
   }
 
   public addToDictionary(accessToken: AccessToken, req: AddToDictionaryRequest): Promise<AddToDictionaryResponse> {
-    return getData(this.post('/api/v1/dictionary/submit', req, {}, accessToken));
+    return getData(post('/api/v1/dictionary/submit', req, {}, this.props, accessToken));
   }
 
   public getUserData(accessToken: AccessToken, id: UserId): Promise<User> {
@@ -641,7 +614,7 @@ export class AcrolinxEndpoint {
 
   public setUserCustomFields(accessToken: AccessToken, id: UserId, customFieldValues: KeyValuePair[]): Promise<User> {
     const requestBody = { id, customFields: customFieldValues };
-    return getData(this.put('/api/v1/user/' + id, requestBody, {}, accessToken));
+    return getData(put('/api/v1/user/' + id, requestBody, {}, this.props, accessToken));
   }
 
   public getDocumentDescriptor(accessToken: AccessToken, id: DocumentId): Promise<DocumentDescriptor> {
@@ -656,11 +629,15 @@ export class AcrolinxEndpoint {
     customFieldValues: KeyValuePair[],
   ): Promise<DocumentDescriptor> {
     const requestBody = { id: documentId, customFields: customFieldValues };
-    return getData(this.put('/api/v1/document/' + documentId, requestBody, {}, accessToken));
+    return getData(put('/api/v1/document/' + documentId, requestBody, {}, this.props, accessToken));
   }
 
-  public async getJsonFromPath<T>(path: string, accessToken?: AccessToken): Promise<T> {
-    return this.getJsonFromUrl<T>(this.getUrlOfPath(path), accessToken);
+  public async getJsonFromPath<T>(
+    path: string,
+    accessToken?: AccessToken,
+    opts?: AdditionalRequestOptions,
+  ): Promise<T> {
+    return this.getJsonFromUrl<T>(getUrlOfPath(this.props, path), accessToken, opts);
   }
 
   public async getJsonFromUrl<T>(
@@ -668,8 +645,12 @@ export class AcrolinxEndpoint {
     accessToken?: AccessToken,
     opts: AdditionalRequestOptions = {},
   ): Promise<T> {
-    return this.fetchJson(url, {
-      headers: { ...this.getCommonHeaders(accessToken), ...opts.headers, ...this.props.additionalHeaders },
+    return fetchJson(url, this.props, {
+      headers: {
+        ...getCommonHeaders(this.props, accessToken, opts.serviceType),
+        ...opts.headers,
+        ...this.props.additionalHeaders,
+      },
     });
   }
 
@@ -679,16 +660,16 @@ export class AcrolinxEndpoint {
     opts: AdditionalRequestOptions = {},
   ): Promise<string> {
     const httpRequest = { url, method: 'GET' };
-    return this.fetch(url, {
-      headers: { ...this.getCommonHeaders(accessToken), ...opts.headers, ...this.props.additionalHeaders },
+    return fetchWithProps(url, this.props, {
+      headers: {
+        ...getCommonHeaders(this.props, accessToken, opts.serviceType),
+        ...opts.headers,
+        ...this.props.additionalHeaders,
+      },
     }).then(
       (res) => handleExpectedTextResponse(httpRequest, res),
       (error) => wrapFetchError(httpRequest, error),
     );
-  }
-
-  private getUrlOfPath(path: string) {
-    return this.props.acrolinxUrl + path;
   }
 
   private async pollForInteractiveSignIn(
@@ -795,94 +776,15 @@ export class AcrolinxEndpoint {
     return this.deleteUrl<CancelResponse>(process.links.cancel, accessToken, opts);
   }
 
-  private getCommonHeaders(accessToken?: AccessToken): StringMap {
-    const headers: StringMap = {
-      'Content-Type': 'application/json',
-      [HEADER_X_ACROLINX_BASE_URL]: this.props.acrolinxUrl,
-      [HEADER_X_ACROLINX_CLIENT]: this.getAcrolinxClientHttpHeader(),
-    };
-    if (this.props.clientLocale) {
-      headers[HEADER_X_ACROLINX_CLIENT_LOCALE] = this.props.clientLocale;
-    }
-    if (accessToken) {
-      headers[HEADER_X_ACROLINX_AUTH] = accessToken;
-      headers[HEADER_ACROLINX_ONE_AUTH] = `Bearer ${accessToken}`;
-    }
-    return headers;
-  }
-
-  private getAcrolinxClientHttpHeader() {
-    return `${this.props.client.signature}; ${this.props.client.version}`;
-  }
-
-  private async post<T>(path: string, body: {}, headers: StringMap = {}, accessToken?: AccessToken): Promise<T> {
-    return this.send<T>('POST', path, body, headers, accessToken);
-  }
-
-  private async put<T>(path: string, body: {}, headers: StringMap = {}, accessToken?: AccessToken): Promise<T> {
-    return this.send<T>('PUT', path, body, headers, accessToken);
-  }
-
-  private async send<T>(
-    method: 'POST' | 'PUT',
-    path: string,
-    body: {},
-    headers: StringMap = {},
-    accessToken?: AccessToken,
-  ): Promise<T> {
-    return this.fetchJson(this.getUrlOfPath(path), {
-      body: JSON.stringify(body),
-      headers: { ...this.getCommonHeaders(accessToken), ...headers, ...this.props.additionalHeaders },
-      method,
-    });
-  }
-
   private async deleteUrl<T>(url: string, accessToken: AccessToken, opts: AdditionalRequestOptions = {}): Promise<T> {
-    return this.fetchJson(url, {
-      headers: { ...this.getCommonHeaders(accessToken), ...opts.headers, ...this.props.additionalHeaders },
+    return fetchJson(url, this.props, {
+      headers: {
+        ...getCommonHeaders(this.props, accessToken, opts.serviceType),
+        ...opts.headers,
+        ...this.props.additionalHeaders,
+      },
       method: 'DELETE',
     });
-  }
-
-  private async fetchJson<T>(url: string, init: RequestInit = {}): Promise<T> {
-    const httpRequest = {
-      url,
-      method: init.method || 'GET',
-    };
-    return this.fetch(url, init).then(
-      (res) => {
-        console.log(res);
-        return handleExpectedJsonResponse(httpRequest, res);
-      },
-      (error) => {
-        console.log(error);
-        return wrapFetchError(httpRequest, error);
-      },
-    );
-  }
-
-  /* tslint:disable:no-console */
-  private async fetch(input: RequestInfo, init: RequestInit = {}): Promise<Response> {
-    const fetchFunction = this.props.fetch || fetch;
-    const fetchProps: RequestInit = {
-      ...init,
-      // Ensure credentials: 'same-origin' in old browsers: https://github.com/github/fetch#sending-cookies
-      credentials: this.props.corsWithCredentials ? 'include' : 'same-origin',
-      ...(this.props.additionalFetchProperties || {}),
-    };
-    if (this.props.enableHttpLogging) {
-      try {
-        console.log('Fetch', input, init, this.props.additionalFetchProperties);
-        const result = await fetchFunction(input, fetchProps);
-        console.log('Fetched Result', result.status);
-        return result;
-      } catch (error) {
-        console.error('Fetch Error', error);
-        throw error;
-      }
-    } else {
-      return fetchFunction(input, fetchProps);
-    }
   }
 
   /* tslint:enable:no-console */
@@ -890,19 +792,6 @@ export class AcrolinxEndpoint {
 
 function getData<T>(promise: Promise<SuccessResponse<T>>): Promise<T> {
   return promise.then((r) => r.data);
-}
-
-function getSigninRequestHeaders(options: SigninOptions = {}): StringMap {
-  if ('accessToken' in options && options.accessToken) {
-    return { [HEADER_X_ACROLINX_AUTH]: options.accessToken };
-  } else if (isSsoSigninOption(options)) {
-    return {
-      username: options.username,
-      password: options.genericToken,
-    };
-  } else {
-    return {};
-  }
 }
 
 function createCheckCanceledByClientError() {

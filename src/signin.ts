@@ -24,10 +24,22 @@ import {
   UserId,
   Username,
 } from './common-types';
+import { HEADER_X_ACROLINX_AUTH } from './headers';
 
 export type PollMoreResult = ProgressResponse;
 
 export type SigninPollResult = AsyncApiResponse<SigninSuccessData>;
+
+export interface SsoSigninOption {
+  username: string;
+  genericToken: string;
+}
+
+interface AccessTokenSigninOption {
+  accessToken?: string;
+}
+
+export type SigninOptions = AccessTokenSigninOption | SsoSigninOption;
 
 export function isSigninLinksResult(signinResult: SigninResult): signinResult is SigninLinksResult {
   return !!(signinResult as SigninLinksResult).links.interactive;
@@ -47,6 +59,12 @@ export interface SigninLinksData {
    * Duration in seconds
    */
   interactiveLinkTimeout: number;
+}
+
+export interface SignInInteractiveOptions {
+  onSignInUrl: (url: string) => void;
+  accessToken?: string;
+  timeoutMs?: number;
 }
 
 export interface SigninLinksResult extends ApiResponse<SigninLinksData> {
@@ -76,4 +94,22 @@ export interface SigninSuccessData {
   };
   authorizedUsing: AuthorizationType;
   links: {};
+}
+
+export function getSigninRequestHeaders(options: SigninOptions = {}): StringMap {
+  if ('accessToken' in options && options.accessToken) {
+    return { [HEADER_X_ACROLINX_AUTH]: options.accessToken };
+  } else if (isSsoSigninOption(options)) {
+    return {
+      username: options.username,
+      password: options.genericToken,
+    };
+  } else {
+    return {};
+  }
+}
+
+export function isSsoSigninOption(signinOptions: SigninOptions): signinOptions is SsoSigninOption {
+  const potentialSsoOptions = signinOptions as SsoSigninOption;
+  return !!(potentialSsoOptions.genericToken && potentialSsoOptions.username);
 }

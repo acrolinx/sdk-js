@@ -14,7 +14,9 @@
  * limitations under the License.
  */
 
-import { AcrolinxError, createErrorFromFetchResponse, ErrorType, HttpRequest } from '../errors';
+import { AccessToken, AcrolinxEndpointProps, ServiceType, StringMap } from '../index';
+import { AcrolinxError, createErrorFromFetchResponse, ErrorType, HttpRequest, wrapFetchError } from '../errors';
+import { getCommonHeaders } from '../headers';
 
 // TODO: Simplify as soon as all API Urls wrap the error
 export async function handleExpectedJsonResponse<T>(req: HttpRequest, res: Response): Promise<T> {
@@ -61,4 +63,90 @@ export function toJson<T>(httpRequest: HttpRequest, res: Response): T | Promise<
       type: ErrorType.InvalidJson,
     });
   });
+}
+
+/* tslint:disable:no-console */
+export async function fetchWithProps(
+  input: RequestInfo,
+  props: AcrolinxEndpointProps,
+  init: RequestInit = {},
+): Promise<Response> {
+  const fetchFunction = props.fetch || fetch;
+  const fetchProps: RequestInit = {
+    ...init,
+    // Ensure credentials: 'same-origin' in old browsers: https://github.com/github/fetch#sending-cookies
+    credentials: props.corsWithCredentials ? 'include' : 'same-origin',
+    ...(props.additionalFetchProperties || {}),
+  };
+  if (props.enableHttpLogging) {
+    try {
+      console.log('Fetch', input, init, props.additionalFetchProperties);
+      const result = await fetchFunction(input, fetchProps);
+      console.log('Fetched Result', result.status);
+      return result;
+    } catch (error) {
+      console.error('Fetch Error', error);
+      throw error;
+    }
+  } else {
+    return fetchFunction(input, fetchProps);
+  }
+}
+
+export async function fetchJson<T>(url: string, props: AcrolinxEndpointProps, init: RequestInit = {}): Promise<T> {
+  const httpRequest = {
+    url,
+    method: init.method || 'GET',
+  };
+  return fetchWithProps(url, props, init).then(
+    (res) => {
+      console.log(res);
+      return handleExpectedJsonResponse(httpRequest, res);
+    },
+    (error) => {
+      console.log(error);
+      return wrapFetchError(httpRequest, error);
+    },
+  );
+}
+
+export async function send<T>(
+  method: 'POST' | 'PUT',
+  path: string,
+  body: {},
+  headers: StringMap = {},
+  props: AcrolinxEndpointProps,
+  accessToken?: AccessToken,
+  serviceType?: ServiceType,
+): Promise<T> {
+  return fetchJson(getUrlOfPath(props, path), props, {
+    body: JSON.stringify(body),
+    headers: { ...getCommonHeaders(props, accessToken, serviceType), ...headers, ...props.additionalHeaders },
+    method,
+  });
+}
+
+export function getUrlOfPath(props: AcrolinxEndpointProps, path: string) {
+  return props.acrolinxUrl + path;
+}
+
+export async function post<T>(
+  path: string,
+  body: {},
+  headers: StringMap = {},
+  props: AcrolinxEndpointProps,
+  accessToken?: AccessToken,
+  serviceType?: ServiceType,
+): Promise<T> {
+  return send<T>('POST', path, body, headers, props, accessToken, serviceType);
+}
+
+export async function put<T>(
+  path: string,
+  body: {},
+  headers: StringMap = {},
+  props: AcrolinxEndpointProps,
+  accessToken?: AccessToken,
+): Promise<T> {
+  return send<T>('PUT', path, body, headers, props, accessToken);
 }
