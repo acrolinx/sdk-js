@@ -36,3 +36,26 @@ export type ChatCompletionRequest = {
 export interface WriteResponse {
   response: string;
 }
+
+export interface AIServiceError {
+  httpErrorCode: number;
+  errorId: AIServiceErrorTypes;
+  errorName: string;
+  errorDescription: string;
+}
+
+export enum AIServiceErrorTypes {
+  AI_PROVIDER_ERROR = 'AI_PROVIDER_ERROR',
+  INVALID_USER_INPUT = 'INVALID_USER_INPUT',
+  BUDGET_EXCEEDED = 'BUDGET_EXCEEDED'
+}
+
+export function isAIServiceError(error: any): error is AIServiceError {
+  return (
+    error &&
+    typeof error.httpErrorCode === 'number' &&
+    Object.values(AIServiceErrorTypes).includes(error.errorId) &&
+    typeof error.errorName === 'string' &&
+    typeof error.errorDescription === 'string'
+  )
+}
