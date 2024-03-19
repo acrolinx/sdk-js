@@ -38,24 +38,14 @@ export interface WriteResponse {
 }
 
 export interface AIServiceError {
-  httpErrorCode: number;
-  errorId: AIServiceErrorTypes;
-  errorName: string;
-  errorDescription: string;
+  code: number;
+  message: string;
 }
 
 export enum AIServiceErrorTypes {
-  AI_PROVIDER_ERROR = 'AI_PROVIDER_ERROR',
-  INVALID_USER_INPUT = 'INVALID_USER_INPUT',
-  BUDGET_EXCEEDED = 'BUDGET_EXCEEDED',
+  AI_SERVICE_ERROR = 'AI_SERVICE_ERROR',
 }
 
 export function isAIServiceError(error: any): error is AIServiceError {
-  return (
-    error &&
-    typeof error.httpErrorCode === 'number' &&
-    Object.values(AIServiceErrorTypes).includes(error.errorId) &&
-    typeof error.errorName === 'string' &&
-    typeof error.errorDescription === 'string'
-  );
+  return error && typeof error.code === 'number' && typeof error.message === 'string';
 }
