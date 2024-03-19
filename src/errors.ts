@@ -15,6 +15,7 @@
  */
 
 import { DocumentId } from './document-descriptor';
+import { isAIServiceError } from  './ai-service'
 
 /**
  * See also https://github.com/acrolinx/server-api-spec/blob/master/apiary.apib
@@ -140,7 +141,15 @@ export function createErrorFromFetchResponse(
       type: jsonBody.type,
       documentId: jsonBody.documentId,
     });
-  } else if (
+  }else if (isAIServiceError(jsonBody)){
+    return new AcrolinxError( {
+      detail: jsonBody.errorDescription,
+      status: jsonBody.httpErrorCode,
+      type: jsonBody.errorId,
+      title: jsonBody.errorName,
+      httpRequest: req
+    });
+  }else if (
     jsonBody &&
     typeof jsonBody.error === 'string' &&
     new RegExp(/realms\/.+?\/protocol\/openid-connect/).test(req.url)

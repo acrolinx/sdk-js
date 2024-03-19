@@ -116,10 +116,12 @@ describe('AI-service', () => {
       const aiRewriteContext = DUMMY_AI_REWRITE_CONTEXT;
 
       mockFetch.mock(getGetAIChatCompletionMatcher(count, internalName), {
-        status: 401,
-        throws: {
-          code: 401,
-          message: 'Unauthorized',
+        status: 500,
+        body: {
+          httpErrorCode: 500,
+          errorId: 'AI_PROVIDER_ERROR',
+          errorName: 'Server unresponsive',
+          errorDescription: 'Server mainatainance window',
         },
       });
 
@@ -136,7 +138,7 @@ describe('AI-service', () => {
           },
           DUMMY_ACCESS_TOKEN,
         ),
-      ).rejects.toThrow('Http Connection Problem');
+      ).rejects.toThrow('Server unresponsive');
     });
   });
 });
