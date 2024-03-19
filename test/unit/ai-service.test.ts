@@ -138,5 +138,37 @@ describe('AI-service', () => {
         ),
       ).rejects.toThrow('There was an error processing your request. It has been logged (ID some-random-id).');
     });
+
+    it('should throw if response was filtered', async () => {
+      endpoint = new AcrolinxEndpoint(DUMMY_ENDPOINT_PROPS);
+      const count = 1;
+      const internalName = 'simplefy';
+      const aiRephraseHint = 'some invalid data';
+      const targetUuid = '123e4567-e89b-12d3-a456-426614174000';
+      const aiRewriteContext = DUMMY_AI_REWRITE_CONTEXT;
+
+      mockFetch.mock(getGetAIChatCompletionMatcher(count, internalName), {
+        status: 400,
+        body: {
+          code: 400,
+          message: 'The response was filtered...bla bla',
+        },
+      });
+
+      await expect(
+        endpoint.getAIChatCompletion(
+          {
+            issue: {
+              internalName,
+              aiRephraseHint,
+              aiRewriteContext,
+            } as unknown as Issue,
+            count,
+            targetUuid,
+          },
+          DUMMY_ACCESS_TOKEN,
+        ),
+      ).rejects.toThrow('The response was filtered...bla bla');
+    });
   });
 });
