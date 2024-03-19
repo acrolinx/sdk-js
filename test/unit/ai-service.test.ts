@@ -119,7 +119,7 @@ describe('AI-service', () => {
         status: 500,
         body: {
           code: 500,
-          message: 'There was an error processing your request. It has been logged (ID bfa13a2ca31b9c49).',
+          message: 'There was an error processing your request. It has been logged (ID some-random-id).',
         },
       });
 
@@ -136,7 +136,7 @@ describe('AI-service', () => {
           },
           DUMMY_ACCESS_TOKEN,
         ),
-      ).rejects.toThrow('There was an error processing your request. It has been logged (ID bfa13a2ca31b9c49).');
+      ).rejects.toThrow('There was an error processing your request. It has been logged (ID some-random-id).');
     });
   });
 });
