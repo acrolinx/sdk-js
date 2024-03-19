@@ -84,12 +84,9 @@ describe('AI-service', () => {
 
     it('correct response', async () => {
       const aiResponse = 'some responds';
-      const response = createDummyAIServiceRequest(500, {
-        status: 200,
-        body: { aiResponse },
-      });
+      const response = await createDummyAIServiceRequest(200, { response: aiResponse });
 
-      expect((await response).response).toBe(response);
+      expect(response.response).toBe(aiResponse);
     });
     it('error response', async () => {
       const response = createDummyAIServiceRequest(500, {
