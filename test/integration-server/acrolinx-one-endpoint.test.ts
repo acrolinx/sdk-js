@@ -2,7 +2,7 @@ import { DeviceAuthResponse, DeviceSignInSuccessResponse } from '../../src/signi
 import { AcrolinxEndpoint, CommonIssue, DEVELOPMENT_SIGNATURE, StringMap } from '../../src';
 import * as dotenv from 'dotenv';
 import 'cross-fetch/polyfill';
-import { AIService } from 'src/services/ai-service/ai-service';
+import { AIService } from '../../src/services/ai-service/ai-service';
 
 dotenv.config();
 
