@@ -14,37 +14,7 @@
  * limitations under the License.
  */
 
-import { CommonIssue } from './check';
-
-export interface AiFeatures {
-  ai: boolean;
-  aiAssistant: boolean;
-}
-
-export interface IsAIEnabledInformation {
-  tenant: string;
-  value: boolean;
-  userHasPrivilege: boolean;
-}
-
-export type ChatCompletionRequest = {
-  issue: CommonIssue;
-  count: number;
-  targetUuid: string;
-};
-
-export interface WriteResponse {
-  response: string;
-}
-
-export interface AIServiceError {
-  code: number;
-  message: string;
-}
-
-export enum AIServiceErrorTypes {
-  AI_SERVICE_ERROR = 'AI_SERVICE_ERROR',
-}
+import { AIServiceError } from './ai-service.types';
 
 export function isAIServiceError(error: any): error is AIServiceError {
   return error && typeof error.code === 'number' && typeof error.message === 'string';
