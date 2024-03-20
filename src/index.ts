@@ -21,7 +21,6 @@ import {
   AppAccessTokenResult,
   AppAccessTokenValidationResult,
 } from './addons';
-import { AiFeatures, ChatCompletionRequest, IsAIEnabledInformation, WriteResponse } from './ai-service';
 import {
   CheckingCapabilities,
   CheckType,
@@ -230,44 +229,6 @@ export class AcrolinxEndpoint {
 
   public async getPlatformInformation(): Promise<PlatformInformation> {
     return getData<PlatformInformation>(this.getJsonFromPath('/api/v1/'));
-  }
-
-  public async getAiFeatures(accessToken: string): Promise<AiFeatures> {
-    return this.getJsonFromPath<AiFeatures>('/ai-service/api/v1/tenants/features/ai', accessToken, {
-      serviceType: ServiceType.ACROLINX_ONE,
-    });
-  }
-
-  public async getAIEnabled(accessToken: string): Promise<IsAIEnabledInformation> {
-    return this.getJsonFromPath('/ai-service/api/v1/tenants/feature/ai-enabled?privilege=generate', accessToken, {
-      serviceType: ServiceType.ACROLINX_ONE,
-    });
-  }
-
-  public async isAIEnabled(accessToken: string): Promise<boolean> {
-    try {
-      const response = await this.getAIEnabled(accessToken);
-      return response.value && response.userHasPrivilege;
-    } catch {
-      return false;
-    }
-  }
-
-  public async getAIChatCompletion(params: ChatCompletionRequest, accessToken: string): Promise<WriteResponse> {
-    const { aiRephraseHint: prompt, internalName } = params.issue;
-    const { targetUuid } = params;
-
-    return post(
-      `/ai-service/api/v1/ai/chat-completions?count=${params.count}&issueInternalName=${internalName}`,
-      {
-        prompt,
-        targetUuid,
-      },
-      {},
-      this.props,
-      accessToken,
-      ServiceType.ACROLINX_ONE,
-    );
   }
 
   public async signInWithSSO(genericToken: string, username: string) {

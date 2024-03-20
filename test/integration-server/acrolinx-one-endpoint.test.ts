@@ -2,6 +2,7 @@ import { DeviceAuthResponse, DeviceSignInSuccessResponse } from '../../src/signi
 import { AcrolinxEndpoint, CommonIssue, DEVELOPMENT_SIGNATURE, StringMap } from '../../src';
 import * as dotenv from 'dotenv';
 import 'cross-fetch/polyfill';
+import { AIService } from '../../src/services/ai-service/ai-service';
 
 dotenv.config();
 
@@ -117,8 +118,9 @@ describe('Acrolinx One E2E Tests', () => {
 
     it('getAiFeatures returns whether certain AI features are enabled', async () => {
       const ep = createEndpoint(ACROLINX_ONE_SERVER_URL);
+      const aiService = new AIService(ep);
 
-      const aiFeatures = await ep.getAiFeatures(KEYCLOAK_ACCESS_TOKEN!);
+      const aiFeatures = await aiService.getAiFeatures(KEYCLOAK_ACCESS_TOKEN!);
 
       expect(typeof aiFeatures.ai).toEqual('boolean');
       expect(typeof aiFeatures.aiAssistant).toEqual('boolean');
@@ -129,8 +131,9 @@ describe('Acrolinx One E2E Tests', () => {
         Authorization: `Bearer ${KEYCLOAK_ACCESS_TOKEN!}`,
       };
       const ep = createEndpoint(ACROLINX_ONE_SERVER_URL, headers);
+      const aiService = new AIService(ep);
 
-      const aiResult = await ep.getAIEnabled(KEYCLOAK_ACCESS_TOKEN!);
+      const aiResult = await aiService.getAIEnabled(KEYCLOAK_ACCESS_TOKEN!);
       expect(aiResult.tenant).toBeDefined();
       expect(aiResult.value).toBeDefined();
       expect(aiResult.userHasPrivilege).toBeDefined();
@@ -141,7 +144,8 @@ describe('Acrolinx One E2E Tests', () => {
         Authorization: `Bearer ${KEYCLOAK_ACCESS_TOKEN!}`,
       };
       const ep = createEndpoint(ACROLINX_ONE_SERVER_URL, headers);
-      const aiResult = await ep.getAIChatCompletion(
+      const aiService = new AIService(ep);
+      const aiResult = await aiService.getAIChatCompletion(
         {
           issue: {
             aiRephraseHint:

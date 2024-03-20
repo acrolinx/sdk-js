@@ -18,10 +18,12 @@ import { AcrolinxEndpoint, Issue } from '../../src/index';
 import { DUMMY_ACCESS_TOKEN } from '../test-utils/mock-server';
 import { DUMMY_ENDPOINT_PROPS } from './common';
 import { DUMMY_AI_REWRITE_CONTEXT } from '../test-utils/dummy-data';
-import { WriteResponse } from 'src/ai-service';
+import { WriteResponse } from '../../src/services/ai-service/ai-service.types';
+import { AIService } from '../../src/services/ai-service/ai-service';
 
 describe('AI-service', () => {
   let endpoint: AcrolinxEndpoint = new AcrolinxEndpoint(DUMMY_ENDPOINT_PROPS);
+  const aiService = new AIService(endpoint);
 
   afterEach(() => {
     mockFetch.restore();
@@ -35,7 +37,7 @@ describe('AI-service', () => {
         body: { value: true, tenant: 'int-1', userHasPrivilege: true },
       });
 
-      const response = await endpoint.isAIEnabled(DUMMY_ACCESS_TOKEN);
+      const response = await aiService.isAIEnabled(DUMMY_ACCESS_TOKEN);
       expect(response).toBe(true);
     });
 
@@ -44,7 +46,7 @@ describe('AI-service', () => {
         status: 200,
         body: { value: true, tenant: 'int-1', userHasPrivilege: false },
       });
-      const response1 = await endpoint.isAIEnabled(DUMMY_ACCESS_TOKEN);
+      const response1 = await aiService.isAIEnabled(DUMMY_ACCESS_TOKEN);
       expect(response1).toBe(false);
       mockFetch.restore();
 
@@ -52,7 +54,7 @@ describe('AI-service', () => {
         status: 200,
         body: { value: false, tenant: 'int-1', userHasPrivilege: true },
       });
-      const response2 = await endpoint.isAIEnabled(DUMMY_ACCESS_TOKEN);
+      const response2 = await aiService.isAIEnabled(DUMMY_ACCESS_TOKEN);
       expect(response2).toBe(false);
       mockFetch.restore();
 
@@ -60,7 +62,7 @@ describe('AI-service', () => {
         status: 200,
         body: { value: false, tenant: 'int-1', userHasPrivilege: false },
       });
-      const response3 = await endpoint.isAIEnabled(DUMMY_ACCESS_TOKEN);
+      const response3 = await aiService.isAIEnabled(DUMMY_ACCESS_TOKEN);
       expect(response3).toBe(false);
     });
 
@@ -73,7 +75,7 @@ describe('AI-service', () => {
           message: 'missing privilege GENERATE',
         },
       });
-      const response = await endpoint.isAIEnabled(DUMMY_ACCESS_TOKEN);
+      const response = await aiService.isAIEnabled(DUMMY_ACCESS_TOKEN);
       expect(response).toBe(false);
     });
   });
@@ -123,7 +125,7 @@ describe('AI-service', () => {
         body: dummyResponseBody,
       });
 
-      return endpoint.getAIChatCompletion(
+      return aiService.getAIChatCompletion(
         {
           issue: {
             internalName,

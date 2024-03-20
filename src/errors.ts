@@ -15,7 +15,8 @@
  */
 
 import { DocumentId } from './document-descriptor';
-import { AIServiceErrorTypes, isAIServiceError } from './ai-service';
+import { AIServiceErrorTypes } from './services/ai-service/ai-service.types';
+import { isAIServiceError } from './services/ai-service/ai-service.utils';
 
 /**
  * See also https://github.com/acrolinx/server-api-spec/blob/master/apiary.apib
