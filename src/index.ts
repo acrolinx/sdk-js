@@ -138,6 +138,9 @@ export {
 };
 
 export { HEADER_X_ACROLINX_APP_SIGNATURE };
+export * from './services/ai-service/ai-service';
+export * from './services/ai-service/ai-service.types';
+export * from './services/ai-service/ai-service.utils';
 
 export * from './check';
 export * from './capabilities';

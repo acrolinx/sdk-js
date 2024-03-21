@@ -31,21 +31,18 @@ export const DUMMY_AI_REWRITE_CONTEXT = [
   {
     sourceId: '123',
     sourceType: 'text',
-    part: 'The beginning of the story',
     begin: 0,
     end: 25,
     externalContent: [
       {
         sourceId: '124',
         sourceType: 'quote',
-        part: 'A quote inside the story',
         begin: 5,
         end: 27,
         externalContent: [
           {
             sourceId: '125',
             sourceType: 'text',
-            part: 'A nested quote detail',
             begin: 10,
             end: 30,
             externalContent: [],
