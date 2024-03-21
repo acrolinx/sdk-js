@@ -224,7 +224,6 @@ export interface ExternalContentMatch {
 export interface RewriteContextPart {
   sourceId?: string;
   sourceType?: string;
-  part: string;
   begin: number;
   end: number;
   externalContent?: RewriteContextPart[];
