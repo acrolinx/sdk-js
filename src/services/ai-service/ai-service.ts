@@ -53,18 +53,22 @@ export class AIService {
   public async getAIChatCompletion(params: ChatCompletionRequest, accessToken: string): Promise<WriteResponse> {
     const { aiRephraseHint: prompt, internalName } = params.issue;
     const { targetUuid } = params;
-
-    return post(
-      this.constructFullPath(`/ai/chat-completions?count=${params.count}&issueInternalName=${internalName}`),
-      {
-        prompt,
-        targetUuid,
-      },
-      {},
-      this.endpoint.props,
-      accessToken,
-      ServiceType.ACROLINX_ONE,
-    );
+  
+    try {
+      return await post(
+        this.constructFullPath(`/ai/chat-completions?count=${params.count}&issueInternalName=${internalName}`),
+        { prompt, targetUuid },
+        {},
+        this.endpoint.props,
+        accessToken,
+        ServiceType.ACROLINX_ONE,
+      );
+    } catch (error) {
+      if (error.response && error.response.data) {
+        throw new Error(JSON.stringify(error.response.data));
+      }
+      throw error;
+    }
   }
 
   private constructFullPath(path: string): string {

@@ -109,6 +109,19 @@ describe('AI-service', () => {
       await expect(response).rejects.toThrow('The response was filtered...bla bla');
     });
 
+    it('should throw with the error description if a specific error response is received', async () => {
+      const errorResponse = {
+        httpErrorCode: 429,
+        errorId: 'BUDGET_EXCEEDED',
+        errorName: 'API Call Budget Exceeded',
+        errorDescription: 'Exceeded the allocated budget to generate suggestions. Please review your usage or upgrade your plan.',
+      };
+    
+      const response = await createDummyAIServiceRequest(429, errorResponse);
+    
+      await expect(response).rejects.toThrow(errorResponse.errorDescription);
+    });
+
     const createDummyAIServiceRequest = async (
       responseStatus: number,
       dummyResponseBody: any,
