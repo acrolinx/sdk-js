@@ -34,7 +34,7 @@ describe('Acrolinx One E2E Tests', () => {
     it('getAiFeatures returns whether certain AI features are enabled', async () => {
       const aiService = new AIService(endpoint);
 
-      const aiFeatures = await aiService.getAiFeatures(ACROLINX_API_TOKEN!);
+      const aiFeatures = await aiService.getAiFeatures(ACROLINX_API_TOKEN);
 
       expect(typeof aiFeatures.ai).toEqual('boolean');
       expect(typeof aiFeatures.aiAssistant).toEqual('boolean');
@@ -43,7 +43,7 @@ describe('Acrolinx One E2E Tests', () => {
     it('check if the ai service is activated', async () => {
       const aiService = new AIService(endpoint);
 
-      const aiResult = await aiService.getAIEnabled(ACROLINX_API_TOKEN!);
+      const aiResult = await aiService.getAIEnabled(ACROLINX_API_TOKEN);
       expect(aiResult.tenant).toBeDefined();
       expect(aiResult.value).toBeDefined();
       expect(aiResult.userHasPrivilege).toBeDefined();
@@ -61,7 +61,7 @@ describe('Acrolinx One E2E Tests', () => {
           count: 1,
           targetUuid: '123e4567-e89b-12d3-a456-426614174000',
         },
-        ACROLINX_API_TOKEN!,
+        ACROLINX_API_TOKEN,
       );
       expect(aiResult.response).toBeDefined();
     }, 100000);
