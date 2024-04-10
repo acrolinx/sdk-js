@@ -1,19 +1,16 @@
-import { DeviceAuthResponse, DeviceSignInSuccessResponse } from '../../src/signin-device-grant';
-import { AcrolinxEndpoint, CommonIssue, DEVELOPMENT_SIGNATURE, StringMap } from '../../src';
+import { AcrolinxEndpoint, CommonIssue, DEVELOPMENT_SIGNATURE } from '../../src';
 import * as dotenv from 'dotenv';
 import 'cross-fetch/polyfill';
 import { AIService } from '../../src/services/ai-service/ai-service';
 
 dotenv.config();
 
-const ACROLINX_ONE_SERVER_URL = process.env.ACROLINX_ONE_SERVER_URL || '';
-const KEYCLOAK_TENANT_ID = process.env.KEYCLOAK_TENANT_ID;
-const KEYCLOAK_CLIENT_ID = process.env.KEYCLOAK_CLIENT_ID || '';
-const KEYCLOAK_REFRESH_TOKEN = process.env.KEYCLOAK_REFRESH_TOKEN;
-const KEYCLOAK_ACCESS_TOKEN = process.env.KEYCLOAK_ACCESS_TOKEN;
+const TEST_SERVER_URL = process.env.TEST_SERVER_URL || ''; /* Add here your own test server URL */
+const ACROLINX_API_TOKEN = process.env.ACROLINX_API_TOKEN || '';
+
 export const ACROLINX_DEV_SIGNATURE = process.env.ACROLINX_DEV_SIGNATURE;
 
-function createEndpoint(acrolinxUrl: string, headers?: StringMap) {
+function createEndpoint(acrolinxUrl: string) {
   return new AcrolinxEndpoint({
     acrolinxUrl,
     enableHttpLogging: true,
@@ -21,130 +18,39 @@ function createEndpoint(acrolinxUrl: string, headers?: StringMap) {
       signature: ACROLINX_DEV_SIGNATURE || DEVELOPMENT_SIGNATURE,
       version: '1.2.3.666',
     },
-    additionalHeaders: headers,
   });
 }
 
 describe('Acrolinx One E2E Tests', () => {
   let endpoint: AcrolinxEndpoint;
 
-  const verifyDeviceGrantUserActionInfo = (deviceGrantUserAction: DeviceAuthResponse) => {
-    expect(deviceGrantUserAction.verificationUrl).toBeDefined();
-    expect(deviceGrantUserAction.verificationUrlComplete).toBeDefined();
-    expect(deviceGrantUserAction.userCode).toBeDefined();
-    expect(deviceGrantUserAction.pollingUrl).toBeDefined();
-    expect(deviceGrantUserAction.deviceCode).toBeDefined();
-    expect(deviceGrantUserAction.expiresInSeconds).toBeDefined();
-    expect(deviceGrantUserAction.pollingIntervalInSeconds).toBeDefined();
-  };
-
-  const verifySignInDeviceGrantSuccess = (signInDeviceGrant: DeviceSignInSuccessResponse) => {
-    expect(signInDeviceGrant.accessToken).toBeDefined();
-    expect(signInDeviceGrant.refreshToken).toBeDefined();
-    expect(signInDeviceGrant.refreshToken).not.toEqual(KEYCLOAK_REFRESH_TOKEN);
-    expect(signInDeviceGrant.accessTokenExpiryInSeconds).toBeDefined();
-    expect(signInDeviceGrant.refreshTokenExpiryInSeconds).toBeDefined();
-    expect(signInDeviceGrant.scope).toBeDefined();
-    expect(signInDeviceGrant.sessionState).toBeDefined();
-    expect(signInDeviceGrant.tokenType).toBeDefined();
-    expect(signInDeviceGrant.tokenType.toLowerCase()).toEqual('bearer');
-  };
-
   beforeEach(() => {
-    endpoint = createEndpoint(ACROLINX_ONE_SERVER_URL);
-  });
-  describe('Sign in with device grant', () => {
-    it('get device verification url', async () => {
-      const deviceGrantUserAction = (await endpoint.deviceAuthSignIn({
-        tenantId: KEYCLOAK_TENANT_ID,
-        clientId: KEYCLOAK_CLIENT_ID,
-      })) as DeviceAuthResponse;
-      console.log(deviceGrantUserAction);
-
-      verifyDeviceGrantUserActionInfo(deviceGrantUserAction);
-    });
-
-    // This test requires valid refresh token
-    it.skip('validate refresh token', async () => {
-      const signInDeviceGrant = (await endpoint.deviceAuthSignIn({
-        tenantId: KEYCLOAK_TENANT_ID,
-        clientId: KEYCLOAK_CLIENT_ID,
-        refreshToken: KEYCLOAK_REFRESH_TOKEN,
-      })) as DeviceSignInSuccessResponse;
-
-      console.log(signInDeviceGrant);
-      verifySignInDeviceGrantSuccess(signInDeviceGrant);
-    });
-
-    it('invalid refresh token triggers new device grant', async () => {
-      const deviceGrantUserAction = (await endpoint.deviceAuthSignIn({
-        tenantId: KEYCLOAK_TENANT_ID,
-        clientId: KEYCLOAK_CLIENT_ID,
-        refreshToken: 'invalid',
-      })) as DeviceAuthResponse;
-      console.log(deviceGrantUserAction);
-
-      verifyDeviceGrantUserActionInfo(deviceGrantUserAction);
-    });
-
-    it('poll for sign in result', async () => {
-      const deviceGrantUserAction = (await endpoint.deviceAuthSignIn({
-        tenantId: KEYCLOAK_TENANT_ID,
-        clientId: KEYCLOAK_CLIENT_ID,
-      })) as DeviceAuthResponse;
-      console.log(deviceGrantUserAction);
-
-      verifyDeviceGrantUserActionInfo(deviceGrantUserAction);
-
-      deviceGrantUserAction.expiresInSeconds = 10;
-      await expect(endpoint.pollDeviceSignInCompletion(KEYCLOAK_CLIENT_ID, deviceGrantUserAction)).rejects.toThrow();
-    }, 30000);
-
-    // This test requires valid keycloak access token
-    it.skip('sign-in with auth header', async () => {
-      const headers: StringMap = {
-        Authorization: `Bearer ${KEYCLOAK_ACCESS_TOKEN!}`,
-      };
-      const ep = createEndpoint(ACROLINX_ONE_SERVER_URL, headers);
-      const result = await ep.signInWithHeaders();
-
-      expect(result).toBeDefined();
-      expect(result.data.accessToken).toBeDefined();
-    });
+    endpoint = createEndpoint(TEST_SERVER_URL);
   });
 
   describe.skip('AI Service Integration Tests', () => {
     // This tests requires valid keycloak access token
 
     it('getAiFeatures returns whether certain AI features are enabled', async () => {
-      const ep = createEndpoint(ACROLINX_ONE_SERVER_URL);
-      const aiService = new AIService(ep);
+      const aiService = new AIService(endpoint);
 
-      const aiFeatures = await aiService.getAiFeatures(KEYCLOAK_ACCESS_TOKEN!);
+      const aiFeatures = await aiService.getAiFeatures(ACROLINX_API_TOKEN!);
 
       expect(typeof aiFeatures.ai).toEqual('boolean');
       expect(typeof aiFeatures.aiAssistant).toEqual('boolean');
     });
 
     it('check if the ai service is activated', async () => {
-      const headers: StringMap = {
-        Authorization: `Bearer ${KEYCLOAK_ACCESS_TOKEN!}`,
-      };
-      const ep = createEndpoint(ACROLINX_ONE_SERVER_URL, headers);
-      const aiService = new AIService(ep);
+      const aiService = new AIService(endpoint);
 
-      const aiResult = await aiService.getAIEnabled(KEYCLOAK_ACCESS_TOKEN!);
+      const aiResult = await aiService.getAIEnabled(ACROLINX_API_TOKEN!);
       expect(aiResult.tenant).toBeDefined();
       expect(aiResult.value).toBeDefined();
       expect(aiResult.userHasPrivilege).toBeDefined();
     });
 
     it('get a chat completion from the ai service', async () => {
-      const headers: StringMap = {
-        Authorization: `Bearer ${KEYCLOAK_ACCESS_TOKEN!}`,
-      };
-      const ep = createEndpoint(ACROLINX_ONE_SERVER_URL, headers);
-      const aiService = new AIService(ep);
+      const aiService = new AIService(endpoint);
       const aiResult = await aiService.getAIChatCompletion(
         {
           issue: {
@@ -155,7 +61,7 @@ describe('Acrolinx One E2E Tests', () => {
           count: 1,
           targetUuid: '123e4567-e89b-12d3-a456-426614174000',
         },
-        KEYCLOAK_ACCESS_TOKEN!,
+        ACROLINX_API_TOKEN!,
       );
       expect(aiResult.response).toBeDefined();
     }, 100000);

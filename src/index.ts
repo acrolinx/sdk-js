@@ -84,28 +84,11 @@ import {
   SigninSuccessData,
   SigninSuccessResult,
 } from './signin';
-import {
-  DeviceAuthResponse,
-  DeviceAuthResponseRaw,
-  IntServiceDiscovery,
-  DeviceSignInSuccessResponse,
-  DeviceSignInOptions,
-  DeviceSignInOptionsInteractive,
-  DeviceSignInSuccessResponseRaw,
-  generateDeviceAuthUrl,
-  generateTokenUrl,
-  getClientId,
-  getTenantId,
-  isSignInDeviceGrantSuccess,
-  tidyKeyCloakSuccessResponse,
-  tidyKeyCloakDeviceAuthResponse,
-  JWTAcrolinxPayload,
-} from './signin-device-grant';
+
 import { User } from './user';
 import { fetchJson, fetchWithProps, getUrlOfPath, handleExpectedTextResponse, post, put } from './utils/fetch';
 import * as logging from './utils/logging';
 import { waitMs } from './utils/mixed-utils';
-import { jwtDecode } from 'jwt-decode';
 
 export * from './dictionary';
 export * from './extraction';
@@ -176,7 +159,6 @@ export interface AcrolinxEndpointProps {
 
   corsWithCredentials?: boolean;
   additionalFetchProperties?: any;
-  additionalHeaders?: StringMap;
   fetch?: typeof fetch;
 
   /**
@@ -247,32 +229,6 @@ export class AcrolinxEndpoint {
     }
   }
 
-  public async signInWithHeaders(): Promise<SigninSuccessResult> {
-    if (!this.props.additionalHeaders) {
-      throw new AcrolinxError({
-        type: ErrorType.SSO,
-        title: 'Headers missing',
-        detail: 'Additional headers must be provided',
-      });
-    }
-
-    const authHeader = this.props.additionalHeaders['Authorization'];
-    if (!authHeader) {
-      throw new AcrolinxError({
-        type: ErrorType.SSO,
-        title: 'Headers missing',
-        detail: 'Additional headers must be provided',
-      });
-    }
-
-    const jwtToken = authHeader.split(' ')?.[1];
-    const decodedToken = jwtDecode<JWTAcrolinxPayload>(jwtToken);
-    const username = decodedToken.preferred_username;
-    const password = decodedToken.genericPassword;
-
-    return await this.signInWithSSO(password, username);
-  }
-
   public async singInInteractive(opts: SignInInteractiveOptions): Promise<SigninSuccessData> {
     const signinResult = await this.signin({ accessToken: opts.accessToken });
 
@@ -283,134 +239,6 @@ export class AcrolinxEndpoint {
     opts.onSignInUrl(signinResult.links.interactive);
 
     return this.pollForInteractiveSignIn(signinResult, opts.timeoutMs || 60 * 60 * 1000);
-  }
-
-  private async fetchLoginInfo(): Promise<IntServiceDiscovery> {
-    return await fetchJson(getUrlOfPath(this.props, '/int-service/api/v1/discovery'), this.props, {
-      method: 'GET',
-    });
-  }
-
-  private async fetchDeviceGrantUserAction(deviceGrantUrl: string, clientId: string): Promise<DeviceAuthResponseRaw> {
-    return await fetchJson(deviceGrantUrl, this.props, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: new URLSearchParams({
-        client_id: clientId,
-      }),
-    });
-  }
-
-  public async deviceAuthSignIn(opts: DeviceSignInOptions): Promise<DeviceAuthResponse | DeviceSignInSuccessResponse> {
-    const tenantId = getTenantId(this.props.acrolinxUrl, opts);
-    const intSeriveDiscovery: IntServiceDiscovery = await this.fetchLoginInfo();
-    const clientId = getClientId(opts);
-
-    const tokenValidationResult = await this.verifyTokenIsValid(
-      generateTokenUrl(intSeriveDiscovery, tenantId),
-      clientId,
-      opts.refreshToken,
-    );
-
-    if (tokenValidationResult) {
-      return tokenValidationResult;
-    }
-
-    const deviceAuthResponse = await this.fetchDeviceGrantUserAction(
-      generateDeviceAuthUrl(intSeriveDiscovery, tenantId),
-      clientId,
-    );
-
-    return tidyKeyCloakDeviceAuthResponse(generateTokenUrl(intSeriveDiscovery, tenantId), deviceAuthResponse);
-  }
-
-  private async verifyTokenIsValid(
-    url: string,
-    clientId: string,
-    refreshToken: string | undefined,
-  ): Promise<DeviceSignInSuccessResponse | undefined> {
-    try {
-      const response = await this.fetchTokenKeyCloak(
-        url,
-        new URLSearchParams({
-          grant_type: 'refresh_token',
-          client_id: clientId,
-          refresh_token: refreshToken ?? '',
-        }),
-      );
-      return tidyKeyCloakSuccessResponse(response);
-    } catch (error: unknown) {
-      const acrolinxError = error as AcrolinxError;
-      if ((acrolinxError.type as ErrorType) === ErrorType.InvalidGrant) {
-        console.log('Refresh token invalid, fetching new device code');
-        return undefined;
-      } else {
-        throw error;
-      }
-    }
-  }
-
-  public async deviceAuthSignInInteractive(opts: DeviceSignInOptionsInteractive): Promise<DeviceSignInSuccessResponse> {
-    const result = await this.deviceAuthSignIn(opts);
-    const clientId = opts.clientId ?? 'device-sign-in';
-
-    if (isSignInDeviceGrantSuccess(result)) {
-      return result;
-    }
-    opts.onDeviceGrantUserAction(result);
-    return await this.pollDeviceSignInCompletion(clientId, result);
-  }
-
-  private async fetchTokenKeyCloak(
-    url: string,
-    urlSearchParams: URLSearchParams,
-  ): Promise<DeviceSignInSuccessResponseRaw> {
-    return await fetchJson(url, this.props, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: urlSearchParams,
-    });
-  }
-
-  public async pollDeviceSignInCompletion(
-    clientId: string,
-    verificationResult: DeviceAuthResponse,
-  ): Promise<DeviceSignInSuccessResponse> {
-    const startTime = Date.now();
-    while (Date.now() < startTime + verificationResult.expiresInSeconds * 1000) {
-      await waitMs(verificationResult.pollingIntervalInSeconds * 1000);
-      try {
-        const response: DeviceSignInSuccessResponseRaw = await this.fetchTokenKeyCloak(
-          verificationResult.pollingUrl,
-          new URLSearchParams({
-            grant_type: 'urn:ietf:params:oauth:grant-type:device_code',
-            device_code: verificationResult.deviceCode,
-            client_id: clientId,
-          }),
-        );
-
-        return tidyKeyCloakSuccessResponse(response);
-      } catch (error: unknown) {
-        const acrolinxError = error as AcrolinxError;
-        if ((acrolinxError.type as ErrorType) === ErrorType.AuthorizationPending) {
-          console.log(acrolinxError.detail);
-          continue;
-        }
-        throw error;
-      }
-    }
-
-    throw new AcrolinxError({
-      type: ErrorType.SigninTimedOut,
-      title: 'Interactive device grant sign-in time out',
-      detail: `Interactive device grant sign-in has timed out by client (${Date.now() - startTime} > ${
-        verificationResult.expiresInSeconds
-      } ms).`,
-    });
   }
 
   public async signin(options: SigninOptions = {}): Promise<SigninResult> {
@@ -613,7 +441,6 @@ export class AcrolinxEndpoint {
       headers: {
         ...getCommonHeaders(this.props, accessToken, opts.serviceType),
         ...opts.headers,
-        ...this.props.additionalHeaders,
       },
     });
   }
@@ -628,7 +455,6 @@ export class AcrolinxEndpoint {
       headers: {
         ...getCommonHeaders(this.props, accessToken, opts.serviceType),
         ...opts.headers,
-        ...this.props.additionalHeaders,
       },
     }).then(
       (res) => handleExpectedTextResponse(httpRequest, res),
@@ -745,7 +571,6 @@ export class AcrolinxEndpoint {
       headers: {
         ...getCommonHeaders(this.props, accessToken, opts.serviceType),
         ...opts.headers,
-        ...this.props.additionalHeaders,
       },
       method: 'DELETE',
     });

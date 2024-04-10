@@ -121,7 +121,7 @@ export async function send<T>(
 ): Promise<T> {
   return fetchJson(getUrlOfPath(props, path), props, {
     body: JSON.stringify(body),
-    headers: { ...getCommonHeaders(props, accessToken, serviceType), ...headers, ...props.additionalHeaders },
+    headers: { ...getCommonHeaders(props, accessToken, serviceType), ...headers },
     method,
   });
 }
