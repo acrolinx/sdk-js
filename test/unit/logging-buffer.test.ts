@@ -85,6 +85,7 @@ describe('LogBuffer', () => {
       const delay = mockConfig.dispatchInterval * Math.pow(2, i);
       totalDelay += Math.min(delay, mockConfig.maxRetries * mockConfig.retryDelay);
     }
+    totalDelay += 300;
     await new Promise((resolve) => setTimeout(resolve, totalDelay));
 
     expect(mockFetch).toHaveBeenCalledTimes(mockConfig.maxRetries);
@@ -114,7 +115,7 @@ describe('LogBuffer', () => {
     };
     logBuffer.add(logEntry);
 
-    await new Promise((resolve) => setTimeout(resolve, 0));
+    await new Promise((resolve) => setTimeout(resolve, 300));
 
     expect(mockFetch).toHaveBeenCalledTimes(1);
     expect(logBuffer['retries']).toBe(1);
