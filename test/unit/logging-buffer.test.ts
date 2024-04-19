@@ -72,21 +72,21 @@ describe('LogBuffer', () => {
       .mockRejectedValueOnce(new Error(NETWORK_ERROR_MESSAGE))
       .mockResolvedValueOnce({ ok: true });
     global.fetch = mockFetch;
-  
+
     const logEntry: LogEntry = {
       type: LogEntryType.warning,
       message: TEST_LOG_MESSAGE,
       details: [],
     };
     logBuffer.add(logEntry);
-  
+
     let totalDelay = 0;
     for (let i = 0; i < mockConfig.maxRetries; i++) {
       const delay = mockConfig.dispatchInterval * Math.pow(2, i);
       totalDelay += Math.min(delay, mockConfig.maxRetries * mockConfig.retryDelay);
     }
     await new Promise((resolve) => setTimeout(resolve, totalDelay));
-  
+
     expect(mockFetch).toHaveBeenCalledTimes(mockConfig.maxRetries);
     expect(logBuffer['buffer']).toHaveLength(0);
   });
@@ -106,16 +106,16 @@ describe('LogBuffer', () => {
   test('should handle failed server response', async () => {
     const mockFetch = jest.fn().mockResolvedValueOnce({ ok: false });
     global.fetch = mockFetch;
-  
+
     const logEntry: LogEntry = {
       type: LogEntryType.error,
       message: TEST_LOG_MESSAGE,
       details: [],
     };
     logBuffer.add(logEntry);
-  
+
     await new Promise((resolve) => setTimeout(resolve, 0));
-  
+
     expect(mockFetch).toHaveBeenCalledTimes(1);
     expect(logBuffer['retries']).toBe(1);
     expect(logBuffer['buffer']).toContain(logEntry);
@@ -124,19 +124,18 @@ describe('LogBuffer', () => {
   test('should flush logs immediately when log type is error', async () => {
     const mockFetch = jest.fn().mockResolvedValueOnce({ ok: true });
     global.fetch = mockFetch;
-  
+
     const errorLogEntry: LogEntry = {
       type: LogEntryType.error,
       message: 'Error log message',
       details: [],
     };
     logBuffer.add(errorLogEntry);
-  
+
     // Wait for a short delay to allow the flush to happen
     await new Promise((resolve) => setTimeout(resolve, 100));
-  
+
     expect(mockFetch).toHaveBeenCalledTimes(1);
     expect(logBuffer['buffer']).toHaveLength(0);
   });
-  
 });
