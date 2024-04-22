@@ -15,7 +15,6 @@
  */
 
 import { DocumentId } from './document-descriptor';
-import { AIServiceErrorTypes } from './services/ai-service/ai-service.types';
 import { isAIServiceError } from './services/ai-service/ai-service.utils';
 
 /**
@@ -138,10 +137,10 @@ export function createErrorFromFetchResponse(
     });
   } else if (isAIServiceError(jsonBody)) {
     return new AcrolinxError({
-      detail: jsonBody.message,
-      status: jsonBody.code,
-      type: AIServiceErrorTypes.AI_SERVICE_ERROR,
-      title: jsonBody.message,
+      detail: jsonBody.error.message,
+      status: jsonBody.error.code,
+      type: jsonBody.error.type,
+      title: jsonBody.error.message,
       httpRequest: req,
     });
   } else {

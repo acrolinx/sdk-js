@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import * as mockFetch from 'fetch-mock';
-import { AcrolinxEndpoint, Issue } from '../../src/index';
+import { AcrolinxEndpoint, AcrolinxError, Issue } from '../../src/index';
 import { DUMMY_ACCESS_TOKEN } from '../test-utils/mock-server';
 import { DUMMY_ENDPOINT_PROPS } from './common';
 import { DUMMY_AI_REWRITE_CONTEXT } from '../test-utils/dummy-data';
@@ -67,12 +67,14 @@ describe('AI-service', () => {
     });
 
     it('error response', async () => {
-      endpoint = new AcrolinxEndpoint(DUMMY_ENDPOINT_PROPS);
       mockFetch.mock(aiEnabledMatcher, {
         status: 403,
-        throws: {
-          code: 403,
-          message: 'missing privilege GENERATE',
+        body: {
+          error: {
+            type: 'INSUFFICIENT_PRIVILEGES',
+            code: 403,
+            message: 'missing privilege GENERATE',
+          },
         },
       });
       const response = await aiService.isAIEnabled(DUMMY_ACCESS_TOKEN);
@@ -92,21 +94,48 @@ describe('AI-service', () => {
     });
     it('error response', async () => {
       const response = createDummyAIServiceRequest(500, {
-        code: 500,
-        message: 'There was an error processing your request. It has been logged (ID some-random-id).',
+        error: {
+          type: 'AI_SERVICE_ERROR',
+          code: 500,
+          message: 'There was an error processing your request. It has been logged (ID some-random-id).',
+        },
       });
 
-      await expect(response).rejects.toThrow(
-        'There was an error processing your request. It has been logged (ID some-random-id).',
+      await expect(response).rejects.toThrowError(
+        new AcrolinxError({
+          detail: 'There was an error processing your request. It has been logged (ID some-random-id).',
+          status: 500,
+          type: 'AI_SERVICE_ERROR',
+          title: 'There was an error processing your request. It has been logged (ID some-random-id).',
+          httpRequest: {
+            url: expect.stringContaining('/ai-service/api/v1/ai/chat-completions'),
+            method: 'POST',
+          },
+        }),
       );
     });
 
     it('should throw if response was filtered', async () => {
       const response = createDummyAIServiceRequest(400, {
-        code: 400,
-        message: 'The response was filtered...bla bla',
+        error: {
+          type: 'FILTERED_RESPONSE',
+          code: 400,
+          message: 'The response was filtered...bla bla',
+        },
       });
-      await expect(response).rejects.toThrow('The response was filtered...bla bla');
+
+      await expect(response).rejects.toThrowError(
+        new AcrolinxError({
+          detail: 'The response was filtered...bla bla',
+          status: 400,
+          type: 'FILTERED_RESPONSE',
+          title: 'The response was filtered...bla bla',
+          httpRequest: {
+            url: expect.stringContaining('/ai-service/api/v1/ai/chat-completions'),
+            method: 'POST',
+          },
+        }),
+      );
     });
 
     const createDummyAIServiceRequest = async (

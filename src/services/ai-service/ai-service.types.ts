@@ -38,8 +38,11 @@ export interface WriteResponse {
 }
 
 export interface AIServiceError {
-  code: number;
-  message: string;
+  error: {
+    type: AIServiceErrorTypes;
+    message: string;
+    code: number;
+  };
 }
 
 export enum AIServiceErrorTypes {
