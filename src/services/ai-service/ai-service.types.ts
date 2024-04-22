@@ -47,4 +47,5 @@ export interface AIServiceError {
 
 export enum AIServiceErrorTypes {
   AI_SERVICE_ERROR = 'AI_SERVICE_ERROR',
+  // This need to be updated with the error list ENUM from ai-service respective error codes
 }
