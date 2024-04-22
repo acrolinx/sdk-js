@@ -14,14 +14,13 @@
  * limitations under the License.
  */
 
-import { AIServiceError } from './ai-service.types';
+import { AIServiceError, AIServiceErrorTypes } from './ai-service.types';
 
 export function isAIServiceError(error: any): error is AIServiceError {
   return (
     error &&
-    error.error &&
-    typeof error.error.type === 'string' &&
-    typeof error.error.message === 'string' &&
-    typeof error.error.code === 'number'
+    typeof error.message === 'string' &&
+    typeof error.code === 'number' &&
+    error.type in AIServiceErrorTypes
   );
 }

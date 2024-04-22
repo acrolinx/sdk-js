@@ -123,7 +123,15 @@ export function createErrorFromFetchResponse(
   res: Response,
   jsonBody: AcrolinxApiError | undefined,
 ): AcrolinxError {
-  if (jsonBody && jsonBody.type) {
+  if (isAIServiceError(jsonBody)) {
+    return new AcrolinxError({
+      detail: jsonBody.message,
+      status: jsonBody.code,
+      type: jsonBody.type,
+      title: jsonBody.message,
+      httpRequest: req,
+    });
+  } else if (jsonBody && jsonBody.type) {
     return new AcrolinxError({
       detail: jsonBody.detail || 'Unknown HTTP Error',
       status: jsonBody.status || res.status,
@@ -134,14 +142,6 @@ export function createErrorFromFetchResponse(
       reference: jsonBody.reference,
       type: jsonBody.type,
       documentId: jsonBody.documentId,
-    });
-  } else if (isAIServiceError(jsonBody)) {
-    return new AcrolinxError({
-      detail: jsonBody.error.message,
-      status: jsonBody.error.code,
-      type: jsonBody.error.type,
-      title: jsonBody.error.message,
-      httpRequest: req,
     });
   } else {
     return new AcrolinxError({

@@ -38,14 +38,13 @@ export interface WriteResponse {
 }
 
 export interface AIServiceError {
-  error: {
-    type: AIServiceErrorTypes;
-    message: string;
-    code: number;
-  };
+  type: AIServiceErrorTypes;
+  message: string;
+  code: number;
 }
 
 export enum AIServiceErrorTypes {
   AI_SERVICE_ERROR = 'AI_SERVICE_ERROR',
+  FILTERED_RESPONSE = 'FILTERED_RESPONSE', // this was just added for testing purposes
   // This need to be updated with the error list ENUM from ai-service respective error codes
 }
