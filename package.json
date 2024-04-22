@@ -67,6 +67,7 @@
     "markdown-doctest": "^1.1.0",
     "prettier": "3.2.5",
     "ts-jest": "^29.1.2",
+    "socket.io-client": "^4.7.5",
     "typedoc": "0.25.13",
     "typescript": "5.4.4",
     "typescript-json-schema": "^0.63.0"

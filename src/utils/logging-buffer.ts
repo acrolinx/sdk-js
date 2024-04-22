@@ -1,3 +1,5 @@
+import { io, Socket } from 'socket.io-client';
+
 export interface LogEntry {
   type: LogEntryType;
   message: string;
@@ -21,16 +23,24 @@ export interface LoggingConfig {
 
 export class LogBuffer {
   private buffer: LogEntry[] = [];
-  private timer: NodeJS.Timeout | null = null;
+  private socket: Socket;
   private retries = 0;
 
-  constructor(private config: LoggingConfig) {}
+  constructor(private config: LoggingConfig) {
+    this.socket = io(config.serverUrl);
+    this.socket.on('connect', () => {
+      console.log('Connected to server');
+    });
+    this.socket.on('disconnect', () => {
+      console.log('Disconnected from server');
+    });
+  }
 
   public add(logObj: LogEntry) {
     if (this.config.logLevel && this.isLoggable(logObj.type)) {
       this.buffer.push(logObj);
       if (logObj.type === LogEntryType.error) {
-        void this.flush();
+        this.flush();
       } else {
         this.scheduleFlush();
       }
@@ -44,7 +54,7 @@ export class LogBuffer {
     return LogEntryType[entryType] <= LogEntryType[this.config.logLevel];
   }
 
-  private async flush() {
+  private flush() {
     if (this.buffer.length === 0) {
       return;
     }
@@ -52,29 +62,18 @@ export class LogBuffer {
     const logsToSend = [...this.buffer];
     this.buffer = [];
 
-    try {
-      const response = await fetch(`${this.config.serverUrl}/int-service/api/v1/logs`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          serviceName: 'sidebar-client-app',
-          logs: logsToSend,
-        }),
-      });
-
-      if (response.ok) {
-        console.log('Logs successfully sent to the server');
-        this.retries = 0;
-      } else {
+    this.socket.emit('logs', {
+      serviceName: 'sidebar-client-app',
+      logs: logsToSend,
+    }, (error: Error | null) => {
+      if (error) {
         console.error('Failed to send logs to the server');
         this.handleRetry(logsToSend);
+      } else {
+        console.log('Logs successfully sent to the server');
+        this.retries = 0;
       }
-    } catch (error) {
-      console.error('Error sending logs to the server:', error);
-      this.handleRetry(logsToSend);
-    }
+    });
   }
 
   private handleRetry(logsToSend: LogEntry[]) {
@@ -83,7 +82,7 @@ export class LogBuffer {
       this.retries++;
       const delay = this.getAdaptiveDelay();
       setTimeout(() => {
-        void this.flush();
+        this.flush();
       }, delay);
     } else {
       console.error('Max retries reached. Discarding logs.');
@@ -93,13 +92,7 @@ export class LogBuffer {
 
   private scheduleFlush() {
     if (this.buffer.length >= this.config.batchSize) {
-      void this.flush();
-    } else if (!this.timer) {
-      const delay = this.getAdaptiveDelay();
-      this.timer = setTimeout(() => {
-        void this.flush();
-        this.timer = null;
-      }, delay);
+      this.flush();
     }
   }
 
