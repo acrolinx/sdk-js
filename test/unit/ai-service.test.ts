@@ -83,6 +83,7 @@ describe('AI-service', () => {
   });
 
   describe('/getAIChatCompletions', () => {
+    const REQUEST_ERROR_MESSAGE = 'There was an error processing your request. It has been logged (ID some-random-id).';
     const getGetAIChatCompletionMatcher = (count: number, internalName: string) =>
       `end:/ai-service/api/v1/ai/chat-completions?count=${count}&issueInternalName=${internalName}`;
 
@@ -97,16 +98,16 @@ describe('AI-service', () => {
         error: {
           type: 'AI_SERVICE_ERROR',
           code: 500,
-          message: 'There was an error processing your request. It has been logged (ID some-random-id).',
+          message: REQUEST_ERROR_MESSAGE,
         },
       });
 
       await expect(response).rejects.toThrowError(
         new AcrolinxError({
-          detail: 'There was an error processing your request. It has been logged (ID some-random-id).',
+          detail: REQUEST_ERROR_MESSAGE,
           status: 500,
           type: 'AI_SERVICE_ERROR',
-          title: 'There was an error processing your request. It has been logged (ID some-random-id).',
+          title: REQUEST_ERROR_MESSAGE,
           httpRequest: {
             url: expect.stringContaining('/ai-service/api/v1/ai/chat-completions'),
             method: 'POST',
@@ -116,20 +117,21 @@ describe('AI-service', () => {
     });
 
     it('should throw if response was filtered', async () => {
+      const FILTERED_RESPONSE_MESSAGE = 'The response was filtered...bla bla';
       const response = createDummyAIServiceRequest(400, {
         error: {
           type: 'FILTERED_RESPONSE',
           code: 400,
-          message: 'The response was filtered...bla bla',
+          message: FILTERED_RESPONSE_MESSAGE,
         },
       });
 
       await expect(response).rejects.toThrowError(
         new AcrolinxError({
-          detail: 'The response was filtered...bla bla',
+          detail: FILTERED_RESPONSE_MESSAGE,
           status: 400,
           type: 'FILTERED_RESPONSE',
-          title: 'The response was filtered...bla bla',
+          title: FILTERED_RESPONSE_MESSAGE,
           httpRequest: {
             url: expect.stringContaining('/ai-service/api/v1/ai/chat-completions'),
             method: 'POST',
