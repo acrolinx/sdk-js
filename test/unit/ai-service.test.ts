@@ -18,7 +18,7 @@ import { AcrolinxEndpoint, AcrolinxError, Issue } from '../../src/index';
 import { DUMMY_ACCESS_TOKEN } from '../test-utils/mock-server';
 import { DUMMY_ENDPOINT_PROPS } from './common';
 import { DUMMY_AI_REWRITE_CONTEXT } from '../test-utils/dummy-data';
-import { WriteResponse } from '../../src/services/ai-service/ai-service.types';
+import { AIServiceErrorTypes, WriteResponse } from '../../src/services/ai-service/ai-service.types';
 import { AIService } from '../../src/services/ai-service/ai-service';
 
 describe('AI-service', () => {
@@ -95,14 +95,14 @@ describe('AI-service', () => {
       const response = createDummyAIServiceRequest(500, {
         code: 500,
         message: REQUEST_ERROR_MESSAGE,
-        errorId: 'AI_SERVICE_ERROR',
+        errorId: AIServiceErrorTypes.GENERAL_EXCEPTION,
       });
 
       await expect(response).rejects.toThrowError(
         new AcrolinxError({
           detail: REQUEST_ERROR_MESSAGE,
           status: 500,
-          type: 'AI_SERVICE_ERROR',
+          type: AIServiceErrorTypes.GENERAL_EXCEPTION,
           title: REQUEST_ERROR_MESSAGE,
           httpRequest: {
             url: expect.stringContaining('/ai-service/api/v1/ai/chat-completions'),
@@ -117,14 +117,14 @@ describe('AI-service', () => {
       const response = createDummyAIServiceRequest(400, {
         code: 400,
         message: FILTERED_RESPONSE_MESSAGE,
-        errorId: 'FILTERED_RESPONSE',
+        errorId: AIServiceErrorTypes.INVALID_USER_INPUT,
       });
 
       await expect(response).rejects.toThrowError(
         new AcrolinxError({
           detail: FILTERED_RESPONSE_MESSAGE,
           status: 400,
-          type: 'FILTERED_RESPONSE',
+          type: AIServiceErrorTypes.INVALID_USER_INPUT,
           title: FILTERED_RESPONSE_MESSAGE,
           httpRequest: {
             url: expect.stringContaining('/ai-service/api/v1/ai/chat-completions'),
