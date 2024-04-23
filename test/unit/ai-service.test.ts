@@ -70,11 +70,9 @@ describe('AI-service', () => {
       mockFetch.mock(aiEnabledMatcher, {
         status: 403,
         body: {
-          error: {
-            type: 'INSUFFICIENT_PRIVILEGES',
-            code: 403,
-            message: 'missing privilege GENERATE',
-          },
+          code: 403,
+          message: 'missing privilege GENERATE',
+          errorId: 'INSUFFICIENT_PRIVILEGES',
         },
       });
       const response = await aiService.isAIEnabled(DUMMY_ACCESS_TOKEN);
@@ -95,11 +93,9 @@ describe('AI-service', () => {
     });
     it('error response', async () => {
       const response = createDummyAIServiceRequest(500, {
-        error: {
-          type: 'AI_SERVICE_ERROR',
-          code: 500,
-          message: REQUEST_ERROR_MESSAGE,
-        },
+        code: 500,
+        message: REQUEST_ERROR_MESSAGE,
+        errorId: 'AI_SERVICE_ERROR',
       });
 
       await expect(response).rejects.toThrowError(
@@ -119,11 +115,9 @@ describe('AI-service', () => {
     it('should throw if response was filtered', async () => {
       const FILTERED_RESPONSE_MESSAGE = 'The response was filtered...bla bla';
       const response = createDummyAIServiceRequest(400, {
-        error: {
-          type: 'FILTERED_RESPONSE',
-          code: 400,
-          message: FILTERED_RESPONSE_MESSAGE,
-        },
+        code: 400,
+        message: FILTERED_RESPONSE_MESSAGE,
+        errorId: 'FILTERED_RESPONSE',
       });
 
       await expect(response).rejects.toThrowError(
