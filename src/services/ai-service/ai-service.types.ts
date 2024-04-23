@@ -38,13 +38,16 @@ export interface WriteResponse {
 }
 
 export interface AIServiceError {
-  type: AIServiceErrorTypes;
-  message: string;
   code: number;
+  message: string;
+  errorId: AIServiceErrorTypes;
 }
 
 export enum AIServiceErrorTypes {
-  AI_SERVICE_ERROR = 'AI_SERVICE_ERROR',
-  FILTERED_RESPONSE = 'FILTERED_RESPONSE', // this was just added for testing purposes
-  // This need to be updated with the error list ENUM from ai-service respective error codes
+  GENERAL_EXCEPTION = 'GENERAL_EXCEPTION',
+  AI_PROVIDER_ERROR = 'AI_PROVIDER_ERROR',
+  INVALID_USER_INPUT = 'INVALID_USER_INPUT',
+  BUDGET_EXCEEDED = 'BUDGET_EXCEEDED',
+  BUDGET_EXPIRED = 'BUDGET_EXPIRED',
+  BUDGET_CONFIGURATION_ERROR = 'BUDGET_CONFIGURATION_ERROR',
 }

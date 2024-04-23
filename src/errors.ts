@@ -127,7 +127,7 @@ export function createErrorFromFetchResponse(
     return new AcrolinxError({
       detail: jsonBody.message,
       status: jsonBody.code,
-      type: jsonBody.type,
+      type: jsonBody.errorId,
       title: jsonBody.message,
       httpRequest: req,
     });

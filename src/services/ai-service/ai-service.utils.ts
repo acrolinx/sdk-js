@@ -21,6 +21,6 @@ export function isAIServiceError(error: any): error is AIServiceError {
     error &&
     typeof error.message === 'string' &&
     typeof error.code === 'number' &&
-    error.type in AIServiceErrorTypes
+    error.errorId in AIServiceErrorTypes
   );
 }
