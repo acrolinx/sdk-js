@@ -25,10 +25,10 @@ export class LogBuffer {
   private config: LoggingConfig;
 
   constructor(
-    private acrolinxUrl: string,
+    private readonly acrolinxUrl: string,
     config?: LoggingConfig,
   ) {
-    this.config = this.setLoggingConfig(config);
+    this.config = this.createLoggingConfig(config);
   }
 
   public add(logObj: LogEntry) {
@@ -42,7 +42,7 @@ export class LogBuffer {
     }
   }
 
-  private setLoggingConfig(config: Partial<LoggingConfig> = {}): LoggingConfig {
+  private createLoggingConfig(config: Partial<LoggingConfig> = {}): LoggingConfig {
     const defaultConfig: LoggingConfig = {
       batchSize: 50,
       dispatchInterval: 10000,
