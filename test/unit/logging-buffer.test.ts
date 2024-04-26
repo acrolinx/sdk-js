@@ -6,17 +6,17 @@ const NETWORK_ERROR_MESSAGE = 'Network error';
 describe('LogBuffer', () => {
   let logBuffer: LogBuffer;
   let mockConfig: LoggingConfig;
+  const acrolinxUrl = 'http://example.com';
 
   beforeEach(() => {
     mockConfig = {
-      serverUrl: 'http://example.com',
       batchSize: 10,
       dispatchInterval: 1000,
       maxRetries: 3,
       retryDelay: 500,
       logLevel: LogEntryType.info,
     };
-    logBuffer = new LogBuffer(mockConfig);
+    logBuffer = new LogBuffer(acrolinxUrl, mockConfig);
     jest.spyOn(console, 'error').mockImplementation(() => {});
   });
 
@@ -41,7 +41,7 @@ describe('LogBuffer', () => {
       details: [],
     };
     mockConfig.logLevel = LogEntryType.error;
-    logBuffer = new LogBuffer(mockConfig);
+    logBuffer = new LogBuffer(acrolinxUrl, mockConfig);
     logBuffer.add(logEntry);
     expect(logBuffer['buffer']).not.toContain(logEntry);
   });
@@ -99,7 +99,7 @@ describe('LogBuffer', () => {
       details: [],
     };
     mockConfig.logLevel = null;
-    logBuffer = new LogBuffer(mockConfig);
+    logBuffer = new LogBuffer(acrolinxUrl, mockConfig);
     logBuffer.add(logEntry);
     expect(logBuffer['buffer']).toHaveLength(0);
   });
