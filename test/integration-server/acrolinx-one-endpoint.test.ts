@@ -18,6 +18,7 @@ function createEndpoint(acrolinxUrl: string) {
       signature: ACROLINX_DEV_SIGNATURE || DEVELOPMENT_SIGNATURE,
       version: '1.2.3.666',
     },
+    enableCloudLogging: true,
   });
 }
 
@@ -65,5 +66,11 @@ describe('Acrolinx One E2E Tests', () => {
       );
       expect(aiResult.response).toBeDefined();
     }, 100000);
+  });
+
+  describe('Logging Tests', () => {
+    it('initialize logging', () => {
+      expect(endpoint.loggingBuffer).toBeDefined();
+    });
   });
 });

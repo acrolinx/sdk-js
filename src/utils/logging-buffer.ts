@@ -11,7 +11,6 @@ export enum LogEntryType {
 }
 
 export interface LoggingConfig {
-  serverUrl: string;
   batchSize: number;
   dispatchInterval: number;
   maxRetries: number;
@@ -23,8 +22,14 @@ export class LogBuffer {
   private buffer: LogEntry[] = [];
   private timer: NodeJS.Timeout | null = null;
   private retries = 0;
+  private config: LoggingConfig;
 
-  constructor(private config: LoggingConfig) {}
+  constructor(
+    private acrolinxUrl: string,
+    config?: LoggingConfig,
+  ) {
+    this.config = this.setLoggingConfig(config);
+  }
 
   public add(logObj: LogEntry) {
     if (this.config.logLevel && this.isLoggable(logObj.type)) {
@@ -35,6 +40,17 @@ export class LogBuffer {
         this.scheduleFlush();
       }
     }
+  }
+
+  private setLoggingConfig(config: Partial<LoggingConfig> = {}): LoggingConfig {
+    const defaultConfig: LoggingConfig = {
+      batchSize: 50,
+      dispatchInterval: 10000,
+      maxRetries: 3,
+      retryDelay: 2000,
+      logLevel: LogEntryType.info,
+    };
+    return { ...defaultConfig, ...config };
   }
 
   private isLoggable(entryType: LogEntryType): boolean {
@@ -53,7 +69,7 @@ export class LogBuffer {
     this.buffer = [];
 
     try {
-      const response = await fetch(`${this.config.serverUrl}/int-service/api/v1/logs`, {
+      const response = await fetch(`${this.acrolinxUrl}/int-service/api/v1/logs`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

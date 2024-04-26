@@ -88,6 +88,7 @@ import {
 import { User } from './user';
 import { fetchJson, fetchWithProps, getUrlOfPath, handleExpectedTextResponse, post, put } from './utils/fetch';
 import * as logging from './utils/logging';
+import { LogBuffer, LoggingConfig } from './utils/logging-buffer';
 import { waitMs } from './utils/mixed-utils';
 
 export * from './dictionary';
@@ -165,6 +166,8 @@ export interface AcrolinxEndpointProps {
    * @ignore
    */
   enableHttpLogging?: boolean;
+  enableCloudLogging?: boolean;
+  loggingConfig?: LoggingConfig;
 }
 
 export interface ClientInformation {
@@ -200,12 +203,17 @@ const VALIDATE_APP_ACCESS_TOKEN_PATH = '/api/v1/apps/whoami';
 
 export class AcrolinxEndpoint {
   public readonly props: AcrolinxEndpointProps;
+  public readonly loggingBuffer: LogBuffer | null = null;
 
   constructor(props: AcrolinxEndpointProps) {
     this.props = {
       ...props,
       acrolinxUrl: props.acrolinxUrl.trim().replace(/\/$/, ''),
     };
+
+    if (this.props.enableCloudLogging) {
+      this.loggingBuffer = new LogBuffer(this.props.acrolinxUrl, this.props.loggingConfig);
+    }
   }
 
   public setClientLocale(clientLocale: string) {

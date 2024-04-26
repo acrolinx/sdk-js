@@ -18,9 +18,6 @@ import { AIServiceError, AIServiceErrorTypes } from './ai-service.types';
 
 export function isAIServiceError(error: any): error is AIServiceError {
   return (
-    error &&
-    typeof error.message === 'string' &&
-    typeof error.code === 'number' &&
-    error.errorId in AIServiceErrorTypes
+    error && typeof error.message === 'string' && typeof error.code === 'number' && error.errorId in AIServiceErrorTypes
   );
 }
