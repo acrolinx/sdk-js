@@ -22,7 +22,10 @@ export const integrationServiceDefaultConfig: IntegrationServiceConfigV1 = {
 
 export class IntService {
   private readonly intServiceBasePath = '/int-service/api/v1';
-  constructor(private readonly endpoint: AcrolinxEndpoint) {}
+  constructor(
+    private readonly endpoint: AcrolinxEndpoint,
+    private readonly _clientSignature: string,
+  ) {}
 
   getConfig(accessToken: string): Promise<IntegrationServiceConfigV1> {
     return this.endpoint.getJsonFromPath<IntegrationServiceConfigV1>(this.constructFullPath('/config'), accessToken, {

@@ -39,6 +39,7 @@ export { SIGNIN_URL_EXPIRED_ERROR };
 export const DUMMY_SIGNIN_LINK_PATH_INTERACTIVE = '/signin-ui/';
 const DUMMY_SIGNIN_LINK_PATH_POLL = '/api/v1/auth/sign-ins/';
 export const DUMMY_ACCESS_TOKEN = 'dummyAccessToken';
+export const DUMMY_CLIENT_SIGNATURE = 'dummyClientSignature';
 export const DUMMY_USER_ID = 'dummyUserId';
 export const DUMMY_USER_NAME = 'dummy@username.org';
 export const DUMMY_RETRY_AFTER = 1;

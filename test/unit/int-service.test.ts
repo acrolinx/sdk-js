@@ -15,12 +15,12 @@
  */
 import * as mockFetch from 'fetch-mock';
 import { AcrolinxEndpoint, IntService } from '../../src/index';
-import { DUMMY_ACCESS_TOKEN } from '../test-utils/mock-server';
+import { DUMMY_ACCESS_TOKEN, DUMMY_CLIENT_SIGNATURE } from '../test-utils/mock-server';
 import { DUMMY_ENDPOINT_PROPS } from './common';
 
 describe('Integration-service', () => {
   let endpoint: AcrolinxEndpoint = new AcrolinxEndpoint(DUMMY_ENDPOINT_PROPS);
-  const intService = new IntService(endpoint);
+  const intService = new IntService(endpoint, DUMMY_CLIENT_SIGNATURE);
 
   afterEach(() => {
     mockFetch.restore();
