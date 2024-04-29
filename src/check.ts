@@ -266,7 +266,15 @@ export interface CommonIssue {
    * Only available if the server runs in Targets mode.
    */
   scoring?: GoalScoring;
+
+  /**
+   * Since Acrolinx platform 2024.04
+   */
   aiRephraseHint?: string;
+
+  /**
+   * Since Acrolinx platform 2024.04
+   */
   aiRewriteContext?: RewriteContextPart[];
 }
 
