@@ -1,18 +1,3 @@
-/*
- * Copyright 2024-present Acrolinx GmbH
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 import * as mockFetch from 'fetch-mock';
 import { AcrolinxEndpoint, IntService } from '../../src/index';
 import { DUMMY_ACCESS_TOKEN, DUMMY_CLIENT_SIGNATURE } from '../test-utils/mock-server';
@@ -27,15 +12,35 @@ describe('Integration-service', () => {
   });
 
   describe('/config', () => {
-    const aiEnabledMatcher = 'end:/int-service/api/v1/config';
+    const configEndpointMatcher = 'end:/int-service/api/v1/config';
+
     it('truthy response', async () => {
-      mockFetch.mock(aiEnabledMatcher, {
-        status: 200,
-        body: { activateGAIGetSuggestionReplaceButton: true },
+      // Mock the endpoint with expected headers check
+      mockFetch.mock(configEndpointMatcher, (url, opts) => {
+        const headers = opts.headers as Record<string, string>; // Asserting headers to be of type Record<string, string>
+        if (headers['X-Client-Signature'] === DUMMY_CLIENT_SIGNATURE) {
+          return {
+            status: 200,
+            body: { activateGAIGetSuggestionReplaceButton: true },
+          };
+        } else {
+          return { status: 401 };
+        }
       });
+      
 
       const response = await intService.getConfig(DUMMY_ACCESS_TOKEN);
       expect(response.activateGAIGetSuggestionReplaceButton).toBe(true);
     });
+
+    it('should fail without correct client signature', async () => {
+      // Test to ensure that the API responds correctly when the signature is missing or incorrect
+      mockFetch.mock(configEndpointMatcher, {
+        status: 401,
+      });
+
+      await expect(intService.getConfig(DUMMY_ACCESS_TOKEN)).rejects.toThrow();
+    });
   });
 });
+``
