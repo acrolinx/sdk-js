@@ -16,6 +16,7 @@ export interface LoggingConfig {
   maxRetries: number;
   retryDelay: number;
   logLevel: LogEntryType | null;
+  enableCloudLogging: boolean;
 }
 
 export class LogBuffer {
@@ -31,17 +32,26 @@ export class LogBuffer {
     this.config = this.createLoggingConfig(config);
   }
 
-  public add(logObj: LogEntry) {
+  public log(logObj: LogEntry) {
+    this.consoleLog(logObj);
     if (this.config.logLevel && this.isLoggable(logObj.type)) {
       this.buffer.push(logObj);
-      if (logObj.type === LogEntryType.error) {
-        void this.flush();
-      } else {
-        this.scheduleFlush();
-      }
+      this.manageBuffer(logObj);
     }
   }
-
+  private consoleLog(logObj: LogEntry): void {
+    switch (logObj.type) {
+      case LogEntryType.info:
+        console.log(logObj.message, ...logObj.details);
+        break;
+      case LogEntryType.warning:
+        console.warn(logObj.message, ...logObj.details);
+        break;
+      case LogEntryType.error:
+        console.error(logObj.message, ...logObj.details);
+        break;
+    }
+  }
   private createLoggingConfig(config: Partial<LoggingConfig> = {}): LoggingConfig {
     const defaultConfig: LoggingConfig = {
       batchSize: 50,
@@ -49,6 +59,7 @@ export class LogBuffer {
       maxRetries: 3,
       retryDelay: 2000,
       logLevel: LogEntryType.info,
+      enableCloudLogging: false,
     };
     return { ...defaultConfig, ...config };
   }
@@ -57,8 +68,17 @@ export class LogBuffer {
     if (this.config.logLevel === null) {
       return false; // Do not log anything if logLevel is null
     }
-    return LogEntryType[entryType] <= LogEntryType[this.config.logLevel];
+    return this.config.enableCloudLogging && LogEntryType[entryType] <= LogEntryType[this.config.logLevel];
   }
+
+  private manageBuffer(logObj: LogEntry): void {
+    if (logObj.type === LogEntryType.error || this.buffer.length >= this.config.batchSize) {
+      void this.flush();
+    } else if (!this.timer) {
+      this.scheduleFlush();
+    }
+  }
+
 
   private async flush() {
     if (this.buffer.length === 0) {
@@ -75,7 +95,7 @@ export class LogBuffer {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          serviceName: 'sidebar-client-app',
+          appName: 'sidebar-client-app',
           logs: logsToSend,
         }),
       });

@@ -15,6 +15,7 @@ describe('LogBuffer', () => {
       maxRetries: 3,
       retryDelay: 500,
       logLevel: LogEntryType.info,
+      enableCloudLogging: true,
     };
     logBuffer = new LogBuffer(acrolinxUrl, mockConfig);
     jest.spyOn(console, 'error').mockImplementation(() => {});
@@ -24,15 +25,27 @@ describe('LogBuffer', () => {
     jest.clearAllMocks();
   });
 
-  test('should add log entry to buffer if log level is sufficient', () => {
+  test('should only add log entry to buffer if enableCloudLogging is true and log level is sufficient', () => {
     const logEntry: LogEntry = {
       type: LogEntryType.info,
       message: TEST_LOG_MESSAGE,
       details: [],
     };
-    logBuffer.add(logEntry);
+    // Enable cloud logging and set sufficient log level
+    mockConfig.enableCloudLogging = true;
+    mockConfig.logLevel = LogEntryType.info;
+    logBuffer = new LogBuffer(acrolinxUrl, mockConfig);
+    
+    logBuffer.log(logEntry);
     expect(logBuffer['buffer']).toContain(logEntry);
+  
+    // Disable cloud logging and repeat
+    mockConfig.enableCloudLogging = false;
+    logBuffer = new LogBuffer(acrolinxUrl, mockConfig);
+    logBuffer.log(logEntry);
+    expect(logBuffer['buffer']).not.toContain(logEntry);
   });
+  
 
   test('should not add log entry to buffer if log level is insufficient', () => {
     const logEntry: LogEntry = {
@@ -42,7 +55,7 @@ describe('LogBuffer', () => {
     };
     mockConfig.logLevel = LogEntryType.error;
     logBuffer = new LogBuffer(acrolinxUrl, mockConfig);
-    logBuffer.add(logEntry);
+    logBuffer.log(logEntry);
     expect(logBuffer['buffer']).not.toContain(logEntry);
   });
 
@@ -56,7 +69,7 @@ describe('LogBuffer', () => {
         message: `${TEST_LOG_MESSAGE} ${i}`,
         details: [],
       };
-      logBuffer.add(logEntry);
+      logBuffer.log(logEntry);
     }
 
     await new Promise((resolve) => setTimeout(resolve, 0));
@@ -78,7 +91,7 @@ describe('LogBuffer', () => {
       message: TEST_LOG_MESSAGE,
       details: [],
     };
-    logBuffer.add(logEntry);
+    logBuffer.log(logEntry);
 
     let totalDelay = 0;
     for (let i = 0; i < mockConfig.maxRetries; i++) {
@@ -100,7 +113,7 @@ describe('LogBuffer', () => {
     };
     mockConfig.logLevel = null;
     logBuffer = new LogBuffer(acrolinxUrl, mockConfig);
-    logBuffer.add(logEntry);
+    logBuffer.log(logEntry);
     expect(logBuffer['buffer']).toHaveLength(0);
   });
 
@@ -113,7 +126,7 @@ describe('LogBuffer', () => {
       message: TEST_LOG_MESSAGE,
       details: [],
     };
-    logBuffer.add(logEntry);
+    logBuffer.log(logEntry);
 
     await new Promise((resolve) => setTimeout(resolve, 300));
 
@@ -122,21 +135,26 @@ describe('LogBuffer', () => {
     expect(logBuffer['buffer']).toContain(logEntry);
   });
 
-  test('should flush logs immediately when log type is error', async () => {
+  test('should flush logs immediately when log type is error and cloud logging is enabled', async () => {
     const mockFetch = jest.fn().mockResolvedValueOnce({ ok: true });
     global.fetch = mockFetch;
-
+    
     const errorLogEntry: LogEntry = {
       type: LogEntryType.error,
       message: 'Error log message',
       details: [],
     };
-    logBuffer.add(errorLogEntry);
-
+    
+    // Ensure cloud logging is enabled
+    mockConfig.enableCloudLogging = true;
+    logBuffer = new LogBuffer(acrolinxUrl, mockConfig);
+    logBuffer.log(errorLogEntry);
+    
     // Wait for a short delay to allow the flush to happen
     await new Promise((resolve) => setTimeout(resolve, 100));
-
+    
     expect(mockFetch).toHaveBeenCalledTimes(1);
     expect(logBuffer['buffer']).toHaveLength(0);
   });
+  
 });
