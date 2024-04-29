@@ -15,6 +15,7 @@ on:
         default: "Manual Workflow Run"
 permissions:
   contents: write
+  pull-requests: write
 
 jobs:
   build:
@@ -74,3 +75,9 @@ jobs:
         if: github.ref == 'refs/heads/main' && steps.publish.outputs.type
         env:
           CUSTOM_TAG: v${{ steps.publish.outputs.version }}
+      
+      - name: Deploy Pages
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: docs/pluginDoc/
+          branc: gh-pages
