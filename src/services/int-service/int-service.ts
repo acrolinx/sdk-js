@@ -10,19 +10,13 @@ export class IntService {
   constructor(private readonly endpoint: AcrolinxEndpoint) {}
 
   async getConfig(accessToken: string): Promise<IntegrationServiceConfigV1> {
-    try {
-      const config = await this.endpoint.getJsonFromPath<IntegrationServiceConfigV1>(
-        this.constructFullPath('/config'),
-        accessToken,
-        {
-          serviceType: ServiceType.ACROLINX_ONE,
-        },
-      );
-      return config;
-    } catch (e) {
-      console.error(e);
-      return integrationServiceDefaultConfig;
-    }
+    return await this.endpoint.getJsonFromPath<IntegrationServiceConfigV1>(
+      this.constructFullPath('/config'),
+      accessToken,
+      {
+        serviceType: ServiceType.ACROLINX_ONE,
+      },
+    );
   }
 
   private constructFullPath(path: string): string {
