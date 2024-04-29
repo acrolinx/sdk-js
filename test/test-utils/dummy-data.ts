@@ -29,35 +29,84 @@ const GOAL_TERM_ID = 'term.unsuitable';
 
 export const DUMMY_AI_REWRITE_CONTEXT = [
   {
-    sourceId: '123',
-    sourceType: 'text',
+    part: 'This',
     begin: 0,
-    end: 25,
-    externalContent: [
-      {
-        sourceId: '124',
-        sourceType: 'quote',
-        begin: 5,
-        end: 27,
-        externalContent: [
-          {
-            sourceId: '125',
-            sourceType: 'text',
-            begin: 10,
-            end: 30,
-            externalContent: [],
-          },
-        ],
-      },
-    ],
+    end: 4,
   },
   {
-    sourceId: '126',
-    sourceType: 'text',
-    part: 'The conclusion of the story',
+    part: ' ',
+    begin: 4,
+    end: 5,
+  },
+  {
+    part: 'is',
+    begin: 5,
+    end: 7,
+  },
+  {
+    part: ' ',
+    begin: 7,
+    end: 8,
+  },
+  {
+    part: 'new',
+    begin: 8,
+    end: 11,
+  },
+  {
+    part: ' ',
+    begin: 11,
+    end: 12,
+  },
+  {
+    part: 'document',
+    begin: 12,
+    end: 20,
+  },
+  {
+    part: '.',
+    begin: 20,
+    end: 21,
+  },
+  {
+    part: ' ',
+    begin: 21,
+    end: 22,
+  },
+  {
+    part: 'This',
+    begin: 22,
+    end: 26,
+  },
+  {
+    part: ' ',
     begin: 26,
-    end: 52,
-    externalContent: [],
+    end: 27,
+  },
+  {
+    part: 'is',
+    begin: 27,
+    end: 29,
+  },
+  {
+    part: ' ',
+    begin: 29,
+    end: 30,
+  },
+  {
+    part: 'not',
+    begin: 30,
+    end: 33,
+  },
+  {
+    part: ' ',
+    begin: 33,
+    end: 34,
+  },
+  {
+    part: 'acceptable',
+    begin: 34,
+    end: 44,
   },
 ];
 
