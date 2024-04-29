@@ -24,7 +24,7 @@ export class IntService {
   private readonly intServiceBasePath = '/int-service/api/v1';
   constructor(
     private readonly endpoint: AcrolinxEndpoint,
-    private readonly _clientSignature: string,
+    private readonly _clientSignature?: string, // the sidebar might have not received a clientSignature
   ) {}
 
   getConfig(accessToken: string): Promise<IntegrationServiceConfigV1> {
