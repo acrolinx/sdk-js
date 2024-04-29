@@ -2,7 +2,7 @@ import { AcrolinxEndpoint } from '../../index';
 import { IntegrationServiceConfigV1 } from './int-service.types';
 
 export const integrationServiceDefaultConfig: IntegrationServiceConfigV1 = {
-  activateGAIGetSuggestionReplaceButton: false,
+  activateGetSuggestionReplacement: false,
 };
 
 export class IntService {
@@ -16,11 +16,10 @@ export class IntService {
     const headers = {
       'X-Client-Signature': this._clientSignature || '',
     };
-    return this.endpoint.postJsonFromPath<IntegrationServiceConfigV1>(
+    return this.endpoint.getJsonFromPath<IntegrationServiceConfigV1>(
       this.constructFullPath('/config'), 
-      {},
       accessToken,
-      headers, 
+      { headers },
     );
   }
 

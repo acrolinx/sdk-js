@@ -14,5 +14,5 @@
  * limitations under the License.
  */
 export type IntegrationServiceConfigV1 = {
-  activateGAIGetSuggestionReplaceButton: boolean;
+  activateGetSuggestionReplacement: boolean;
 };

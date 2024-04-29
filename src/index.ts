@@ -455,23 +455,6 @@ export class AcrolinxEndpoint {
     });
   }
 
-  public async postJsonFromPath<T>(
-    path: string,
-    body: any,
-    accessToken: AccessToken,
-    additionalHeaders: StringMap = {},
-  ): Promise<T> {
-    const url = this.props.acrolinxUrl + path;
-    return fetchJson(url, this.props, {
-      method: 'POST',
-      body: JSON.stringify(body),
-      headers: {
-        ...getCommonHeaders(this.props, accessToken),
-        ...additionalHeaders,
-      },
-    });
-  }  
-
   public async getTextFromUrl(
     url: string,
     accessToken?: AccessToken,
