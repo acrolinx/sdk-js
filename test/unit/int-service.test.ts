@@ -34,7 +34,7 @@ describe('Integration-service', () => {
       });
 
       const response = await intService.getConfig(DUMMY_ACCESS_TOKEN);
-      expect(response.activateGetSuggestionReplacement ).toBe(true); // Assertion updated to check new property name
+      expect(response.activateGetSuggestionReplacement).toBe(true); // Assertion updated to check new property name
     });
 
     it('Default config response for unavailable client signature', async () => {
@@ -42,14 +42,14 @@ describe('Integration-service', () => {
       intService = new IntService(endpoint);
       // Mock the endpoint with expected headers check and updated response property
       mockFetch.mock(configEndpointMatcher, () => {
-          return {
-            status: 200,
-            body: { activateGetSuggestionReplacement: false },
-          };
+        return {
+          status: 200,
+          body: { activateGetSuggestionReplacement: false },
+        };
       });
 
       const response = await intService.getConfig(DUMMY_ACCESS_TOKEN);
-      expect(response.activateGetSuggestionReplacement ).toBe(false); // Assertion updated to check new property name
+      expect(response.activateGetSuggestionReplacement).toBe(false); // Assertion updated to check new property name
     });
   });
 });

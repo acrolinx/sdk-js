@@ -41,14 +41,15 @@ export function getCommonHeaders(
   }
   return {
     ...headers,
-    ...getHeaders(accessToken),
+    ...getHeaders(props, accessToken),
   };
 }
 
-export function getHeaders(accessToken?: AccessToken): StringMap {
+export function getHeaders(props: AcrolinxEndpointProps, accessToken?: AccessToken): StringMap {
   const headers: StringMap = {};
   if (accessToken) {
     headers[HEADER_ACROLINX_ONE_AUTH] = `Bearer ${accessToken}`;
+    headers[HEADER_X_ACROLINX_CLIENT] = getAcrolinxClientHttpHeader(props);
   }
   return headers;
 }

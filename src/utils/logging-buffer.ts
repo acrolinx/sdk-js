@@ -79,7 +79,6 @@ export class LogBuffer {
     }
   }
 
-
   private async flush() {
     if (this.buffer.length === 0) {
       return;
