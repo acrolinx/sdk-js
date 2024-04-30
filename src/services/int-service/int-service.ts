@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { AcrolinxEndpoint } from '../../index';
+import { AcrolinxEndpoint, ServiceType } from '../../index';
 import { IntegrationServiceConfig } from './int-service.types';
 
 export const integrationServiceDefaultConfig: IntegrationServiceConfig = {
@@ -23,15 +23,12 @@ export const integrationServiceDefaultConfig: IntegrationServiceConfig = {
 
 export class IntService {
   private readonly intServiceBasePath = '/int-service/api/v1';
-  constructor(
-    private readonly endpoint: AcrolinxEndpoint,
-  ) {}
+  constructor(private readonly endpoint: AcrolinxEndpoint) {}
 
   getConfig(accessToken: string): Promise<IntegrationServiceConfig> {
-    return this.endpoint.getJsonFromPath<IntegrationServiceConfig>(
-      this.constructFullPath('/config'), 
-      accessToken,
-    );
+    return this.endpoint.getJsonFromPath<IntegrationServiceConfig>(this.constructFullPath('/config'), accessToken, {
+      serviceType: ServiceType.ACROLINX_ONE,
+    });
   }
 
   private constructFullPath(path: string): string {
