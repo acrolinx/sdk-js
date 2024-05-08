@@ -39,6 +39,16 @@ The LogBuffer class supports the following log entry types:
 - `LogEntryType.warning`: Warning log entries.
 - `LogEntryType.error`: Error log entries.
 
+### Buffering and Sending Logs
+
+The `LogBuffer` class buffers the log entries until one of the following conditions is met:
+- The number of buffered log entries reaches the configured `batchSize`.
+- An `error` log entry is added to the buffer.
+- The configured `dispatchInterval` has elapsed.
+
+When any of these conditions is met, the LogBuffer will flush the buffer and send the logs to the Acrolinx server.
+
+
 ### Retry Mechanism
 
 If sending logs to the server fails, the LogBuffer class will retry the operation up to the configured maxRetries. The retry delay is adaptive and increases exponentially with each retry attempt, up to a maximum of maxRetries * retryDelay.
