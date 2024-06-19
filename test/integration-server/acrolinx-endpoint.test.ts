@@ -51,10 +51,9 @@ import { describeIf, expectFailingPromise, testIf } from '../test-utils/utils';
 dotenv.config();
 
 const TEST_SERVER_URL = process.env.TEST_SERVER_URL || ''; /* Add here your own test server URL */
-const SSO_USERNAME = process.env.SSO_USERNAME;
 const SSO_GENERIC_TOKEN = process.env.SSO_GENERIC_TOKEN;
 const ACROLINX_API_TOKEN = process.env.ACROLINX_API_TOKEN || '';
-const ACROLINX_API_USERNAME = process.env.ACROLINX_API_USERNAME || 'api-js-test-user';
+const ACROLINX_API_USERNAME = process.env.ACROLINX_API_USERNAME || '';
 export const ACROLINX_DEV_SIGNATURE = process.env.ACROLINX_DEV_SIGNATURE;
 
 const ajv = new Ajv({ allErrors: true });
@@ -158,12 +157,12 @@ describe('e2e - AcrolinxEndpoint', () => {
     });
 
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
-    testIf(SSO_USERNAME && SSO_GENERIC_TOKEN, 'signin with sso', async () => {
+    testIf(ACROLINX_API_USERNAME && SSO_GENERIC_TOKEN, 'signin with sso', async () => {
       const result = (await api.signin({
         genericToken: SSO_GENERIC_TOKEN!,
-        username: SSO_USERNAME!,
+        username: ACROLINX_API_USERNAME,
       })) as SigninSuccessResult;
-      expect(result.data.user.username).toContain(SSO_USERNAME);
+      expect(result.data.user.username).toContain(ACROLINX_API_USERNAME);
     });
 
     it('signInWithSSO throws SSO Error', async () =>
