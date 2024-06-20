@@ -1,6 +1,6 @@
 {
   "name": "@acrolinx/sdk",
-  "version": "1.2.0",
+  "version": "1.3.0-dev.1",
   "description": "Acrolinx JavaScript SDK for the Acrolinx API",
   "license": "Apache-2.0",
   "author": "Acrolinx",
@@ -10,6 +10,9 @@
   "types": "dist/src/index.d.ts",
   "engines": {
     "node": ">=18.0.0"
+  },
+  "publishConfig": {
+    "tag": "dev"
   },
   "scripts": {
     "ci": "npm run build && npm run lint && npm run testCoverage",
