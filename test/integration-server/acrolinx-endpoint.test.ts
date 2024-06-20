@@ -748,7 +748,8 @@ describe('e2e - AcrolinxEndpoint', () => {
      * The user associated with the used ACROLINX_API_TOKEN must have the admin privilege for
      * the test app "selectRanges".
      */
-    it.skip('request and validate app token', async () => { // SI-307
+    it.skip('request and validate app token', async () => {
+      // SI-307
       const appId = 'selectRanges';
 
       const appTokenResult = await api.getAppAccessToken(ACROLINX_API_TOKEN, appId);
