@@ -1,13 +1,10 @@
 {
   "compilerOptions": {
-    "target": "es5",
+    "target": "ES6",
     "lib": [
-      "ES2015.Promise",
-      "ES2015.Iterable",
-      "ES5",
       "DOM"
     ],
-    "module": "commonjs",
+    "module": "CommonJS",
     "resolveJsonModule": true,
     "noImplicitAny": true,
     "noImplicitReturns": true,
