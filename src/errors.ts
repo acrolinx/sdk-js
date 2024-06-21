@@ -125,10 +125,10 @@ export function createErrorFromFetchResponse(
 ): AcrolinxError {
   if (isAIServiceError(jsonBody)) {
     return new AcrolinxError({
-      detail: jsonBody.message,
-      status: jsonBody.code,
+      detail: jsonBody.errorDescription,
+      status: jsonBody.httpErrorCode,
       type: jsonBody.errorId,
-      title: jsonBody.message,
+      title: jsonBody.errorTitle,
       httpRequest: req,
     });
   } else if (jsonBody && jsonBody.type) {

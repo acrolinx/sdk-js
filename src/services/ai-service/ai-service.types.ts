@@ -38,8 +38,9 @@ export interface WriteResponse {
 }
 
 export interface AIServiceError {
-  code: number;
-  message: string;
+  httpErrorCode: number;
+  errorTitle: string;
+  errorDescription: string;
   errorId: AIServiceErrorTypes;
 }
 
