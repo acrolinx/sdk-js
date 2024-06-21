@@ -70,8 +70,9 @@ describe('AI-service', () => {
       mockFetch.mock(aiEnabledMatcher, {
         status: 403,
         body: {
-          code: 403,
-          message: 'missing privilege GENERATE',
+          httpErrorCode: 403,
+          errorTitle: 'missing privilege GENERATE',
+          errorDescription: 'missing privilege GENERATE',
           errorId: 'INSUFFICIENT_PRIVILEGES',
         },
       });
@@ -93,8 +94,9 @@ describe('AI-service', () => {
     });
     it('error response', async () => {
       const response = createDummyAIServiceRequest(500, {
-        code: 500,
-        message: REQUEST_ERROR_MESSAGE,
+        httpErrorCode: 500,
+        errorTitle: REQUEST_ERROR_MESSAGE,
+        errorDescription: REQUEST_ERROR_MESSAGE,
         errorId: AIServiceErrorTypes.GENERAL_EXCEPTION,
       });
 
@@ -115,8 +117,9 @@ describe('AI-service', () => {
     it('should throw if response was filtered', async () => {
       const FILTERED_RESPONSE_MESSAGE = 'The response was filtered...bla bla';
       const response = createDummyAIServiceRequest(400, {
-        code: 400,
-        message: FILTERED_RESPONSE_MESSAGE,
+        httpErrorCode: 400,
+        errorTitle: FILTERED_RESPONSE_MESSAGE,
+        errorDescription: FILTERED_RESPONSE_MESSAGE,
         errorId: AIServiceErrorTypes.INVALID_USER_INPUT,
       });
 
