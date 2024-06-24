@@ -14,12 +14,14 @@
  * limitations under the License.
  */
 
-import { MockResponseObject } from 'fetch-mock';
+import fetchMock from 'fetch-mock';
 import { AcrolinxApiError } from '../../src/errors';
 
 export interface MockResponseObjectOf<T extends string | {} | undefined> extends MockResponseObject {
   body: T;
 }
+
+export interface MockResponseObject extends fetchMock.MockResponseObject {}
 
 export interface Route {
   handler: (args: string[], requestOpts: RequestInit) => MockResponseObject | AcrolinxApiError | {};

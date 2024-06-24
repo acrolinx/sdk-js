@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-call */
 /*
  * Copyright 2018-present Acrolinx GmbH
  *
@@ -15,8 +16,8 @@
  */
 
 /* tslint:disable:no-console object-literal-sort-keys */
-import * as fetchMock from 'fetch-mock';
-import { MockResponseObject } from 'fetch-mock';
+import fetchMock from 'fetch-mock';
+import { MockResponseObject } from './common-mocking';
 import * as _ from 'lodash';
 import { SuccessResponse } from '../../src/common-types';
 import { AcrolinxApiError, AcrolinxError, ErrorType } from '../../src/errors';
