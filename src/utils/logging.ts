@@ -23,6 +23,7 @@ export function log(...args: any[]) {
   }
   try {
     console.log(...args);
+    // eslint-disable-next-line  @typescript-eslint/no-unused-vars
   } catch (e) {
     // What should we do, log the problem ? :-)
   }
@@ -34,6 +35,7 @@ export function error(...args: any[]) {
   }
   try {
     console.error(...args);
+    // eslint-disable-next-line  @typescript-eslint/no-unused-vars
   } catch (e) {
     // What should we do, log the problem ? :-)
   }

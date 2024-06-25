@@ -151,7 +151,6 @@ export class AcrolinxServerMock {
     this.ssoMockMode = ssoMockMode;
   }
 
-  // eslint-disable-next-line sonarjs/cognitive-complexity
   public handleFetchRequest = (url: string, optsArg: RequestInit = {}): MockResponseObject => {
     const opts = { method: 'GET', ...optsArg, headers: (optsArg.headers || {}) as StringMap };
 
