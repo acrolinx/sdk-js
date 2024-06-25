@@ -156,7 +156,6 @@ describe('e2e - AcrolinxEndpoint', () => {
       await expectFailingPromise(signinPollResultPromise, ErrorType.SigninTimedOut);
     });
 
-    // eslint-disable-next-line @typescript-eslint/no-misused-promises
     testIf(ACROLINX_API_USERNAME && SSO_GENERIC_TOKEN, 'signin with sso', async () => {
       const result = (await api.signin({
         genericToken: SSO_GENERIC_TOKEN!,
@@ -176,7 +175,6 @@ describe('e2e - AcrolinxEndpoint', () => {
     });
   });
 
-  // eslint-disable-next-line sonarjs/cognitive-complexity
   describeIf(ACROLINX_API_TOKEN, 'with API token', () => {
     let api: AcrolinxEndpoint;
 

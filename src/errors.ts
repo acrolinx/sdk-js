@@ -173,6 +173,5 @@ export class CheckCanceledByClientError extends AcrolinxError {
 
 function setCorrectErrorPrototype<T>(self: T, clazz: new (...args: any[]) => T) {
   // https://github.com/Microsoft/TypeScript/wiki/Breaking-Changes#extending-built-ins-like-error-array-and-map-may-no-longer-work
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-call
   (Object as any).setPrototypeOf(self, clazz.prototype);
 }

@@ -23,7 +23,6 @@ const PORT = 3000;
 const serverMock = new AcrolinxServerMock('http://0.0.0.0:' + PORT);
 
 http
-  // eslint-disable-next-line @typescript-eslint/no-misused-promises
   .createServer(async (req, res) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
