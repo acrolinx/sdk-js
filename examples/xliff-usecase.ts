@@ -16,15 +16,14 @@
 
 /* tslint:disable:no-console */
 import 'cross-fetch/polyfill';
-import {CheckResultResponse} from '../src/check';
-import {AcrolinxEndpoint} from '../src/index';
-import {EXAMPLE_ACROLINX_ENDPOINT_PROPS} from './common';
+import { CheckResultResponse } from '../src/check';
+import { AcrolinxEndpoint } from '../src/index';
+import { EXAMPLE_ACROLINX_ENDPOINT_PROPS } from './common';
 import { readFileSync } from 'fs';
 
 function waitMs(ms: number) {
-  return new Promise(resolve => setTimeout(resolve, ms));
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
-
 
 async function xliffExample() {
   const acrolinxAddress = process.argv[2];
@@ -35,7 +34,7 @@ async function xliffExample() {
     console.error('Missing AccessToken');
   }
 
-  if(!xliffDocument) {
+  if (!xliffDocument) {
     console.error('Missing xliff document');
   }
 
@@ -56,43 +55,41 @@ async function xliffExample() {
       contentFormat: 'XML',
     },
     document: {
-      reference: 'filename.xlf'
+      reference: 'filename.xlf',
     },
-    content: xliffDoc
+    content: xliffDoc,
   });
   console.log('check', check);
 
   let checkResultOrProgress: CheckResultResponse;
   do {
-    checkResultOrProgress = await acrolinxEndpoint.pollForCheckResult(accessToken, check); 
+    checkResultOrProgress = await acrolinxEndpoint.pollForCheckResult(accessToken, check);
     if ('progress' in checkResultOrProgress) {
       console.log('checkResultOrProgress:', JSON.stringify(checkResultOrProgress, null, 2));
       await waitMs(checkResultOrProgress.progress.retryAfter * 1000);
     }
   } while ('progress' in checkResultOrProgress);
 
-  checkResultOrProgress.data.issues.forEach(issue => {
+  checkResultOrProgress.data.issues.forEach((issue) => {
     const matches = issue.positionalInformation.matches;
-      const docUptoMatch = xliffDoc.substring(0, matches[matches.length - 1].originalEnd);
+    const docUptoMatch = xliffDoc.substring(0, matches[matches.length - 1].originalEnd);
 
-      // trans-unit is from xliff spec http://docs.oasis-open.org/xliff/v1.2/os/xliff-core.html#trans-unit
-      const transationalUnitStart = docUptoMatch.lastIndexOf('<trans-unit');
-      const transationalUnitEnd = docUptoMatch.indexOf('>', transationalUnitStart);
-      const transationalUnitTag = docUptoMatch.substring(transationalUnitStart, transationalUnitEnd);
+    // trans-unit is from xliff spec http://docs.oasis-open.org/xliff/v1.2/os/xliff-core.html#trans-unit
+    const transationalUnitStart = docUptoMatch.lastIndexOf('<trans-unit');
+    const transationalUnitEnd = docUptoMatch.indexOf('>', transationalUnitStart);
+    const transationalUnitTag = docUptoMatch.substring(transationalUnitStart, transationalUnitEnd);
 
-      const idRegex = new RegExp(/id="(.*?)"/g);
-      const m = idRegex.exec(transationalUnitTag);
-      if(!m) throw new Error('Id not found');
+    const idRegex = new RegExp(/id="(.*?)"/g);
+    const m = idRegex.exec(transationalUnitTag);
+    if (!m) throw new Error('Id not found');
 
-      // Get first group from match
-      const id = m[1];
+    // Get first group from match
+    const id = m[1];
 
-      console.log('Id for issue ' + issue.displaySurface + ' is: ' + id);
-
+    console.log('Id for issue ' + issue.displaySurface + ' is: ' + id);
   });
-
 }
 
-xliffExample().catch(error => {
+xliffExample().catch((error) => {
   console.error(error);
 });

@@ -21,12 +21,12 @@ Acrolinx offers different other SDKs, and examples for developing integrations.
 
 Before you start developing your own integration, you might benefit from looking into:
 
-* [Build With Acrolinx](https://support.acrolinx.com/hc/en-us/categories/10209837818770-Build-With-Acrolinx),
-* the [Guidance for the Development of Acrolinx Integrations](https://github.com/acrolinx/acrolinx-coding-guidance),
-* the [Acrolinx Platform API](https://github.com/acrolinx/platform-api)
-* the [Rendered Version of the Acrolinx Platform API](https://acrolinxapi.docs.apiary.io/#)
-* the [Acrolinx SDKs](https://github.com/acrolinx?q=sdk), and
-* the [Acrolinx Demo Projects](https://github.com/acrolinx?q=demo).
+- [Build With Acrolinx](https://support.acrolinx.com/hc/en-us/categories/10209837818770-Build-With-Acrolinx),
+- the [Guidance for the Development of Acrolinx Integrations](https://github.com/acrolinx/acrolinx-coding-guidance),
+- the [Acrolinx Platform API](https://github.com/acrolinx/platform-api)
+- the [Rendered Version of the Acrolinx Platform API](https://acrolinxapi.docs.apiary.io/#)
+- the [Acrolinx SDKs](https://github.com/acrolinx?q=sdk), and
+- the [Acrolinx Demo Projects](https://github.com/acrolinx?q=demo).
 
 ### Start Developing
 
@@ -51,16 +51,16 @@ See [`Check.ts`](examples/check.ts) for more examples.
 ```javascript
 import 'cross-fetch/polyfill'; // Use a fetch polyfill, when you target Node.js or IE11
 import assert from 'assert';
-import {AcrolinxEndpoint, DEVELOPMENT_SIGNATURE} from '@acrolinx/sdk';
+import { AcrolinxEndpoint, DEVELOPMENT_SIGNATURE } from '@acrolinx/sdk';
 
 const acrolinxEndpoint = new AcrolinxEndpoint({
-  client: {version: '1.2.3.666', signature: DEVELOPMENT_SIGNATURE},
-  acrolinxUrl: TEST_SERVER_URL, /* Add here your own test server URL */
+  client: { version: '1.2.3.666', signature: DEVELOPMENT_SIGNATURE },
+  acrolinxUrl: TEST_SERVER_URL /* Add here your own test server URL */,
 });
 
-acrolinxEndpoint.getPlatformInformation().then(info => {
+acrolinxEndpoint.getPlatformInformation().then((info) => {
   assert.ok(info.server.name.length > 0);
-  assert.ok(info.server.version.split('.').length >= 2 );
+  assert.ok(info.server.version.split('.').length >= 2);
   assert.ok(info.locales.includes('en'));
 });
 ```

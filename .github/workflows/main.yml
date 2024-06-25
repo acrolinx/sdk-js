@@ -4,15 +4,15 @@ on:
   push:
     branches: [main]
   schedule:
-    - cron: "0 2 * * *" # Everyday at 2:00AM
+    - cron: '0 2 * * *' # Everyday at 2:00AM
   pull_request:
     branches: [main]
   workflow_dispatch:
     inputs:
       reason:
-        description: "Trigger Comment (Optional)"
+        description: 'Trigger Comment (Optional)'
         required: false
-        default: "Manual Workflow Run"
+        default: 'Manual Workflow Run'
 permissions:
   contents: write
   pull-requests: write
@@ -21,11 +21,11 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      TEST_SERVER_URL:       ${{ secrets.TEST_SERVER_URL }}
+      TEST_SERVER_URL: ${{ secrets.TEST_SERVER_URL }}
       ACROLINX_API_USERNAME: ${{ secrets.ACROLINX_API_USERNAME }}
-      ACROLINX_API_TOKEN:    ${{ secrets.ACROLINX_API_TOKEN }}
-      SSO_GENERIC_TOKEN:     ${{ secrets.SSO_GENERIC_TOKEN }}
-      GITHUB_TOKEN:          ${{ secrets.GITHUB_TOKEN }}
+      ACROLINX_API_TOKEN: ${{ secrets.ACROLINX_API_TOKEN }}
+      SSO_GENERIC_TOKEN: ${{ secrets.SSO_GENERIC_TOKEN }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       ACROLINX_DEV_SIGNATURE: ${{ secrets.ACROLINX_DEV_SIGNATURE}}
 
     steps:
@@ -42,18 +42,18 @@ jobs:
           npm ci
           npm run ci
           npm run docs
-      
-      - name: Setup and Audit Source Code    
+
+      - name: Setup and Audit Source Code
         run: |
           npm ci
           npm audit --production --audit-level=moderate
-      
+
       - name: Check For Suitable Licenses
         run: |
-         export v=`node -p "require('./package.json').version"`
-         export n=`node -p "require('./package.json').name"`
-         npx license-checker --production --onlyAllow 'BSD;CC-PDDC;CC-BY-3.0;CC-BY-1.0;CC-BY-2.0;CC-BY-4.0;CC0-1.0;Apache;Artistic;MIT;MPL;ISC;Unlicense' --excludePackages "$n@$v$LICENSE_EXCLUDED_PACKAGES" --excludePrivatePackages
-      
+          export v=`node -p "require('./package.json').version"`
+          export n=`node -p "require('./package.json').name"`
+          npx license-checker --production --onlyAllow 'BSD;CC-PDDC;CC-BY-3.0;CC-BY-1.0;CC-BY-2.0;CC-BY-4.0;CC0-1.0;Apache;Artistic;MIT;MPL;ISC;Unlicense' --excludePackages "$n@$v$LICENSE_EXCLUDED_PACKAGES" --excludePrivatePackages
+
       - name: Archive Artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -68,13 +68,13 @@ jobs:
         if: github.ref == 'refs/heads/main'
         with:
           token: ${{ secrets.NPM_ACCESS_TOKEN }}
-      
+
       - name: Push Tag
         uses: anothrNick/github-tag-action@v1
         if: github.ref == 'refs/heads/main' && steps.publish.outputs.type
         env:
           CUSTOM_TAG: v${{ steps.publish.outputs.version }}
-      
+
       - name: Deploy Pages
         uses: JamesIves/github-pages-deploy-action@v4
         if: github.ref == 'refs/heads/main' && steps.publish.outputs.type
