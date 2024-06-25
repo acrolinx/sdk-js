@@ -16,16 +16,16 @@
 
 /* tslint:disable:no-console */
 import 'cross-fetch/polyfill';
-import {AcrolinxEndpoint, isSigninSuccessResult} from '../src/index';
-import {isSigninLinksResult} from '../src/signin';
-import {EXAMPLE_ACROLINX_ENDPOINT_PROPS} from './common';
+import { AcrolinxEndpoint, isSigninSuccessResult } from '../src/index';
+import { isSigninLinksResult } from '../src/signin';
+import { EXAMPLE_ACROLINX_ENDPOINT_PROPS } from './common';
 
 async function signInExample() {
   const accessToken = process.argv[2];
 
   const acrolinxEndpoint = new AcrolinxEndpoint(EXAMPLE_ACROLINX_ENDPOINT_PROPS);
 
-  const loginResult = await acrolinxEndpoint.signin({accessToken});
+  const loginResult = await acrolinxEndpoint.signin({ accessToken });
 
   if (isSigninLinksResult(loginResult)) {
     if (accessToken) {
@@ -50,6 +50,6 @@ async function signInExample() {
   }
 }
 
-signInExample().catch(error => {
+signInExample().catch((error) => {
   console.error(error);
 });

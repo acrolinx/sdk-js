@@ -16,14 +16,13 @@
 
 /* tslint:disable:no-console */
 import 'cross-fetch/polyfill';
-import {CheckResultResponse} from '../src/check';
-import {AcrolinxEndpoint} from '../src/index';
-import {EXAMPLE_ACROLINX_ENDPOINT_PROPS} from './common';
+import { CheckResultResponse } from '../src/check';
+import { AcrolinxEndpoint } from '../src/index';
+import { EXAMPLE_ACROLINX_ENDPOINT_PROPS } from './common';
 
 function waitMs(ms: number) {
-  return new Promise(resolve => setTimeout(resolve, ms));
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
-
 
 async function checkExample() {
   const acrolinxAddress = process.argv[2];
@@ -47,9 +46,9 @@ async function checkExample() {
       guidanceProfileId: capabilities.guidanceProfiles[0].id,
     },
     document: {
-      reference: 'filename.txt'
+      reference: 'filename.txt',
     },
-    content: 'Testt Textt'
+    content: 'Testt Textt',
   });
   console.log('check', check);
 
@@ -63,9 +62,8 @@ async function checkExample() {
   } while ('progress' in checkResultOrProgress);
 
   console.log('checkResult:', JSON.stringify(checkResultOrProgress, null, 2));
-
 }
 
-checkExample().catch(error => {
+checkExample().catch((error) => {
   console.error(error);
 });

@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-import {AcrolinxEndpointProps, DEVELOPMENT_SIGNATURE} from '../src';
+import { AcrolinxEndpointProps, DEVELOPMENT_SIGNATURE } from '../src';
 
 export const EXAMPLE_ACROLINX_ENDPOINT_PROPS: AcrolinxEndpointProps = {
   client: {
     signature: DEVELOPMENT_SIGNATURE,
-    version: '1.2.3.666'
+    version: '1.2.3.666',
   },
-  acrolinxUrl: 'https://test-ssl.acrolinx.com' /* Add here your own test server URL */
+  acrolinxUrl: 'https://test-ssl.acrolinx.com' /* Add here your own test server URL */,
 };
