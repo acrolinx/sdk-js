@@ -99,14 +99,8 @@ export async function fetchJson<T>(url: string, props: AcrolinxEndpointProps, in
     method: init.method || 'GET',
   };
   return fetchWithProps(url, props, init).then(
-    (res) => {
-      console.log(res);
-      return handleExpectedJsonResponse(httpRequest, res);
-    },
-    (error) => {
-      console.log(error);
-      return wrapFetchError(httpRequest, error);
-    },
+    (res) => handleExpectedJsonResponse(httpRequest, res),
+    (error) => wrapFetchError(httpRequest, error),
   );
 }
 
