@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-/* tslint:disable:no-console */
 let LOGGING_ENABLED = false;
 
 export function log(...args: any[]) {

@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-/* tslint:disable:no-console */
 import 'cross-fetch/polyfill';
 import { AcrolinxEndpoint } from '../src/index';
 import { EXAMPLE_ACROLINX_ENDPOINT_PROPS } from './common';
