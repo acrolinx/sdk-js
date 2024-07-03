@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-/* tslint:disable:no-console */
 import * as parse from 'co-body';
 import * as http from 'http';
 import { AcrolinxServerMock, StringMap } from './mock-server';

@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-/* tslint:disable:no-console object-literal-sort-keys */
 import * as fetchMock from 'fetch-mock';
 import { MockResponseObject } from 'fetch-mock';
 import * as _ from 'lodash';

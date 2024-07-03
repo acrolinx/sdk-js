@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-/* tslint:disable:no-console */
 import 'cross-fetch/polyfill';
 import { CheckResultResponse } from '../src/check';
 import { AcrolinxEndpoint } from '../src/index';
