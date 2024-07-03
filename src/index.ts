@@ -197,7 +197,7 @@ export interface CancelablePromiseWrapper<T> {
 
   getId(): string | undefined;
 
-  cancel(): void;
+  cancel(): Promise<void>;
 }
 
 const VALIDATE_APP_ACCESS_TOKEN_PATH = '/api/v1/apps/whoami';
@@ -505,36 +505,36 @@ export class AcrolinxEndpoint {
       cancelPromiseReject = reject;
     });
 
-    function cancel() {
+    async function cancel() {
       canceledByClient = true;
       cancelPromiseReject(createCheckCanceledByClientError());
-      cancelOnServerIfPossibleAndStillNeeded();
+      await cancelOnServerIfPossibleAndStillNeeded();
     }
 
-    const handlePotentialCancellation = () => {
+    const handlePotentialCancellation = async () => {
       if (canceledByClient) {
-        cancelOnServerIfPossibleAndStillNeeded();
+        await cancelOnServerIfPossibleAndStillNeeded();
         // We don't want to poll forever if the canceling does not work on the server.
         // To be consistent we throw the same exception, that the server would throw while polling.
         throw createCheckCanceledByClientError();
       }
     };
 
-    const cancelOnServerIfPossibleAndStillNeeded = () => {
+    const cancelOnServerIfPossibleAndStillNeeded = async () => {
       if (!requestedCanceledOnServer && runningCheck) {
         requestedCanceledOnServer = true;
-        this.cancelAsyncStartedProcess(accessToken, runningCheck, opts);
+        await this.cancelAsyncStartedProcess(accessToken, runningCheck, opts);
       }
     };
 
     const poll = async (): Promise<Result> => {
       runningCheck = await asyncStartedProcessPromise;
-      handlePotentialCancellation();
+      await handlePotentialCancellation();
 
       let checkResultOrProgress: AsyncApiResponse<Result>;
       do {
         checkResultOrProgress = await this.pollForAsyncResult(accessToken, runningCheck, opts);
-        handlePotentialCancellation();
+        await handlePotentialCancellation();
 
         if (isProgressResponse(checkResultOrProgress)) {
           if (opts.onProgress) {
@@ -542,7 +542,7 @@ export class AcrolinxEndpoint {
           }
 
           await waitMs(checkResultOrProgress.progress.retryAfter * 1000);
-          handlePotentialCancellation();
+          await handlePotentialCancellation();
         }
       } while (isProgressResponse(checkResultOrProgress));
 
