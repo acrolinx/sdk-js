@@ -65,7 +65,6 @@ export function toJson<T>(httpRequest: HttpRequest, res: Response): T | Promise<
   });
 }
 
-/* tslint:disable:no-console */
 export async function fetchWithProps(
   input: RequestInfo,
   props: AcrolinxEndpointProps,

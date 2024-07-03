@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-/* tslint:disable:no-console */
 import 'cross-fetch/polyfill';
 import { AcrolinxEndpoint, isSigninSuccessResult } from '../src/index';
 import { isSigninLinksResult } from '../src/signin';
