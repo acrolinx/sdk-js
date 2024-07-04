@@ -167,4 +167,27 @@ describe('AI-service', () => {
       );
     };
   });
+
+  describe('getAIAssistantUrl', () => {
+    it('should return correct URL without targetId', () => {
+      const expectedPath = '/ai-service/api/v1/content-cube/assistant';
+      const url = aiService.getAIAssistantUrl();
+      const parsedUrl = new URL(url);
+
+      expect(parsedUrl.origin).toBe(DUMMY_ENDPOINT_PROPS.acrolinxUrl);
+      expect(parsedUrl.pathname).toBe(expectedPath);
+      expect(parsedUrl.searchParams.get('targetId')).toBeNull();
+    });
+
+    it('should return correct URL with targetId', () => {
+      const targetId = 'test-target-id';
+      const expectedPath = '/ai-service/api/v1/content-cube/assistant';
+      const url = aiService.getAIAssistantUrl(targetId);
+      const parsedUrl = new URL(url);
+
+      expect(parsedUrl.origin).toBe(DUMMY_ENDPOINT_PROPS.acrolinxUrl);
+      expect(parsedUrl.pathname).toBe(expectedPath);
+      expect(parsedUrl.searchParams.get('targetId')).toBe(targetId);
+    });
+  });
 });
