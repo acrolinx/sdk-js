@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import * as mockFetch from 'fetch-mock';
+import fetchMock from 'fetch-mock';
 import { AcrolinxEndpoint, AcrolinxError, Issue } from '../../src/index';
 import { DUMMY_ACCESS_TOKEN } from '../test-utils/mock-server';
 import { DUMMY_ENDPOINT_PROPS } from './common';
@@ -26,13 +26,13 @@ describe('AI-service', () => {
   const aiService = new AIService(endpoint);
 
   afterEach(() => {
-    mockFetch.restore();
+    fetchMock.restore();
   });
 
   describe('/ai-enabled', () => {
     const aiEnabledMatcher = 'end:/ai-enabled?privilege=generate';
     it('truthy response', async () => {
-      mockFetch.mock(aiEnabledMatcher, {
+      fetchMock.mock(aiEnabledMatcher, {
         status: 200,
         body: { value: true, tenant: 'int-1', userHasPrivilege: true },
       });
@@ -42,23 +42,23 @@ describe('AI-service', () => {
     });
 
     it('falsy response', async () => {
-      mockFetch.mock(aiEnabledMatcher, {
+      fetchMock.mock(aiEnabledMatcher, {
         status: 200,
         body: { value: true, tenant: 'int-1', userHasPrivilege: false },
       });
       const response1 = await aiService.isAIEnabled(DUMMY_ACCESS_TOKEN);
       expect(response1).toBe(false);
-      mockFetch.restore();
+      fetchMock.restore();
 
-      mockFetch.mock(aiEnabledMatcher, {
+      fetchMock.mock(aiEnabledMatcher, {
         status: 200,
         body: { value: false, tenant: 'int-1', userHasPrivilege: true },
       });
       const response2 = await aiService.isAIEnabled(DUMMY_ACCESS_TOKEN);
       expect(response2).toBe(false);
-      mockFetch.restore();
+      fetchMock.restore();
 
-      mockFetch.mock(aiEnabledMatcher, {
+      fetchMock.mock(aiEnabledMatcher, {
         status: 200,
         body: { value: false, tenant: 'int-1', userHasPrivilege: false },
       });
@@ -67,7 +67,7 @@ describe('AI-service', () => {
     });
 
     it('error response', async () => {
-      mockFetch.mock(aiEnabledMatcher, {
+      fetchMock.mock(aiEnabledMatcher, {
         status: 403,
         body: {
           httpErrorCode: 403,
@@ -148,7 +148,7 @@ describe('AI-service', () => {
       const targetUuid = '123e4567-e89b-12d3-a456-426614174000';
       const aiRewriteContext = DUMMY_AI_REWRITE_CONTEXT;
 
-      mockFetch.mock(getGetAIChatCompletionMatcher(count, internalName), {
+      fetchMock.mock(getGetAIChatCompletionMatcher(count, internalName), {
         status: responseStatus,
         body: dummyResponseBody,
       });

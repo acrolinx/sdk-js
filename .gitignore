@@ -18,3 +18,4 @@ testdocs
 
 # Eclipse
 .project
+.settings/
