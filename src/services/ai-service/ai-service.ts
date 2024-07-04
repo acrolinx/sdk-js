@@ -70,7 +70,9 @@ export class AIService {
   public getAIAssistantUrl(targetId?: string): string {
     const path = '/content-cube/assistant';
     const url = new URL(this.endpoint.props.acrolinxUrl);
-    
+
+    url.pathname = url.pathname.endsWith('/') ? url.pathname.slice(0, -1) : url.pathname;
+  
     url.pathname += this.constructFullPath(path);
     
     if (targetId) {
