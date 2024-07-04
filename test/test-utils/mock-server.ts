@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 
-import fetchMock from 'fetch-mock';
+const fetchMock = require("fetch-mock");
+import { MockResponseObject } from './common-mocking';
 import * as _ from 'lodash';
 import { SuccessResponse } from '../../src/common-types';
 import { AcrolinxApiError, AcrolinxError, ErrorType } from '../../src/errors';
@@ -32,7 +33,6 @@ import {
   SIGNIN_URL_EXPIRED_ERROR,
 } from './mocked-errors';
 
-type MockResponseObject = fetchMock.MockResponseObject;
 
 export { SIGNIN_URL_EXPIRED_ERROR };
 

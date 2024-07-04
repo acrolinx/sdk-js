@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import fetchMock from 'fetch-mock';
+const fetchMock = require("fetch-mock");
 import { AcrolinxEndpoint, AcrolinxError, Issue } from '../../src/index';
 import { DUMMY_ACCESS_TOKEN } from '../test-utils/mock-server';
 import { DUMMY_ENDPOINT_PROPS } from './common';

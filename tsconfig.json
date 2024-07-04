@@ -19,7 +19,7 @@
     "outDir": "dist",
     "baseUrl": ".",
     "paths": {
-      "fetch-mock": ["node_modules/fetch-mock/es5/client"]
+      "fetch-mock": ["node_modules/fetch-mock/src/lib"]
     }
   },
   "exclude": ["node_modules", "dist"],
