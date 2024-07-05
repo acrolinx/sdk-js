@@ -8,11 +8,7 @@ on:
   pull_request:
     branches: [main]
   workflow_dispatch:
-    inputs:
-      reason:
-        description: 'Trigger Comment (Optional)'
-        required: false
-        default: 'Manual Workflow Run'
+
 permissions:
   contents: write
   pull-requests: write
@@ -32,7 +28,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Node.JS
+      - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 20
