@@ -55,10 +55,12 @@ export class AIService {
     const { targetUuid } = params;
 
     return post(
-      this.constructFullPath(`/ai/chat-completions?count=${params.count}&issueInternalName=${internalName}`),
+      this.constructFullPath('/ai/chat-completions'),
       {
         prompt,
         targetUuid,
+        count: params.count,
+        issueInternalName: internalName
       },
       {},
       this.endpoint.props,
