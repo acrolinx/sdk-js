@@ -83,8 +83,7 @@ describe('AI-service', () => {
 
   describe('/getAIChatCompletions', () => {
     const REQUEST_ERROR_MESSAGE = 'There was an error processing your request. It has been logged (ID some-random-id).';
-    const getGetAIChatCompletionMatcher = (count: number, internalName: string) =>
-      `end:/ai-service/api/v1/ai/chat-completions?count=${count}&issueInternalName=${internalName}`;
+    const getGetAIChatCompletionMatcher = () => 'end:/ai-service/api/v1/ai/chat-completions';
 
     it('correct response', async () => {
       const aiResponse = 'some responds';
@@ -148,7 +147,7 @@ describe('AI-service', () => {
       const targetUuid = '123e4567-e89b-12d3-a456-426614174000';
       const aiRewriteContext = DUMMY_AI_REWRITE_CONTEXT;
 
-      mockFetch.mock(getGetAIChatCompletionMatcher(count, internalName), {
+      mockFetch.mock(getGetAIChatCompletionMatcher(), {
         status: responseStatus,
         body: dummyResponseBody,
       });
