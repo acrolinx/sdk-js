@@ -4,23 +4,21 @@ on:
   pull_request:
     branches: [main]
   schedule:
-    - cron: '0 2 * * *' # Everyday at 2:00AM
+    - cron: '0 2 * * *'
   workflow_dispatch:
 
 jobs:
   test:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
     runs-on: ${{ matrix.os }}
-
     env:
       TEST_SERVER_URL: ${{ secrets.TEST_SERVER_URL }}
       ACROLINX_API_USERNAME: ${{ secrets.ACROLINX_API_USERNAME }}
       ACROLINX_API_TOKEN: ${{ secrets.ACROLINX_API_TOKEN }}
       SSO_GENERIC_TOKEN: ${{ secrets.SSO_GENERIC_TOKEN }}
       ACROLINX_DEV_SIGNATURE: ${{ secrets.ACROLINX_DEV_SIGNATURE}}
-
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
 
     steps:
       - name: Checkout Code
@@ -30,6 +28,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
+          cache: 'npm'
 
       - name: Compile and Test
         run: |
