@@ -43,7 +43,7 @@ export enum ErrorType {
   NoGuidanceProfileConfigured = 'noGuidanceProfileConfigured',
   AppSignatureRejected = 'appSignatureRejected',
   LicenseLimitExceeded = 'licenseLimitExceeded',
-  SocketTimeout = 'socket_timeout',
+  RequestTimeout = 'request_timeout',
 }
 
 export interface AcrolinxErrorProps {
