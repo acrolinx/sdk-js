@@ -25,7 +25,6 @@ export enum ErrorType {
   HttpErrorStatus = 'http_error_status',
   HttpConnectionProblem = 'http_connection_problem',
   InvalidJson = 'invalid_json',
-
   Client = 'client',
   Server = 'server',
   ClientSignatureMissing = 'clientSignatureMissing',
@@ -44,6 +43,7 @@ export enum ErrorType {
   NoGuidanceProfileConfigured = 'noGuidanceProfileConfigured',
   AppSignatureRejected = 'appSignatureRejected',
   LicenseLimitExceeded = 'licenseLimitExceeded',
+  SocketTimeout = 'socket_timeout',
 }
 
 export interface AcrolinxErrorProps {
