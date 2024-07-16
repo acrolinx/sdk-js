@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import { afterEach, beforeEach, describe, expect, test } from 'vitest';
 import { CheckCanceledByClientError, ErrorType } from '../../src/errors';
 import { AcrolinxEndpoint } from '../../src/index';
 import { mockAcrolinxServer, mockBrokenJsonServer, restoreOriginalFetch } from '../test-utils/mock-server';
@@ -31,7 +32,7 @@ describe('errors', () => {
     restoreOriginalFetch();
   });
 
-  it('should return an failing promise for broken json', async () => {
+  test('should return an failing promise for broken json', async () => {
     const api = new AcrolinxEndpoint({ ...DUMMY_ENDPOINT_PROPS, acrolinxUrl: BROKEN_JSON_SERVER });
     try {
       await api.getJsonFromUrl(BROKEN_JSON_SERVER);
@@ -41,7 +42,7 @@ describe('errors', () => {
     expect.hasAssertions();
   });
 
-  it('should return an api error for invalid signin poll address', async () => {
+  test('should return an api error for invalid signin poll address', async () => {
     const api = new AcrolinxEndpoint(DUMMY_ENDPOINT_PROPS);
     try {
       await api.pollForSignin({
@@ -59,7 +60,7 @@ describe('errors', () => {
 
   describe('custom errors and instanceof', () => {
     // Needed because of https://github.com/Microsoft/TypeScript/wiki/Breaking-Changes#extending-built-ins-like-error-array-and-map-may-no-longer-work
-    it('CheckCanceledByClientError should support instanceof', () => {
+    test('CheckCanceledByClientError should support instanceof', () => {
       const error = new CheckCanceledByClientError({
         detail: 'The check was canceled. No result is available.',
         type: ErrorType.CheckCanceled,

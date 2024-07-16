@@ -38,6 +38,7 @@ import {
 } from '../test-utils/mock-server';
 import { expectFailingPromise } from '../test-utils/utils';
 import { DUMMY_ENDPOINT_PROPS, DUMMY_SERVER_URL } from './common';
+import { describe, beforeEach, afterEach, expect, vi, test } from 'vitest';
 
 describe('signin', () => {
   let endpoint: AcrolinxEndpoint;
@@ -52,14 +53,14 @@ describe('signin', () => {
     restoreOriginalFetch();
   });
 
-  it('should return the signin links', async () => {
+  test('should return the signin links', async () => {
     const result = (await endpoint.signin()) as SigninLinksResult;
     expect(isSigninLinksResult(result)).toBeTruthy();
     expect(_.startsWith(result.links.interactive, DUMMY_SERVER_URL + DUMMY_SIGNIN_LINK_PATH_INTERACTIVE)).toBeTruthy();
     expect(result.data.interactiveLinkTimeout).toEqual(DUMMY_INTERACTIVE_LINK_TIMEOUT);
   });
 
-  it('should return the provided accessToken if valid', async () => {
+  test('should return the provided accessToken if valid', async () => {
     const result = (await endpoint.signin({ accessToken: DUMMY_ACCESS_TOKEN })) as SigninLinksResult;
     if (isSigninSuccessResult(result)) {
       expect(result.data.accessToken).toEqual(DUMMY_ACCESS_TOKEN);
@@ -68,7 +69,7 @@ describe('signin', () => {
     }
   });
 
-  it('polling should return accessToken after signin', async () => {
+  test('polling should return accessToken after signin', async () => {
     const signinLinks = (await endpoint.signin()) as SigninLinksResult;
 
     const pollResult1 = (await endpoint.pollForSignin(signinLinks)) as PollMoreResult;
@@ -83,33 +84,33 @@ describe('signin', () => {
   });
 
   describe('signInWithSSO', () => {
-    it('success', async () => {
+    test('success', async () => {
       mockedAcrolinxServer.enableSSO(SsoMockMode.direct);
       const signinSuccess = await endpoint.signInWithSSO(SSO_GENERIC_TOKEN, 'kaja');
       expect(signinSuccess.data.user.username).toEqual('kaja');
     });
 
-    it('failure because of disabled SSO', async () => {
+    test('failure because of disabled SSO', async () => {
       return expectFailingPromise(endpoint.signInWithSSO(SSO_GENERIC_TOKEN, 'kaja'), ErrorType.SSO);
     });
 
-    it('failure because of wrong generic password', async () => {
+    test('failure because of wrong generic password', async () => {
       mockedAcrolinxServer.enableSSO(SsoMockMode.direct);
       return expectFailingPromise(endpoint.signInWithSSO('wrongGenericPassword', 'kaja'), ErrorType.SSO);
     });
   });
 
   describe.only('singInInteractive', () => {
-    it('success with token', async () => {
-      const onSignInUrl = jest.fn();
+    test('success with token', async () => {
+      const onSignInUrl = vi.fn();
       const result = await endpoint.singInInteractive({ onSignInUrl, accessToken: DUMMY_ACCESS_TOKEN });
 
       expect(onSignInUrl).toHaveBeenCalledTimes(0);
       expect(result.user.username).toEqual(DUMMY_USER_NAME);
     });
 
-    it('polling', async () => {
-      const onSignInUrl = jest.fn();
+    test('polling', async () => {
+      const onSignInUrl = vi.fn();
       const singInInteractivePromise = endpoint.singInInteractive({ onSignInUrl });
 
       mockedAcrolinxServer.fakeSignIn();
@@ -121,8 +122,8 @@ describe('signin', () => {
       expect(result.user.username).toEqual(DUMMY_USER_NAME);
     });
 
-    it('polling timeout', async () => {
-      const onSignInUrl = jest.fn();
+    test('polling timeout', async () => {
+      const onSignInUrl = vi.fn();
       const singInInteractivePromise = endpoint.singInInteractive({ onSignInUrl, timeoutMs: 100 });
 
       await waitMs(1000);

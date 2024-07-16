@@ -2,6 +2,7 @@ import { AcrolinxEndpoint, CommonIssue, DEVELOPMENT_SIGNATURE } from '../../src'
 import * as dotenv from 'dotenv';
 import 'cross-fetch/polyfill';
 import { AIService } from '../../src/services/ai-service/ai-service';
+import { describe, beforeEach, expect, test } from 'vitest';
 
 dotenv.config();
 
@@ -32,7 +33,7 @@ describe('Acrolinx One E2E Tests', () => {
   describe.skip('AI Service Integration Tests', () => {
     // This tests requires valid keycloak access token
 
-    it('getAiFeatures returns whether certain AI features are enabled', async () => {
+    test('getAiFeatures returns whether certain AI features are enabled', async () => {
       const aiService = new AIService(endpoint);
 
       const aiFeatures = await aiService.getAiFeatures(ACROLINX_API_TOKEN);
@@ -41,7 +42,7 @@ describe('Acrolinx One E2E Tests', () => {
       expect(typeof aiFeatures.aiAssistant).toEqual('boolean');
     });
 
-    it('check if the ai service is activated', async () => {
+    test('check if the ai service is activated', async () => {
       const aiService = new AIService(endpoint);
 
       const aiResult = await aiService.getAIEnabled(ACROLINX_API_TOKEN);
@@ -50,7 +51,7 @@ describe('Acrolinx One E2E Tests', () => {
       expect(aiResult.userHasPrivilege).toBeDefined();
     });
 
-    it('get a chat completion from the ai service', async () => {
+    test('get a chat completion from the ai service', async () => {
       const aiService = new AIService(endpoint);
       const aiResult = await aiService.getAIChatCompletion(
         {
@@ -69,7 +70,7 @@ describe('Acrolinx One E2E Tests', () => {
   });
 
   describe('Logging Tests', () => {
-    it('initialize logging', () => {
+    test('initialize logging', () => {
       expect(endpoint.loggingBuffer).toBeDefined();
     });
   });

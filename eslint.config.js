@@ -20,7 +20,7 @@ module.exports = [
     },
 
     plugins: {
-      sonarjs
+      sonarjs,
     },
 
     rules: {

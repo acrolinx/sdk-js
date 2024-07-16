@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import { describe, expect, test } from 'vitest';
 import { DEVELOPMENT_SIGNATURE } from '../../src';
 import { AcrolinxEndpoint } from '../../src/index';
 import { ACROLINX_DEV_SIGNATURE } from '../integration-server/acrolinx-endpoint.test';
@@ -31,7 +32,7 @@ function createEndpoint(acrolinxUrl: string) {
 
 describe('AcrolinxEndpoint', () => {
   describe('sanitize acrolinxUrl', () => {
-    it('trim and remove training slash', () => {
+    test('trim and remove training slash', () => {
       expect(createEndpoint(' http://host/ ').props.acrolinxUrl).toEqual('http://host');
       // eslint-disable-next-line sonarjs/no-duplicate-string
       expect(createEndpoint(' http://host/path/ ').props.acrolinxUrl).toEqual('http://host/path');

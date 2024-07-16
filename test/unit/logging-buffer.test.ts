@@ -2,6 +2,7 @@ import { LogBuffer, LogEntry, LogEntryType, LoggingConfig } from '../../src/util
 
 const TEST_LOG_MESSAGE = 'Test log message';
 const NETWORK_ERROR_MESSAGE = 'Network error';
+import { describe, afterEach, expect, beforeEach, vi, test } from 'vitest';
 
 describe('LogBuffer', () => {
   let logBuffer: LogBuffer;
@@ -18,11 +19,11 @@ describe('LogBuffer', () => {
       enableCloudLogging: true,
     };
     logBuffer = new LogBuffer(acrolinxUrl, mockConfig);
-    jest.spyOn(console, 'error').mockImplementation(() => {});
+    vi.spyOn(console, 'error').mockImplementation(() => {});
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   test('should only add log entry to buffer if enableCloudLogging is true and log level is sufficient', () => {
@@ -59,7 +60,7 @@ describe('LogBuffer', () => {
   });
 
   test('should flush logs to server when buffer reaches batch size', async () => {
-    const mockFetch = jest.fn().mockResolvedValue({ ok: true });
+    const mockFetch = vi.fn().mockResolvedValue({ ok: true });
     global.fetch = mockFetch;
 
     for (let i = 0; i < mockConfig.batchSize; i++) {
@@ -78,7 +79,7 @@ describe('LogBuffer', () => {
   });
 
   test('should retry sending logs on failure', async () => {
-    const mockFetch = jest.fn();
+    const mockFetch = vi.fn();
     mockFetch
       .mockRejectedValueOnce(new Error(NETWORK_ERROR_MESSAGE))
       .mockRejectedValueOnce(new Error(NETWORK_ERROR_MESSAGE))
@@ -117,7 +118,7 @@ describe('LogBuffer', () => {
   });
 
   test('should handle failed server response', async () => {
-    const mockFetch = jest.fn().mockResolvedValueOnce({ ok: false });
+    const mockFetch = vi.fn().mockResolvedValueOnce({ ok: false });
     global.fetch = mockFetch;
 
     const logEntry: LogEntry = {
@@ -135,7 +136,7 @@ describe('LogBuffer', () => {
   });
 
   test('should flush logs immediately when log type is error and cloud logging is enabled', async () => {
-    const mockFetch = jest.fn().mockResolvedValueOnce({ ok: true });
+    const mockFetch = vi.fn().mockResolvedValueOnce({ ok: true });
     global.fetch = mockFetch;
 
     const errorLogEntry: LogEntry = {
