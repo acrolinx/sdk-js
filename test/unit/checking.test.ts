@@ -17,6 +17,7 @@
 import { AcrolinxEndpoint } from '../../src/index';
 import { DUMMY_ACCESS_TOKEN, mockAcrolinxServer, restoreOriginalFetch } from '../test-utils/mock-server';
 import { DUMMY_ENDPOINT_PROPS, DUMMY_SERVER_URL } from './common';
+import { describe, afterEach, expect, beforeEach, test } from 'vitest';
 
 describe('checking', () => {
   let endpoint: AcrolinxEndpoint;
@@ -30,7 +31,7 @@ describe('checking', () => {
     restoreOriginalFetch();
   });
 
-  it('get checking capabilities', async () => {
+  test('get checking capabilities', async () => {
     const capabilities = await endpoint.getCheckingCapabilities(DUMMY_ACCESS_TOKEN);
     expect(capabilities.guidanceProfiles.length).toBeGreaterThan(0);
   });

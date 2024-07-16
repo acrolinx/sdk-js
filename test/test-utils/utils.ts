@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
+import { describe, expect, test } from 'vitest';
 import { ErrorType, HttpRequest } from '../../src/errors';
 
-export function testIf(condition: boolean | string | undefined, testName: string, test: (done: () => void) => void) {
+export function testIf(condition: boolean | string | undefined, testName: string, testFn: (done: () => void) => void) {
   if (condition) {
-    it(testName, test);
+    test(testName, testFn);
   } else {
-    it.skip(testName, test);
+    test.skip(testName, test);
   }
 }
 

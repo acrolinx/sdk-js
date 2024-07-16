@@ -2,6 +2,7 @@ import * as mockFetch from 'fetch-mock';
 import { AcrolinxEndpoint, IntService } from '../../src/index';
 import { DUMMY_ACCESS_TOKEN } from '../test-utils/mock-server';
 import { DUMMY_ENDPOINT_PROPS } from './common';
+import { describe, afterEach, expect, beforeEach, test } from 'vitest';
 
 describe('Integration-service', () => {
   let endpoint: AcrolinxEndpoint;
@@ -14,7 +15,7 @@ describe('Integration-service', () => {
   describe('/config', () => {
     const configEndpointMatcher = 'end:/int-service/api/v1/config';
 
-    it('truthy response for correct client signature', async () => {
+    test('truthy response for correct client signature', async () => {
       endpoint = new AcrolinxEndpoint(DUMMY_ENDPOINT_PROPS);
       intService = new IntService(endpoint);
       // Mock the endpoint with expected headers check and updated response property
@@ -37,7 +38,7 @@ describe('Integration-service', () => {
       expect(response.activateGetSuggestionReplacement).toBe(true); // Assertion updated to check new property name
     });
 
-    it('Default config response for unavailable client signature', async () => {
+    test('Default config response for unavailable client signature', async () => {
       endpoint = new AcrolinxEndpoint(DUMMY_ENDPOINT_PROPS);
       intService = new IntService(endpoint);
       // Mock the endpoint with expected headers check and updated response property

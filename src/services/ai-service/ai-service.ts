@@ -60,7 +60,7 @@ export class AIService {
         prompt,
         targetUuid,
         count: params.count,
-        issueInternalName: internalName
+        issueInternalName: internalName,
       },
       {},
       this.endpoint.props,

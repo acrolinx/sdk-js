@@ -18,6 +18,7 @@ import { AcrolinxEndpoint } from '../../src/index';
 import { SigninLinksResult } from '../../src/signin';
 import { AcrolinxServerMock, mockAcrolinxServer, restoreOriginalFetch } from '../test-utils/mock-server';
 import { DUMMY_ENDPOINT_PROPS, DUMMY_SERVER_URL } from './common';
+import { describe, afterEach, expect, beforeEach, test } from 'vitest';
 
 describe('corsWithCredentials', () => {
   let endpoint: AcrolinxEndpoint;
@@ -31,7 +32,7 @@ describe('corsWithCredentials', () => {
     restoreOriginalFetch();
   });
 
-  it('corsWithCredentials === true should set fetch option credentials to "include"', async () => {
+  test('corsWithCredentials === true should set fetch option credentials to "include"', async () => {
     endpoint = new AcrolinxEndpoint({ ...DUMMY_ENDPOINT_PROPS, corsWithCredentials: true });
 
     const result = (await endpoint.signin()) as SigninLinksResult;
@@ -43,7 +44,7 @@ describe('corsWithCredentials', () => {
   /**
    * Ensure credentials: 'same-origin' in old browsers: https://github.com/github/fetch#sending-cookies
    */
-  it('corsWithCredentials !== true should set fetch option credentials to "same-origin"', async () => {
+  test('corsWithCredentials !== true should set fetch option credentials to "same-origin"', async () => {
     endpoint = new AcrolinxEndpoint(DUMMY_ENDPOINT_PROPS);
 
     const result = (await endpoint.signin()) as SigninLinksResult;

@@ -20,6 +20,7 @@ import { DUMMY_ENDPOINT_PROPS } from './common';
 import { DUMMY_AI_REWRITE_CONTEXT } from '../test-utils/dummy-data';
 import { AIServiceErrorTypes, WriteResponse } from '../../src/services/ai-service/ai-service.types';
 import { AIService } from '../../src/services/ai-service/ai-service';
+import { describe, afterEach, expect, test } from 'vitest';
 
 describe('AI-service', () => {
   let endpoint: AcrolinxEndpoint = new AcrolinxEndpoint(DUMMY_ENDPOINT_PROPS);
@@ -31,7 +32,7 @@ describe('AI-service', () => {
 
   describe('/ai-enabled', () => {
     const aiEnabledMatcher = 'end:/ai-enabled?privilege=generate';
-    it('truthy response', async () => {
+    test('truthy response', async () => {
       mockFetch.mock(aiEnabledMatcher, {
         status: 200,
         body: { value: true, tenant: 'int-1', userHasPrivilege: true },
@@ -41,7 +42,7 @@ describe('AI-service', () => {
       expect(response).toBe(true);
     });
 
-    it('falsy response', async () => {
+    test('falsy response', async () => {
       mockFetch.mock(aiEnabledMatcher, {
         status: 200,
         body: { value: true, tenant: 'int-1', userHasPrivilege: false },
@@ -66,7 +67,7 @@ describe('AI-service', () => {
       expect(response3).toBe(false);
     });
 
-    it('error response', async () => {
+    test('error response', async () => {
       mockFetch.mock(aiEnabledMatcher, {
         status: 403,
         body: {
@@ -85,13 +86,13 @@ describe('AI-service', () => {
     const REQUEST_ERROR_MESSAGE = 'There was an error processing your request. It has been logged (ID some-random-id).';
     const getGetAIChatCompletionMatcher = () => 'end:/ai-service/api/v1/ai/chat-completions';
 
-    it('correct response', async () => {
+    test('correct response', async () => {
       const aiResponse = 'some responds';
       const response = await createDummyAIServiceRequest(200, { response: aiResponse });
 
       expect(response.response).toBe(aiResponse);
     });
-    it('error response', async () => {
+    test('error response', async () => {
       const response = createDummyAIServiceRequest(500, {
         httpErrorCode: 500,
         errorTitle: REQUEST_ERROR_MESSAGE,
@@ -113,7 +114,7 @@ describe('AI-service', () => {
       );
     });
 
-    it('should throw if response was filtered', async () => {
+    test('should throw if response was filtered', async () => {
       const FILTERED_RESPONSE_MESSAGE = 'The response was filtered...bla bla';
       const response = createDummyAIServiceRequest(400, {
         httpErrorCode: 400,

@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import { describe, beforeEach, afterEach, expect, test } from 'vitest';
 import { AcrolinxEndpoint } from '../../src/index';
 import { DUMMY_ACCESS_TOKEN, mockAcrolinxServer, restoreOriginalFetch } from '../test-utils/mock-server';
 import { DUMMY_ENDPOINT_PROPS, DUMMY_SERVER_URL } from './common';
@@ -30,7 +31,7 @@ describe('platform-notifications', () => {
     restoreOriginalFetch();
   });
 
-  it('get notifications', async () => {
+  test('get notifications', async () => {
     const serverMessages = await endpoint.getServerNotifications(DUMMY_ACCESS_TOKEN, 0);
     expect(Array.isArray(serverMessages.data.platformNotifications)).toBe(true);
     expect(serverMessages.data.requestTimeInMilliseconds).toBeGreaterThan(0);
