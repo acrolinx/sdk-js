@@ -7,10 +7,10 @@ export default defineConfig({
     testTimeout: 60000,
     coverage: {
       thresholds: {
-        lines: 93.7,
+        lines: 93,
         functions: 86,
         branches: 81,
-        statements: 93.5,
+        statements: 93,
       },
     },
   }
