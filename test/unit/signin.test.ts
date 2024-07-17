@@ -100,7 +100,7 @@ describe('signin', () => {
     });
   });
 
-  describe.only('singInInteractive', () => {
+  describe('singInInteractive', () => {
     test('success with token', async () => {
       const onSignInUrl = vi.fn();
       const result = await endpoint.singInInteractive({ onSignInUrl, accessToken: DUMMY_ACCESS_TOKEN });
