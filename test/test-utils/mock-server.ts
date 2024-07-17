@@ -14,8 +14,7 @@
  * limitations under the License.
  */
 
-import * as fetchMock from 'fetch-mock';
-import { MockResponseObject } from 'fetch-mock';
+import fetchMock from 'fetch-mock';
 import * as _ from 'lodash';
 import { SuccessResponse } from '../../src/common-types';
 import { AcrolinxApiError, AcrolinxError, ErrorType } from '../../src/errors';
@@ -58,8 +57,8 @@ export interface StringMap {
   [key: string]: string;
 }
 
-function isMockResponseObject(o: MockResponseObject | {}): o is MockResponseObject {
-  return !!(o as MockResponseObject).body;
+function isMockResponseObject(o: fetchMock.MockResponseObject | {}): o is fetchMock.MockResponseObject {
+  return !!(o as fetchMock.MockResponseObject).body;
 }
 
 function isAcrolinxApiError(o: AcrolinxApiError | {}): o is AcrolinxApiError {
@@ -150,7 +149,7 @@ export class AcrolinxServerMock {
     this.ssoMockMode = ssoMockMode;
   }
 
-  public handleFetchRequest = (url: string, optsArg: RequestInit = {}): MockResponseObject => {
+  public handleFetchRequest = (url: string, optsArg: RequestInit = {}): fetchMock.MockResponseObject => {
     const opts = { method: 'GET', ...optsArg, headers: (optsArg.headers || {}) as StringMap };
 
     this.requests.push({ opts, url });
@@ -366,7 +365,7 @@ export function mockAcrolinxServer(url: string): AcrolinxServerMock {
 }
 
 export function mockBrokenJsonServer(url: string) {
-  fetchMock.mock('begin:' + url, (_url: string, _opts: RequestInit): MockResponseObject => {
+  fetchMock.mock('begin:' + url, (_url: string, _opts: RequestInit): fetchMock.MockResponseObject => {
     return { body: "This isn't the json you are looking for" };
   });
 }
