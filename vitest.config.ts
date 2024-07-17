@@ -6,7 +6,7 @@ export default defineConfig({
     hookTimeout: 60000,
     testTimeout: 60000,
     coverage: {
-      exclude: ['./examples'],
+      include: ['src'],
       thresholds: {
         lines: 93,
         functions: 86,
