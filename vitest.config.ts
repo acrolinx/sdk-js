@@ -8,7 +8,7 @@ export default defineConfig({
     coverage: {
       exclude: ['./examples'],
       thresholds: {
-        lines: 79,
+        lines: 93,
         functions: 86,
         branches: 81,
         statements: 93,
