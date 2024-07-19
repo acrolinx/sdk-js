@@ -15,11 +15,12 @@
     "strictPropertyInitialization": true,
     "removeComments": true,
     "sourceMap": true,
+    "skipLibCheck": true,
     "declaration": true,
     "outDir": "dist",
     "baseUrl": ".",
   },
-  "include": ["src"],
+  "include": ["src", "test"],
   "typedocOptions": {
     "theme": "default",
     "readme": "none",
