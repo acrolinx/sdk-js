@@ -1,13 +1,13 @@
 {
   "name": "@acrolinx/sdk",
-  "version": "1.3.4",
+  "version": "1.3.5",
   "description": "Acrolinx JavaScript SDK for the Acrolinx API",
   "license": "Apache-2.0",
   "author": "Acrolinx",
   "url": "https://www.acrolinx.com",
   "repository": "https://github.com/acrolinx/sdk-js",
   "main": "dist/src/index.js",
-  "types": "dist/test/index.d.ts",
+  "types": "dist/src/index.d.ts",
   "engines": {
     "node": ">=20"
   },
