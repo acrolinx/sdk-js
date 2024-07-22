@@ -78,7 +78,6 @@ function assertDictionaryScopes(scopes: DictionaryScope[]) {
 
 describe('e2e - AcrolinxEndpoint', () => {
   describe('errors by bad server address', () => {
-    const LONG_TIME_OUT_MS = 10000;
     const DUMMY_PATH = '/something';
 
     test('should return an failing promise for 404', async () => {
@@ -102,7 +101,6 @@ describe('e2e - AcrolinxEndpoint', () => {
           url: 'https://non-extisting-server' + DUMMY_PATH,
         });
       },
-      LONG_TIME_OUT_MS,
     );
 
     test(
@@ -115,7 +113,6 @@ describe('e2e - AcrolinxEndpoint', () => {
           url: invalidAcrolinxUrl + DUMMY_PATH,
         });
       },
-      LONG_TIME_OUT_MS,
     );
   });
 
@@ -344,7 +341,7 @@ describe('e2e - AcrolinxEndpoint', () => {
         const validateCheckResult = ajv.compile(checkResultSchema);
         validateCheckResult(checkResult);
         expect(validateCheckResult.errors).toBeNull();
-      }, 10000);
+      });
 
       test('can check with external content set', async () => {
         const text = `<?xml version='1.0' encoding='UTF-8'?>
@@ -367,7 +364,7 @@ describe('e2e - AcrolinxEndpoint', () => {
           },
         });
         expect(checkResult.goals.length).toBeGreaterThan(0);
-      }, 10000);
+      });
 
       test('can check with xinclude external content set', async () => {
         const text =
@@ -396,7 +393,7 @@ describe('e2e - AcrolinxEndpoint', () => {
           },
         });
         expect(checkResult.goals.length).toBeGreaterThan(0);
-      }, 10000);
+      });
 
       test('can check with integration field set', async () => {
         const text = 'Sample content to test integration field in check request';
@@ -414,7 +411,7 @@ describe('e2e - AcrolinxEndpoint', () => {
           },
         });
         expect(checkResult.quality.score).toBeGreaterThan(0);
-      }, 10000);
+      });
 
       test.skip('can cancel check', async () => {
         const check = await createDummyCheck();
@@ -491,7 +488,7 @@ describe('e2e - AcrolinxEndpoint', () => {
         expect(harvestedTerm.links.termContributionInteractive).toMatch(/^http/);
         expect(harvestedTerm.occurrences).toHaveLength(1);
         expect(harvestedTerm.occurrences[0].positionalInformation.matches).toHaveLength(1);
-      }, 10000);
+      });
     });
 
     describe('checkAndGetResult', () => {
@@ -587,7 +584,7 @@ describe('e2e - AcrolinxEndpoint', () => {
         const url = new URL(urlString);
         expect(url).toBeTruthy();
         // Here you should open the url and test of it loads the correct results :-)
-      }, 10_000);
+      });
     });
 
     describe('analyzeAndGetResult', () => {
