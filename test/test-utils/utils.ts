@@ -21,7 +21,7 @@ export function testIf(condition: boolean | string | undefined, testName: string
   if (condition) {
     test(testName, testFn);
   } else {
-    test.skip(testName, test);
+    test.skip(testName, testFn);
   }
 }
 
