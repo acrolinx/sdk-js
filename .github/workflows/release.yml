@@ -1,20 +1,13 @@
-name: Build and Deploy
+name: Release
 
 on:
-  push:
-    branches: [main]
-  schedule:
-    - cron: '0 2 * * *'
-  pull_request:
-    branches: [main]
   workflow_dispatch:
-
 permissions:
   contents: write
   pull-requests: write
 
 jobs:
-  build:
+  release:
     runs-on: ubuntu-latest
     env:
       TEST_SERVER_URL: ${{ secrets.TEST_SERVER_URL }}
@@ -62,19 +55,16 @@ jobs:
       - name: Publish To NPM
         id: publish
         uses: JS-DevTools/npm-publish@v3
-        if: github.ref == 'refs/heads/main'
         with:
           token: ${{ secrets.NPM_ACCESS_TOKEN }}
 
       - name: Push Tag
         uses: anothrNick/github-tag-action@v1
-        if: github.ref == 'refs/heads/main' && steps.publish.outputs.type
         env:
           CUSTOM_TAG: v${{ steps.publish.outputs.version }}
 
       - name: Deploy Pages
         uses: JamesIves/github-pages-deploy-action@v4
-        if: github.ref == 'refs/heads/main' && steps.publish.outputs.type
         with:
           folder: docs/pluginDoc/
           branc: gh-pages
