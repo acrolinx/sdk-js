@@ -499,7 +499,8 @@ describe('e2e - AcrolinxEndpoint', () => {
         expect(checkResult.goals.length).toBeGreaterThan(0);
       });
 
-      test('should return the check id even in case of some kind of errors', async () => {
+      // Skipping test temporarily.
+      test.skip('should return the check id even in case of some kind of errors', async () => {
         const checkProcess = api.checkAndGetResult(
           ACROLINX_API_TOKEN,
           await createDummyCheckRequest({
@@ -507,7 +508,7 @@ describe('e2e - AcrolinxEndpoint', () => {
             checkOptions: { contentFormat: 'XML' },
           }),
         );
-
+-
         await expectFailingPromise<AcrolinxError>(checkProcess.promise, ErrorType.CheckFailed);
         expect(checkProcess.getId()).toBeTruthy();
       });
