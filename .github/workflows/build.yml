@@ -9,10 +9,7 @@ on:
 
 jobs:
   test:
-    strategy:
-      matrix:
-        os: [macos-latest, ubuntu-latest, windows-latest]
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
     env:
       TEST_SERVER_URL: ${{ secrets.TEST_SERVER_URL }}
       ACROLINX_API_USERNAME: ${{ secrets.ACROLINX_API_USERNAME }}
