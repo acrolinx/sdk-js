@@ -67,4 +67,4 @@ jobs:
         uses: JamesIves/github-pages-deploy-action@v4
         with:
           folder: docs/pluginDoc/
-          branc: gh-pages
+          branch: gh-pages
