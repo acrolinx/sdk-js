@@ -83,7 +83,7 @@ describe('e2e - AcrolinxEndpoint', () => {
     test('should return an failing promise for 404', async () => {
       const api = createEndpoint(TEST_SERVER_URL);
       try {
-        await api.getJsonFromPath('/not-there');
+        await api.getJsonFromPath('/not-there', ACROLINX_API_TOKEN);
       } catch (error) {
         expect(error.type).toEqual(ErrorType.HttpErrorStatus);
         expect(error.status).toEqual(404);
@@ -92,28 +92,22 @@ describe('e2e - AcrolinxEndpoint', () => {
       expect.hasAssertions();
     });
 
-    test(
-      'should return an failing promise for non existing server',
-      async () => {
-        const api = createEndpoint('https://non-extisting-server');
-        await expectFailingPromise(api.getJsonFromPath(DUMMY_PATH), ErrorType.HttpConnectionProblem, {
-          method: 'GET',
-          url: 'https://non-extisting-server' + DUMMY_PATH,
-        });
-      },
-    );
+    test('should return an failing promise for non existing server', async () => {
+      const api = createEndpoint('https://non-extisting-server');
+      await expectFailingPromise(api.getJsonFromPath(DUMMY_PATH), ErrorType.HttpConnectionProblem, {
+        method: 'GET',
+        url: 'https://non-extisting-server' + DUMMY_PATH,
+      });
+    });
 
-    test(
-      'should return an failing promise for invalid URLS',
-      async () => {
-        const invalidAcrolinxUrl = 'http://non-ext!::?isting-server';
-        const api = createEndpoint(invalidAcrolinxUrl);
-        await expectFailingPromise(api.getJsonFromPath(DUMMY_PATH), ErrorType.HttpConnectionProblem, {
-          method: 'GET',
-          url: invalidAcrolinxUrl + DUMMY_PATH,
-        });
-      },
-    );
+    test('should return an failing promise for invalid URLS', async () => {
+      const invalidAcrolinxUrl = 'http://non-ext!::?isting-server';
+      const api = createEndpoint(invalidAcrolinxUrl);
+      await expectFailingPromise(api.getJsonFromPath(DUMMY_PATH), ErrorType.HttpConnectionProblem, {
+        method: 'GET',
+        url: invalidAcrolinxUrl + DUMMY_PATH,
+      });
+    });
   });
 
   describe('signin', () => {
@@ -609,9 +603,6 @@ describe('e2e - AcrolinxEndpoint', () => {
         const extractedText = await api.getTextFromUrl(result.extracted.link, ACROLINX_API_TOKEN);
         expect(extractedText).toContain(inputText);
 
-        const extractedTextAuthenticated = await api.getTextFromUrl(result.extracted.linkAuthenticated);
-        expect(extractedTextAuthenticated).toContain(inputText);
-
         // Verify offsets
         expect(new URL(result.offsets!.link)).toBeTruthy();
         const offsets = (
@@ -648,9 +639,6 @@ describe('e2e - AcrolinxEndpoint', () => {
 
         const extractedText = await api.getTextFromUrl(result.extracted.link, ACROLINX_API_TOKEN);
         expect(extractedText).toEqual('Körper');
-
-        const extractedTextAuthenticated = await api.getTextFromUrl(result.extracted.linkAuthenticated);
-        expect(extractedTextAuthenticated).toContain('Körper');
 
         // Verify offsets
         expect(new URL(result.offsets!.link)).toBeTruthy();

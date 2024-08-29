@@ -18,7 +18,7 @@
     "skipLibCheck": true,
     "declaration": true,
     "outDir": "dist",
-    "baseUrl": ".",
+    "baseUrl": "."
   },
   "include": ["src", "test"],
   "typedocOptions": {
