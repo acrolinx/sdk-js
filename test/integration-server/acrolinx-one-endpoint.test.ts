@@ -30,7 +30,7 @@ describe('Acrolinx One E2E Tests', () => {
     endpoint = createEndpoint(TEST_SERVER_URL);
   });
 
-  describe.skip('AI Service Integration Tests', () => {
+  describe('AI Service Integration Tests', () => {
     // This tests requires valid keycloak access token
 
     test('getAiFeatures returns whether certain AI features are enabled', async () => {
@@ -57,11 +57,11 @@ describe('Acrolinx One E2E Tests', () => {
         {
           issue: {
             aiRephraseHint:
-              '[{"role": "system", "content": "Rewrite this content so that it mentions between 3 and 5 of the seven dwarfs"}]',
+              '{"documentId":"random","aiRephraseHint":[{"role":"system","content":"You are a writing assistant designed to carry out specific tasks and follow instructions. You write clear, grammatically correct and simple text."},{"role":"user","content":"Avoid repeating \'this\' or \'that\' at the beginning of the sentence."},{"role":"user","content":"This is new document. This is not acceptable"},{"role":"assistant","content":"Sure! Here\'s your new sentence: "}]}',
             internalName: 'simplify',
           } as unknown as CommonIssue,
           count: 1,
-          targetUuid: '123e4567-e89b-12d3-a456-426614174000',
+          targetUuid: '2755ce18-fa33-4744-a16e-655bd6ce412e',
         },
         ACROLINX_API_TOKEN,
       );
