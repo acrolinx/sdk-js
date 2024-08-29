@@ -1,10 +1,6 @@
 const tsEslint = require('typescript-eslint');
-const sonarjs = require('eslint-plugin-sonarjs');
 const sourceTsFiles = ['src/**/*.ts'];
 
-/**
- * @type {import('eslint').Linter.FlatConfig[]}
- */
 module.exports = [
   ...tsEslint.configs.recommendedTypeChecked.map((config) => ({
     ...config,
@@ -17,10 +13,6 @@ module.exports = [
         project: true,
         tsconfigRootDir: __dirname,
       },
-    },
-
-    plugins: {
-      sonarjs,
     },
 
     rules: {
