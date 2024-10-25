@@ -1,9 +1,16 @@
 import { AcrolinxEndpoint, IntService } from '..';
 
+export enum LogTarget {
+  Console = 'console',
+  Cloud = 'cloud',
+  Both = 'both',
+}
+
 export interface LogEntry {
   type: LogEntryType;
   message: string;
   details: unknown[];
+  target?: LogTarget; // Optional, defaults to console
 }
 
 export enum LogEntryType {
