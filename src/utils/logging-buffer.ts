@@ -1,3 +1,6 @@
+import { AcrolinxEndpoint, ServiceType } from "..";
+import { post } from "./fetch";
+
 export interface LogEntry {
   type: LogEntryType;
   message: string;
@@ -20,17 +23,20 @@ export interface LoggingConfig {
 }
 
 export class LogBuffer {
+  private readonly intServiceBasePath = '/int-service/api/v1';
   private buffer: LogEntry[] = [];
   private timer: NodeJS.Timeout | null = null;
   private retries = 0;
   private config: LoggingConfig;
 
   constructor(
-    private readonly acrolinxUrl: string,
-    config?: LoggingConfig,
+    private readonly endpoint: AcrolinxEndpoint,
+    private readonly accessToken: string,
+    config?: Partial<LoggingConfig>,
   ) {
     this.config = this.createLoggingConfig(config);
   }
+  
 
   public log(logObj: LogEntry) {
     this.consoleLog(logObj);
@@ -83,33 +89,33 @@ export class LogBuffer {
     if (this.buffer.length === 0) {
       return;
     }
-
+  
     const logsToSend = [...this.buffer];
     this.buffer = [];
-
+  
     try {
-      const response = await fetch(`${this.acrolinxUrl}/int-service/api/v1/logs`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
+      await post<Response>(
+        this.constructFullPath('/logs'),
+        {
           appName: 'sidebar-client-app',
           logs: logsToSend,
-        }),
-      });
-
-      if (response.ok) {
-        console.log('Logs successfully sent to the server');
-        this.retries = 0;
-      } else {
-        console.error('Failed to send logs to the server');
-        this.handleRetry(logsToSend);
-      }
+        },
+        {},
+        this.endpoint.props,
+        this.accessToken,
+        ServiceType.ACROLINX_ONE,
+      );
+  
+      console.log('Logs successfully sent to the server');
+      this.retries = 0;
     } catch (error) {
       console.error('Error sending logs to the server:', error);
       this.handleRetry(logsToSend);
     }
+  }
+
+  private constructFullPath(path: string): string {
+    return this.intServiceBasePath + path;
   }
 
   private handleRetry(logsToSend: LogEntry[]) {

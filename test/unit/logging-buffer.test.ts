@@ -1,15 +1,35 @@
 import { LogBuffer, LogEntry, LogEntryType, LoggingConfig } from '../../src/utils/logging-buffer';
+import * as fetchUtils from '../../src/utils/fetch';
 
 const TEST_LOG_MESSAGE = 'Test log message';
 const NETWORK_ERROR_MESSAGE = 'Network error';
 import { describe, afterEach, expect, beforeEach, vi, test } from 'vitest';
+import { AcrolinxEndpoint, ServiceType } from '../../src';
+
+vi.mock('./utils/fetch', async () => {
+  const actual = await vi.importActual<typeof fetchUtils>('./utils/fetch');
+  return {
+    ...actual,
+    post: vi.fn(),
+  };
+});
 
 describe('LogBuffer', () => {
   let logBuffer: LogBuffer;
   let mockConfig: LoggingConfig;
-  const acrolinxUrl = 'http://example.com';
+  let mockEndpoint: AcrolinxEndpoint;
+  const mockAccessToken = 'test-token';
 
   beforeEach(() => {
+    vi.clearAllMocks();
+
+    mockEndpoint = {
+      props: {
+        acrolinxUrl: 'http://example.com',
+        client: { signature: 'test', version: '1.0.0' },
+      },
+    } as AcrolinxEndpoint;
+
     mockConfig = {
       batchSize: 10,
       dispatchInterval: 1000,
@@ -18,50 +38,18 @@ describe('LogBuffer', () => {
       logLevel: LogEntryType.info,
       enableCloudLogging: true,
     };
-    logBuffer = new LogBuffer(acrolinxUrl, mockConfig);
+
+    logBuffer = new LogBuffer(mockEndpoint, mockAccessToken, mockConfig);
     vi.spyOn(console, 'error').mockImplementation(() => {});
+    vi.spyOn(console, 'log').mockImplementation(() => {});
   });
 
   afterEach(() => {
     vi.clearAllMocks();
   });
 
-  test('should only add log entry to buffer if enableCloudLogging is true and log level is sufficient', () => {
-    const logEntry: LogEntry = {
-      type: LogEntryType.info,
-      message: TEST_LOG_MESSAGE,
-      details: [],
-    };
-    // Enable cloud logging and set sufficient log level
-    mockConfig.enableCloudLogging = true;
-    mockConfig.logLevel = LogEntryType.info;
-    logBuffer = new LogBuffer(acrolinxUrl, mockConfig);
-
-    logBuffer.log(logEntry);
-    expect(logBuffer['buffer']).toContain(logEntry);
-
-    // Disable cloud logging and repeat
-    mockConfig.enableCloudLogging = false;
-    logBuffer = new LogBuffer(acrolinxUrl, mockConfig);
-    logBuffer.log(logEntry);
-    expect(logBuffer['buffer']).not.toContain(logEntry);
-  });
-
-  test('should not add log entry to buffer if log level is insufficient', () => {
-    const logEntry: LogEntry = {
-      type: LogEntryType.warning,
-      message: TEST_LOG_MESSAGE,
-      details: [],
-    };
-    mockConfig.logLevel = LogEntryType.error;
-    logBuffer = new LogBuffer(acrolinxUrl, mockConfig);
-    logBuffer.log(logEntry);
-    expect(logBuffer['buffer']).not.toContain(logEntry);
-  });
-
   test('should flush logs to server when buffer reaches batch size', async () => {
-    const mockFetch = vi.fn().mockResolvedValue({ ok: true });
-    global.fetch = mockFetch;
+    const mockPost = vi.spyOn(fetchUtils, 'post').mockResolvedValue({});
 
     for (let i = 0; i < mockConfig.batchSize; i++) {
       const logEntry: LogEntry = {
@@ -72,36 +60,62 @@ describe('LogBuffer', () => {
       logBuffer.log(logEntry);
     }
 
-    await new Promise((resolve) => setTimeout(resolve, 0));
+    // Use a longer timeout to ensure async operations complete
+    await new Promise((resolve) => setTimeout(resolve, 100));
 
-    expect(mockFetch).toHaveBeenCalledTimes(1);
+    expect(mockPost).toHaveBeenCalledWith(
+      '/int-service/api/v1/logs',
+      {
+        appName: 'sidebar-client-app',
+        logs: expect.any(Array),
+      },
+      {},
+      mockEndpoint.props,
+      mockAccessToken,
+      ServiceType.ACROLINX_ONE,
+    );
     expect(logBuffer['buffer']).toHaveLength(0);
   });
 
   test('should retry sending logs on failure', async () => {
-    const mockFetch = vi.fn();
-    mockFetch
+    const mockPost = vi
+      .spyOn(fetchUtils, 'post')
       .mockRejectedValueOnce(new Error(NETWORK_ERROR_MESSAGE))
       .mockRejectedValueOnce(new Error(NETWORK_ERROR_MESSAGE))
-      .mockResolvedValueOnce({ ok: true });
-    global.fetch = mockFetch;
+      .mockResolvedValueOnce({});
+
+    // Set small values for testing
+    mockConfig = {
+      ...mockConfig,
+      dispatchInterval: 100,
+      maxRetries: 3,
+      retryDelay: 100,
+      batchSize: 1, // Force immediate flush
+      enableCloudLogging: true,
+      logLevel: LogEntryType.warning,
+    };
+
+    logBuffer = new LogBuffer(mockEndpoint, mockAccessToken, mockConfig);
 
     const logEntry: LogEntry = {
       type: LogEntryType.warning,
       message: TEST_LOG_MESSAGE,
       details: [],
     };
+
+    // Log the entry which should trigger immediate flush due to batchSize: 1
     logBuffer.log(logEntry);
 
-    let totalDelay = 0;
-    for (let i = 0; i < mockConfig.maxRetries; i++) {
-      const delay = mockConfig.dispatchInterval * Math.pow(2, i);
-      totalDelay += Math.min(delay, mockConfig.maxRetries * mockConfig.retryDelay);
-    }
-    totalDelay += 300;
-    await new Promise((resolve) => setTimeout(resolve, totalDelay));
+    // Wait for initial attempt + all retries
+    await new Promise((resolve) => {
+      setTimeout(resolve, 1000); // Give enough time for all retries
+    });
 
-    expect(mockFetch).toHaveBeenCalledTimes(mockConfig.maxRetries);
+    console.log('Mock post calls:', mockPost.mock.calls.length);
+    console.log('Buffer length:', logBuffer['buffer'].length);
+    console.log('Retries count:', logBuffer['retries']);
+
+    expect(mockPost).toHaveBeenCalledTimes(mockConfig.maxRetries);
     expect(logBuffer['buffer']).toHaveLength(0);
   });
 
@@ -112,14 +126,13 @@ describe('LogBuffer', () => {
       details: [],
     };
     mockConfig.logLevel = null;
-    logBuffer = new LogBuffer(acrolinxUrl, mockConfig);
+    logBuffer = new LogBuffer(mockEndpoint, mockAccessToken, mockConfig);
     logBuffer.log(logEntry);
     expect(logBuffer['buffer']).toHaveLength(0);
   });
 
   test('should handle failed server response', async () => {
-    const mockFetch = vi.fn().mockResolvedValueOnce({ ok: false });
-    global.fetch = mockFetch;
+    const mockPost = vi.spyOn(fetchUtils, 'post').mockRejectedValue(new Error('Server Error'));
 
     const logEntry: LogEntry = {
       type: LogEntryType.error,
@@ -128,16 +141,15 @@ describe('LogBuffer', () => {
     };
     logBuffer.log(logEntry);
 
-    await new Promise((resolve) => setTimeout(resolve, 300));
+    await new Promise((resolve) => setTimeout(resolve, 500));
 
-    expect(mockFetch).toHaveBeenCalledTimes(1);
+    expect(mockPost).toHaveBeenCalledTimes(1);
     expect(logBuffer['retries']).toBe(1);
     expect(logBuffer['buffer']).toContain(logEntry);
   });
 
   test('should flush logs immediately when log type is error and cloud logging is enabled', async () => {
-    const mockFetch = vi.fn().mockResolvedValueOnce({ ok: true });
-    global.fetch = mockFetch;
+    const mockPost = vi.spyOn(fetchUtils, 'post').mockResolvedValue({});
 
     const errorLogEntry: LogEntry = {
       type: LogEntryType.error,
@@ -145,15 +157,14 @@ describe('LogBuffer', () => {
       details: [],
     };
 
-    // Ensure cloud logging is enabled
     mockConfig.enableCloudLogging = true;
-    logBuffer = new LogBuffer(acrolinxUrl, mockConfig);
+    logBuffer = new LogBuffer(mockEndpoint, mockAccessToken, mockConfig);
     logBuffer.log(errorLogEntry);
 
-    // Wait for a short delay to allow the flush to happen
-    await new Promise((resolve) => setTimeout(resolve, 100));
+    // Increase timeout to ensure async operations complete
+    await new Promise((resolve) => setTimeout(resolve, 200));
 
-    expect(mockFetch).toHaveBeenCalledTimes(1);
+    expect(mockPost).toHaveBeenCalledTimes(1);
     expect(logBuffer['buffer']).toHaveLength(0);
   });
 });

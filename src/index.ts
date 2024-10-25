@@ -211,10 +211,6 @@ export class AcrolinxEndpoint {
       ...props,
       acrolinxUrl: props.acrolinxUrl.trim().replace(/\/$/, ''),
     };
-
-    if (this.props.enableCloudLogging) {
-      this.loggingBuffer = new LogBuffer(this.props.acrolinxUrl, this.props.loggingConfig);
-    }
   }
 
   public setClientLocale(clientLocale: string) {
