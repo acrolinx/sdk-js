@@ -46,12 +46,18 @@ export class LogBuffer {
   }
 
   public log(logObj: LogEntry) {
-    this.consoleLog(logObj);
-    if (this.config.logLevel && this.isLoggable(logObj.type)) {
+    const target = logObj.target || LogTarget.Console; // Default to console if not specified
+
+    if (target === LogTarget.Console || target === LogTarget.Both) {
+      this.consoleLog(logObj);
+    }
+
+    if ((target === LogTarget.Cloud || target === LogTarget.Both) && this.isLoggable(logObj.type)) {
       this.buffer.push(logObj);
       this.manageBuffer(logObj);
     }
   }
+
   private consoleLog(logObj: LogEntry): void {
     switch (logObj.type) {
       case LogEntryType.info:
@@ -78,10 +84,10 @@ export class LogBuffer {
   }
 
   private isLoggable(entryType: LogEntryType): boolean {
-    if (this.config.logLevel === null) {
-      return false; // Do not log anything if logLevel is null
+    if (this.config.logLevel === null || !this.config.enableCloudLogging) {
+      return false;
     }
-    return this.config.enableCloudLogging && LogEntryType[entryType] <= LogEntryType[this.config.logLevel];
+    return LogEntryType[entryType] >= LogEntryType[this.config.logLevel];
   }
 
   private manageBuffer(logObj: LogEntry): void {
