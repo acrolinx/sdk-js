@@ -1,5 +1,4 @@
-import { AcrolinxEndpoint, ServiceType } from "..";
-import { post } from "./fetch";
+import { AcrolinxEndpoint, IntService } from '..';
 
 export interface LogEntry {
   type: LogEntryType;
@@ -23,20 +22,21 @@ export interface LoggingConfig {
 }
 
 export class LogBuffer {
-  private readonly intServiceBasePath = '/int-service/api/v1';
   private buffer: LogEntry[] = [];
   private timer: NodeJS.Timeout | null = null;
   private retries = 0;
   private config: LoggingConfig;
+  private readonly intService: IntService;
 
   constructor(
     private readonly endpoint: AcrolinxEndpoint,
     private readonly accessToken: string,
+    private readonly appName: string,
     config?: Partial<LoggingConfig>,
   ) {
     this.config = this.createLoggingConfig(config);
+    this.intService = new IntService(endpoint);
   }
-  
 
   public log(logObj: LogEntry) {
     this.consoleLog(logObj);
@@ -89,33 +89,18 @@ export class LogBuffer {
     if (this.buffer.length === 0) {
       return;
     }
-  
+
     const logsToSend = [...this.buffer];
     this.buffer = [];
-  
+
     try {
-      await post<Response>(
-        this.constructFullPath('/logs'),
-        {
-          appName: 'sidebar-client-app',
-          logs: logsToSend,
-        },
-        {},
-        this.endpoint.props,
-        this.accessToken,
-        ServiceType.ACROLINX_ONE,
-      );
-  
+      await this.intService.sendLogs(this.appName, logsToSend, this.accessToken);
       console.log('Logs successfully sent to the server');
       this.retries = 0;
     } catch (error) {
       console.error('Error sending logs to the server:', error);
       this.handleRetry(logsToSend);
     }
-  }
-
-  private constructFullPath(path: string): string {
-    return this.intServiceBasePath + path;
   }
 
   private handleRetry(logsToSend: LogEntry[]) {
