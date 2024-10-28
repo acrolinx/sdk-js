@@ -15,7 +15,6 @@
  */
 
 import { AcrolinxEndpoint, ServiceType } from '../../index';
-import { post } from '../../utils/fetch';
 import { LogEntry } from '../../utils/logging-buffer';
 import { IntegrationServiceConfig } from './int-service.types';
 
