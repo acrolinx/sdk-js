@@ -108,7 +108,6 @@ export class LogBuffer {
 
     try {
       await this.intService.sendLogs(this.appName, logsToSend, this.accessToken);
-      console.log('Logs successfully sent to the server');
       this.retries = 0;
     } catch (error) {
       console.error('Error sending logs to the server:', error);
