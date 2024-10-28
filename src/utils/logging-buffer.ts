@@ -25,7 +25,6 @@ export interface LoggingConfig {
   maxRetries: number;
   retryDelay: number;
   logLevel: LogEntryType | null;
-  enableCloudLogging: boolean;
 }
 
 export class LogBuffer {
@@ -36,7 +35,7 @@ export class LogBuffer {
   private readonly intService: IntService;
 
   constructor(
-    private readonly endpoint: AcrolinxEndpoint,
+    endpoint: AcrolinxEndpoint,
     private readonly accessToken: string,
     private readonly appName: string,
     config?: Partial<LoggingConfig>,
@@ -52,7 +51,7 @@ export class LogBuffer {
       this.consoleLog(logObj);
     }
 
-    if ((target === LogTarget.Cloud || target === LogTarget.Both) && this.isLoggable(logObj.type)) {
+    if ((target === LogTarget.Cloud || target === LogTarget.Both)) {
       this.buffer.push(logObj);
       this.manageBuffer(logObj);
     }
@@ -78,16 +77,8 @@ export class LogBuffer {
       maxRetries: 3,
       retryDelay: 2000,
       logLevel: LogEntryType.info,
-      enableCloudLogging: false,
     };
     return { ...defaultConfig, ...config };
-  }
-
-  private isLoggable(entryType: LogEntryType): boolean {
-    if (this.config.logLevel === null || !this.config.enableCloudLogging) {
-      return false;
-    }
-    return LogEntryType[entryType] >= LogEntryType[this.config.logLevel];
   }
 
   private manageBuffer(logObj: LogEntry): void {
@@ -110,12 +101,10 @@ export class LogBuffer {
       await this.intService.sendLogs(this.appName, logsToSend, this.accessToken);
       this.retries = 0;
     } catch (error) {
-      console.error('Error sending logs to the server:', error);
   
       if (this.isRetryableError(error)) {
         this.handleRetry(logsToSend);
       } else {
-        console.error('Non-retryable error occurred. Discarding logs.');
         this.retries = 0;
       }
     }
