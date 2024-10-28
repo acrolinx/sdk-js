@@ -34,16 +34,14 @@ export class IntService {
   }
 
   async sendLogs(appName: string, logs: LogEntry[], accessToken: string): Promise<void> {
-    await post<Response>(
+    await this.endpoint.postJsonToPath<void>(
       this.constructFullPath('/logs'),
       {
         appName,
         logs,
       },
-      {},
-      this.endpoint.props,
       accessToken,
-      ServiceType.ACROLINX_ONE,
+      { serviceType: ServiceType.ACROLINX_ONE },
     );
   }
 
