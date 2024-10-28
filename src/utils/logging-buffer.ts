@@ -1,4 +1,5 @@
-import { AcrolinxEndpoint, IntService } from '..';
+import { AcrolinxEndpoint } from 'src/index';
+import { IntService } from "../services/int-service";
 
 export enum LogTarget {
   Console = 'console',
