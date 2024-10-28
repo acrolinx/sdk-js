@@ -102,19 +102,34 @@ export class LogBuffer {
     if (this.buffer.length === 0) {
       return;
     }
-
+  
     const logsToSend = [...this.buffer];
     this.buffer = [];
-
+  
     try {
       await this.intService.sendLogs(this.appName, logsToSend, this.accessToken);
       this.retries = 0;
     } catch (error) {
       console.error('Error sending logs to the server:', error);
-      this.handleRetry(logsToSend);
+  
+      if (this.isRetryableError(error)) {
+        this.handleRetry(logsToSend);
+      } else {
+        console.error('Non-retryable error occurred. Discarding logs.');
+        this.retries = 0;
+      }
     }
   }
-
+  
+  private isRetryableError(error: any): boolean {
+    // Check for 5XX server errors
+    if (error.response && error.response.status >= 500 && error.response.status < 600) {
+      return true;
+    }
+  
+    return false;
+  }
+  
   private handleRetry(logsToSend: LogEntry[]) {
     if (this.retries < this.config.maxRetries) {
       this.buffer.unshift(...logsToSend);
@@ -128,6 +143,7 @@ export class LogBuffer {
       this.retries = 0;
     }
   }
+  
 
   private scheduleFlush() {
     if (this.buffer.length >= this.config.batchSize) {
