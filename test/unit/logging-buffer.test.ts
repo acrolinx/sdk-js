@@ -70,6 +70,45 @@ describe('LogBuffer', () => {
     expect(logBuffer['buffer']).toHaveLength(0);
   });
 
+  test('should discard logs after max retries are reached', async () => {
+    const serverError = {
+      response: { status: 500 },
+    };
+  
+    const mockSendLogs = vi.spyOn(IntService.prototype, 'sendLogs').mockRejectedValue(serverError);
+  
+    mockConfig = {
+      ...mockConfig,
+      dispatchInterval: 100,
+      maxRetries: 2, // Set maxRetries to a small number for testing
+      retryDelay: 100,
+      batchSize: 1,
+      logLevel: LogEntryType.warning,
+    };
+  
+    logBuffer = new LogBuffer(mockEndpoint, mockAccessToken, 'test-app', mockConfig);
+  
+    const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+  
+    const logEntry: LogEntry = {
+      type: LogEntryType.warning,
+      message: TEST_LOG_MESSAGE,
+      details: [],
+      target: LogTarget.Cloud,
+    };
+  
+    logBuffer.log(logEntry);
+  
+    // Wait enough time for all retries to occur
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+  
+    expect(mockSendLogs).toHaveBeenCalledTimes(3); // initial attempt + 2 retries
+    expect(logBuffer['retries']).toBe(0);
+    expect(logBuffer['buffer']).toHaveLength(0);
+    expect(consoleErrorSpy).toHaveBeenCalledWith('Max retries reached. Discarding logs.');
+  });
+  
+
   test('should retry sending logs on failure', async () => {
     const serverError = {
       response: { status: 500 },
