@@ -93,6 +93,18 @@ describe('LogBuffer', () => {
     expect(logBuffer['buffer']).toHaveLength(0); // Logs should be discarded
   });  
 
+  test('should use default config when none is provided', () => {
+    const defaultLogBuffer = new LogBuffer(mockEndpoint, mockAccessToken, 'test-app');
+  
+    expect(defaultLogBuffer['config']).toEqual({
+      batchSize: 50,
+      dispatchInterval: 10000,
+      maxRetries: 3,
+      retryDelay: 2000,
+      logLevel: LogEntryType.info,
+    });
+  });  
+
   test('should discard logs after max retries are reached', async () => {
     const serverError = {
       response: { status: 500 },
