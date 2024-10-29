@@ -16,7 +16,6 @@
 
 import { AcrolinxEndpoint, ServiceType } from '../../index';
 import { AiFeatures, ChatCompletionRequest, IsAIEnabledInformation, WriteResponse } from './ai-service.types';
-import { post } from '../../utils/fetch';
 
 /**
  * Available in Acrolinx One
