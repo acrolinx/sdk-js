@@ -70,6 +70,29 @@ describe('LogBuffer', () => {
     expect(logBuffer['buffer']).toHaveLength(0);
   });
 
+  test('should not retry on non-retryable error', async () => {
+    const nonRetryableError = {
+      response: { status: 400 }, // 4XX errors are non-retryable
+    };
+  
+    const mockSendLogs = vi.spyOn(IntService.prototype, 'sendLogs').mockRejectedValue(nonRetryableError);
+  
+    const logEntry: LogEntry = {
+      type: LogEntryType.error,
+      message: TEST_LOG_MESSAGE,
+      details: [],
+      target: LogTarget.Cloud,
+    };
+  
+    logBuffer.log(logEntry);
+  
+    await new Promise((resolve) => setTimeout(resolve, 500));
+  
+    expect(mockSendLogs).toHaveBeenCalledTimes(1);
+    expect(logBuffer['retries']).toBe(0);
+    expect(logBuffer['buffer']).toHaveLength(0); // Logs should be discarded
+  });  
+
   test('should discard logs after max retries are reached', async () => {
     const serverError = {
       response: { status: 500 },
