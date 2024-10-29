@@ -84,14 +84,40 @@ describe('AI-service', () => {
 
   describe('/getAIChatCompletions', () => {
     const REQUEST_ERROR_MESSAGE = 'There was an error processing your request. It has been logged (ID some-random-id).';
-    const getGetAIChatCompletionMatcher = () => 'end:/ai-service/api/v1/ai/chat-completions';
+    const getAIChatCompletionMatcher = () => 'end:/ai-service/api/v1/ai/chat-completions';
 
-    test('correct response', async () => {
-      const aiResponse = 'some responds';
+    test('correct response without previousVersion', async () => {
+      const aiResponse = 'some response';
       const response = await createDummyAIServiceRequest(200, { response: aiResponse });
 
       expect(response.response).toBe(aiResponse);
+
+      // Verify that previousVersion is null in the request body
+      const lastCall = fetchMock.lastCall(getAIChatCompletionMatcher());
+      expect(lastCall).toBeDefined();
+
+      const requestBody = JSON.parse(lastCall![1]?.body as string);
+
+      expect(requestBody.previousVersion).toBeNull();
     });
+
+    test('correct response with previousVersion', async () => {
+      const aiResponse = 'another response';
+      const previousVersion = 'previous suggestion text';
+
+      const response = await createDummyAIServiceRequest(200, { response: aiResponse }, previousVersion);
+
+      expect(response.response).toBe(aiResponse);
+
+      // Verify that fetch was called with the correct body including previousVersion
+      const lastCall = fetchMock.lastCall(getAIChatCompletionMatcher());
+      expect(lastCall).toBeDefined();
+
+      const requestBody = JSON.parse(lastCall![1]?.body as string);
+
+      expect(requestBody.previousVersion).toBe(previousVersion);
+    });
+
     test('error response', async () => {
       const response = createDummyAIServiceRequest(500, {
         httpErrorCode: 500,
@@ -115,7 +141,7 @@ describe('AI-service', () => {
     });
 
     test('should throw if response was filtered', async () => {
-      const FILTERED_RESPONSE_MESSAGE = 'The response was filtered...bla bla';
+      const FILTERED_RESPONSE_MESSAGE = 'The response was filtered...';
       const response = createDummyAIServiceRequest(400, {
         httpErrorCode: 400,
         errorTitle: FILTERED_RESPONSE_MESSAGE,
@@ -140,15 +166,16 @@ describe('AI-service', () => {
     const createDummyAIServiceRequest = async (
       responseStatus: number,
       dummyResponseBody: any,
+      previousVersion?: string,
     ): Promise<WriteResponse> => {
       endpoint = new AcrolinxEndpoint(DUMMY_ENDPOINT_PROPS);
       const count = 1;
-      const internalName = 'simplefy';
-      const aiRephraseHint = 'some invalid data';
+      const internalName = 'simplify content';
+      const aiRephraseHint = 'some hint';
       const targetUuid = '123e4567-e89b-12d3-a456-426614174000';
       const aiRewriteContext = DUMMY_AI_REWRITE_CONTEXT;
 
-      fetchMock.mock(getGetAIChatCompletionMatcher(), {
+      fetchMock.mock(getAIChatCompletionMatcher(), {
         status: responseStatus,
         body: dummyResponseBody,
       });
@@ -159,9 +186,10 @@ describe('AI-service', () => {
             internalName,
             aiRephraseHint,
             aiRewriteContext,
-          } as unknown as Issue,
+          } as Issue,
           count,
           targetUuid,
+          previousVersion: previousVersion ?? null,
         },
         DUMMY_ACCESS_TOKEN,
       );
