@@ -31,6 +31,7 @@ export type ChatCompletionRequest = {
   issue: CommonIssue;
   count: number;
   targetUuid: string;
+  previousVersion?: string | null;
 };
 
 export interface WriteResponse {
