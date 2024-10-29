@@ -1,7 +1,17 @@
+import { AcrolinxEndpoint } from 'src/index';
+import { IntService } from "../services/int-service";
+
+export enum LogTarget {
+  Console = 'console',
+  Cloud = 'cloud',
+  Both = 'both',
+}
+
 export interface LogEntry {
   type: LogEntryType;
   message: string;
   details: unknown[];
+  target?: LogTarget; // Optional, defaults to console
 }
 
 export enum LogEntryType {
@@ -16,7 +26,6 @@ export interface LoggingConfig {
   maxRetries: number;
   retryDelay: number;
   logLevel: LogEntryType | null;
-  enableCloudLogging: boolean;
 }
 
 export class LogBuffer {
@@ -24,21 +33,31 @@ export class LogBuffer {
   private timer: NodeJS.Timeout | null = null;
   private retries = 0;
   private config: LoggingConfig;
+  private readonly intService: IntService;
 
   constructor(
-    private readonly acrolinxUrl: string,
-    config?: LoggingConfig,
+    endpoint: AcrolinxEndpoint,
+    private readonly accessToken: string,
+    private readonly appName: string,
+    config?: Partial<LoggingConfig>,
   ) {
     this.config = this.createLoggingConfig(config);
+    this.intService = new IntService(endpoint);
   }
 
   public log(logObj: LogEntry) {
-    this.consoleLog(logObj);
-    if (this.config.logLevel && this.isLoggable(logObj.type)) {
+    const target = logObj.target || LogTarget.Console; // Default to console if not specified
+
+    if (target === LogTarget.Console || target === LogTarget.Both) {
+      this.consoleLog(logObj);
+    }
+
+    if ((target === LogTarget.Cloud || target === LogTarget.Both)) {
       this.buffer.push(logObj);
       this.manageBuffer(logObj);
     }
   }
+
   private consoleLog(logObj: LogEntry): void {
     switch (logObj.type) {
       case LogEntryType.info:
@@ -59,16 +78,8 @@ export class LogBuffer {
       maxRetries: 3,
       retryDelay: 2000,
       logLevel: LogEntryType.info,
-      enableCloudLogging: false,
     };
     return { ...defaultConfig, ...config };
-  }
-
-  private isLoggable(entryType: LogEntryType): boolean {
-    if (this.config.logLevel === null) {
-      return false; // Do not log anything if logLevel is null
-    }
-    return this.config.enableCloudLogging && LogEntryType[entryType] <= LogEntryType[this.config.logLevel];
   }
 
   private manageBuffer(logObj: LogEntry): void {
@@ -83,35 +94,32 @@ export class LogBuffer {
     if (this.buffer.length === 0) {
       return;
     }
-
+  
     const logsToSend = [...this.buffer];
     this.buffer = [];
-
+  
     try {
-      const response = await fetch(`${this.acrolinxUrl}/int-service/api/v1/logs`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          appName: 'sidebar-client-app',
-          logs: logsToSend,
-        }),
-      });
-
-      if (response.ok) {
-        console.log('Logs successfully sent to the server');
-        this.retries = 0;
-      } else {
-        console.error('Failed to send logs to the server');
-        this.handleRetry(logsToSend);
-      }
+      await this.intService.sendLogs(this.appName, logsToSend, this.accessToken);
+      this.retries = 0;
     } catch (error) {
-      console.error('Error sending logs to the server:', error);
-      this.handleRetry(logsToSend);
+  
+      if (this.isRetryableError(error)) {
+        this.handleRetry(logsToSend);
+      } else {
+        this.retries = 0;
+      }
     }
   }
-
+  
+  private isRetryableError(error: any): boolean {
+    // Check for 5XX server errors
+    if (error.response && error.response.status >= 500 && error.response.status < 600) {
+      return true;
+    }
+  
+    return false;
+  }
+  
   private handleRetry(logsToSend: LogEntry[]) {
     if (this.retries < this.config.maxRetries) {
       this.buffer.unshift(...logsToSend);
@@ -125,6 +133,7 @@ export class LogBuffer {
       this.retries = 0;
     }
   }
+  
 
   private scheduleFlush() {
     if (this.buffer.length >= this.config.batchSize) {

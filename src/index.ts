@@ -211,10 +211,6 @@ export class AcrolinxEndpoint {
       ...props,
       acrolinxUrl: props.acrolinxUrl.trim().replace(/\/$/, ''),
     };
-
-    if (this.props.enableCloudLogging) {
-      this.loggingBuffer = new LogBuffer(this.props.acrolinxUrl, this.props.loggingConfig);
-    }
   }
 
   public setClientLocale(clientLocale: string) {
@@ -451,6 +447,24 @@ export class AcrolinxEndpoint {
         ...getCommonHeaders(this.props, accessToken, opts.serviceType),
         ...opts.headers,
       },
+    });
+  }
+
+  public async postJsonToPath<T>(
+    path: string,
+    body: any,
+    accessToken?: AccessToken,
+    opts: AdditionalRequestOptions = {},
+  ): Promise<T> {
+    const url = getUrlOfPath(this.props, path);
+    return fetchJson(url, this.props, {
+      method: 'POST',
+      headers: {
+        ...getCommonHeaders(this.props, accessToken, opts.serviceType),
+        'Content-Type': 'application/json',
+        ...opts.headers,
+      },
+      body: JSON.stringify(body),
     });
   }
 

@@ -15,6 +15,7 @@
  */
 
 import { AcrolinxEndpoint, ServiceType } from '../../index';
+import { LogEntry } from '../../utils/logging-buffer';
 import { IntegrationServiceConfig } from './int-service.types';
 
 export const integrationServiceDefaultConfig: IntegrationServiceConfig = {
@@ -29,6 +30,18 @@ export class IntService {
     return this.endpoint.getJsonFromPath<IntegrationServiceConfig>(this.constructFullPath('/config'), accessToken, {
       serviceType: ServiceType.ACROLINX_ONE,
     });
+  }
+
+  async sendLogs(appName: string, logs: LogEntry[], accessToken: string): Promise<void> {
+    await this.endpoint.postJsonToPath<void>(
+      this.constructFullPath('/logs'),
+      {
+        appName,
+        logs,
+      },
+      accessToken,
+      { serviceType: ServiceType.ACROLINX_ONE },
+    );
   }
 
   private constructFullPath(path: string): string {
