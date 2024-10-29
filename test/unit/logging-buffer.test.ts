@@ -105,6 +105,31 @@ describe('LogBuffer', () => {
     });
   });  
 
+  test('should increase delay exponentially with retries', () => {
+    mockConfig = {
+      ...mockConfig,
+      dispatchInterval: 100,
+      retryDelay: 800,
+      maxRetries: 3,
+    };
+  
+    logBuffer = new LogBuffer(mockEndpoint, mockAccessToken, 'test-app', mockConfig);
+  
+    const getAdaptiveDelaySpy = vi.spyOn(logBuffer as any, 'getAdaptiveDelay');
+  
+    // Simulate retries
+    (logBuffer as any).retries = 1;
+    (logBuffer as any).getAdaptiveDelay();
+  
+    expect(getAdaptiveDelaySpy).toReturnWith(200); // 100 * 2^1
+  
+    (logBuffer as any).retries = 2;
+    (logBuffer as any).getAdaptiveDelay();
+  
+    expect(getAdaptiveDelaySpy).toReturnWith(400); // 100 * 2^2
+  });
+  
+
   test('should discard logs after max retries are reached', async () => {
     const serverError = {
       response: { status: 500 },
