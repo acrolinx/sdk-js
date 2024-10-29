@@ -105,6 +105,21 @@ describe('LogBuffer', () => {
     });
   });  
 
+  test('should use console.error for error logs', () => {
+    const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+  
+    const logEntry: LogEntry = {
+      type: LogEntryType.error,
+      message: TEST_LOG_MESSAGE,
+      details: [],
+      target: LogTarget.Console,
+    };
+  
+    logBuffer.log(logEntry);
+  
+    expect(consoleErrorSpy).toHaveBeenCalledWith(TEST_LOG_MESSAGE);
+  });  
+
   test('should increase delay exponentially with retries', () => {
     mockConfig = {
       ...mockConfig,
