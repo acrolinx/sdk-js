@@ -3,7 +3,8 @@ import * as fetchUtils from '../../src/utils/fetch';
 
 const TEST_LOG_MESSAGE = 'Test log message';
 import { describe, afterEach, expect, beforeEach, vi, test } from 'vitest';
-import { AcrolinxEndpoint, IntService } from '../../src';
+import { AcrolinxEndpoint } from '../../src';
+import { IntService } from '../../src/services/int-service';
 
 vi.mock('./utils/fetch', async () => {
   const actual = await vi.importActual<typeof fetchUtils>('./utils/fetch');
