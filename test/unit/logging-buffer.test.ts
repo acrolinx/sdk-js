@@ -245,7 +245,7 @@ describe('LogBuffer', () => {
     const mockSendLogs = vi.spyOn(IntService.prototype, 'sendLogs').mockResolvedValue({ message: 'Test log success' });
 
     const errorLogEntry: LogEntry = {
-      type: LogEntryType.info,
+      type: LogEntryType.error,
       message: 'test sdk-js log message',
       details: [],
       target: LogTarget.Cloud,
