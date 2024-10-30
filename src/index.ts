@@ -88,7 +88,6 @@ import {
 import { User } from './user';
 import { fetchJson, fetchWithProps, getUrlOfPath, handleExpectedTextResponse, post, put } from './utils/fetch';
 import * as logging from './utils/logging';
-import { LogBuffer, LoggingConfig } from './utils/logging-buffer';
 import { waitMs } from './utils/mixed-utils';
 
 export * from './dictionary';
@@ -126,7 +125,7 @@ export * from './services/ai-service/ai-service';
 export * from './services/ai-service/ai-service.types';
 export * from './services/ai-service/ai-service.utils';
 
-export * from './services/int-service';
+export * from './services/int-service/int-service';
 
 export * from './check';
 export * from './capabilities';
@@ -167,8 +166,6 @@ export interface AcrolinxEndpointProps {
    * @ignore
    */
   enableHttpLogging?: boolean;
-  enableCloudLogging?: boolean;
-  loggingConfig?: LoggingConfig;
 }
 
 export interface ClientInformation {
@@ -204,7 +201,6 @@ const VALIDATE_APP_ACCESS_TOKEN_PATH = '/api/v1/apps/whoami';
 
 export class AcrolinxEndpoint {
   public readonly props: AcrolinxEndpointProps;
-  public readonly loggingBuffer: LogBuffer | null = null;
 
   constructor(props: AcrolinxEndpointProps) {
     this.props = {

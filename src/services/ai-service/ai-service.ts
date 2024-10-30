@@ -16,7 +16,6 @@
 
 import { AcrolinxEndpoint, ServiceType } from '../../index';
 import { AiFeatures, ChatCompletionRequest, IsAIEnabledInformation, WriteResponse } from './ai-service.types';
-import { post } from '../../utils/fetch';
 
 /**
  * Available in Acrolinx One
@@ -52,20 +51,19 @@ export class AIService {
 
   public async getAIChatCompletion(params: ChatCompletionRequest, accessToken: string): Promise<WriteResponse> {
     const { aiRephraseHint: prompt, internalName } = params.issue;
-    const { targetUuid } = params;
+    const { targetUuid, count, previousVersion } = params;
 
-    return post(
+    return this.endpoint.postJsonToPath<WriteResponse>(
       this.constructFullPath('/ai/chat-completions'),
       {
         prompt,
         targetUuid,
-        count: params.count,
+        count,
         issueInternalName: internalName,
+        previousVersion,
       },
-      {},
-      this.endpoint.props,
       accessToken,
-      ServiceType.ACROLINX_ONE,
+      { serviceType: ServiceType.ACROLINX_ONE },
     );
   }
 
