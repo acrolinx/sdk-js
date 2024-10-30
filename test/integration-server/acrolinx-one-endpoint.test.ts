@@ -6,6 +6,7 @@ import { IntService } from '../../src/services/int-service/int-service';
 
 import { describe, beforeEach, expect, test } from 'vitest';
 import { LogEntry, LogEntryType } from 'src/utils/logging-buffer';
+import { IntegrationServiceResponse } from 'src/services/int-service/int-service.types';
 
 dotenv.config();
 
@@ -22,7 +23,6 @@ function createEndpoint(acrolinxUrl: string) {
       signature: ACROLINX_DEV_SIGNATURE || DEVELOPMENT_SIGNATURE,
       version: '1.2.3.666',
     },
-
   });
 }
 
@@ -88,7 +88,7 @@ describe('Acrolinx One E2E Tests', () => {
   });
 
   describe('Integrations Service Integration Tests', () => {
-    test('Getting integration config',async () => {
+    test('Getting integration config', async () => {
       const intService = new IntService(endpoint);
 
       const intConfig = await intService.getConfig(ACROLINX_API_TOKEN);
@@ -97,21 +97,23 @@ describe('Acrolinx One E2E Tests', () => {
     }, 100000);
   });
 
-  test('Send log integration test',async () => {
+  test('Send log integration test', async () => {
     const intService = new IntService(endpoint);
 
     const logs: LogEntry[] = [
       {
-        type: LogEntryType.error,
-        message: 'Test Error log message',
-        details: [{'sdk-test': 'sdk-test-data'}],
+        type: LogEntryType.action,
+        message: 'Test sdk-js log message',
+        details: [{ 'sdk-test': 'sdk-test-data' }],
       },
     ];
 
-    const intResponse = await intService.sendLogs("sdk-js-test", logs, ACROLINX_API_TOKEN);
-    console.log("test return val" + intResponse);
+    const intResponse = (await intService.sendLogs(
+      'sdk-js-test',
+      logs,
+      ACROLINX_API_TOKEN,
+    )) as IntegrationServiceResponse;
 
-   // expect(intResponse.response).toBeDefined();
-    
+    expect(intResponse.message).toBeDefined();
   }, 100000);
 });

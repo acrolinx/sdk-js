@@ -33,6 +33,7 @@ export enum LogEntryType {
   info = 'info',
   warning = 'warning',
   error = 'error',
+  action = 'action',
 }
 
 export interface LoggingConfig {

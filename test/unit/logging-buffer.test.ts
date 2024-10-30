@@ -52,7 +52,7 @@ describe('LogBuffer', () => {
   });
 
   test('should flush logs to server when buffer reaches batch size', async () => {
-    const mockSendLogs = vi.spyOn(IntService.prototype, 'sendLogs').mockResolvedValue(undefined);
+    const mockSendLogs = vi.spyOn(IntService.prototype, 'sendLogs').mockResolvedValue({ message: 'Test log success' });
 
     for (let i = 0; i < mockConfig.batchSize; i++) {
       const logEntry: LogEntry = {
@@ -191,7 +191,7 @@ describe('LogBuffer', () => {
       .spyOn(IntService.prototype, 'sendLogs')
       .mockRejectedValueOnce(serverError)
       .mockRejectedValueOnce(serverError)
-      .mockResolvedValueOnce(undefined);
+      .mockResolvedValueOnce({ message: 'Test log success' });
 
     mockConfig = {
       ...mockConfig,
@@ -242,11 +242,11 @@ describe('LogBuffer', () => {
   });
 
   test('should flush logs immediately when log type is error', async () => {
-    const mockSendLogs = vi.spyOn(IntService.prototype, 'sendLogs').mockResolvedValue(undefined);
+    const mockSendLogs = vi.spyOn(IntService.prototype, 'sendLogs').mockResolvedValue({ message: 'Test log success' });
 
     const errorLogEntry: LogEntry = {
-      type: LogEntryType.error,
-      message: 'Error log message',
+      type: LogEntryType.info,
+      message: 'test sdk-js log message',
       details: [],
       target: LogTarget.Cloud,
     };

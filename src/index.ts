@@ -453,7 +453,7 @@ export class AcrolinxEndpoint {
     opts: AdditionalRequestOptions = {},
   ): Promise<T> {
     const url = getUrlOfPath(this.props, path);
-    return  fetchJson(url, this.props, {
+    return fetchJson(url, this.props, {
       method: 'POST',
       headers: {
         ...getCommonHeaders(this.props, accessToken, opts.serviceType),

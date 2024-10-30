@@ -16,7 +16,7 @@
 
 import { AcrolinxEndpoint, ServiceType } from '../../index';
 import { LogEntry } from '../../utils/logging-buffer';
-import { IntegrationServiceConfig } from './int-service.types';
+import { IntegrationServiceConfig, IntegrationServiceResponse } from './int-service.types';
 
 export const integrationServiceDefaultConfig: IntegrationServiceConfig = {
   activateGetSuggestionReplacement: false,
@@ -32,8 +32,8 @@ export class IntService {
     });
   }
 
-  sendLogs(appName: string, logs: LogEntry[], accessToken: string): Promise<Response> {
-    return this.endpoint.postJsonToPath<Response>(
+  sendLogs(appName: string, logs: LogEntry[], accessToken: string): Promise<IntegrationServiceResponse> {
+    return this.endpoint.postJsonToPath<IntegrationServiceResponse>(
       this.constructFullPath('/logs'),
       {
         appName,
