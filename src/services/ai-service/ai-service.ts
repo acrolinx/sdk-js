@@ -60,7 +60,7 @@ export class AIService {
         targetUuid,
         count,
         issueInternalName: internalName,
-        previousVersion: previousVersion ?? null,
+        previousVersion,
       },
       accessToken,
       { serviceType: ServiceType.ACROLINX_ONE },
