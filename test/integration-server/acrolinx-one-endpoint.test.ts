@@ -54,7 +54,7 @@ describe('Acrolinx One E2E Tests', () => {
       expect(aiResult.userHasPrivilege).toBeDefined();
     });
 
-    test.skip('get a chat completion from the ai service', async () => {
+    test('get a chat completion from the ai service', async () => {
       const aiService = new AIService(endpoint);
       const aiResult = await aiService.getAIChatCompletion(
         {
