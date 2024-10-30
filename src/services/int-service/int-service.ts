@@ -32,8 +32,8 @@ export class IntService {
     });
   }
 
-  async sendLogs(appName: string, logs: LogEntry[], accessToken: string): Promise<void> {
-    await this.endpoint.postJsonToPath<void>(
+  sendLogs(appName: string, logs: LogEntry[], accessToken: string): Promise<Response> {
+    return this.endpoint.postJsonToPath<Response>(
       this.constructFullPath('/logs'),
       {
         appName,

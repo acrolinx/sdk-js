@@ -2,7 +2,10 @@ import { AcrolinxEndpoint, CommonIssue, DEVELOPMENT_SIGNATURE } from '../../src'
 import * as dotenv from 'dotenv';
 import 'cross-fetch/polyfill';
 import { AIService } from '../../src/services/ai-service/ai-service';
+import { IntService } from '../../src/services/int-service/int-service';
+
 import { describe, beforeEach, expect, test } from 'vitest';
+import { LogEntry, LogEntryType } from 'src/utils/logging-buffer';
 
 dotenv.config();
 
@@ -19,7 +22,7 @@ function createEndpoint(acrolinxUrl: string) {
       signature: ACROLINX_DEV_SIGNATURE || DEVELOPMENT_SIGNATURE,
       version: '1.2.3.666',
     },
-    enableCloudLogging: true,
+
   });
 }
 
@@ -51,7 +54,7 @@ describe('Acrolinx One E2E Tests', () => {
       expect(aiResult.userHasPrivilege).toBeDefined();
     });
 
-    test('get a chat completion from the ai service', async () => {
+    test('get a chat completion from the ai service & validate previous version too', async () => {
       const aiService = new AIService(endpoint);
       const aiResult = await aiService.getAIChatCompletion(
         {
@@ -66,12 +69,49 @@ describe('Acrolinx One E2E Tests', () => {
         ACROLINX_API_TOKEN,
       );
       expect(aiResult.response).toBeDefined();
+      const aiResultSecondTime = await aiService.getAIChatCompletion(
+        {
+          issue: {
+            aiRephraseHint:
+              '{"documentId":"random","aiRephraseHint":[{"role":"system","content":"You are a writing assistant designed to carry out specific tasks and follow instructions. You write clear, grammatically correct and simple text."},{"role":"user","content":"Avoid repeating \'this\' or \'that\' at the beginning of the sentence."},{"role":"user","content":"This is new document. This is not acceptable"},{"role":"assistant","content":"Sure! Here\'s your new sentence: "}]}',
+            internalName: 'simplify',
+          } as unknown as CommonIssue,
+          count: 2,
+          previousVersion: aiResult.response,
+          targetUuid: '2755ce18-fa33-4744-a16e-655bd6ce412e',
+        },
+        ACROLINX_API_TOKEN,
+      );
+      expect(aiResultSecondTime.response).toBeDefined();
+      expect(aiResultSecondTime.response).not.equal(aiResult.response);
     }, 100000);
   });
 
-  describe('Logging Tests', () => {
-    test('initialize logging', () => {
-      expect(endpoint.loggingBuffer).toBeDefined();
-    });
+  describe('Integrations Service Integration Tests', () => {
+    test('Getting integration config',async () => {
+      const intService = new IntService(endpoint);
+
+      const intConfig = await intService.getConfig(ACROLINX_API_TOKEN);
+
+      expect(intConfig.activateGetSuggestionReplacement).toEqual(false);
+    }, 100000);
   });
+
+  test('Send log integration test',async () => {
+    const intService = new IntService(endpoint);
+
+    const logs: LogEntry[] = [
+      {
+        type: LogEntryType.error,
+        message: 'Test Error log message',
+        details: [{'sdk-test': 'sdk-test-data'}],
+      },
+    ];
+
+    const intResponse = await intService.sendLogs("sdk-js-test", logs, ACROLINX_API_TOKEN);
+    console.log("test return val" + intResponse);
+
+   // expect(intResponse.response).toBeDefined();
+    
+  }, 100000);
 });

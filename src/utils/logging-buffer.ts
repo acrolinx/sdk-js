@@ -1,9 +1,24 @@
+/*
+ * Copyright 2024-present Acrolinx GmbH
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 import { AcrolinxEndpoint } from 'src/index';
-import { IntService } from "../services/int-service";
+import { IntService } from '../services/int-service/int-service';
 
 export enum LogTarget {
-  Console = 'console',
   Cloud = 'cloud',
+  Console = 'console',
   Both = 'both',
 }
 
@@ -11,7 +26,7 @@ export interface LogEntry {
   type: LogEntryType;
   message: string;
   details: unknown[];
-  target?: LogTarget; // Optional, defaults to console
+  target?: LogTarget; // Optional, defaults to cloud
 }
 
 export enum LogEntryType {
@@ -46,13 +61,13 @@ export class LogBuffer {
   }
 
   public log(logObj: LogEntry) {
-    const target = logObj.target || LogTarget.Console; // Default to console if not specified
+    const target = logObj.target || LogTarget.Cloud; // Default to cloud if not specified
 
     if (target === LogTarget.Console || target === LogTarget.Both) {
       this.consoleLog(logObj);
     }
 
-    if ((target === LogTarget.Cloud || target === LogTarget.Both)) {
+    if (target === LogTarget.Cloud || target === LogTarget.Both) {
       this.buffer.push(logObj);
       this.manageBuffer(logObj);
     }
@@ -94,15 +109,14 @@ export class LogBuffer {
     if (this.buffer.length === 0) {
       return;
     }
-  
+
     const logsToSend = [...this.buffer];
     this.buffer = [];
-  
+
     try {
       await this.intService.sendLogs(this.appName, logsToSend, this.accessToken);
       this.retries = 0;
     } catch (error) {
-  
       if (this.isRetryableError(error)) {
         this.handleRetry(logsToSend);
       } else {
@@ -110,16 +124,16 @@ export class LogBuffer {
       }
     }
   }
-  
+
   private isRetryableError(error: any): boolean {
     // Check for 5XX server errors
     if (error.response && error.response.status >= 500 && error.response.status < 600) {
       return true;
     }
-  
+
     return false;
   }
-  
+
   private handleRetry(logsToSend: LogEntry[]) {
     if (this.retries < this.config.maxRetries) {
       this.buffer.unshift(...logsToSend);
@@ -133,7 +147,6 @@ export class LogBuffer {
       this.retries = 0;
     }
   }
-  
 
   private scheduleFlush() {
     if (this.buffer.length >= this.config.batchSize) {
