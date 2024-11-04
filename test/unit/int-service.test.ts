@@ -97,7 +97,7 @@ describe('Integration-service', () => {
       expect(headers).toMatchObject({
         'Content-Type': 'application/json',
         'X-Acrolinx-Client': expect.any(String),
-        'Authorization': `Bearer ${DUMMY_ACCESS_TOKEN}`,
+        Authorization: `Bearer ${DUMMY_ACCESS_TOKEN}`,
       });
     });
 
@@ -116,9 +116,7 @@ describe('Integration-service', () => {
         body: { message: 'Internal Server Error' },
       });
 
-      await expect(intService.sendLogs(appName, logs, DUMMY_ACCESS_TOKEN)).rejects.toThrow(
-        'Unknown HTTP Error',
-      );    
+      await expect(intService.sendLogs(appName, logs, DUMMY_ACCESS_TOKEN)).rejects.toThrow('Unknown HTTP Error');
 
       const lastCall = fetchMock.lastCall(logsEndpointMatcher);
 
@@ -141,9 +139,7 @@ describe('Integration-service', () => {
 
       fetchMock.mock(logsEndpointMatcher, { throws: new TypeError('Network Error') });
 
-      await expect(intService.sendLogs(appName, logs, DUMMY_ACCESS_TOKEN)).rejects.toThrow(
-        'Http Connection Problem',
-      );
+      await expect(intService.sendLogs(appName, logs, DUMMY_ACCESS_TOKEN)).rejects.toThrow('Http Connection Problem');
 
       const lastCall = fetchMock.lastCall(logsEndpointMatcher);
 

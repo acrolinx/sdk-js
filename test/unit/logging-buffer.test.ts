@@ -4,7 +4,7 @@ import * as fetchUtils from '../../src/utils/fetch';
 const TEST_LOG_MESSAGE = 'Test log message';
 import { describe, afterEach, expect, beforeEach, vi, test } from 'vitest';
 import { AcrolinxEndpoint } from '../../src';
-import { IntService } from '../../src/services/int-service';
+import { IntService } from '../../src/services/int-service/int-service';
 
 vi.mock('./utils/fetch', async () => {
   const actual = await vi.importActual<typeof fetchUtils>('./utils/fetch');
@@ -52,7 +52,7 @@ describe('LogBuffer', () => {
   });
 
   test('should flush logs to server when buffer reaches batch size', async () => {
-    const mockSendLogs = vi.spyOn(IntService.prototype, 'sendLogs').mockResolvedValue(undefined);
+    const mockSendLogs = vi.spyOn(IntService.prototype, 'sendLogs').mockResolvedValue({ message: 'Test log success' });
 
     for (let i = 0; i < mockConfig.batchSize; i++) {
       const logEntry: LogEntry = {
@@ -74,28 +74,28 @@ describe('LogBuffer', () => {
     const nonRetryableError = {
       response: { status: 400 }, // 4XX errors are non-retryable
     };
-  
+
     const mockSendLogs = vi.spyOn(IntService.prototype, 'sendLogs').mockRejectedValue(nonRetryableError);
-  
+
     const logEntry: LogEntry = {
       type: LogEntryType.error,
       message: TEST_LOG_MESSAGE,
       details: [],
       target: LogTarget.Cloud,
     };
-  
+
     logBuffer.log(logEntry);
-  
+
     await new Promise((resolve) => setTimeout(resolve, 500));
-  
+
     expect(mockSendLogs).toHaveBeenCalledTimes(1);
     expect(logBuffer['retries']).toBe(0);
     expect(logBuffer['buffer']).toHaveLength(0); // Logs should be discarded
-  });  
+  });
 
   test('should use default config when none is provided', () => {
     const defaultLogBuffer = new LogBuffer(mockEndpoint, mockAccessToken, 'test-app');
-  
+
     expect(defaultLogBuffer['config']).toEqual({
       batchSize: 50,
       dispatchInterval: 10000,
@@ -103,22 +103,22 @@ describe('LogBuffer', () => {
       retryDelay: 2000,
       logLevel: LogEntryType.info,
     });
-  });  
+  });
 
   test('should use console.error for error logs', () => {
     const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-  
+
     const logEntry: LogEntry = {
       type: LogEntryType.error,
       message: TEST_LOG_MESSAGE,
       details: [],
       target: LogTarget.Console,
     };
-  
+
     logBuffer.log(logEntry);
-  
+
     expect(consoleErrorSpy).toHaveBeenCalledWith(TEST_LOG_MESSAGE);
-  });  
+  });
 
   test('should increase delay exponentially with retries', () => {
     mockConfig = {
@@ -127,31 +127,30 @@ describe('LogBuffer', () => {
       retryDelay: 800,
       maxRetries: 3,
     };
-  
+
     logBuffer = new LogBuffer(mockEndpoint, mockAccessToken, 'test-app', mockConfig);
-  
+
     const getAdaptiveDelaySpy = vi.spyOn(logBuffer as any, 'getAdaptiveDelay');
-  
+
     // Simulate retries
     (logBuffer as any).retries = 1;
     (logBuffer as any).getAdaptiveDelay();
-  
+
     expect(getAdaptiveDelaySpy).toReturnWith(200); // 100 * 2^1
-  
+
     (logBuffer as any).retries = 2;
     (logBuffer as any).getAdaptiveDelay();
-  
+
     expect(getAdaptiveDelaySpy).toReturnWith(400); // 100 * 2^2
   });
-  
 
   test('should discard logs after max retries are reached', async () => {
     const serverError = {
       response: { status: 500 },
     };
-  
+
     const mockSendLogs = vi.spyOn(IntService.prototype, 'sendLogs').mockRejectedValue(serverError);
-  
+
     mockConfig = {
       ...mockConfig,
       dispatchInterval: 100,
@@ -160,29 +159,28 @@ describe('LogBuffer', () => {
       batchSize: 1,
       logLevel: LogEntryType.warning,
     };
-  
+
     logBuffer = new LogBuffer(mockEndpoint, mockAccessToken, 'test-app', mockConfig);
-  
+
     const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-  
+
     const logEntry: LogEntry = {
       type: LogEntryType.warning,
       message: TEST_LOG_MESSAGE,
       details: [],
       target: LogTarget.Cloud,
     };
-  
+
     logBuffer.log(logEntry);
-  
+
     // Wait enough time for all retries to occur
     await new Promise((resolve) => setTimeout(resolve, 1000));
-  
+
     expect(mockSendLogs).toHaveBeenCalledTimes(3); // initial attempt + 2 retries
     expect(logBuffer['retries']).toBe(0);
     expect(logBuffer['buffer']).toHaveLength(0);
     expect(consoleErrorSpy).toHaveBeenCalledWith('Max retries reached. Discarding logs.');
   });
-  
 
   test('should retry sending logs on failure', async () => {
     const serverError = {
@@ -193,7 +191,7 @@ describe('LogBuffer', () => {
       .spyOn(IntService.prototype, 'sendLogs')
       .mockRejectedValueOnce(serverError)
       .mockRejectedValueOnce(serverError)
-      .mockResolvedValueOnce(undefined);
+      .mockResolvedValueOnce({ message: 'Test log success' });
 
     mockConfig = {
       ...mockConfig,
@@ -244,11 +242,11 @@ describe('LogBuffer', () => {
   });
 
   test('should flush logs immediately when log type is error', async () => {
-    const mockSendLogs = vi.spyOn(IntService.prototype, 'sendLogs').mockResolvedValue(undefined);
+    const mockSendLogs = vi.spyOn(IntService.prototype, 'sendLogs').mockResolvedValue({ message: 'Test log success' });
 
     const errorLogEntry: LogEntry = {
       type: LogEntryType.error,
-      message: 'Error log message',
+      message: 'test sdk-js log message',
       details: [],
       target: LogTarget.Cloud,
     };

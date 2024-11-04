@@ -16,3 +16,8 @@
 export type IntegrationServiceConfig = {
   activateGetSuggestionReplacement: boolean;
 };
+
+export interface IntegrationServiceResponse<T = any> {
+  message: string;
+  data?: T;
+}
