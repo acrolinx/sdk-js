@@ -126,6 +126,7 @@ export * from './services/ai-service/ai-service.types';
 export * from './services/ai-service/ai-service.utils';
 
 export * from './services/int-service/int-service';
+export * from './services/int-service/int-service.types';
 
 export * from './check';
 export * from './capabilities';
