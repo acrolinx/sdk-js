@@ -13,27 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { AcrolinxEndpoint } from 'src/index';
-import { IntService } from '../services/int-service/int-service';
-
-export enum LogTarget {
-  Cloud = 'cloud',
-  Console = 'console',
-  Both = 'both',
-}
-
-export interface LogEntry {
+export interface LogBufferEntry {
   type: LogEntryType;
   message: string;
   details: unknown[];
-  target?: LogTarget; // Optional, defaults to cloud
 }
 
 export enum LogEntryType {
   info = 'info',
   warning = 'warning',
   error = 'error',
-  action = 'action',
+  debug = 'debug',
 }
 
 export interface LoggingConfig {
@@ -44,49 +34,28 @@ export interface LoggingConfig {
   logLevel: LogEntryType | null;
 }
 
+export type LogCallBack = (logsToSend: LogBufferEntry[]) => Promise<void>;
+
 export class LogBuffer {
-  private buffer: LogEntry[] = [];
+  private buffer: LogBufferEntry[] = [];
   private timer: NodeJS.Timeout | null = null;
   private retries = 0;
   private config: LoggingConfig;
-  private readonly intService: IntService;
+  private logCallBack?: LogCallBack;
 
-  constructor(
-    endpoint: AcrolinxEndpoint,
-    private readonly accessToken: string,
-    private readonly appName: string,
-    config?: Partial<LoggingConfig>,
-  ) {
+  constructor(config?: Partial<LoggingConfig>) {
     this.config = this.createLoggingConfig(config);
-    this.intService = new IntService(endpoint);
   }
 
-  public log(logObj: LogEntry) {
-    const target = logObj.target || LogTarget.Cloud; // Default to cloud if not specified
-
-    if (target === LogTarget.Console || target === LogTarget.Both) {
-      this.consoleLog(logObj);
-    }
-
-    if (target === LogTarget.Cloud || target === LogTarget.Both) {
-      this.buffer.push(logObj);
-      this.manageBuffer(logObj);
-    }
+  public setCallback(callback: LogCallBack) {
+    this.logCallBack = callback;
   }
 
-  private consoleLog(logObj: LogEntry): void {
-    switch (logObj.type) {
-      case LogEntryType.info:
-        console.log(logObj.message, ...logObj.details);
-        break;
-      case LogEntryType.warning:
-        console.warn(logObj.message, ...logObj.details);
-        break;
-      case LogEntryType.error:
-        console.error(logObj.message, ...logObj.details);
-        break;
-    }
+  public log(logObj: LogBufferEntry) {
+    this.buffer.push(logObj);
+    this.manageBuffer(logObj);
   }
+
   private createLoggingConfig(config: Partial<LoggingConfig> = {}): LoggingConfig {
     const defaultConfig: LoggingConfig = {
       batchSize: 50,
@@ -98,7 +67,7 @@ export class LogBuffer {
     return { ...defaultConfig, ...config };
   }
 
-  private manageBuffer(logObj: LogEntry): void {
+  private manageBuffer(logObj: LogBufferEntry): void {
     if (logObj.type === LogEntryType.error || this.buffer.length >= this.config.batchSize) {
       void this.flush();
     } else if (!this.timer) {
@@ -107,35 +76,21 @@ export class LogBuffer {
   }
 
   private async flush() {
-    if (this.buffer.length === 0) {
+    if (this.buffer.length === 0 || !this.logCallBack) {
       return;
     }
-
     const logsToSend = [...this.buffer];
     this.buffer = [];
 
     try {
-      await this.intService.sendLogs(this.appName, logsToSend, this.accessToken);
+      await this.logCallBack(logsToSend);
       this.retries = 0;
     } catch (error) {
-      if (this.isRetryableError(error)) {
-        this.handleRetry(logsToSend);
-      } else {
-        this.retries = 0;
-      }
+      this.handleRetry(logsToSend);
     }
   }
 
-  private isRetryableError(error: any): boolean {
-    // Check for 5XX server errors
-    if (error.response && error.response.status >= 500 && error.response.status < 600) {
-      return true;
-    }
-
-    return false;
-  }
-
-  private handleRetry(logsToSend: LogEntry[]) {
+  private handleRetry(logsToSend: LogBufferEntry[]) {
     if (this.retries < this.config.maxRetries) {
       this.buffer.unshift(...logsToSend);
       this.retries++;
@@ -151,6 +106,9 @@ export class LogBuffer {
 
   private scheduleFlush() {
     if (this.buffer.length >= this.config.batchSize) {
+      if (this.timer) {
+        clearTimeout(this.timer);
+      }
       void this.flush();
     } else if (!this.timer) {
       const delay = this.getAdaptiveDelay();

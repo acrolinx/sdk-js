@@ -3,7 +3,7 @@ import { AcrolinxEndpoint, IntService } from '../../src/index';
 import { DUMMY_ACCESS_TOKEN } from '../test-utils/mock-server';
 import { DUMMY_ENDPOINT_PROPS } from './common';
 import { describe, afterEach, expect, test, beforeEach } from 'vitest';
-import { LogEntry, LogEntryType } from '../../src/utils/logging-buffer';
+import { LogBufferEntry, LogEntryType } from '../../src/utils/logging-buffer';
 
 describe('Integration-service', () => {
   let endpoint: AcrolinxEndpoint;
@@ -65,7 +65,7 @@ describe('Integration-service', () => {
 
     test('should send logs successfully', async () => {
       const appName = 'test-app';
-      const logs: LogEntry[] = [
+      const logs: LogBufferEntry[] = [
         {
           type: LogEntryType.info,
           message: 'Test log message',
@@ -103,7 +103,7 @@ describe('Integration-service', () => {
 
     test('should handle server errors gracefully', async () => {
       const appName = 'test-app';
-      const logs: LogEntry[] = [
+      const logs: LogBufferEntry[] = [
         {
           type: LogEntryType.error,
           message: 'Error log message',
@@ -129,7 +129,7 @@ describe('Integration-service', () => {
 
     test('should throw error on network failure', async () => {
       const appName = 'test-app';
-      const logs: LogEntry[] = [
+      const logs: LogBufferEntry[] = [
         {
           type: LogEntryType.warning,
           message: 'Warning log message',
