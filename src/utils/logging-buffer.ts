@@ -85,7 +85,7 @@ export class LogBuffer {
     try {
       await this.logCallBack(logsToSend);
       this.retries = 0;
-    } catch (error) {
+    } catch {
       this.handleRetry(logsToSend);
     }
   }

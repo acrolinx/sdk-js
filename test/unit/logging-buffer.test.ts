@@ -85,7 +85,7 @@ describe('LogBuffer', () => {
     const mockSendLogs = vi.fn().mockRejectedValue({ message: 'error' });
     logBuffer.setCallback(mockSendLogs);
 
-    const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => { });
+    const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
     const logEntry: LogBufferEntry = {
       type: LogEntryType.warning,
