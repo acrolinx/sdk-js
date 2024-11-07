@@ -5,7 +5,7 @@ import { AIService } from '../../src/services/ai-service/ai-service';
 import { IntService } from '../../src/services/int-service/int-service';
 
 import { describe, beforeEach, expect, test } from 'vitest';
-import { LogEntry, LogEntryType } from 'src/utils/logging-buffer';
+import { LogBufferEntry, LogEntryType } from 'src/utils/logging-buffer';
 import { IntegrationServiceResponse } from 'src/services/int-service/int-service.types';
 
 dotenv.config();
@@ -118,9 +118,9 @@ describe('Acrolinx One E2E Tests', () => {
   test('Send log integration test', async () => {
     const intService = new IntService(endpoint);
 
-    const logs: LogEntry[] = [
+    const logs: LogBufferEntry[] = [
       {
-        type: LogEntryType.action,
+        type: LogEntryType.info,
         message: 'Test sdk-js log message',
         details: [{ 'sdk-test': 'sdk-test-data' }],
       },
