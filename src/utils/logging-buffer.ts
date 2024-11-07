@@ -47,6 +47,9 @@ export class LogBuffer {
     this.config = this.createLoggingConfig(config);
   }
 
+  /**
+   * Set the callback function to process the log buffer
+   */
   public setCallback(callback: LogCallBack) {
     this.logCallBack = callback;
   }
@@ -76,7 +79,11 @@ export class LogBuffer {
   }
 
   private async flush() {
-    if (this.buffer.length === 0 || !this.logCallBack) {
+    if (this.buffer.length === 0) {
+      return;
+    }
+    if (!this.logCallBack) {
+      this.cleanup();
       return;
     }
     const logsToSend = [...this.buffer];
@@ -123,5 +130,12 @@ export class LogBuffer {
     const baseDelay = this.config.dispatchInterval;
     const adaptiveDelay = baseDelay * Math.pow(2, this.retries);
     return Math.min(adaptiveDelay, this.config.maxRetries * this.config.retryDelay);
+  }
+
+  private cleanup() {
+    if (this.buffer.length >= this.config.batchSize * 2 + 10) {
+      this.buffer = []; // logs will be lost
+      console.warn('No callback provided; buffer size is increasing, so logs are being cleared.');
+    }
   }
 }
