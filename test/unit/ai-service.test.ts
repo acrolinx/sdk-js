@@ -106,7 +106,11 @@ describe('AI-service', () => {
       const previousVersion = 'previous suggestion text';
       const intermediateResponse = 'intermediate response';
 
-      const response = await createDummyAIServiceRequest(200, { response: aiResponse, intermediateResponse: intermediateResponse }, previousVersion);
+      const response = await createDummyAIServiceRequest(
+        200,
+        { response: aiResponse, intermediateResponse: intermediateResponse },
+        previousVersion,
+      );
 
       expect(response.response).toBe(aiResponse);
 
