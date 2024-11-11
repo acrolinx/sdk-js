@@ -36,6 +36,7 @@ export type ChatCompletionRequest = {
 
 export interface WriteResponse {
   response: string;
+  intermediateResponse: string;
 }
 
 export interface AIServiceError {
