@@ -52,7 +52,7 @@
     "cross-fetch": "^4.0.0",
     "dotenv": "^16.4.5",
     "eslint": "^9.14.0",
-    "fetch-mock": "^11.1.5",
+    "fetch-mock": "^12.1.0",
     "lodash": "^4.17.21",
     "markdown-doctest": "^1.1.0",
     "prettier": "^3.3.3",
