@@ -97,7 +97,7 @@ describe('Acrolinx One E2E Tests', () => {
             internalName: 'clarity_issue',
           } as unknown as CommonIssue,
           count: 2,
-          previousVersion: aiResult.response,
+          previousVersion: aiResult.intermediateResponse,
           targetUuid: '2755ce18-fa33-4744-a16e-655bd6ce412e',
         },
         ACROLINX_API_TOKEN,
