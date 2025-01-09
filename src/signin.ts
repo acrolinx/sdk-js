@@ -100,9 +100,17 @@ export function getSigninRequestHeaders(options: SigninOptions = {}): StringMap 
   if ('accessToken' in options && options.accessToken) {
     return { [HEADER_X_ACROLINX_AUTH]: options.accessToken };
   } else if (isSsoSigninOption(options)) {
+    let username = options.username;
+    let password = options.genericToken;
+    if (!isUrlEncoded(username)) {
+      username = encodeURIComponent(username);
+    }
+    if (!isUrlEncoded(password)) {
+      password = encodeURIComponent(password);
+    }
     return {
-      username: options.username,
-      password: options.genericToken,
+      username,
+      password,
     };
   } else {
     return {};
@@ -112,4 +120,17 @@ export function getSigninRequestHeaders(options: SigninOptions = {}): StringMap 
 export function isSsoSigninOption(signinOptions: SigninOptions): signinOptions is SsoSigninOption {
   const potentialSsoOptions = signinOptions as SsoSigninOption;
   return !!(potentialSsoOptions.genericToken && potentialSsoOptions.username);
+}
+
+function isUrlEncoded(str: string) {
+  if (!str.includes('%')) return false;
+
+  try {
+    const decoded = decodeURIComponent(str);
+    const reEncoded = encodeURIComponent(decoded);
+    return str === reEncoded;
+  } catch {
+    // If decoding fails, it might be partially encoded or malformed
+    return false;
+  }
 }
