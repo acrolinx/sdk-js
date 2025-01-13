@@ -127,7 +127,7 @@ describe('e2e - AcrolinxEndpoint', () => {
       test('should return the provided API-Token', async () => {
         const result = (await api.signin({ accessToken: ACROLINX_API_TOKEN })) as SigninSuccessResult;
         expect(result.data.accessToken).toBe(ACROLINX_API_TOKEN);
-        expect(result.data.user.username).toBe(ACROLINX_API_USERNAME);
+        expect(result.data.user.username).toBe(encodeURIComponent(ACROLINX_API_USERNAME));
       });
 
       test('should return client properties', async () => {
@@ -152,7 +152,7 @@ describe('e2e - AcrolinxEndpoint', () => {
         genericToken: SSO_GENERIC_TOKEN!,
         username: ACROLINX_API_USERNAME,
       })) as SigninSuccessResult;
-      expect(result.data.user.username).toContain(ACROLINX_API_USERNAME);
+      expect(result.data.user.username).toContain(encodeURIComponent(ACROLINX_API_USERNAME));
     });
 
     test('signInWithSSO throws SSO Error', async () =>
