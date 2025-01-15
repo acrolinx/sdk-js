@@ -77,10 +77,6 @@ Place the .xlf file in directory and rename it to sample.xlf `testdocs/sample.xl
 
 Run script `npm run runExampleXliff`
 
-## Contributing to this SDK
-
-See: [`CONTRIBUTING.md`](CONTRIBUTING.md)
-
 ## License
 
 Copyright 2018-present Acrolinx GmbH
