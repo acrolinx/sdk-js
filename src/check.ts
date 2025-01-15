@@ -255,6 +255,7 @@ export interface CommonIssue {
   canAddToDictionary: boolean;
   subIssues?: SubIssue[];
   goalId?: GoalId;
+  guidelineId?: string;
 
   /**
    * Since Acrolinx platform 2021.2
