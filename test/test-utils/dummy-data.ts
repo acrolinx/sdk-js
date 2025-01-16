@@ -261,6 +261,7 @@ export const DUMMY_CHECK_RESULT: CheckResult = {
       aiRewriteContext: DUMMY_AI_REWRITE_CONTEXT,
       canAddToDictionary: true,
       goalId: 'spelling',
+      guidelineId: 'spelling',
       issueType: IssueType.actionable,
       internalName: 'title_case_chicago',
       displayNameHtml: 'Use Chicago style for the title case?',
