@@ -60,7 +60,7 @@ describe('signin', () => {
     const accessToken = 'someToken';
     expect(getSigninRequestHeaders({ accessToken })).toEqual({ [HEADER_X_ACROLINX_AUTH]: accessToken });
 
-    const username = 'name§$%&/(';
+    const username = '日name@test.de §$%&/(';
     const genericToken = 'password§$%&/(';
 
     const usernameEncoded = encodeURIComponent(username);

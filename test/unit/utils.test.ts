@@ -6,7 +6,7 @@ describe('utils', () => {
     test('isURLEncoded', () => {
       const stringOne = 'afdafsdsadas';
       const stringTwo = '1sdfasd%/%%"';
-      const stringThree = 'asdb1234"$§%&§23432asdafasd';
+      const stringThree = 'D日name@test.de §$%&/(';
 
       expect(isUrlEncoded(stringOne)).toBe(false);
       expect(isUrlEncoded(encodeURIComponent(stringOne))).toBe(false); // is not encoded because encoding has no effect
