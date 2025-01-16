@@ -143,15 +143,3 @@ export async function put<T>(
 ): Promise<T> {
   return send<T>('PUT', path, body, headers, props, accessToken);
 }
-
-export function isUrlEncoded(str: string) {
-  if (!str.includes('%')) return false;
-
-  try {
-    const decoded = decodeURIComponent(str);
-    return str !== decoded;
-  } catch {
-    // If decoding fails, it might be partially encoded or malformed
-    return false;
-  }
-}

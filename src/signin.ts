@@ -25,7 +25,6 @@ import {
   Username,
 } from './common-types';
 import { HEADER_X_ACROLINX_AUTH } from './headers';
-import { isUrlEncoded } from './utils/fetch';
 
 export type PollMoreResult = ProgressResponse;
 
@@ -101,17 +100,9 @@ export function getSigninRequestHeaders(options: SigninOptions = {}): StringMap 
   if ('accessToken' in options && options.accessToken) {
     return { [HEADER_X_ACROLINX_AUTH]: options.accessToken };
   } else if (isSsoSigninOption(options)) {
-    let username = options.username;
-    let password = options.genericToken;
-    if (!isUrlEncoded(username)) {
-      username = encodeURIComponent(username);
-    }
-    if (!isUrlEncoded(password)) {
-      password = encodeURIComponent(password);
-    }
     return {
-      username,
-      password,
+      username: encodeURIComponent(options.username),
+      password: encodeURIComponent(options.genericToken),
     };
   } else {
     return {};

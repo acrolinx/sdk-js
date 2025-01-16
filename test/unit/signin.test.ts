@@ -72,9 +72,6 @@ describe('signin', () => {
     };
 
     expect(getSigninRequestHeaders({ username, genericToken })).toEqual(result);
-    expect(getSigninRequestHeaders({ username: usernameEncoded, genericToken })).toEqual(result);
-    expect(getSigninRequestHeaders({ username, genericToken: genericTokenEncoded })).toEqual(result);
-    expect(getSigninRequestHeaders({ username: usernameEncoded, genericToken: genericTokenEncoded })).toEqual(result);
   });
 
   test('should return the signin links', async () => {
