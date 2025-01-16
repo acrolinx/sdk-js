@@ -69,10 +69,11 @@ describe('Acrolinx One E2E Tests', () => {
         ACROLINX_API_TOKEN,
       );
       expect(aiResult.response).toBeDefined();
+      expect(aiResult.intermediateResponse).toBeDefined();
     }, 100000);
 
     // Run this case manually after running the case for multiple times AI-Service starts giving same response.
-    test.skip('get a chat completion from the ai service & validate previous version too', async () => {
+    test('get a chat completion from the ai service & validate previous version too', async () => {
       const aiService = new AIService(endpoint);
       const aiResult = await aiService.getAIChatCompletion(
         {
@@ -87,6 +88,7 @@ describe('Acrolinx One E2E Tests', () => {
         ACROLINX_API_TOKEN,
       );
       expect(aiResult.response).toBeDefined();
+      expect(aiResult.intermediateResponse).toBeDefined();
       const aiResultSecondTime = await aiService.getAIChatCompletion(
         {
           issue: {
@@ -95,13 +97,14 @@ describe('Acrolinx One E2E Tests', () => {
             internalName: 'clarity_issue',
           } as unknown as CommonIssue,
           count: 2,
-          previousVersion: aiResult.response,
+          previousVersion: aiResult.intermediateResponse,
           targetUuid: '2755ce18-fa33-4744-a16e-655bd6ce412e',
         },
         ACROLINX_API_TOKEN,
       );
       expect(aiResultSecondTime.response).toBeDefined();
-      expect(aiResultSecondTime.response).not.equal(aiResult.response);
+      expect(aiResultSecondTime.intermediateResponse).toBeDefined();
+      expect(aiResultSecondTime.intermediateResponse).not.equal(aiResultSecondTime.response);
     }, 100000);
   });
 
