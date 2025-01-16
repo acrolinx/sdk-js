@@ -22,7 +22,7 @@ import {
   isSigninSuccessResult,
   PollMoreResult,
 } from '../../src/index';
-import { SigninLinksResult, SigninSuccessResult } from '../../src/signin';
+import { getSigninRequestHeaders, SigninLinksResult, SigninSuccessResult } from '../../src/signin';
 import { waitMs } from '../../src/utils/mixed-utils';
 import {
   AcrolinxServerMock,
@@ -39,6 +39,7 @@ import {
 import { expectFailingPromise } from '../test-utils/utils';
 import { DUMMY_ENDPOINT_PROPS, DUMMY_SERVER_URL } from './common';
 import { describe, beforeEach, afterEach, expect, vi, test } from 'vitest';
+import { HEADER_X_ACROLINX_AUTH } from 'src/headers';
 
 describe('signin', () => {
   let endpoint: AcrolinxEndpoint;
@@ -51,6 +52,29 @@ describe('signin', () => {
 
   afterEach(() => {
     restoreOriginalFetch();
+  });
+
+  test('getSigninRequestHeaders', () => {
+    expect(getSigninRequestHeaders({})).toEqual({});
+
+    const accessToken = 'someToken';
+    expect(getSigninRequestHeaders({ accessToken })).toEqual({ [HEADER_X_ACROLINX_AUTH]: accessToken });
+
+    const username = 'name§$%&/(';
+    const genericToken = 'password§$%&/(';
+
+    const usernameEncoded = encodeURIComponent(username);
+    const genericTokenEncoded = encodeURIComponent(genericToken);
+
+    const result = {
+      username: usernameEncoded,
+      password: genericTokenEncoded,
+    };
+
+    expect(getSigninRequestHeaders({ username, genericToken })).toEqual(result);
+    expect(getSigninRequestHeaders({ username: usernameEncoded, genericToken })).toEqual(result);
+    expect(getSigninRequestHeaders({ username, genericToken: genericTokenEncoded })).toEqual(result);
+    expect(getSigninRequestHeaders({ username: usernameEncoded, genericToken: genericTokenEncoded })).toEqual(result);
   });
 
   test('should return the signin links', async () => {
