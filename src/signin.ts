@@ -101,8 +101,8 @@ export function getSigninRequestHeaders(options: SigninOptions = {}): StringMap 
     return { [HEADER_X_ACROLINX_AUTH]: options.accessToken };
   } else if (isSsoSigninOption(options)) {
     return {
-      username: options.username,
-      password: options.genericToken,
+      username: encodeURIComponent(options.username),
+      password: encodeURIComponent(options.genericToken),
     };
   } else {
     return {};
