@@ -127,8 +127,7 @@ function isUrlEncoded(str: string) {
 
   try {
     const decoded = decodeURIComponent(str);
-    const reEncoded = encodeURIComponent(decoded);
-    return str === reEncoded;
+    return str !== decoded;
   } catch {
     // If decoding fails, it might be partially encoded or malformed
     return false;
