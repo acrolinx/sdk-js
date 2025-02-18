@@ -154,7 +154,7 @@ export function createErrorFromFetchResponse(
   }
 }
 
-function formatGenericErrorDetail(statusText: string, jsonBody: AcrolinxApiError | undefined) {
+function formatGenericErrorDetail(statusText: string, jsonBody: AcrolinxApiError | undefined): string {
   let detail = statusText;
 
   if (jsonBody) {
