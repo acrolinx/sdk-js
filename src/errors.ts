@@ -145,13 +145,28 @@ export function createErrorFromFetchResponse(
     });
   } else {
     return new AcrolinxError({
-      detail: `${res.statusText}:${JSON.stringify(jsonBody)}`,
+      detail: formatGenericErrorDetail(res.statusText, jsonBody),
       status: res.status,
       httpRequest: req,
       title: 'Unknown HTTP Error',
       type: ErrorType.HttpErrorStatus,
     });
   }
+}
+
+function formatGenericErrorDetail(statusText: string, jsonBody: AcrolinxApiError | undefined): string {
+  let detail = statusText;
+
+  if (jsonBody) {
+    try {
+      detail += ':' + JSON.stringify(jsonBody);
+    } catch (error) {
+      console.error('Error stringifying JSON:', error);
+      detail += ':[JSON stringify error]';
+    }
+  }
+
+  return detail;
 }
 
 export function wrapFetchError(httpRequest: HttpRequest, error: Error): Promise<any> {
