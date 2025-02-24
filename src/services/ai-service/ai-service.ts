@@ -52,7 +52,6 @@ export class AIService {
   public async getAIChatCompletion(params: ChatCompletionRequest, accessToken: string): Promise<WriteResponse> {
     const { aiRephraseHint: prompt, internalName } = params.issue;
     const { targetUuid, count, previousVersion } = params;
-    this.endpoint.counters.getSuggestionCounter.add(1);
 
     return this.endpoint.postJsonToPath<WriteResponse>(
       this.constructFullPath('/ai/chat-completions'),
