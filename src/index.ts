@@ -84,6 +84,7 @@ import {
   SigninSuccessData,
   SigninSuccessResult,
 } from './signin';
+import { Counters, createCounters, initializeTelemetry, Instruments } from './telemetry/initialize-telemetry';
 
 import { User } from './user';
 import { fetchJson, fetchWithProps, getUrlOfPath, handleExpectedTextResponse, post, put } from './utils/fetch';
@@ -202,12 +203,16 @@ const VALIDATE_APP_ACCESS_TOKEN_PATH = '/api/v1/apps/whoami';
 
 export class AcrolinxEndpoint {
   public readonly props: AcrolinxEndpointProps;
+  public readonly instruments: Instruments;
+  public readonly counters: Counters;
 
   constructor(props: AcrolinxEndpointProps) {
     this.props = {
       ...props,
       acrolinxUrl: props.acrolinxUrl.trim().replace(/\/$/, ''),
     };
+    this.instruments = initializeTelemetry();
+    this.counters = createCounters(this.instruments.meter);
   }
 
   public setClientLocale(clientLocale: string) {
@@ -295,6 +300,7 @@ export class AcrolinxEndpoint {
   }
 
   public async check(accessToken: AccessToken, req: CheckRequest): Promise<CheckResponse> {
+    this.counters.checkCounter.add(1);
     return post<CheckResponse>('/api/v1/checking/checks', req, {}, this.props, accessToken);
   }
 
