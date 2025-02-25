@@ -5,18 +5,18 @@ import { SimpleSpanProcessor } from '@opentelemetry/sdk-trace-base';
 import { WebTracerProvider } from '@opentelemetry/sdk-trace-web';
 import { ATTR_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
 import { ZoneContextManager } from '@opentelemetry/context-zone';
-import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-proto';
-import { OPENTELEMETRY_AGENT_ENDPOINT } from './config';
+import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
+import { OPENTELEMETRY_TRACES_ENDPOINT, SERVICE_NAME } from '../config';
 
-export const initTele = () => {
+export const setupTraces = () => {
   const provider = new WebTracerProvider({
     resource: new Resource({
-      [ATTR_SERVICE_NAME]: 'sidebar-app',
+      [ATTR_SERVICE_NAME]: SERVICE_NAME,
     }),
     spanProcessors: [
       new SimpleSpanProcessor(
         new OTLPTraceExporter({
-          url: OPENTELEMETRY_AGENT_ENDPOINT
+          url: OPENTELEMETRY_TRACES_ENDPOINT,
         }),
       ),
     ],
@@ -36,10 +36,9 @@ export const initTele = () => {
           if (testId) {
             span.setAttribute('target_element_testid', testId);
           }
-
           return false;
         },
-      })
+      }),
     ],
   });
 };
