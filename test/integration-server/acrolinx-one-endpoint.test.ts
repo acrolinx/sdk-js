@@ -114,7 +114,7 @@ describe('Acrolinx One E2E Tests', () => {
 
       const intConfig = await intService.getConfig(ACROLINX_API_TOKEN);
 
-      expect(intConfig.activateGetSuggestionReplacement).toEqual(false);
+      expect(intConfig.activateGetSuggestionReplacement).toEqual(true);
     }, 100000);
   });
 
