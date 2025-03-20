@@ -56,7 +56,7 @@
     "lodash": "^4.17.21",
     "markdown-doctest": "^1.1.0",
     "prettier": "^3.5.3",
-    "typedoc": "^0.28.0",
+    "typedoc": "^0.28.1",
     "typescript": "^5.8.2",
     "typescript-eslint": "^8.27.0",
     "typescript-json-schema": "^0.65.1",
