@@ -16,7 +16,7 @@
 
 import { DocumentId } from './document-descriptor';
 import { isAIServiceError } from './services/ai-service/ai-service.utils';
-import { errorIdGenerator } from './utils/errorid-generator'
+import { errorIdGenerator } from './utils/errorid-generator';
 
 /**
  * See also https://github.com/acrolinx/server-api-spec/blob/master/apiary.apib
