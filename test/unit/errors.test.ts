@@ -15,7 +15,7 @@
  */
 
 import { afterEach, beforeEach, describe, expect, test } from 'vitest';
-import { CheckCanceledByClientError, ErrorType } from '../../src/errors';
+import { AcrolinxError, CheckCanceledByClientError, ErrorType } from '../../src/errors';
 import { AcrolinxEndpoint } from '../../src/index';
 import { mockAcrolinxServer, mockBrokenJsonServer, restoreOriginalFetch } from '../test-utils/mock-server';
 import { DUMMY_ENDPOINT_PROPS, DUMMY_SERVER_URL } from './common';
@@ -30,6 +30,26 @@ describe('errors', () => {
 
   afterEach(() => {
     restoreOriginalFetch();
+  });
+
+  test('error ID string is not empty, null or undefined', async () => {
+    const error = new AcrolinxError({
+      type: ErrorType.HttpErrorStatus,
+      detail: 'Unknown HTTP Error',
+      title: 'Unknown HTTP Error',
+    });
+    expect(error.id).not.toBeNull();
+    expect(error.id).not.toBeUndefined();
+    expect(error.id).toBeTruthy();
+  });
+
+  test('error ID string has 6 digit length', () => {
+    const error = new AcrolinxError({
+      type: ErrorType.HttpErrorStatus,
+      detail: 'Unknown HTTP Error',
+      title: 'Unknown HTTP Error',
+    });
+    expect(error.id.length).toBe(6);
   });
 
   test('should return an failing promise for broken json', async () => {
