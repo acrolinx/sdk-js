@@ -100,7 +100,7 @@ export class AcrolinxError extends Error implements AcrolinxErrorProps {
 
   public constructor(props: AcrolinxErrorProps) {
     super(props.title);
-    this.id = props.id || errorIdGenerator.generateUniqueErrorIdString();
+    this.id = props.id ?? errorIdGenerator.generateUniqueErrorIdString();
     this.type = props.type;
     this.status = props.status;
     this.responseHeaders = props.responseHeaders;
