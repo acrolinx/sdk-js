@@ -1,5 +1,5 @@
 export class ErrorIdGenerator {
-  private generatedIds: Set<number> = new Set<number>();
+  private readonly generatedIds: Set<number> = new Set<number>();
   private readonly idLength: number = 6;
 
   generateUniqueErrorId(): number {
