@@ -131,8 +131,10 @@ describe('AI-service', () => {
         errorId: AIServiceErrorTypes.GENERAL_EXCEPTION,
       });
 
+      await expect(response).rejects.toThrowError(AcrolinxError);
       await expect(response).rejects.toThrowError(
-        new AcrolinxError({
+        expect.objectContaining({
+          id: expect.any(String),
           detail: REQUEST_ERROR_MESSAGE,
           status: 500,
           type: AIServiceErrorTypes.GENERAL_EXCEPTION,
@@ -154,8 +156,10 @@ describe('AI-service', () => {
         errorId: AIServiceErrorTypes.INVALID_USER_INPUT,
       });
 
+      await expect(response).rejects.toThrowError(AcrolinxError);
       await expect(response).rejects.toThrowError(
-        new AcrolinxError({
+        expect.objectContaining({
+          id: expect.any(String),
           detail: FILTERED_RESPONSE_MESSAGE,
           status: 400,
           type: AIServiceErrorTypes.INVALID_USER_INPUT,

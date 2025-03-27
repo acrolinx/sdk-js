@@ -16,6 +16,7 @@
 
 import { DocumentId } from './document-descriptor';
 import { isAIServiceError } from './services/ai-service/ai-service.utils';
+import { errorIdGenerator } from './utils/errorid-generator';
 
 /**
  * See also https://github.com/acrolinx/server-api-spec/blob/master/apiary.apib
@@ -50,6 +51,7 @@ export interface AcrolinxErrorProps {
   title: string;
   detail: string;
   type: string;
+  id?: string;
   httpRequest?: HttpRequest;
   status?: number;
   responseHeaders?: Headers;
@@ -84,6 +86,7 @@ export interface AcrolinxApiError extends AcrolinxErrorProps {
 }
 
 export class AcrolinxError extends Error implements AcrolinxErrorProps {
+  public readonly id: string;
   public readonly type: string;
   public readonly title: string;
   public readonly detail: string;
@@ -97,6 +100,7 @@ export class AcrolinxError extends Error implements AcrolinxErrorProps {
 
   public constructor(props: AcrolinxErrorProps) {
     super(props.title);
+    this.id = props.id ?? errorIdGenerator.generateUniqueErrorIdString();
     this.type = props.type;
     this.status = props.status;
     this.responseHeaders = props.responseHeaders;
