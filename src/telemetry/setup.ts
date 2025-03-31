@@ -8,6 +8,7 @@ export type TelemetryConfig = {
   acrolinxUrl: string;
   accessToken: AccessToken;
   serviceName: string;
+  serviceVersion: string;
 }
 
 export const setupTelemetry = (config: TelemetryConfig): AcrolinxInstrumentation => {

@@ -1,7 +1,7 @@
 import { OTLPMetricExporter } from '@opentelemetry/exporter-metrics-otlp-http';
 import { MeterProvider, PeriodicExportingMetricReader } from '@opentelemetry/sdk-metrics';
-import { Resource } from '@opentelemetry/resources';
-import { ATTR_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
+import { ATTR_SERVICE_NAME, ATTR_SERVICE_VERSION } from '@opentelemetry/semantic-conventions';
+import { resourceFromAttributes } from '@opentelemetry/resources';
 import { Counter } from '@opentelemetry/api';
 import { TelemetryConfig } from '../setup';
 
@@ -14,6 +14,12 @@ export const setupMetrics = (config: TelemetryConfig) => {
   };
   const metricExporter = new OTLPMetricExporter(collectorOptions);
 
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+  const resource = resourceFromAttributes({
+    [ATTR_SERVICE_NAME]: config.serviceName,
+    [ATTR_SERVICE_VERSION]: config.serviceVersion
+  });
+
   const meterProvider = new MeterProvider({
     readers: [
       new PeriodicExportingMetricReader({
@@ -21,9 +27,7 @@ export const setupMetrics = (config: TelemetryConfig) => {
         exportIntervalMillis: 5000,
       }),
     ],
-    resource: new Resource({
-      [ATTR_SERVICE_NAME]: config.serviceName,
-    }),
+    resource,
   });
 
   return meterProvider;
@@ -31,7 +35,6 @@ export const setupMetrics = (config: TelemetryConfig) => {
 
 export const createDefaultCounters = (meterProvider: MeterProvider): Counters => {
   const defaultMeter = meterProvider.getMeter('default');
-
 
   return {
     check: defaultMeter.createCounter('check'),

@@ -217,6 +217,7 @@ export class AcrolinxEndpoint {
       accessToken: ACROLINX_API_TOKEN,
       acrolinxUrl: this.props.acrolinxUrl,
       serviceName: 'sidebar-test',
+      serviceVersion: this.props.client.version
     });
   }
 

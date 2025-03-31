@@ -1,7 +1,7 @@
 import { SeverityNumber } from '@opentelemetry/api-logs';
 import { LoggerProvider, BatchLogRecordProcessor } from '@opentelemetry/sdk-logs';
 import { OTLPLogExporter } from '@opentelemetry/exporter-logs-otlp-http';
-import { Resource } from '@opentelemetry/resources';
+import { resourceFromAttributes } from '@opentelemetry/resources';
 import { ATTR_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
 import { TelemetryConfig } from '../setup';
 
@@ -14,10 +14,12 @@ export const setupLogging = (config: TelemetryConfig) => {
     concurrencyLimit: 1,
   };
   const logExporter = new OTLPLogExporter(collectorOptions);
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+  const resource = resourceFromAttributes({
+    [ATTR_SERVICE_NAME]: 'api-service',
+  });
   const loggerProvider = new LoggerProvider({
-    resource: new Resource({
-      [ATTR_SERVICE_NAME]: config.serviceName,
-    }),
+    resource,
   });
 
   loggerProvider.addLogRecordProcessor(new BatchLogRecordProcessor(logExporter));
