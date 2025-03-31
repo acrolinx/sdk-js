@@ -1,13 +1,16 @@
 import { OTLPMetricExporter } from '@opentelemetry/exporter-metrics-otlp-http';
 import { MeterProvider, PeriodicExportingMetricReader } from '@opentelemetry/sdk-metrics';
-import { OPENTELEMETRY_METRICS_ENDPOINT, SERVICE_NAME } from '../config';
 import { Resource } from '@opentelemetry/resources';
 import { ATTR_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
 import { Counter } from '@opentelemetry/api';
+import { TelemetryConfig } from '../setup';
 
-export const setupMetrics = () => {
+export const setupMetrics = (config: TelemetryConfig) => {
   const collectorOptions = {
-    url: OPENTELEMETRY_METRICS_ENDPOINT,
+    url: `${config.acrolinxUrl}/otlp/metrics`,
+    headers: {
+      Authorization: `Bearer ${config.accessToken}`,
+    },
   };
   const metricExporter = new OTLPMetricExporter(collectorOptions);
 
@@ -19,7 +22,7 @@ export const setupMetrics = () => {
       }),
     ],
     resource: new Resource({
-      [ATTR_SERVICE_NAME]: SERVICE_NAME,
+      [ATTR_SERVICE_NAME]: config.serviceName,
     }),
   });
 
@@ -28,6 +31,7 @@ export const setupMetrics = () => {
 
 export const createDefaultCounters = (meterProvider: MeterProvider): Counters => {
   const defaultMeter = meterProvider.getMeter('default');
+
 
   return {
     check: defaultMeter.createCounter('check'),

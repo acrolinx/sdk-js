@@ -85,12 +85,13 @@ import {
   SigninSuccessData,
   SigninSuccessResult,
 } from './signin';
-import { AcrolinxInstrumentaion, setupTelemetry } from './telemetry/setup';
+import { AcrolinxInstrumentation, setupTelemetry } from './telemetry/setup';
 
 import { User } from './user';
 import { fetchJson, fetchWithProps, getUrlOfPath, handleExpectedTextResponse, post, put } from './utils/fetch';
 import * as logging from './utils/logging';
 import { waitMs } from './utils/mixed-utils';
+import { ACROLINX_API_TOKEN } from './telemetry/config';
 
 export * from './dictionary';
 export * from './extraction';
@@ -204,7 +205,7 @@ const VALIDATE_APP_ACCESS_TOKEN_PATH = '/api/v1/apps/whoami';
 
 export class AcrolinxEndpoint {
   public readonly props: AcrolinxEndpointProps;
-  public readonly acrolinxInstrumenation: AcrolinxInstrumentaion;
+  public readonly acrolinxInstrumenation: AcrolinxInstrumentation;
 
   constructor(props: AcrolinxEndpointProps) {
     this.props = {
@@ -212,8 +213,14 @@ export class AcrolinxEndpoint {
       acrolinxUrl: props.acrolinxUrl.trim().replace(/\/$/, ''),
     };
 
-    this.acrolinxInstrumenation = setupTelemetry();
+    this.acrolinxInstrumenation = setupTelemetry({
+      accessToken: ACROLINX_API_TOKEN,
+      acrolinxUrl: this.props.acrolinxUrl,
+      serviceName: 'sidebar-test',
+    });
   }
+
+  public initializeTelemtry() {}
 
   public setClientLocale(clientLocale: string) {
     this.props.clientLocale = clientLocale;
