@@ -36,7 +36,6 @@ export class AcrolinxInstrumentation {
           meterProvider,
           defaultCounters,
         },
-        traces: {},
         logging: {
           logger,
         },
@@ -71,7 +70,6 @@ export type TelemetryConfig = {
 
 export type Instruments = {
   metrics: MetricInstrumentation;
-  traces: TracingInstrumentation;
   logging: LoggingInstrumentation;
 };
 
