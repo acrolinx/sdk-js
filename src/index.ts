@@ -233,7 +233,6 @@ export class AcrolinxEndpoint {
   public async signInWithSSO(genericToken: string, username: string) {
     const signinResult = await this.signin({ genericToken, username });
     if (isSigninSuccessResult(signinResult)) {
-      await this.getTelemetryInstruments(signinResult.data.accessToken);
       return signinResult;
     } else {
       throw new AcrolinxError({
@@ -248,7 +247,6 @@ export class AcrolinxEndpoint {
     const signinResult = await this.signin({ accessToken: opts.accessToken });
 
     if (isSigninSuccessResult(signinResult)) {
-      await this.getTelemetryInstruments(signinResult.data.accessToken);
       return signinResult.data;
     }
 
@@ -273,7 +271,6 @@ export class AcrolinxEndpoint {
   }
 
   public async getAppAccessToken(accessToken: AccessToken, appId: AddonId): Promise<AppAccessTokenResult> {
-    await this.getTelemetryInstruments(accessToken);
     const tokenApiResult = await getData<AppAccessTokenApiResult>(
       post('/api/v1/apps/accessToken/' + appId, {}, undefined, this.props, accessToken),
     );
@@ -295,12 +292,10 @@ export class AcrolinxEndpoint {
   }
 
   public async getCapabilities(accessToken: AccessToken): Promise<PlatformCapabilities> {
-    await this.getTelemetryInstruments(accessToken);
     return getData(this.getJsonFromPath('/api/v1/capabilities', accessToken));
   }
 
   public async getFeatures(accessToken: AccessToken): Promise<PlatformFeatures> {
-    await this.getTelemetryInstruments(accessToken);
     const responsePromise = await getData<PlatformFeaturesResponse>(
       this.getJsonFromPath('/api/v1/configuration/features', accessToken),
     );
@@ -308,7 +303,6 @@ export class AcrolinxEndpoint {
   }
 
   public async getCheckingCapabilities(accessToken: AccessToken): Promise<CheckingCapabilities> {
-    await this.getTelemetryInstruments(accessToken);
     return getData(this.getJsonFromPath('/api/v1/checking/capabilities', accessToken));
   }
 
@@ -325,7 +319,6 @@ export class AcrolinxEndpoint {
   }
 
   public async getLiveSuggestions(accessToken: AccessToken, req: LiveSearchRequest): Promise<LiveSearchResponse> {
-    await this.getTelemetryInstruments(accessToken);
     return post<LiveSearchResponse>(
       '/reuse-service/api/v1/phrases/preferred/with-description',
       req,
@@ -360,7 +353,6 @@ export class AcrolinxEndpoint {
   }
 
   public async cancelCheck(accessToken: AccessToken, check: CheckResponse): Promise<CancelCheckResponse> {
-    await this.getTelemetryInstruments(accessToken);
     return this.cancelAsyncStartedProcess(accessToken, check);
   }
 

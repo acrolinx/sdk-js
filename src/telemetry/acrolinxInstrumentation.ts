@@ -48,17 +48,20 @@ export class AcrolinxInstrumentation {
     return undefined;
   }
 
-  private async isAllowed(accessToken: AccessToken): Promise<boolean> {
+  private async isAllowed(_accessToken: AccessToken): Promise<boolean> {
     // TODO: Add launch darkly flag
     if (Date.now() - this.lastAccessChecked <= this.intervalInMs) {
       return this.isTelemetryAllowed;
     }
-    const config = await this.integrationService.getConfig(accessToken);
-    if (config) {
-      this.isTelemetryAllowed = true; //TODO: Set based on config
-      return true;
-    }
-    return false;
+    return new Promise((resolve) => {
+
+      resolve(true);
+    });
+    // const config = await this.integrationService.getConfig(accessToken);
+    // if (config) {
+    //   this.isTelemetryAllowed = true;
+    //   return true;
+    // }
   }
 }
 
