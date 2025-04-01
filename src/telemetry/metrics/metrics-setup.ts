@@ -17,7 +17,7 @@ export const setupMetrics = (config: TelemetryConfig) => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-call
   const resource = resourceFromAttributes({
     [ATTR_SERVICE_NAME]: config.serviceName,
-    [ATTR_SERVICE_VERSION]: config.serviceVersion
+    [ATTR_SERVICE_VERSION]: config.serviceVersion,
   });
 
   const meterProvider = new MeterProvider({
