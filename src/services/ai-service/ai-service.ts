@@ -50,8 +50,8 @@ export class AIService {
   }
 
   public async getAIChatCompletion(params: ChatCompletionRequest, accessToken: string): Promise<WriteResponse> {
-    const acrolinxInstrumenation = this.endpoint.fetchAcrolinxInstrumentation(accessToken);
-    acrolinxInstrumenation.instruments.metrics.defaultCounters.getSuggestion.add(1);
+    const instruments = await this.endpoint.getTelemetryInstruments(accessToken);
+    instruments?.metrics.defaultCounters.getSuggestion.add(1);
 
     const { aiRephraseHint: prompt, internalName } = params.issue;
     const { targetUuid, count, previousVersion } = params;
