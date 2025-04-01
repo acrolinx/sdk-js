@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-import { SeverityNumber } from '@opentelemetry/api-logs';
 import {
   AddonId,
   AppAccessToken,
@@ -314,12 +313,6 @@ export class AcrolinxEndpoint {
   public async check(accessToken: AccessToken, req: CheckRequest): Promise<CheckResponse> {
     const instruments = await this.getTelemetryInstruments(accessToken);
     instruments?.metrics.defaultCounters.check.add(1);
-    instruments?.logging.logger.emit({
-      severityNumber: SeverityNumber.INFO,
-      severityText: 'info',
-      body: 'Submitting a check',
-      attributes: { 'log.type': 'api' },
-    });
     return post<CheckResponse>('/api/v1/checking/checks', req, {}, this.props, accessToken);
   }
 
