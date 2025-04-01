@@ -50,7 +50,6 @@ export class AcrolinxInstrumentation {
       return this.isTelemetryAllowed;
     }
     return new Promise((resolve) => {
-
       resolve(true);
     });
     // const config = await this.integrationService.getConfig(accessToken);
