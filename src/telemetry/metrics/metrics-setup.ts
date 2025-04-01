@@ -3,7 +3,7 @@ import { MeterProvider, PeriodicExportingMetricReader } from '@opentelemetry/sdk
 import { ATTR_SERVICE_NAME, ATTR_SERVICE_VERSION } from '@opentelemetry/semantic-conventions';
 import { resourceFromAttributes } from '@opentelemetry/resources';
 import { Counter } from '@opentelemetry/api';
-import { TelemetryConfig } from '../setup';
+import { TelemetryConfig } from '../acrolinxInstrumentation';
 
 export const setupMetrics = (config: TelemetryConfig) => {
   const collectorOptions = {

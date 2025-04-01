@@ -3,7 +3,7 @@ import { LoggerProvider, BatchLogRecordProcessor } from '@opentelemetry/sdk-logs
 import { OTLPLogExporter } from '@opentelemetry/exporter-logs-otlp-http';
 import { resourceFromAttributes } from '@opentelemetry/resources';
 import { ATTR_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
-import { TelemetryConfig } from '../setup';
+import { TelemetryConfig } from '../acrolinxInstrumentation';
 
 export const setupLogging = (config: TelemetryConfig) => {
   const collectorOptions = {

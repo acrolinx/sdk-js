@@ -85,13 +85,12 @@ import {
   SigninSuccessData,
   SigninSuccessResult,
 } from './signin';
-import { AcrolinxInstrumentation, setupTelemetry } from './telemetry/setup';
+import { AcrolinxInstrumentation } from './telemetry/acrolinxInstrumentation';
 
 import { User } from './user';
 import { fetchJson, fetchWithProps, getUrlOfPath, handleExpectedTextResponse, post, put } from './utils/fetch';
 import * as logging from './utils/logging';
 import { waitMs } from './utils/mixed-utils';
-import { ACROLINX_API_TOKEN } from './telemetry/config';
 
 export * from './dictionary';
 export * from './extraction';
@@ -205,23 +204,24 @@ const VALIDATE_APP_ACCESS_TOKEN_PATH = '/api/v1/apps/whoami';
 
 export class AcrolinxEndpoint {
   public readonly props: AcrolinxEndpointProps;
-  public readonly acrolinxInstrumenation: AcrolinxInstrumentation;
+  public acrolinxInstrumenation: AcrolinxInstrumentation | undefined = undefined;
 
   constructor(props: AcrolinxEndpointProps) {
     this.props = {
       ...props,
       acrolinxUrl: props.acrolinxUrl.trim().replace(/\/$/, ''),
     };
+  }
 
-    this.acrolinxInstrumenation = setupTelemetry({
-      accessToken: ACROLINX_API_TOKEN,
+  public fetchAcrolinxInstrumentation(accessToken: AccessToken) {
+    this.acrolinxInstrumenation = AcrolinxInstrumentation.getInstance({
+      accessToken: accessToken,
       acrolinxUrl: this.props.acrolinxUrl,
       serviceName: 'sidebar-test',
       serviceVersion: this.props.client.version
     });
+    return this.acrolinxInstrumenation;
   }
-
-  public initializeTelemtry() {}
 
   public setClientLocale(clientLocale: string) {
     this.props.clientLocale = clientLocale;
@@ -234,6 +234,7 @@ export class AcrolinxEndpoint {
   public async signInWithSSO(genericToken: string, username: string) {
     const signinResult = await this.signin({ genericToken, username });
     if (isSigninSuccessResult(signinResult)) {
+      this.fetchAcrolinxInstrumentation(signinResult.data.accessToken);
       return signinResult;
     } else {
       throw new AcrolinxError({
@@ -248,6 +249,7 @@ export class AcrolinxEndpoint {
     const signinResult = await this.signin({ accessToken: opts.accessToken });
 
     if (isSigninSuccessResult(signinResult)) {
+      this.fetchAcrolinxInstrumentation(signinResult.data.accessToken);
       return signinResult.data;
     }
 
@@ -272,6 +274,7 @@ export class AcrolinxEndpoint {
   }
 
   public async getAppAccessToken(accessToken: AccessToken, appId: AddonId): Promise<AppAccessTokenResult> {
+    this.fetchAcrolinxInstrumentation(accessToken);
     const tokenApiResult = await getData<AppAccessTokenApiResult>(
       post('/api/v1/apps/accessToken/' + appId, {}, undefined, this.props, accessToken),
     );
@@ -293,10 +296,12 @@ export class AcrolinxEndpoint {
   }
 
   public getCapabilities(accessToken: AccessToken): Promise<PlatformCapabilities> {
+    this.fetchAcrolinxInstrumentation(accessToken);
     return getData(this.getJsonFromPath('/api/v1/capabilities', accessToken));
   }
 
   public async getFeatures(accessToken: AccessToken): Promise<PlatformFeatures> {
+    this.fetchAcrolinxInstrumentation(accessToken);
     const responsePromise = await getData<PlatformFeaturesResponse>(
       this.getJsonFromPath('/api/v1/configuration/features', accessToken),
     );
@@ -304,12 +309,14 @@ export class AcrolinxEndpoint {
   }
 
   public getCheckingCapabilities(accessToken: AccessToken): Promise<CheckingCapabilities> {
+    this.fetchAcrolinxInstrumentation(accessToken);
     return getData(this.getJsonFromPath('/api/v1/checking/capabilities', accessToken));
   }
 
   public async check(accessToken: AccessToken, req: CheckRequest): Promise<CheckResponse> {
-    this.acrolinxInstrumenation.metrics.defaultCounters.check.add(1);
-    this.acrolinxInstrumenation.logging.logger.emit({
+    const acrolinxInstrumenation = this.fetchAcrolinxInstrumentation(accessToken);
+    acrolinxInstrumenation.instruments.metrics.defaultCounters.check.add(1);
+    acrolinxInstrumenation.instruments.logging.logger.emit({
       severityNumber: SeverityNumber.INFO,
       severityText: 'info',
       body: 'Submitting a check',
@@ -319,6 +326,7 @@ export class AcrolinxEndpoint {
   }
 
   public async getLiveSuggestions(accessToken: AccessToken, req: LiveSearchRequest): Promise<LiveSearchResponse> {
+    this.fetchAcrolinxInstrumentation(accessToken);
     return post<LiveSearchResponse>(
       '/reuse-service/api/v1/phrases/preferred/with-description',
       req,
@@ -353,6 +361,7 @@ export class AcrolinxEndpoint {
   }
 
   public async cancelCheck(accessToken: AccessToken, check: CheckResponse): Promise<CancelCheckResponse> {
+    this.fetchAcrolinxInstrumentation(accessToken);
     return this.cancelAsyncStartedProcess(accessToken, check);
   }
 
