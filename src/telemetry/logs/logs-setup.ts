@@ -14,6 +14,7 @@ export const setupLogging = (config: TelemetryConfig) => {
     concurrencyLimit: 1,
   };
   const logExporter = new OTLPLogExporter(collectorOptions);
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-call
   const resource = resourceFromAttributes({
     [ATTR_SERVICE_NAME]: 'api-service',
   });

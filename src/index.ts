@@ -172,6 +172,11 @@ export interface AcrolinxEndpointProps {
 }
 
 export interface ClientInformation {
+  /**
+   * The name of the app.
+   * @example: 'acrolinx-for-chrome'
+   */
+  appName?: string;
   signature: string;
   /**
    * The version of the client.
@@ -216,7 +221,7 @@ export class AcrolinxEndpoint {
     const acrolinxInstrumenation = AcrolinxInstrumentation.getInstance(this, {
       accessToken: accessToken,
       acrolinxUrl: this.props.acrolinxUrl,
-      serviceName: 'sidebar-test',
+      serviceName: this.props.client.appName || 'sdk-js',
       serviceVersion: this.props.client.version,
     });
     return await acrolinxInstrumenation.getInstruments();

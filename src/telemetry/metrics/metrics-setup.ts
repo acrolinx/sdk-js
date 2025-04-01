@@ -14,6 +14,7 @@ export const setupMetrics = (config: TelemetryConfig) => {
   };
   const metricExporter = new OTLPMetricExporter(collectorOptions);
 
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-call
   const resource = resourceFromAttributes({
     [ATTR_SERVICE_NAME]: config.serviceName,
     [ATTR_SERVICE_VERSION]: config.serviceVersion,
