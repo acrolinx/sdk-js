@@ -84,7 +84,7 @@ import {
   SigninSuccessData,
   SigninSuccessResult,
 } from './signin';
-import { AcrolinxInstrumentation } from './telemetry/acrolinxInstrumentation';
+import { AcrolinxInstrumentation, Instruments } from './telemetry/acrolinxInstrumentation';
 
 import { User } from './user';
 import { fetchJson, fetchWithProps, getUrlOfPath, handleExpectedTextResponse, post, put } from './utils/fetch';
@@ -212,14 +212,19 @@ export class AcrolinxEndpoint {
     };
   }
 
-  public async getTelemetryInstruments(accessToken: AccessToken) {
-    const acrolinxInstrumentation = AcrolinxInstrumentation.getInstance(this, {
-      accessToken: accessToken,
-      acrolinxUrl: this.props.acrolinxUrl,
-      serviceName: this.props.client.appName ?? 'sdk-js',
-      serviceVersion: this.props.client.version,
-    });
-    return await acrolinxInstrumentation.getInstruments();
+  public async getTelemetryInstruments(accessToken: AccessToken): Promise<Instruments | undefined> {
+    try {
+      const acrolinxInstrumentation = AcrolinxInstrumentation.getInstance(this, {
+        accessToken: accessToken,
+        acrolinxUrl: this.props.acrolinxUrl,
+        serviceName: this.props.client.appName ?? 'sdk-js',
+        serviceVersion: this.props.client.version,
+      });
+      return await acrolinxInstrumentation.getInstruments();
+    }catch(e) {
+      console.log(e);
+      return undefined;
+    }
   }
 
   public setClientLocale(clientLocale: string) {
