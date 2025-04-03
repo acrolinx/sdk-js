@@ -3,17 +3,16 @@ import { Counters, createDefaultCounters, setupMetrics } from './metrics/metrics
 import { MeterProvider } from '@opentelemetry/sdk-metrics';
 import { Logger } from '@opentelemetry/api-logs';
 import { AccessToken } from 'src/common-types';
-import { AcrolinxEndpoint } from 'src';
+import { AcrolinxEndpoint, IntService } from 'src';
 
 export class AcrolinxInstrumentation {
   private static acrolinxInstrumentation: AcrolinxInstrumentation;
   public instruments: Instruments | undefined = undefined;
-  private lastAccessChecked: number = 0;
-  private intervalInMs = 60000; // 1 minute = 1 * 60 * 1000
-  private isTelemetryAllowed = false;
   private config: TelemetryConfig;
+  private intService: IntService;
 
-  private constructor(_endpoint: AcrolinxEndpoint, config: TelemetryConfig) {
+  private constructor(endpoint: AcrolinxEndpoint, config: TelemetryConfig) {
+    this.intService = new IntService(endpoint);
     this.config = config;
   }
 
@@ -44,19 +43,9 @@ export class AcrolinxInstrumentation {
     return undefined;
   }
 
-  private async isAllowed(_accessToken: AccessToken): Promise<boolean> {
-    // TODO: Add launch darkly flag
-    if (Date.now() - this.lastAccessChecked <= this.intervalInMs) {
-      return this.isTelemetryAllowed;
-    }
-    return new Promise((resolve) => {
-      resolve(true);
-    });
-    // const config = await this.integrationService.getConfig(accessToken);
-    // if (config) {
-    //   this.isTelemetryAllowed = true;
-    //   return true;
-    // }
+  private async isAllowed(accessToken: AccessToken): Promise<boolean> {
+    const config = await this.intService.getConfig(accessToken);
+    return config && config.telemetryEnabled;
   }
 }
 

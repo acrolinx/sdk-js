@@ -20,6 +20,7 @@ import { IntegrationServiceConfig, IntegrationServiceResponse } from './int-serv
 
 export const integrationServiceDefaultConfig: IntegrationServiceConfig = {
   activateGetSuggestionReplacement: false,
+  telemetryEnabled: false,
 };
 
 export class IntService {

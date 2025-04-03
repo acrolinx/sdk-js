@@ -24,7 +24,7 @@ export const setupMetrics = (config: TelemetryConfig) => {
     readers: [
       new PeriodicExportingMetricReader({
         exporter: metricExporter,
-        exportIntervalMillis: 5000,
+        exportIntervalMillis: 30000, // Every 30 seconds, TODO:// Delay in production
       }),
     ],
     resource,
@@ -34,10 +34,10 @@ export const setupMetrics = (config: TelemetryConfig) => {
 };
 
 export const createDefaultCounters = (meterProvider: MeterProvider): Counters => {
-  const defaultMeter = meterProvider.getMeter('default');
+  const defaultMeter = meterProvider.getMeter('integration-');
 
   return {
-    check: defaultMeter.createCounter('check'),
+    check: defaultMeter.createCounter('check-requested'),
     getSuggestion: defaultMeter.createCounter('get-suggestion'),
   };
 };

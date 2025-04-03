@@ -15,6 +15,7 @@
  */
 export type IntegrationServiceConfig = {
   activateGetSuggestionReplacement: boolean;
+  telemetryEnabled: boolean;
 };
 
 export interface IntegrationServiceResponse<T = any> {
