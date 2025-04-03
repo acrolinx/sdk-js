@@ -1,6 +1,6 @@
 import { AcrolinxEndpoint, DEVELOPMENT_SIGNATURE } from 'src';
 import { AcrolinxInstrumentation, TelemetryConfig } from 'src/telemetry/acrolinxInstrumentation';
-import { ACROLINX_API_TOKEN, ACROLINX_DEV_SIGNATURE, TEST_SERVER_URL } from 'test/integration-server/constants';
+import { ACROLINX_API_TOKEN, ACROLINX_DEV_SIGNATURE, TEST_SERVER_URL } from 'test/integration-server/env-config';
 import { beforeEach, describe, expect, it } from 'vitest';
 import * as dotenv from 'dotenv';
 

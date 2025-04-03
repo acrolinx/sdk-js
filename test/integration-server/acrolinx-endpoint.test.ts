@@ -54,7 +54,7 @@ import {
   ACROLINX_API_TOKEN,
   ACROLINX_API_USERNAME,
   SSO_GENERIC_TOKEN,
-} from './constants';
+} from './env-config';
 
 dotenv.config();
 

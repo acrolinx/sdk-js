@@ -17,7 +17,7 @@
 import { describe, expect, test } from 'vitest';
 import { DEVELOPMENT_SIGNATURE } from '../../src';
 import { AcrolinxEndpoint } from '../../src/index';
-import { ACROLINX_DEV_SIGNATURE } from 'test/integration-server/constants';
+import { ACROLINX_DEV_SIGNATURE } from 'test/integration-server/env-config';
 
 function createEndpoint(acrolinxUrl: string) {
   return new AcrolinxEndpoint({
