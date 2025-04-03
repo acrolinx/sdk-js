@@ -216,7 +216,7 @@ export class AcrolinxEndpoint {
     const acrolinxInstrumenation = AcrolinxInstrumentation.getInstance(this, {
       accessToken: accessToken,
       acrolinxUrl: this.props.acrolinxUrl,
-      serviceName: this.props.client.appName || 'sdk-js',
+      serviceName: this.props.client.appName ?? 'sdk-js',
       serviceVersion: this.props.client.version,
     });
     return await acrolinxInstrumenation.getInstruments();

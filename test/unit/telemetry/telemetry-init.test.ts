@@ -15,7 +15,7 @@ describe('Telemtry initialization', () => {
       acrolinxUrl: TEST_SERVER_URL,
       enableHttpLogging: true,
       client: {
-        signature: ACROLINX_DEV_SIGNATURE || DEVELOPMENT_SIGNATURE,
+        signature: ACROLINX_DEV_SIGNATURE ?? DEVELOPMENT_SIGNATURE,
         version: '1.2.3.666',
       },
     });
