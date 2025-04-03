@@ -213,13 +213,13 @@ export class AcrolinxEndpoint {
   }
 
   public async getTelemetryInstruments(accessToken: AccessToken) {
-    const acrolinxInstrumenation = AcrolinxInstrumentation.getInstance(this, {
+    const acrolinxInstrumentation = AcrolinxInstrumentation.getInstance(this, {
       accessToken: accessToken,
       acrolinxUrl: this.props.acrolinxUrl,
       serviceName: this.props.client.appName ?? 'sdk-js',
       serviceVersion: this.props.client.version,
     });
-    return await acrolinxInstrumenation.getInstruments();
+    return await acrolinxInstrumentation.getInstruments();
   }
 
   public setClientLocale(clientLocale: string) {
