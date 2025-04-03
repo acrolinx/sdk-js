@@ -8,8 +8,8 @@ import { AcrolinxEndpoint, IntService } from 'src';
 export class AcrolinxInstrumentation {
   private static acrolinxInstrumentation: AcrolinxInstrumentation;
   public instruments: Instruments | undefined = undefined;
-  private config: TelemetryConfig;
-  private intService: IntService;
+  private readonly config: TelemetryConfig;
+  private readonly intService: IntService;
 
   private constructor(endpoint: AcrolinxEndpoint, config: TelemetryConfig) {
     this.intService = new IntService(endpoint);
@@ -45,7 +45,7 @@ export class AcrolinxInstrumentation {
 
   private async isAllowed(accessToken: AccessToken): Promise<boolean> {
     const config = await this.intService.getConfig(accessToken);
-    return config && config.telemetryEnabled;
+    return config?.telemetryEnabled;
   }
 }
 
