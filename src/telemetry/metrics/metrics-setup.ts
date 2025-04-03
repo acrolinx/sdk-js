@@ -33,7 +33,7 @@ export const setupMetrics = (config: TelemetryConfig) => {
 };
 
 export const createDefaultCounters = (meterProvider: MeterProvider): Counters => {
-  const defaultMeter = meterProvider.getMeter('integration-');
+  const defaultMeter = meterProvider.getMeter('integrations');
 
   return {
     check: defaultMeter.createCounter('check-requested'),

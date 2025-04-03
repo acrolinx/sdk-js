@@ -15,7 +15,7 @@ export const setupLogging = (config: TelemetryConfig) => {
   };
   const logExporter = new OTLPLogExporter(collectorOptions);
   const resource = resourceFromAttributes({
-    [ATTR_SERVICE_NAME]: 'api-service',
+    [ATTR_SERVICE_NAME]: config.serviceName,
   });
   const loggerProvider = new LoggerProvider({
     resource,
@@ -28,7 +28,6 @@ export const setupLogging = (config: TelemetryConfig) => {
     severityNumber: SeverityNumber.INFO,
     severityText: 'info',
     body: 'Logger initialized',
-    attributes: { 'log.type': 'custom' },
   });
 
   return logger;
