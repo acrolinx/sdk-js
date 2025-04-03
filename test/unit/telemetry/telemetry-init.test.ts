@@ -1,31 +1,50 @@
-import { AcrolinxEndpoint, DEVELOPMENT_SIGNATURE } from 'src';
-import { AcrolinxInstrumentation, TelemetryConfig } from 'src/telemetry/acrolinxInstrumentation';
-import { ACROLINX_API_TOKEN, ACROLINX_DEV_SIGNATURE, TEST_SERVER_URL } from 'test/integration-server/env-config';
-import { beforeEach, describe, expect, it } from 'vitest';
-import * as dotenv from 'dotenv';
-
-dotenv.config();
+import { AcrolinxEndpoint } from 'src';
+import { AcrolinxInstrumentation } from 'src/telemetry/acrolinxInstrumentation';
+import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest';
+import { FetchMocker, MockServer } from 'mentoss';
 
 describe('Telemtry initialization', () => {
-  let acrolinxEndpoint: AcrolinxEndpoint;
-  let props: TelemetryConfig;
+  const acrolinxUrl = 'https://tenant.acrolinx.cloud';
+  const acrolinxEndpoint = new AcrolinxEndpoint({
+    acrolinxUrl: acrolinxUrl,
+    enableHttpLogging: true,
+    client: {
+      signature: 'dummy-signature',
+      version: '1.2.3.666',
+    },
+  });
+  const props = {
+    accessToken: 'random-token',
+    acrolinxUrl: acrolinxUrl,
+    serviceName: 'sdk-js',
+    serviceVersion: '1.0.0',
+  };
+
+  const server = new MockServer(acrolinxUrl);
+  const mocker = new FetchMocker({
+    servers: [server],
+  });
+
+  beforeAll(() => {
+    mocker.mockGlobal();
+  });
 
   beforeEach(() => {
-    acrolinxEndpoint = new AcrolinxEndpoint({
-      acrolinxUrl: TEST_SERVER_URL,
-      enableHttpLogging: true,
-      client: {
-        signature: ACROLINX_DEV_SIGNATURE ?? DEVELOPMENT_SIGNATURE,
-        version: '1.2.3.666',
+    server.get('/int-service/api/v1/config', {
+      status: 200,
+      body: {
+        activateGetSuggestionReplacement: true,
+        telemetryEnabled: true,
       },
     });
+  });
 
-    props = {
-      accessToken: ACROLINX_API_TOKEN,
-      acrolinxUrl: acrolinxEndpoint.props.acrolinxUrl,
-      serviceName: 'sdk-js',
-      serviceVersion: '1.0.0',
-    };
+  afterEach(() => {
+    mocker.clearAll();
+  });
+
+  afterAll(() => {
+    mocker.unmockGlobal();
   });
 
   it('should create a new instance', () => {
