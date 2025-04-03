@@ -25,22 +25,22 @@ export class AcrolinxInstrumentation {
   }
 
   public async getInstruments(): Promise<Instruments | undefined> {
-    if (await this.isAllowed(this.config.accessToken)) {
-      const meterProvider = setupMetrics(this.config);
-      const defaultCounters = createDefaultCounters(meterProvider);
-      const logger = setupLogging(this.config);
-
-      return {
-        metrics: {
-          meterProvider,
-          defaultCounters,
-        },
-        logging: {
-          logger,
-        },
-      };
+    if (!(await this.isAllowed(this.config.accessToken))) {
+      return undefined;
     }
-    return undefined;
+    const meterProvider = setupMetrics(this.config);
+    const defaultCounters = createDefaultCounters(meterProvider);
+    const logger = setupLogging(this.config);
+
+    return {
+      metrics: {
+        meterProvider,
+        defaultCounters,
+      },
+      logging: {
+        logger,
+      },
+    };
   }
 
   private async isAllowed(accessToken: AccessToken): Promise<boolean> {
