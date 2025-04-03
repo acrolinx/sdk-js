@@ -69,5 +69,3 @@ export type MetricInstrumentation = {
 export type LoggingInstrumentation = {
   logger: Logger;
 };
-
-export type TracingInstrumentation = {};
