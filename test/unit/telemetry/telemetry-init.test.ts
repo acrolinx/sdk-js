@@ -1,6 +1,10 @@
-import { AcrolinxEndpoint } from 'src';
+import { AcrolinxEndpoint, DEVELOPMENT_SIGNATURE } from 'src';
 import { AcrolinxInstrumentation, TelemetryConfig } from 'src/telemetry/acrolinxInstrumentation';
+import { ACROLINX_API_TOKEN, ACROLINX_DEV_SIGNATURE, TEST_SERVER_URL } from 'test/integration-server/constants';
 import { beforeEach, describe, expect, it } from 'vitest';
+import * as dotenv from 'dotenv';
+
+dotenv.config();
 
 describe('Telemtry initialization', () => {
   let acrolinxEndpoint: AcrolinxEndpoint;
@@ -8,17 +12,18 @@ describe('Telemtry initialization', () => {
 
   beforeEach(() => {
     acrolinxEndpoint = new AcrolinxEndpoint({
-      acrolinxUrl: 'https://teanant.acrolinx.cloud',
+      acrolinxUrl: TEST_SERVER_URL,
+      enableHttpLogging: true,
       client: {
-        signature: 'invalid-signature',
-        version: '1.0.0',
+        signature: ACROLINX_DEV_SIGNATURE || DEVELOPMENT_SIGNATURE,
+        version: '1.2.3.666',
       },
     });
 
     props = {
-      accessToken: 'invalid-token',
+      accessToken: ACROLINX_API_TOKEN,
       acrolinxUrl: acrolinxEndpoint.props.acrolinxUrl,
-      serviceName: 'test-service',
+      serviceName: 'sdk-js',
       serviceVersion: '1.0.0',
     };
   });

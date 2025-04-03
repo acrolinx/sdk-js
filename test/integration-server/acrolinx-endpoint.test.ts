@@ -48,14 +48,15 @@ import * as checkResultSchema from '../schemas/check-result.json';
 import * as termHarvestingReportSchema from '../schemas/term-harvesting-report.json';
 import { describeIf, expectFailingPromise, testIf } from '../test-utils/utils';
 import { expect, describe, beforeEach, beforeAll, test } from 'vitest';
+import {
+  ACROLINX_DEV_SIGNATURE,
+  TEST_SERVER_URL,
+  ACROLINX_API_TOKEN,
+  ACROLINX_API_USERNAME,
+  SSO_GENERIC_TOKEN,
+} from './constants';
 
 dotenv.config();
-
-const TEST_SERVER_URL = process.env.TEST_SERVER_URL || ''; /* Add here your own test server URL */
-const SSO_GENERIC_TOKEN = process.env.SSO_GENERIC_TOKEN;
-const ACROLINX_API_TOKEN = process.env.ACROLINX_API_TOKEN || '';
-const ACROLINX_API_USERNAME = process.env.ACROLINX_API_USERNAME || '';
-export const ACROLINX_DEV_SIGNATURE = process.env.ACROLINX_DEV_SIGNATURE;
 
 const ajv = new Ajv({ allErrors: true });
 
