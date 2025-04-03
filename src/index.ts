@@ -307,7 +307,7 @@ export class AcrolinxEndpoint {
     return responsePromise.features;
   }
 
-  public async getCheckingCapabilities(accessToken: AccessToken): Promise<CheckingCapabilities> {
+  public getCheckingCapabilities(accessToken: AccessToken): Promise<CheckingCapabilities> {
     return getData(this.getJsonFromPath('/api/v1/checking/capabilities', accessToken));
   }
 
