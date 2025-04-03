@@ -221,7 +221,7 @@ export class AcrolinxEndpoint {
         serviceVersion: this.props.client.version,
       });
       return await acrolinxInstrumentation.getInstruments();
-    }catch(e) {
+    } catch (e) {
       console.log(e);
       return undefined;
     }
