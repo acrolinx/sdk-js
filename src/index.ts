@@ -84,6 +84,7 @@ import {
   SigninSuccessData,
   SigninSuccessResult,
 } from './signin';
+import { AcrolinxInstrumentation, Instruments } from './telemetry/acrolinxInstrumentation';
 
 import { User } from './user';
 import { fetchJson, fetchWithProps, getUrlOfPath, handleExpectedTextResponse, post, put } from './utils/fetch';
@@ -93,7 +94,6 @@ import { waitMs } from './utils/mixed-utils';
 export * from './dictionary';
 export * from './extraction';
 export { isSigninSuccessResult, AuthorizationType } from './signin';
-export { AcrolinxApiError } from './errors';
 export { setLoggingEnabled } from './utils/logging';
 export { SigninSuccessResult, isSigninLinksResult, PollMoreResult, SigninResult, SigninLinksResult };
 export {
@@ -108,8 +108,6 @@ export {
   ContentFormat,
   CheckOptions,
   CheckType,
-  DocumentDescriptor,
-  DocumentId,
   ReportType,
   SuccessResponse,
   CheckRequest,
@@ -117,7 +115,6 @@ export {
   CheckResultResponse,
   CheckResponse,
   Report,
-  PlatformFeatures,
 };
 
 export { HEADER_X_ACROLINX_APP_SIGNATURE };
@@ -170,6 +167,11 @@ export interface AcrolinxEndpointProps {
 }
 
 export interface ClientInformation {
+  /**
+   * The name of the app.
+   * @example: 'acrolinx-for-chrome'
+   */
+  appName?: string;
   signature: string;
   /**
    * The version of the client.
@@ -208,6 +210,21 @@ export class AcrolinxEndpoint {
       ...props,
       acrolinxUrl: props.acrolinxUrl.trim().replace(/\/$/, ''),
     };
+  }
+
+  public async getTelemetryInstruments(accessToken: AccessToken): Promise<Instruments | undefined> {
+    try {
+      const acrolinxInstrumentation = AcrolinxInstrumentation.getInstance(this, {
+        accessToken: accessToken,
+        acrolinxUrl: this.props.acrolinxUrl,
+        serviceName: this.props.client.appName ?? 'sdk-js',
+        serviceVersion: this.props.client.version,
+      });
+      return await acrolinxInstrumentation.getInstruments();
+    } catch (e) {
+      console.log(e);
+      return undefined;
+    }
   }
 
   public setClientLocale(clientLocale: string) {
@@ -279,7 +296,7 @@ export class AcrolinxEndpoint {
     return getData(this.getJsonFromPath(VALIDATE_APP_ACCESS_TOKEN_PATH, appToken));
   }
 
-  public getCapabilities(accessToken: AccessToken): Promise<PlatformCapabilities> {
+  public async getCapabilities(accessToken: AccessToken): Promise<PlatformCapabilities> {
     return getData(this.getJsonFromPath('/api/v1/capabilities', accessToken));
   }
 
@@ -295,6 +312,8 @@ export class AcrolinxEndpoint {
   }
 
   public async check(accessToken: AccessToken, req: CheckRequest): Promise<CheckResponse> {
+    const instruments = await this.getTelemetryInstruments(accessToken);
+    instruments?.metrics.defaultCounters.check.add(1);
     return post<CheckResponse>('/api/v1/checking/checks', req, {}, this.props, accessToken);
   }
 

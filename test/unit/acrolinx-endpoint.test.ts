@@ -17,14 +17,14 @@
 import { describe, expect, test } from 'vitest';
 import { DEVELOPMENT_SIGNATURE } from '../../src';
 import { AcrolinxEndpoint } from '../../src/index';
-import { ACROLINX_DEV_SIGNATURE } from '../integration-server/acrolinx-endpoint.test';
+import { ACROLINX_DEV_SIGNATURE } from 'test/integration-server/env-config';
 
 function createEndpoint(acrolinxUrl: string) {
   return new AcrolinxEndpoint({
     acrolinxUrl,
     enableHttpLogging: true,
     client: {
-      signature: ACROLINX_DEV_SIGNATURE || DEVELOPMENT_SIGNATURE,
+      signature: ACROLINX_DEV_SIGNATURE ?? DEVELOPMENT_SIGNATURE,
       version: '1.2.3.666',
     },
   });
