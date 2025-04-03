@@ -37,11 +37,9 @@ export const createDefaultCounters = (meterProvider: MeterProvider): Counters =>
 
   return {
     check: defaultMeter.createCounter('check-requested'),
-    getSuggestion: defaultMeter.createCounter('get-suggestion'),
   };
 };
 
 export type Counters = {
   check: Counter;
-  getSuggestion: Counter;
 };
