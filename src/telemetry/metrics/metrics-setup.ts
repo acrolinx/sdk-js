@@ -23,7 +23,7 @@ export const setupMetrics = (config: TelemetryConfig) => {
     readers: [
       new PeriodicExportingMetricReader({
         exporter: metricExporter,
-        exportIntervalMillis: 30000, // Every 30 seconds, TODO:// Delay in production
+        exportIntervalMillis: 60000, // Every 60 seconds
       }),
     ],
     resource,
