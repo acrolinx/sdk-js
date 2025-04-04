@@ -3,7 +3,7 @@ import { Counters, createDefaultCounters, setupMetrics } from './metrics/metrics
 import { MeterProvider } from '@opentelemetry/sdk-metrics';
 import { Logger } from '@opentelemetry/api-logs';
 import { AccessToken } from 'src/common-types';
-import { AcrolinxEndpoint, IntService } from 'src';
+import { AcrolinxEndpointProps, IntService } from 'src';
 
 export class AcrolinxInstrumentation {
   private static acrolinxInstrumentation: AcrolinxInstrumentation;
@@ -11,14 +11,14 @@ export class AcrolinxInstrumentation {
   private readonly config: TelemetryConfig;
   private readonly intService: IntService;
 
-  private constructor(endpoint: AcrolinxEndpoint, config: TelemetryConfig) {
-    this.intService = new IntService(endpoint);
+  private constructor(endpointProps: AcrolinxEndpointProps, config: TelemetryConfig) {
+    this.intService = new IntService(endpointProps);
     this.config = config;
   }
 
-  public static getInstance(endpoint: AcrolinxEndpoint, config: TelemetryConfig): AcrolinxInstrumentation {
+  public static getInstance(endpointProps: AcrolinxEndpointProps, config: TelemetryConfig): AcrolinxInstrumentation {
     if (!AcrolinxInstrumentation.acrolinxInstrumentation) {
-      AcrolinxInstrumentation.acrolinxInstrumentation = new AcrolinxInstrumentation(endpoint, config);
+      AcrolinxInstrumentation.acrolinxInstrumentation = new AcrolinxInstrumentation(endpointProps, config);
       return AcrolinxInstrumentation.acrolinxInstrumentation;
     }
     return AcrolinxInstrumentation.acrolinxInstrumentation;

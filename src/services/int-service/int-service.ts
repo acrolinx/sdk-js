@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 
-import { AcrolinxEndpoint, ServiceType } from '../../index';
+import { getJsonFromPath, postJsonToPath } from 'src/utils/fetch';
+import { AcrolinxEndpointProps, ServiceType } from '../../index';
 import { LogBufferEntry } from '../../utils/logging-buffer';
 import { IntegrationServiceConfig, IntegrationServiceResponse } from './int-service.types';
 
@@ -25,21 +26,27 @@ export const integrationServiceDefaultConfig: IntegrationServiceConfig = {
 
 export class IntService {
   private readonly intServiceBasePath = '/int-service/api/v1';
-  constructor(private readonly endpoint: AcrolinxEndpoint) {}
+  constructor(private readonly endpointProps: AcrolinxEndpointProps) {}
 
   getConfig(accessToken: string): Promise<IntegrationServiceConfig> {
-    return this.endpoint.getJsonFromPath<IntegrationServiceConfig>(this.constructFullPath('/config'), accessToken, {
-      serviceType: ServiceType.ACROLINX_ONE,
-    });
+    return getJsonFromPath<IntegrationServiceConfig>(
+      this.constructFullPath('/config'),
+      this.endpointProps,
+      accessToken,
+      {
+        serviceType: ServiceType.ACROLINX_ONE,
+      },
+    );
   }
 
   sendLogs(appName: string, logs: LogBufferEntry[], accessToken: string): Promise<IntegrationServiceResponse> {
-    return this.endpoint.postJsonToPath<IntegrationServiceResponse>(
+    return postJsonToPath<IntegrationServiceResponse>(
       this.constructFullPath('/logs'),
       {
         appName,
         logs,
       },
+      this.endpointProps,
       accessToken,
       { serviceType: ServiceType.ACROLINX_ONE },
     );

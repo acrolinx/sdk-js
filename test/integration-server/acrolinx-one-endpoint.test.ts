@@ -37,7 +37,7 @@ describe('Acrolinx One E2E Tests', () => {
     // This tests requires valid keycloak access token
 
     test('getAiFeatures returns whether certain AI features are enabled', async () => {
-      const aiService = new AIService(endpoint);
+      const aiService = new AIService(endpoint.props);
 
       const aiFeatures = await aiService.getAiFeatures(ACROLINX_API_TOKEN);
 
@@ -46,7 +46,7 @@ describe('Acrolinx One E2E Tests', () => {
     });
 
     test('check if the ai service is activated', async () => {
-      const aiService = new AIService(endpoint);
+      const aiService = new AIService(endpoint.props);
 
       const aiResult = await aiService.getAIEnabled(ACROLINX_API_TOKEN);
       expect(aiResult.tenant).toBeDefined();
@@ -55,7 +55,7 @@ describe('Acrolinx One E2E Tests', () => {
     });
 
     test('get a chat completion from the ai service', async () => {
-      const aiService = new AIService(endpoint);
+      const aiService = new AIService(endpoint.props);
       const aiResult = await aiService.getAIChatCompletion(
         {
           issue: {
@@ -74,7 +74,7 @@ describe('Acrolinx One E2E Tests', () => {
 
     // Run this case manually after running the case for multiple times AI-Service starts giving same response.
     test('get a chat completion from the ai service & validate previous version too', async () => {
-      const aiService = new AIService(endpoint);
+      const aiService = new AIService(endpoint.props);
       const aiResult = await aiService.getAIChatCompletion(
         {
           issue: {
@@ -110,7 +110,7 @@ describe('Acrolinx One E2E Tests', () => {
 
   describe('Integrations Service Integration Tests', () => {
     test('Getting integration config', async () => {
-      const intService = new IntService(endpoint);
+      const intService = new IntService(endpoint.props);
 
       const intConfig = await intService.getConfig(ACROLINX_API_TOKEN);
 
@@ -119,7 +119,7 @@ describe('Acrolinx One E2E Tests', () => {
   });
 
   test('Send log integration test', async () => {
-    const intService = new IntService(endpoint);
+    const intService = new IntService(endpoint.props);
 
     const logs: LogBufferEntry[] = [
       {

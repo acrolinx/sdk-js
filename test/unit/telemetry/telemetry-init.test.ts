@@ -52,7 +52,6 @@ describe('Telemtry initialization', () => {
   });
 
   it('should return telemtry instrumnents if telemetry in enabled', async () => {
-
     server.get('/int-service/api/v1/config', {
       status: 200,
       body: {
@@ -60,7 +59,6 @@ describe('Telemtry initialization', () => {
         telemetryEnabled: true,
       },
     });
-
 
     const acrolinxInstrumentation = AcrolinxInstrumentation.getInstance(acrolinxEndpoint, props);
     const instruments = await acrolinxInstrumentation.getInstruments();
@@ -71,7 +69,6 @@ describe('Telemtry initialization', () => {
   });
 
   it('should return undefined if telemetry is disabled', async () => {
-
     server.get('/int-service/api/v1/config', {
       status: 200,
       body: {
@@ -80,14 +77,12 @@ describe('Telemtry initialization', () => {
       },
     });
 
-
     const acrolinxInstrumentation = AcrolinxInstrumentation.getInstance(acrolinxEndpoint, props);
     const instruments = await acrolinxInstrumentation.getInstruments();
     expect(instruments).toBeUndefined();
   });
 
   it('should return undefined if config api returns 500', async () => {
-
     server.get('/int-service/api/v1/config', {
       status: 500,
     });
@@ -98,7 +93,6 @@ describe('Telemtry initialization', () => {
   });
 
   it('should return undefined if telemetry config is missing', async () => {
-
     server.get('/int-service/api/v1/config', {
       status: 200,
       body: {
@@ -112,7 +106,6 @@ describe('Telemtry initialization', () => {
   });
 
   it('should return telemtry instrumnents if telemetry config is type string', async () => {
-
     server.get('/int-service/api/v1/config', {
       status: 200,
       body: {

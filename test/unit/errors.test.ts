@@ -19,6 +19,7 @@ import { AcrolinxError, CheckCanceledByClientError, ErrorType } from '../../src/
 import { AcrolinxEndpoint } from '../../src/index';
 import { mockAcrolinxServer, mockBrokenJsonServer, restoreOriginalFetch } from '../test-utils/mock-server';
 import { DUMMY_ENDPOINT_PROPS, DUMMY_SERVER_URL } from './common';
+import { getJsonFromUrl } from 'src/utils/fetch';
 
 const BROKEN_JSON_SERVER = 'http://broken-json-server';
 
@@ -55,7 +56,7 @@ describe('errors', () => {
   test('should return an failing promise for broken json', async () => {
     const api = new AcrolinxEndpoint({ ...DUMMY_ENDPOINT_PROPS, acrolinxUrl: BROKEN_JSON_SERVER });
     try {
-      await api.getJsonFromUrl(BROKEN_JSON_SERVER);
+      await getJsonFromUrl(BROKEN_JSON_SERVER, api.props);
     } catch (e) {
       expect(e.type).toEqual(ErrorType.InvalidJson);
     }

@@ -87,7 +87,16 @@ import {
 import { AcrolinxInstrumentation, Instruments } from './telemetry/acrolinxInstrumentation';
 
 import { User } from './user';
-import { fetchJson, fetchWithProps, getUrlOfPath, handleExpectedTextResponse, post, put } from './utils/fetch';
+import {
+  fetchJson,
+  fetchWithProps,
+  getJsonFromPath,
+  getJsonFromUrl,
+  getUrlOfPath,
+  handleExpectedTextResponse,
+  post,
+  put,
+} from './utils/fetch';
 import * as logging from './utils/logging';
 import { waitMs } from './utils/mixed-utils';
 
@@ -232,7 +241,7 @@ export class AcrolinxEndpoint {
   }
 
   public async getPlatformInformation(): Promise<PlatformInformation> {
-    return getData<PlatformInformation>(this.getJsonFromPath('/api/v1/'));
+    return getData<PlatformInformation>(getJsonFromPath('/api/v1/', this.props));
   }
 
   public async signInWithSSO(genericToken: string, username: string) {
@@ -272,7 +281,7 @@ export class AcrolinxEndpoint {
       logging.log('Waiting before retry', lastPollResult.progress.retryAfter);
       await waitMs(lastPollResult.progress.retryAfter * 1000);
     }
-    return this.getJsonFromUrl<SigninPollResult>(signinLinks.links.poll);
+    return getJsonFromUrl<SigninPollResult>(signinLinks.links.poll, this.props);
   }
 
   public async getAppAccessToken(accessToken: AccessToken, appId: AddonId): Promise<AppAccessTokenResult> {
@@ -293,22 +302,22 @@ export class AcrolinxEndpoint {
   }
 
   public async validateAppAccessToken(appToken: AppAccessToken): Promise<AppAccessTokenValidationResult> {
-    return getData(this.getJsonFromPath(VALIDATE_APP_ACCESS_TOKEN_PATH, appToken));
+    return getData(getJsonFromPath(VALIDATE_APP_ACCESS_TOKEN_PATH, this.props, appToken));
   }
 
   public async getCapabilities(accessToken: AccessToken): Promise<PlatformCapabilities> {
-    return getData(this.getJsonFromPath('/api/v1/capabilities', accessToken));
+    return getData(getJsonFromPath('/api/v1/capabilities', this.props, accessToken));
   }
 
   public async getFeatures(accessToken: AccessToken): Promise<PlatformFeatures> {
     const responsePromise = await getData<PlatformFeaturesResponse>(
-      this.getJsonFromPath('/api/v1/configuration/features', accessToken),
+      getJsonFromPath('/api/v1/configuration/features', this.props, accessToken),
     );
     return responsePromise.features;
   }
 
   public getCheckingCapabilities(accessToken: AccessToken): Promise<CheckingCapabilities> {
-    return getData(this.getJsonFromPath('/api/v1/checking/capabilities', accessToken));
+    return getData(getJsonFromPath('/api/v1/checking/capabilities', this.props, accessToken));
   }
 
   public async check(accessToken: AccessToken, req: CheckRequest): Promise<CheckResponse> {
@@ -363,7 +372,9 @@ export class AcrolinxEndpoint {
     accessToken: AccessToken,
     reports: HasTermHarvestingReport,
   ): Promise<TermHarvestingReport> {
-    return getData(this.getJsonFromUrl<ApiResponse<TermHarvestingReport>>(reports.termHarvesting.link, accessToken));
+    return getData(
+      getJsonFromUrl<ApiResponse<TermHarvestingReport>>(reports.termHarvesting.link, this.props, accessToken),
+    );
   }
 
   /**
@@ -373,16 +384,18 @@ export class AcrolinxEndpoint {
     accessToken: AccessToken,
     batchId: string,
   ): Promise<AggregatedReportLinkResult> {
-    return this.getJsonFromPath<AggregatedReportLinkResult>(
+    return getJsonFromPath<AggregatedReportLinkResult>(
       '/api/v1/checking/aggregation/' + encodeURIComponent(batchId),
+      this.props,
       accessToken,
     );
   }
 
   public async getContentAnalysisDashboard(accessToken: AccessToken, batchId: string): Promise<string> {
     const serviceResult = await getData(
-      this.getJsonFromPath<SuccessResponse<ContentAnalysisDashboardResult>>(
+      getJsonFromPath<SuccessResponse<ContentAnalysisDashboardResult>>(
         `/api/v1/checking/${encodeURIComponent(batchId)}/contentanalysis`,
+        this.props,
         accessToken,
       ),
     );
@@ -396,7 +409,7 @@ export class AcrolinxEndpoint {
     accessToken: AccessToken,
     sinceTimeStamp: number,
   ): Promise<ServerNotificationResponse> {
-    return this.getJsonFromPath<any>('/api/v1/broadcasts/platform-notifications/' + sinceTimeStamp, accessToken);
+    return getJsonFromPath<any>('/api/v1/broadcasts/platform-notifications/' + sinceTimeStamp, this.props, accessToken);
   }
 
   // TODO (marco) Review! Added this method to test DEV-17460
@@ -414,7 +427,7 @@ export class AcrolinxEndpoint {
   }
 
   public getDictionaryCapabilities(accessToken: AccessToken): Promise<DictionaryCapabilities> {
-    return getData(this.getJsonFromPath('/api/v1/dictionary/capabilities', accessToken));
+    return getData(getJsonFromPath('/api/v1/dictionary/capabilities', this.props, accessToken));
   }
 
   public addToDictionary(accessToken: AccessToken, req: AddToDictionaryRequest): Promise<AddToDictionaryResponse> {
@@ -422,7 +435,7 @@ export class AcrolinxEndpoint {
   }
 
   public getUserData(accessToken: AccessToken, id: UserId): Promise<User> {
-    return getData(this.getJsonFromPath('/api/v1/user/' + id, accessToken));
+    return getData(getJsonFromPath('/api/v1/user/' + id, this.props, accessToken));
   }
 
   public setUserCustomFields(accessToken: AccessToken, id: UserId, customFieldValues: KeyValuePair[]): Promise<User> {
@@ -431,7 +444,7 @@ export class AcrolinxEndpoint {
   }
 
   public getDocumentDescriptor(accessToken: AccessToken, id: DocumentId): Promise<DocumentDescriptor> {
-    return getData<DocumentDescriptor>(this.getJsonFromPath('/api/v1/document/' + id, accessToken)).then(
+    return getData<DocumentDescriptor>(getJsonFromPath('/api/v1/document/' + id, this.props, accessToken)).then(
       sanitizeDocumentDescriptor,
     );
   }
@@ -443,45 +456,6 @@ export class AcrolinxEndpoint {
   ): Promise<DocumentDescriptor> {
     const requestBody = { id: documentId, customFields: customFieldValues };
     return getData(put('/api/v1/document/' + documentId, requestBody, {}, this.props, accessToken));
-  }
-
-  public async getJsonFromPath<T>(
-    path: string,
-    accessToken?: AccessToken,
-    opts?: AdditionalRequestOptions,
-  ): Promise<T> {
-    return this.getJsonFromUrl<T>(getUrlOfPath(this.props, path), accessToken, opts);
-  }
-
-  public async getJsonFromUrl<T>(
-    url: string,
-    accessToken?: AccessToken,
-    opts: AdditionalRequestOptions = {},
-  ): Promise<T> {
-    return fetchJson(url, this.props, {
-      headers: {
-        ...getCommonHeaders(this.props, accessToken, opts.serviceType),
-        ...opts.headers,
-      },
-    });
-  }
-
-  public async postJsonToPath<T>(
-    path: string,
-    body: any,
-    accessToken?: AccessToken,
-    opts: AdditionalRequestOptions = {},
-  ): Promise<T> {
-    const url = getUrlOfPath(this.props, path);
-    return fetchJson(url, this.props, {
-      method: 'POST',
-      headers: {
-        ...getCommonHeaders(this.props, accessToken, opts.serviceType),
-        'Content-Type': 'application/json',
-        ...opts.headers,
-      },
-      body: JSON.stringify(body),
-    });
   }
 
   public async getTextFromUrl(
@@ -593,7 +567,7 @@ export class AcrolinxEndpoint {
     check: AsyncStartedProcess,
     opts: AdditionalRequestOptions = {},
   ): Promise<R> {
-    return this.getJsonFromUrl<R>(check.links.result, accessToken, opts);
+    return getJsonFromUrl<R>(check.links.result, this.props, accessToken, opts);
   }
 
   private async cancelAsyncStartedProcess<CancelResponse>(
