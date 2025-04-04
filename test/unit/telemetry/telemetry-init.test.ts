@@ -1,31 +1,40 @@
-import { AcrolinxEndpoint, DEVELOPMENT_SIGNATURE } from 'src';
-import { AcrolinxInstrumentation, TelemetryConfig } from 'src/telemetry/acrolinxInstrumentation';
-import { ACROLINX_API_TOKEN, ACROLINX_DEV_SIGNATURE, TEST_SERVER_URL } from 'test/integration-server/env-config';
-import { beforeEach, describe, expect, it } from 'vitest';
-import * as dotenv from 'dotenv';
-
-dotenv.config();
+import { AcrolinxEndpoint } from '../../../src/index';
+import { AcrolinxInstrumentation } from '../../../src/telemetry/acrolinxInstrumentation';
+import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
+import { FetchMocker, MockServer } from 'mentoss';
 
 describe('Telemtry initialization', () => {
-  let acrolinxEndpoint: AcrolinxEndpoint;
-  let props: TelemetryConfig;
+  const acrolinxUrl = 'https://tenant.acrolinx.cloud';
+  const acrolinxEndpoint = new AcrolinxEndpoint({
+    acrolinxUrl: acrolinxUrl,
+    enableHttpLogging: true,
+    client: {
+      signature: 'dummy-signature',
+      version: '1.2.3.666',
+    },
+  });
+  const props = {
+    accessToken: 'random-token',
+    acrolinxUrl: acrolinxUrl,
+    serviceName: 'sdk-js',
+    serviceVersion: '1.0.0',
+  };
 
-  beforeEach(() => {
-    acrolinxEndpoint = new AcrolinxEndpoint({
-      acrolinxUrl: TEST_SERVER_URL,
-      enableHttpLogging: true,
-      client: {
-        signature: ACROLINX_DEV_SIGNATURE ?? DEVELOPMENT_SIGNATURE,
-        version: '1.2.3.666',
-      },
-    });
+  const server = new MockServer(acrolinxUrl);
+  const mocker = new FetchMocker({
+    servers: [server],
+  });
 
-    props = {
-      accessToken: ACROLINX_API_TOKEN,
-      acrolinxUrl: acrolinxEndpoint.props.acrolinxUrl,
-      serviceName: 'sdk-js',
-      serviceVersion: '1.0.0',
-    };
+  beforeAll(() => {
+    mocker.mockGlobal();
+  });
+
+  afterEach(() => {
+    mocker.clearAll();
+  });
+
+  afterAll(() => {
+    mocker.unmockGlobal();
   });
 
   it('should create a new instance', () => {
@@ -42,7 +51,76 @@ describe('Telemtry initialization', () => {
     expect(acrolinxInstrumentation).toBe(acrolinxInstrumentation3);
   });
 
-  it('should return telemtry instrumnents', async () => {
+  it('should return telemtry instrumnents if telemetry in enabled', async () => {
+
+    server.get('/int-service/api/v1/config', {
+      status: 200,
+      body: {
+        activateGetSuggestionReplacement: true,
+        telemetryEnabled: true,
+      },
+    });
+
+
+    const acrolinxInstrumentation = AcrolinxInstrumentation.getInstance(acrolinxEndpoint, props);
+    const instruments = await acrolinxInstrumentation.getInstruments();
+    expect(instruments?.metrics).toBeDefined();
+    expect(instruments?.metrics.meterProvider).toBeDefined();
+    expect(instruments?.logging).toBeDefined();
+    expect(instruments?.logging.logger).toBeDefined();
+  });
+
+  it('should return undefined if telemetry is disabled', async () => {
+
+    server.get('/int-service/api/v1/config', {
+      status: 200,
+      body: {
+        activateGetSuggestionReplacement: true,
+        telemetryEnabled: false,
+      },
+    });
+
+
+    const acrolinxInstrumentation = AcrolinxInstrumentation.getInstance(acrolinxEndpoint, props);
+    const instruments = await acrolinxInstrumentation.getInstruments();
+    expect(instruments).toBeUndefined();
+  });
+
+  it('should return undefined if config api returns 500', async () => {
+
+    server.get('/int-service/api/v1/config', {
+      status: 500,
+    });
+
+    const acrolinxInstrumentation = AcrolinxInstrumentation.getInstance(acrolinxEndpoint, props);
+    const instruments = await acrolinxInstrumentation.getInstruments();
+    expect(instruments).toBeUndefined();
+  });
+
+  it('should return undefined if telemetry config is missing', async () => {
+
+    server.get('/int-service/api/v1/config', {
+      status: 200,
+      body: {
+        activateGetSuggestionReplacement: true,
+      },
+    });
+
+    const acrolinxInstrumentation = AcrolinxInstrumentation.getInstance(acrolinxEndpoint, props);
+    const instruments = await acrolinxInstrumentation.getInstruments();
+    expect(instruments).toBeUndefined();
+  });
+
+  it('should return telemtry instrumnents if telemetry config is type string', async () => {
+
+    server.get('/int-service/api/v1/config', {
+      status: 200,
+      body: {
+        activateGetSuggestionReplacement: true,
+        telemetryEnabled: 'true',
+      },
+    });
+
     const acrolinxInstrumentation = AcrolinxInstrumentation.getInstance(acrolinxEndpoint, props);
     const instruments = await acrolinxInstrumentation.getInstruments();
     expect(instruments?.metrics).toBeDefined();

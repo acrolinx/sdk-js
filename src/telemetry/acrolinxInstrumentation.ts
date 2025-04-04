@@ -44,8 +44,13 @@ export class AcrolinxInstrumentation {
   }
 
   private async isAllowed(accessToken: AccessToken): Promise<boolean> {
-    const config = await this.intService.getConfig(accessToken);
-    return config?.telemetryEnabled;
+    try {
+      const config = await this.intService.getConfig(accessToken);
+      return config?.telemetryEnabled;
+    } catch (e) {
+      console.log(e);
+    }
+    return false;
   }
 }
 
