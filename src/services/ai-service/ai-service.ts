@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 
-import { AcrolinxEndpoint, ServiceType } from '../../index';
+import { getJsonFromPath, postJsonToPath } from 'src/utils/fetch';
+import { AcrolinxEndpointProps, ServiceType } from '../../index';
 import { AiFeatures, ChatCompletionRequest, IsAIEnabledInformation, WriteResponse } from './ai-service.types';
 
 /**
@@ -22,17 +23,24 @@ import { AiFeatures, ChatCompletionRequest, IsAIEnabledInformation, WriteRespons
  */
 export class AIService {
   private readonly aiServiceBasePath = '/ai-service/api/v1';
-  constructor(private readonly endpoint: AcrolinxEndpoint) {}
+
+  constructor(private readonly endpointProps: AcrolinxEndpointProps) {}
 
   public async getAiFeatures(accessToken: string): Promise<AiFeatures> {
-    return this.endpoint.getJsonFromPath<AiFeatures>(this.constructFullPath('/tenants/features/ai'), accessToken, {
-      serviceType: ServiceType.ACROLINX_ONE,
-    });
+    return getJsonFromPath<AiFeatures>(
+      this.constructFullPath('/tenants/features/ai'),
+      this.endpointProps,
+      accessToken,
+      {
+        serviceType: ServiceType.ACROLINX_ONE,
+      },
+    );
   }
 
   public async getAIEnabled(accessToken: string): Promise<IsAIEnabledInformation> {
-    return this.endpoint.getJsonFromPath(
+    return getJsonFromPath(
       this.constructFullPath('/tenants/feature/ai-enabled?privilege=generate'),
+      this.endpointProps,
       accessToken,
       {
         serviceType: ServiceType.ACROLINX_ONE,
@@ -53,7 +61,7 @@ export class AIService {
     const { aiRephraseHint: prompt, internalName } = params.issue;
     const { targetUuid, count, previousVersion } = params;
 
-    return this.endpoint.postJsonToPath<WriteResponse>(
+    return postJsonToPath<WriteResponse>(
       this.constructFullPath('/ai/chat-completions'),
       {
         prompt,
@@ -62,6 +70,7 @@ export class AIService {
         issueInternalName: internalName,
         previousVersion,
       },
+      this.endpointProps,
       accessToken,
       { serviceType: ServiceType.ACROLINX_ONE },
     );
