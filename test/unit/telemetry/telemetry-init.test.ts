@@ -38,14 +38,14 @@ describe('Telemtry initialization', () => {
   });
 
   it('should create a new instance', () => {
-    const acrolinxInstrumentation = AcrolinxInstrumentation.getInstance(acrolinxEndpoint, props);
+    const acrolinxInstrumentation = AcrolinxInstrumentation.getInstance(acrolinxEndpoint.props, props);
     expect(acrolinxInstrumentation).toBeDefined();
   });
 
   it('should not create multiple instances', () => {
-    const acrolinxInstrumentation = AcrolinxInstrumentation.getInstance(acrolinxEndpoint, props);
-    const acrolinxInstrumentation2 = AcrolinxInstrumentation.getInstance(acrolinxEndpoint, props);
-    const acrolinxInstrumentation3 = AcrolinxInstrumentation.getInstance(acrolinxEndpoint, props);
+    const acrolinxInstrumentation = AcrolinxInstrumentation.getInstance(acrolinxEndpoint.props, props);
+    const acrolinxInstrumentation2 = AcrolinxInstrumentation.getInstance(acrolinxEndpoint.props, props);
+    const acrolinxInstrumentation3 = AcrolinxInstrumentation.getInstance(acrolinxEndpoint.props, props);
 
     expect(acrolinxInstrumentation).toBe(acrolinxInstrumentation2);
     expect(acrolinxInstrumentation).toBe(acrolinxInstrumentation3);
@@ -60,7 +60,7 @@ describe('Telemtry initialization', () => {
       },
     });
 
-    const acrolinxInstrumentation = AcrolinxInstrumentation.getInstance(acrolinxEndpoint, props);
+    const acrolinxInstrumentation = AcrolinxInstrumentation.getInstance(acrolinxEndpoint.props, props);
     const instruments = await acrolinxInstrumentation.getInstruments();
     expect(instruments?.metrics).toBeDefined();
     expect(instruments?.metrics.meterProvider).toBeDefined();
@@ -77,7 +77,7 @@ describe('Telemtry initialization', () => {
       },
     });
 
-    const acrolinxInstrumentation = AcrolinxInstrumentation.getInstance(acrolinxEndpoint, props);
+    const acrolinxInstrumentation = AcrolinxInstrumentation.getInstance(acrolinxEndpoint.props, props);
     const instruments = await acrolinxInstrumentation.getInstruments();
     expect(instruments).toBeUndefined();
   });
@@ -87,7 +87,7 @@ describe('Telemtry initialization', () => {
       status: 500,
     });
 
-    const acrolinxInstrumentation = AcrolinxInstrumentation.getInstance(acrolinxEndpoint, props);
+    const acrolinxInstrumentation = AcrolinxInstrumentation.getInstance(acrolinxEndpoint.props, props);
     const instruments = await acrolinxInstrumentation.getInstruments();
     expect(instruments).toBeUndefined();
   });
@@ -100,7 +100,7 @@ describe('Telemtry initialization', () => {
       },
     });
 
-    const acrolinxInstrumentation = AcrolinxInstrumentation.getInstance(acrolinxEndpoint, props);
+    const acrolinxInstrumentation = AcrolinxInstrumentation.getInstance(acrolinxEndpoint.props, props);
     const instruments = await acrolinxInstrumentation.getInstruments();
     expect(instruments).toBeUndefined();
   });
@@ -114,7 +114,7 @@ describe('Telemtry initialization', () => {
       },
     });
 
-    const acrolinxInstrumentation = AcrolinxInstrumentation.getInstance(acrolinxEndpoint, props);
+    const acrolinxInstrumentation = AcrolinxInstrumentation.getInstance(acrolinxEndpoint.props, props);
     const instruments = await acrolinxInstrumentation.getInstruments();
     expect(instruments?.metrics).toBeDefined();
     expect(instruments?.metrics.meterProvider).toBeDefined();
