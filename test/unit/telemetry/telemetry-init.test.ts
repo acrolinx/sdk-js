@@ -1,6 +1,6 @@
 import { AcrolinxEndpoint } from '../../../src/index';
 import { AcrolinxInstrumentation } from '../../../src/telemetry/acrolinxInstrumentation';
-import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest';
+import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
 import { FetchMocker, MockServer } from 'mentoss';
 
 describe('Telemtry initialization', () => {
