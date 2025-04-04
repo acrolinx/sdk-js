@@ -38,21 +38,20 @@ describe('Telemtry initialization', () => {
   });
 
   it('should create a new instance', () => {
-    const acrolinxInstrumentation = AcrolinxInstrumentation.getInstance(acrolinxEndpoint, props);
+    const acrolinxInstrumentation = AcrolinxInstrumentation.getInstance(acrolinxEndpoint.props, props);
     expect(acrolinxInstrumentation).toBeDefined();
   });
 
   it('should not create multiple instances', () => {
-    const acrolinxInstrumentation = AcrolinxInstrumentation.getInstance(acrolinxEndpoint, props);
-    const acrolinxInstrumentation2 = AcrolinxInstrumentation.getInstance(acrolinxEndpoint, props);
-    const acrolinxInstrumentation3 = AcrolinxInstrumentation.getInstance(acrolinxEndpoint, props);
+    const acrolinxInstrumentation = AcrolinxInstrumentation.getInstance(acrolinxEndpoint.props, props);
+    const acrolinxInstrumentation2 = AcrolinxInstrumentation.getInstance(acrolinxEndpoint.props, props);
+    const acrolinxInstrumentation3 = AcrolinxInstrumentation.getInstance(acrolinxEndpoint.props, props);
 
     expect(acrolinxInstrumentation).toBe(acrolinxInstrumentation2);
     expect(acrolinxInstrumentation).toBe(acrolinxInstrumentation3);
   });
 
   it('should return telemtry instrumnents if telemetry in enabled', async () => {
-
     server.get('/int-service/api/v1/config', {
       status: 200,
       body: {
@@ -61,8 +60,7 @@ describe('Telemtry initialization', () => {
       },
     });
 
-
-    const acrolinxInstrumentation = AcrolinxInstrumentation.getInstance(acrolinxEndpoint, props);
+    const acrolinxInstrumentation = AcrolinxInstrumentation.getInstance(acrolinxEndpoint.props, props);
     const instruments = await acrolinxInstrumentation.getInstruments();
     expect(instruments?.metrics).toBeDefined();
     expect(instruments?.metrics.meterProvider).toBeDefined();
@@ -71,7 +69,6 @@ describe('Telemtry initialization', () => {
   });
 
   it('should return undefined if telemetry is disabled', async () => {
-
     server.get('/int-service/api/v1/config', {
       status: 200,
       body: {
@@ -80,25 +77,22 @@ describe('Telemtry initialization', () => {
       },
     });
 
-
-    const acrolinxInstrumentation = AcrolinxInstrumentation.getInstance(acrolinxEndpoint, props);
+    const acrolinxInstrumentation = AcrolinxInstrumentation.getInstance(acrolinxEndpoint.props, props);
     const instruments = await acrolinxInstrumentation.getInstruments();
     expect(instruments).toBeUndefined();
   });
 
   it('should return undefined if config api returns 500', async () => {
-
     server.get('/int-service/api/v1/config', {
       status: 500,
     });
 
-    const acrolinxInstrumentation = AcrolinxInstrumentation.getInstance(acrolinxEndpoint, props);
+    const acrolinxInstrumentation = AcrolinxInstrumentation.getInstance(acrolinxEndpoint.props, props);
     const instruments = await acrolinxInstrumentation.getInstruments();
     expect(instruments).toBeUndefined();
   });
 
   it('should return undefined if telemetry config is missing', async () => {
-
     server.get('/int-service/api/v1/config', {
       status: 200,
       body: {
@@ -106,13 +100,12 @@ describe('Telemtry initialization', () => {
       },
     });
 
-    const acrolinxInstrumentation = AcrolinxInstrumentation.getInstance(acrolinxEndpoint, props);
+    const acrolinxInstrumentation = AcrolinxInstrumentation.getInstance(acrolinxEndpoint.props, props);
     const instruments = await acrolinxInstrumentation.getInstruments();
     expect(instruments).toBeUndefined();
   });
 
   it('should return telemtry instrumnents if telemetry config is type string', async () => {
-
     server.get('/int-service/api/v1/config', {
       status: 200,
       body: {
@@ -121,7 +114,7 @@ describe('Telemtry initialization', () => {
       },
     });
 
-    const acrolinxInstrumentation = AcrolinxInstrumentation.getInstance(acrolinxEndpoint, props);
+    const acrolinxInstrumentation = AcrolinxInstrumentation.getInstance(acrolinxEndpoint.props, props);
     const instruments = await acrolinxInstrumentation.getInstruments();
     expect(instruments?.metrics).toBeDefined();
     expect(instruments?.metrics.meterProvider).toBeDefined();

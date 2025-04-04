@@ -55,6 +55,7 @@ import {
   ACROLINX_API_USERNAME,
   SSO_GENERIC_TOKEN,
 } from './env-config';
+import { getJsonFromPath, getJsonFromUrl } from 'src/utils/fetch';
 
 dotenv.config();
 
@@ -84,7 +85,7 @@ describe('e2e - AcrolinxEndpoint', () => {
     test('should return an failing promise for 404', async () => {
       const api = createEndpoint(TEST_SERVER_URL);
       try {
-        await api.getJsonFromPath('/not-there', ACROLINX_API_TOKEN);
+        await getJsonFromPath('/not-there', api.props, ACROLINX_API_TOKEN);
       } catch (error) {
         expect(error.type).toEqual(ErrorType.HttpErrorStatus);
         expect(error.status).toEqual(404);
@@ -95,7 +96,7 @@ describe('e2e - AcrolinxEndpoint', () => {
 
     test('should return an failing promise for non existing server', async () => {
       const api = createEndpoint('https://non-extisting-server');
-      await expectFailingPromise(api.getJsonFromPath(DUMMY_PATH), ErrorType.HttpConnectionProblem, {
+      await expectFailingPromise(getJsonFromPath(DUMMY_PATH, api.props), ErrorType.HttpConnectionProblem, {
         method: 'GET',
         url: 'https://non-extisting-server' + DUMMY_PATH,
       });
@@ -104,7 +105,7 @@ describe('e2e - AcrolinxEndpoint', () => {
     test('should return an failing promise for invalid URLS', async () => {
       const invalidAcrolinxUrl = 'http://non-ext!::?isting-server';
       const api = createEndpoint(invalidAcrolinxUrl);
-      await expectFailingPromise(api.getJsonFromPath(DUMMY_PATH), ErrorType.HttpConnectionProblem, {
+      await expectFailingPromise(getJsonFromPath(DUMMY_PATH, api.props), ErrorType.HttpConnectionProblem, {
         method: 'GET',
         url: invalidAcrolinxUrl + DUMMY_PATH,
       });
@@ -607,7 +608,7 @@ describe('e2e - AcrolinxEndpoint', () => {
         // Verify offsets
         expect(new URL(result.offsets!.link)).toBeTruthy();
         const offsets = (
-          await api.getJsonFromUrl<SuccessResponse<OffsetReport>>(result.offsets!.link, ACROLINX_API_TOKEN)
+          await getJsonFromUrl<SuccessResponse<OffsetReport>>(result.offsets!.link, api.props, ACROLINX_API_TOKEN)
         ).data;
 
         const firstRange = offsets.ranges[0];
@@ -644,7 +645,7 @@ describe('e2e - AcrolinxEndpoint', () => {
         // Verify offsets
         expect(new URL(result.offsets!.link)).toBeTruthy();
         const offsets = (
-          await api.getJsonFromUrl<SuccessResponse<OffsetReport>>(result.offsets!.link, ACROLINX_API_TOKEN)
+          await getJsonFromUrl<SuccessResponse<OffsetReport>>(result.offsets!.link, api.props, ACROLINX_API_TOKEN)
         ).data;
 
         expect(offsets).toEqual({

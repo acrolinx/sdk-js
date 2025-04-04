@@ -24,7 +24,7 @@ import { describe, afterEach, expect, test } from 'vitest';
 
 describe('AI-service', () => {
   let endpoint: AcrolinxEndpoint = new AcrolinxEndpoint(DUMMY_ENDPOINT_PROPS);
-  const aiService = new AIService(endpoint);
+  const aiService = new AIService(endpoint.props);
 
   afterEach(() => {
     fetchMock.restore();
