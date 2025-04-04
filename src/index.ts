@@ -223,7 +223,7 @@ export class AcrolinxEndpoint {
 
   public async getTelemetryInstruments(accessToken: AccessToken): Promise<Instruments | undefined> {
     try {
-      const acrolinxInstrumentation = AcrolinxInstrumentation.getInstance(this, {
+      const acrolinxInstrumentation = AcrolinxInstrumentation.getInstance(this.props, {
         accessToken: accessToken,
         acrolinxUrl: this.props.acrolinxUrl,
         serviceName: this.props.client.appName ?? 'sdk-js',
