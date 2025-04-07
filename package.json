@@ -58,7 +58,7 @@
     "mentoss": "^0.9.1",
     "prettier": "^3.5.3",
     "typedoc": "^0.28.2",
-    "typescript": "^5.8.2",
+    "typescript": "^5.8.3",
     "typescript-eslint": "^8.29.0",
     "typescript-json-schema": "^0.65.1",
     "vitest": "^3.1.1"
