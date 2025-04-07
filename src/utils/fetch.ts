@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { AccessToken, AcrolinxEndpointProps, ServiceType, StringMap } from '../index';
+import { AccessToken, AcrolinxEndpointProps, AdditionalRequestOptions, ServiceType, StringMap } from '../index';
 import { AcrolinxError, createErrorFromFetchResponse, ErrorType, HttpRequest, wrapFetchError } from '../errors';
 import { getCommonHeaders } from '../headers';
 
@@ -142,4 +142,46 @@ export async function put<T>(
   accessToken?: AccessToken,
 ): Promise<T> {
   return send<T>('PUT', path, body, headers, props, accessToken);
+}
+
+export function getJsonFromPath<T>(
+  path: string,
+  props: AcrolinxEndpointProps,
+  accessToken?: AccessToken,
+  opts?: AdditionalRequestOptions,
+): Promise<T> {
+  return getJsonFromUrl<T>(getUrlOfPath(props, path), props, accessToken, opts);
+}
+
+export function getJsonFromUrl<T>(
+  url: string,
+  props: AcrolinxEndpointProps,
+  accessToken?: AccessToken,
+  opts: AdditionalRequestOptions = {},
+): Promise<T> {
+  return fetchJson(url, props, {
+    headers: {
+      ...getCommonHeaders(props, accessToken, opts.serviceType),
+      ...opts.headers,
+    },
+  });
+}
+
+export function postJsonToPath<T>(
+  path: string,
+  body: any,
+  props: AcrolinxEndpointProps,
+  accessToken?: AccessToken,
+  opts: AdditionalRequestOptions = {},
+): Promise<T> {
+  const url = getUrlOfPath(props, path);
+  return fetchJson(url, props, {
+    method: 'POST',
+    headers: {
+      ...getCommonHeaders(props, accessToken, opts.serviceType),
+      'Content-Type': 'application/json',
+      ...opts.headers,
+    },
+    body: JSON.stringify(body),
+  });
 }

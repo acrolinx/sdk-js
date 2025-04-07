@@ -18,7 +18,7 @@ describe('Integration-service', () => {
 
     test('truthy response for correct client signature', async () => {
       endpoint = new AcrolinxEndpoint(DUMMY_ENDPOINT_PROPS);
-      intService = new IntService(endpoint);
+      intService = new IntService(endpoint.props);
       // Mock the endpoint with expected headers check and updated response property
       fetchMock.mock(configEndpointMatcher, (_url: any, opts: any) => {
         const headers = opts.headers as Record<string, string>; // Asserting headers to be of type Record<string, string>
@@ -41,7 +41,7 @@ describe('Integration-service', () => {
 
     test('Default config response for unavailable client signature', async () => {
       endpoint = new AcrolinxEndpoint(DUMMY_ENDPOINT_PROPS);
-      intService = new IntService(endpoint);
+      intService = new IntService(endpoint.props);
       // Mock the endpoint with expected headers check and updated response property
       fetchMock.mock(configEndpointMatcher, () => {
         return {
@@ -60,7 +60,7 @@ describe('Integration-service', () => {
 
     beforeEach(() => {
       endpoint = new AcrolinxEndpoint(DUMMY_ENDPOINT_PROPS);
-      intService = new IntService(endpoint);
+      intService = new IntService(endpoint.props);
     });
 
     test('should send logs successfully', async () => {
