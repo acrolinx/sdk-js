@@ -50,6 +50,7 @@ import {
   ApiResponse,
   AsyncApiResponse,
   AsyncStartedProcess,
+  IntegrationDetails,
   isProgressResponse,
   Progress,
   ServiceType,
@@ -181,10 +182,9 @@ export interface AcrolinxEndpointProps {
 
 export interface ClientInformation {
   /**
-   * The name of the app.
-   * @example: 'acrolinx-for-chrome'
+   * The details of the integration
    */
-  appName?: string;
+  integrationDetails?: IntegrationDetails;
   signature: string;
   /**
    * The version of the client.
@@ -193,6 +193,7 @@ export interface ClientInformation {
    */
   version: string;
 }
+
 
 export interface CheckAndGetResultOptions {
   onProgress?(progress: Progress): void;
@@ -230,7 +231,7 @@ export class AcrolinxEndpoint {
       const acrolinxInstrumentation = AcrolinxInstrumentation.getInstance(this.props, {
         accessToken: accessToken,
         acrolinxUrl: this.props.acrolinxUrl,
-        serviceName: this.props.client.appName ?? 'sdk-js',
+        serviceName: this.props.client.integrationDetails?.name ?? 'sdk-js',
         serviceVersion: this.props.client.version,
       });
       return await acrolinxInstrumentation.getInstruments();
