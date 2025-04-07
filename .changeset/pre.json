@@ -1,0 +1,11 @@
+{
+  "mode": "pre",
+  "tag": "beta",
+  "initialVersions": {
+    "@acrolinx_slack_test/sdk": "1.5.0-beta.1"
+  },
+  "changesets": [
+    "every-pillows-share",
+    "honest-lies-cross"
+  ]
+}
