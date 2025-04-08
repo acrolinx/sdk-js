@@ -2,10 +2,12 @@
   "mode": "pre",
   "tag": "beta",
   "initialVersions": {
-    "@acrolinx_slack_test/sdk": "1.5.0-beta.1"
+    "@acrolinx/sdk": "2.0.0-beta.2"
   },
   "changesets": [
+    "curly-bars-start",
     "every-pillows-share",
-    "honest-lies-cross"
+    "honest-lies-cross",
+    "six-stars-open"
   ]
 }

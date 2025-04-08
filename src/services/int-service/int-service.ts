@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { getJsonFromPath, postJsonToPath } from 'src/utils/fetch';
+import { getJsonFromPath, postJsonToPath } from '../../utils/fetch';
 import { AcrolinxEndpointProps, ServiceType } from '../../index';
 import { LogBufferEntry } from '../../utils/logging-buffer';
 import { IntegrationServiceConfig, IntegrationServiceResponse } from './int-service.types';
