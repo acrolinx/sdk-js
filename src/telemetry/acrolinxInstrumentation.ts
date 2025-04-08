@@ -2,8 +2,8 @@ import { setupLogging } from './logs/logs-setup';
 import { Counters, createDefaultCounters, setupMetrics } from './metrics/metrics-setup';
 import { MeterProvider } from '@opentelemetry/sdk-metrics';
 import { Logger } from '@opentelemetry/api-logs';
-import { AccessToken } from 'src/common-types';
-import { AcrolinxEndpointProps, IntService } from 'src';
+import { AccessToken } from '../common-types';
+import { AcrolinxEndpointProps, IntService } from '../index';
 
 export class AcrolinxInstrumentation {
   private static acrolinxInstrumentation: AcrolinxInstrumentation;
