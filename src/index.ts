@@ -103,6 +103,7 @@ import { waitMs } from './utils/mixed-utils';
 export * from './dictionary';
 export * from './extraction';
 export { isSigninSuccessResult, AuthorizationType } from './signin';
+export { AcrolinxApiError } from './errors';
 export { setLoggingEnabled } from './utils/logging';
 export { SigninSuccessResult, isSigninLinksResult, PollMoreResult, SigninResult, SigninLinksResult };
 export {
@@ -117,6 +118,8 @@ export {
   ContentFormat,
   CheckOptions,
   CheckType,
+  DocumentDescriptor,
+  DocumentId,
   ReportType,
   SuccessResponse,
   CheckRequest,
@@ -124,6 +127,7 @@ export {
   CheckResultResponse,
   CheckResponse,
   Report,
+  PlatformFeatures,
 };
 
 export { HEADER_X_ACROLINX_APP_SIGNATURE };
