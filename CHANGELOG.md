@@ -1,5 +1,11 @@
 # @acrolinx/sdk
 
+## 2.0.0-beta.4
+
+### Patch Changes
+
+- cc3e485: NONE fix: import paths in telemetry
+
 ## 2.0.0-beta.3
 
 ### Patch Changes

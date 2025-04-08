@@ -2,12 +2,13 @@
   "mode": "pre",
   "tag": "beta",
   "initialVersions": {
-    "@acrolinx/sdk": "2.0.0-beta.2"
+    "@acrolinx/sdk": "2.0.0-beta.3"
   },
   "changesets": [
     "curly-bars-start",
     "every-pillows-share",
     "honest-lies-cross",
+    "silly-tools-cheat",
     "six-stars-open"
   ]
 }
