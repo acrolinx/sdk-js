@@ -14,13 +14,15 @@
  * limitations under the License.
  */
 import fetchMock from 'fetch-mock';
-import { AcrolinxEndpoint, AcrolinxError, Issue } from '../../src/index';
+import { AcrolinxEndpoint} from '../../src/index';
 import { DUMMY_ACCESS_TOKEN } from '../test-utils/mock-server';
 import { DUMMY_ENDPOINT_PROPS } from './common';
 import { DUMMY_AI_REWRITE_CONTEXT } from '../test-utils/dummy-data';
 import { AIServiceErrorTypes, WriteResponse } from '../../src/services/ai-service/ai-service.types';
 import { AIService } from '../../src/services/ai-service/ai-service';
 import { describe, afterEach, expect, test } from 'vitest';
+import { Issue } from '../../src/check';
+import { AcrolinxError } from '../../src/errors';
 
 describe('AI-service', () => {
   let endpoint: AcrolinxEndpoint = new AcrolinxEndpoint(DUMMY_ENDPOINT_PROPS);

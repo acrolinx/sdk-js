@@ -23,16 +23,10 @@ import {
 } from './addons';
 import {
   CheckingCapabilities,
-  CheckType,
-  ContentEncoding,
-  ContentFormat,
-  GuidanceProfile,
-  ReportType,
 } from './capabilities';
 import {
   AggregatedReportLinkResult,
   CancelCheckResponse,
-  CheckOptions,
   CheckRequest,
   CheckResponse,
   CheckResult,
@@ -40,7 +34,6 @@ import {
   ContentAnalysisDashboardResult,
   HasTermHarvestingReport,
   KeyValuePair,
-  Report,
   TermHarvestingReport,
   LiveSearchRequest,
   LiveSearchResponse,
@@ -73,7 +66,6 @@ import { ServerNotificationPost, ServerNotificationResponse } from './notificati
 import { PlatformCapabilities } from './platform-capabilities';
 import {
   getSigninRequestHeaders,
-  isSigninLinksResult,
   isSigninSuccessResult,
   PollMoreResult,
   SignInInteractiveOptions,
@@ -82,7 +74,7 @@ import {
   SigninPollResult,
   SigninResult,
   SigninSuccessData,
-  SigninSuccessResult,
+  SigninSuccessResult
 } from './signin';
 import { AcrolinxInstrumentation, Instruments } from './telemetry/acrolinxInstrumentation';
 
@@ -99,49 +91,6 @@ import {
 } from './utils/fetch';
 import * as logging from './utils/logging';
 import { waitMs } from './utils/mixed-utils';
-
-export * from './dictionary';
-export * from './extraction';
-export { isSigninSuccessResult, AuthorizationType } from './signin';
-export { setLoggingEnabled } from './utils/logging';
-export { SigninSuccessResult, isSigninLinksResult, PollMoreResult, SigninResult, SigninLinksResult };
-export {
-  AcrolinxError,
-  AccessToken,
-  CheckingCapabilities,
-  CheckCanceledByClientError,
-  CancelCheckResponse,
-  GuidanceProfile,
-  ErrorType,
-  ContentEncoding,
-  ContentFormat,
-  CheckOptions,
-  CheckType,
-  ReportType,
-  SuccessResponse,
-  CheckRequest,
-  CheckResult,
-  CheckResultResponse,
-  CheckResponse,
-  Report,
-};
-
-export { HEADER_X_ACROLINX_APP_SIGNATURE };
-export * from './services/ai-service/ai-service';
-export * from './services/ai-service/ai-service.types';
-export * from './services/ai-service/ai-service.utils';
-
-export * from './services/int-service/int-service';
-export * from './services/int-service/int-service.types';
-
-export * from './check';
-export * from './capabilities';
-export * from './user';
-export * from './custom-fields';
-export * from './common-types';
-export * from './signin';
-export * from './addons';
-export * from './notifications';
 
 // You'll get the clientSignature for your integration after a successful certification meeting.
 // See: https://support.acrolinx.com/hc/en-us/articles/205687652-Getting-Started-with-Custom-Integrations
@@ -247,7 +196,8 @@ export class AcrolinxEndpoint {
   public async signInWithSSO(genericToken: string, username: string) {
     const signinResult = await this.signin({ genericToken, username });
     if (isSigninSuccessResult(signinResult)) {
-      return signinResult;
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+      return signinResult as SigninSuccessResult;
     } else {
       throw new AcrolinxError({
         type: ErrorType.SSO,

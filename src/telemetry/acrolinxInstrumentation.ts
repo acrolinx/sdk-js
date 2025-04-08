@@ -3,7 +3,8 @@ import { Counters, createDefaultCounters, setupMetrics } from './metrics/metrics
 import { MeterProvider } from '@opentelemetry/sdk-metrics';
 import { Logger } from '@opentelemetry/api-logs';
 import { AccessToken } from '../common-types';
-import { AcrolinxEndpointProps, IntService } from '../index';
+import { AcrolinxEndpointProps } from '../index';
+import { IntService } from '../services/int-service/int-service';
 
 export class AcrolinxInstrumentation {
   private static acrolinxInstrumentation: AcrolinxInstrumentation;

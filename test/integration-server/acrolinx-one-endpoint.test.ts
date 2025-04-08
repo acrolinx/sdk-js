@@ -1,12 +1,13 @@
-import { AcrolinxEndpoint, CommonIssue, DEVELOPMENT_SIGNATURE } from '../../src';
+import { AcrolinxEndpoint, DEVELOPMENT_SIGNATURE } from '../../src';
 import * as dotenv from 'dotenv';
 import 'cross-fetch/polyfill';
 import { AIService } from '../../src/services/ai-service/ai-service';
 import { IntService } from '../../src/services/int-service/int-service';
 
 import { describe, beforeEach, expect, test } from 'vitest';
-import { LogBufferEntry, LogEntryType } from 'src/utils/logging-buffer';
-import { IntegrationServiceResponse } from 'src/services/int-service/int-service.types';
+import { LogBufferEntry, LogEntryType } from '../../src/utils/logging-buffer';
+import { IntegrationServiceResponse } from '../../src/services/int-service/int-service.types';
+import { CommonIssue } from '../../src/check';
 
 dotenv.config();
 

@@ -1,9 +1,10 @@
 import fetchMock from 'fetch-mock';
-import { AcrolinxEndpoint, IntService } from '../../src/index';
+import { AcrolinxEndpoint } from '../../src/index';
 import { DUMMY_ACCESS_TOKEN } from '../test-utils/mock-server';
 import { DUMMY_ENDPOINT_PROPS } from './common';
 import { describe, afterEach, expect, test, beforeEach } from 'vitest';
 import { LogBufferEntry, LogEntryType } from '../../src/utils/logging-buffer';
+import { IntService } from '../../src/services/int-service/int-service';
 
 describe('Integration-service', () => {
   let endpoint: AcrolinxEndpoint;

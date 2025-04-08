@@ -15,8 +15,8 @@
  */
 
 import 'cross-fetch/polyfill';
-import { AcrolinxEndpoint, isSigninSuccessResult } from '../src/index';
-import { isSigninLinksResult } from '../src/signin';
+import { AcrolinxEndpoint } from '../src/index';
+import { isSigninLinksResult, isSigninSuccessResult } from '../src/signin';
 import { EXAMPLE_ACROLINX_ENDPOINT_PROPS } from './common';
 
 async function signInExample() {

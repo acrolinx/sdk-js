@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { AcrolinxEndpointProps } from 'src';
+import { AcrolinxEndpointProps } from './index';
 import { AccessToken, ServiceType, StringMap } from './common-types';
 
 export const HEADER_X_ACROLINX_CLIENT = 'X-Acrolinx-Client';

@@ -15,8 +15,9 @@
  */
 
 import { getJsonFromPath, postJsonToPath } from '../../utils/fetch';
-import { AcrolinxEndpointProps, ServiceType } from '../../index';
+import { AcrolinxEndpointProps } from '../../index';
 import { AiFeatures, ChatCompletionRequest, IsAIEnabledInformation, WriteResponse } from './ai-service.types';
+import { ServiceType } from '../../common-types';
 
 /**
  * Available in Acrolinx One

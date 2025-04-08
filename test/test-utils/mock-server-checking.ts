@@ -15,13 +15,13 @@
  */
 
 import * as _ from 'lodash';
-import { CheckingCapabilities } from '../../src';
 import { CheckId, CheckRequest, CheckResponse, CheckResultResponse } from '../../src/check';
 import { SuccessResponse, URL } from '../../src/common-types';
 import { AcrolinxApiError } from '../../src/errors';
 import { Route } from './common-mocking';
 import { DUMMY_CAPABILITIES, DUMMY_CHECK_RESULT } from './dummy-data';
 import { NOT_FOUND_CHECK_ID } from './mocked-errors';
+import { CheckingCapabilities } from '../../src/capabilities';
 
 const CHECK_TIME_MS = 10 * 1000;
 

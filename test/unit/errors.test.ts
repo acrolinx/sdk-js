@@ -19,7 +19,7 @@ import { AcrolinxError, CheckCanceledByClientError, ErrorType } from '../../src/
 import { AcrolinxEndpoint } from '../../src/index';
 import { mockAcrolinxServer, mockBrokenJsonServer, restoreOriginalFetch } from '../test-utils/mock-server';
 import { DUMMY_ENDPOINT_PROPS, DUMMY_SERVER_URL } from './common';
-import { getJsonFromUrl } from 'src/utils/fetch';
+import { getJsonFromUrl } from '../../src/utils/fetch';
 
 const BROKEN_JSON_SERVER = 'http://broken-json-server';
 
@@ -58,7 +58,8 @@ describe('errors', () => {
     try {
       await getJsonFromUrl(BROKEN_JSON_SERVER, api.props);
     } catch (e) {
-      expect(e.type).toEqual(ErrorType.InvalidJson);
+      const error = e as { type: ErrorType };
+      expect(error.type).toEqual(ErrorType.InvalidJson);
     }
     expect.hasAssertions();
   });
@@ -74,7 +75,8 @@ describe('errors', () => {
         },
       });
     } catch (e) {
-      expect(e.type).toEqual(ErrorType.Client);
+      const error = e as { type: ErrorType };
+      expect(error.type).toEqual(ErrorType.Client);
     }
     expect.hasAssertions();
   });

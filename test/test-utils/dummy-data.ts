@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { DictionaryScope, IssueType, SuggestionIconId } from '../../src';
+import { DictionaryScope } from '../../src/dictionary';
 import {
   CheckingCapabilities,
   CheckType,
@@ -22,7 +22,7 @@ import {
   GuidanceProfileStatus,
   ReportType,
 } from '../../src/capabilities';
-import { CheckResult, DocumentQualityStatus } from '../../src/check';
+import { CheckResult, DocumentQualityStatus, IssueType, SuggestionIconId } from '../../src/check';
 
 const GOAL_VOICE_ID = 'voice.readability';
 const GOAL_TERM_ID = 'term.unsuitable';

@@ -15,9 +15,10 @@
  */
 
 import { getJsonFromPath, postJsonToPath } from '../../utils/fetch';
-import { AcrolinxEndpointProps, ServiceType } from '../../index';
+import { AcrolinxEndpointProps } from '../../index';
 import { LogBufferEntry } from '../../utils/logging-buffer';
 import { IntegrationServiceConfig, IntegrationServiceResponse } from './int-service.types';
+import { ServiceType } from '../../common-types';
 
 export const integrationServiceDefaultConfig: IntegrationServiceConfig = {
   activateGetSuggestionReplacement: false,

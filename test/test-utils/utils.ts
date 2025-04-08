@@ -42,11 +42,12 @@ export async function expectFailingPromise<E = any>(
   try {
     unexpectedSuccessfulResult = await promise;
   } catch (e) {
-    expect(e.type).toEqual(expectedErrorType);
+    const error = e as { type: ErrorType; httpRequest?: any };
+    expect(error.type).toEqual(expectedErrorType);
     if (expectedHttpRequest) {
-      expect(e.httpRequest).toEqual(expectedHttpRequest);
+      expect(error.httpRequest).toEqual(expectedHttpRequest);
     }
-    return e;
+    return error as E;
   }
 
   throw new Error('Unexpected success ' + JSON.stringify(unexpectedSuccessfulResult));

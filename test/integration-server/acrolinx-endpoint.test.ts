@@ -19,30 +19,14 @@ import 'cross-fetch/polyfill';
 import * as dotenv from 'dotenv';
 import * as _ from 'lodash';
 import {
-  AnalysisType,
-  AppAccessTokenValidationResult,
-  CheckCanceledByClientError,
-  CheckRequest,
-  CheckResult,
-  CustomFieldType,
   DEVELOPMENT_APP_SIGNATURE,
   DEVELOPMENT_SIGNATURE,
-  DictionaryScope,
-  ErrorType,
-  GoalScoring,
-  hasTermHarvestingReport,
-  HasTermHarvestingReport,
-  OffsetReport,
-  PollMoreResult,
-  ReportType,
-  SuccessResponse,
-  User,
 } from '../../src';
-import { CheckOptions } from '../../src/check';
+import { CheckOptions, CheckRequest, CheckResult, hasTermHarvestingReport, HasTermHarvestingReport } from '../../src/check';
 import { DocumentDescriptor } from '../../src/document-descriptor';
-import { AcrolinxError, ValidationDetail } from '../../src/errors';
-import { AcrolinxEndpoint, isSigninSuccessResult, SigninSuccessResult } from '../../src/index';
-import { SigninLinksResult } from '../../src/signin';
+import { AcrolinxError, CheckCanceledByClientError, ErrorType, ValidationDetail } from '../../src/errors';
+import { AcrolinxEndpoint } from '../../src/index';
+import { isSigninSuccessResult, PollMoreResult, SigninLinksResult, SigninSuccessResult } from '../../src/signin';
 import { waitMs } from '../../src/utils/mixed-utils';
 import * as checkResultSchema from '../schemas/check-result.json';
 import * as termHarvestingReportSchema from '../schemas/term-harvesting-report.json';
@@ -55,7 +39,14 @@ import {
   ACROLINX_API_USERNAME,
   SSO_GENERIC_TOKEN,
 } from './env-config';
-import { getJsonFromPath, getJsonFromUrl } from 'src/utils/fetch';
+import { getJsonFromPath, getJsonFromUrl } from '../../src/utils/fetch';
+import { AppAccessTokenValidationResult } from '../../src/addons';
+import { GoalScoring, ReportType } from '../../src/capabilities';
+import { SuccessResponse } from '../../src/common-types';
+import { CustomFieldType } from '../../src/custom-fields';
+import { DictionaryScope } from '../../src/dictionary';
+import { AnalysisType, OffsetReport } from '../../src/extraction';
+import { User } from '../../src/user';
 
 dotenv.config();
 
@@ -87,9 +78,10 @@ describe('e2e - AcrolinxEndpoint', () => {
       try {
         await getJsonFromPath('/not-there', api.props, ACROLINX_API_TOKEN);
       } catch (error) {
-        expect(error.type).toEqual(ErrorType.HttpErrorStatus);
-        expect(error.status).toEqual(404);
-        expect(error.httpRequest).toEqual({ method: 'GET', url: TEST_SERVER_URL + '/not-there' });
+        const httpError = error as { type: ErrorType; status: number; httpRequest: any };
+        expect(httpError.type).toEqual(ErrorType.HttpErrorStatus);
+        expect(httpError.status).toEqual(404);
+        expect(httpError.httpRequest).toEqual({ method: 'GET', url: TEST_SERVER_URL + '/not-there' });
       }
       expect.hasAssertions();
     });

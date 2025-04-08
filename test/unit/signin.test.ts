@@ -17,12 +17,8 @@
 import * as _ from 'lodash';
 import {
   AcrolinxEndpoint,
-  ErrorType,
-  isSigninLinksResult,
-  isSigninSuccessResult,
-  PollMoreResult,
 } from '../../src/index';
-import { getSigninRequestHeaders, SigninLinksResult, SigninSuccessResult } from '../../src/signin';
+import { getSigninRequestHeaders, isSigninLinksResult, isSigninSuccessResult, PollMoreResult, SigninLinksResult, SigninSuccessResult } from '../../src/signin';
 import { waitMs } from '../../src/utils/mixed-utils';
 import {
   AcrolinxServerMock,
@@ -39,7 +35,8 @@ import {
 import { expectFailingPromise } from '../test-utils/utils';
 import { DUMMY_ENDPOINT_PROPS, DUMMY_SERVER_URL } from './common';
 import { describe, beforeEach, afterEach, expect, vi, test } from 'vitest';
-import { HEADER_X_ACROLINX_AUTH } from 'src/headers';
+import { HEADER_X_ACROLINX_AUTH } from '../../src/headers';
+import { ErrorType } from '../../src/errors';
 
 describe('signin', () => {
   let endpoint: AcrolinxEndpoint;
