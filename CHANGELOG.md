@@ -1,5 +1,12 @@
 # @acrolinx/sdk
 
+## 2.0.0-beta.3
+
+### Patch Changes
+
+- 3b06568: NONE chore: ignore .changeset
+- NONE fix: relative import paths
+
 ## 2.0.0-beta.2
 
 ### Major Changes

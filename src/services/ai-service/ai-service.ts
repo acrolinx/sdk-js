@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { getJsonFromPath, postJsonToPath } from 'src/utils/fetch';
+import { getJsonFromPath, postJsonToPath } from '../../utils/fetch';
 import { AcrolinxEndpointProps, ServiceType } from '../../index';
 import { AiFeatures, ChatCompletionRequest, IsAIEnabledInformation, WriteResponse } from './ai-service.types';
 
@@ -26,7 +26,7 @@ export class AIService {
 
   constructor(private readonly endpointProps: AcrolinxEndpointProps) {}
 
-  public async getAiFeatures(accessToken: string): Promise<AiFeatures> {
+  public getAiFeatures(accessToken: string): Promise<AiFeatures> {
     return getJsonFromPath<AiFeatures>(
       this.constructFullPath('/tenants/features/ai'),
       this.endpointProps,
@@ -37,7 +37,7 @@ export class AIService {
     );
   }
 
-  public async getAIEnabled(accessToken: string): Promise<IsAIEnabledInformation> {
+  public getAIEnabled(accessToken: string): Promise<IsAIEnabledInformation> {
     return getJsonFromPath(
       this.constructFullPath('/tenants/feature/ai-enabled?privilege=generate'),
       this.endpointProps,
@@ -57,7 +57,7 @@ export class AIService {
     }
   }
 
-  public async getAIChatCompletion(params: ChatCompletionRequest, accessToken: string): Promise<WriteResponse> {
+  public getAIChatCompletion(params: ChatCompletionRequest, accessToken: string): Promise<WriteResponse> {
     const { aiRephraseHint: prompt, internalName } = params.issue;
     const { targetUuid, count, previousVersion } = params;
 
