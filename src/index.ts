@@ -84,7 +84,7 @@ import {
   SigninSuccessData,
   SigninSuccessResult,
 } from './signin';
-import { AcrolinxInstrumentation, getTelemetryInstruments, Instruments } from './telemetry/acrolinxInstrumentation';
+import { getTelemetryInstruments } from './telemetry/acrolinxInstrumentation';
 import { IntegrationDetails } from './telemetry/interfaces/integration';
 import { getCommonMetricAttributes } from './telemetry/metrics/attribute-utils';
 
@@ -224,19 +224,6 @@ export class AcrolinxEndpoint {
       ...props,
       acrolinxUrl: props.acrolinxUrl.trim().replace(/\/$/, ''),
     };
-  }
-
-  public async getTelemetryInstruments(accessToken: AccessToken): Promise<Instruments | undefined> {
-    try {
-      const acrolinxInstrumentation = AcrolinxInstrumentation.getInstance({
-        endpointProps: this.props,
-        accessToken: accessToken,
-      });
-      return await acrolinxInstrumentation.getInstruments();
-    } catch (e) {
-      console.log(e);
-      return undefined;
-    }
   }
 
   public setClientLocale(clientLocale: string) {
