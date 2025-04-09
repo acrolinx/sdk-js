@@ -94,7 +94,7 @@ describe('getCommonMetricAttributes', () => {
             name,
             version: '120.0.0',
             engine
-          } as any // Type assertion needed due to union type constraints
+          } as any
         }
       };
 
