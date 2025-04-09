@@ -34,10 +34,7 @@ export const setupMetrics = (config: TelemetryConfig) => {
   return meterProvider;
 };
 
-export const createDefaultMeters = (
-  integrationDetails: IntegrationDetails,
-  meterProvider: MeterProvider,
-): Meters => {
+export const createDefaultMeters = (integrationDetails: IntegrationDetails, meterProvider: MeterProvider): Meters => {
   const defaultMeter = meterProvider.getMeter(metricPrefix);
   const integrationType = integrationDetails.type;
   const integrationName = integrationDetails.name;

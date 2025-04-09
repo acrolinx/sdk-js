@@ -1,6 +1,11 @@
 import { expect, describe, it } from 'vitest';
 import { getCommonMetricAttributes } from '../../../src/telemetry/metrics/attribute-utils';
-import { BrowserEngine, BrowserNames, IntegrationDetails, IntegrationType } from '../../../src/telemetry/interfaces/integration';
+import {
+  BrowserEngine,
+  BrowserNames,
+  IntegrationDetails,
+  IntegrationType,
+} from '../../../src/telemetry/interfaces/integration';
 
 describe('getCommonMetricAttributes', () => {
   it('should return correct attributes when all information is provided', () => {
@@ -10,14 +15,14 @@ describe('getCommonMetricAttributes', () => {
       type: IntegrationType.authoring,
       system: {
         sidebar: {
-          version: '2.0.0'
+          version: '2.0.0',
         },
         browser: {
           name: BrowserNames.chrome,
           version: '120.0.0',
-          engine: BrowserEngine.blink
-        }
-      }
+          engine: BrowserEngine.blink,
+        },
+      },
     };
 
     const attributes = getCommonMetricAttributes(integrationDetails);
@@ -25,7 +30,7 @@ describe('getCommonMetricAttributes', () => {
     expect(attributes).to.deep.equal({
       'sidebar-version': '2.0.0',
       'browser-name': BrowserNames.chrome,
-      'browser-engine': BrowserEngine.blink
+      'browser-engine': BrowserEngine.blink,
     });
   });
 
@@ -38,9 +43,9 @@ describe('getCommonMetricAttributes', () => {
         browser: {
           name: BrowserNames.chrome,
           version: '120.0.0',
-          engine: BrowserEngine.blink
-        }
-      }
+          engine: BrowserEngine.blink,
+        },
+      },
     };
 
     const attributes = getCommonMetricAttributes(integrationDetails);
@@ -48,7 +53,7 @@ describe('getCommonMetricAttributes', () => {
     expect(attributes).to.deep.equal({
       'sidebar-version': 'unknown',
       'browser-name': BrowserNames.chrome,
-      'browser-engine': BrowserEngine.blink
+      'browser-engine': BrowserEngine.blink,
     });
   });
 
@@ -59,9 +64,9 @@ describe('getCommonMetricAttributes', () => {
       type: IntegrationType.authoring,
       system: {
         sidebar: {
-          version: '2.0.0'
-        }
-      }
+          version: '2.0.0',
+        },
+      },
     };
 
     const attributes = getCommonMetricAttributes(integrationDetails);
@@ -69,7 +74,7 @@ describe('getCommonMetricAttributes', () => {
     expect(attributes).to.deep.equal({
       'sidebar-version': '2.0.0',
       'browser-name': BrowserNames.other,
-      'browser-engine': BrowserEngine.other
+      'browser-engine': BrowserEngine.other,
     });
   });
 
@@ -78,7 +83,7 @@ describe('getCommonMetricAttributes', () => {
       { name: BrowserNames.firefox, engine: BrowserEngine.gecko },
       { name: BrowserNames.safari, engine: BrowserEngine.webkit },
       { name: BrowserNames.edge, engine: BrowserEngine.blink },
-      { name: BrowserNames.javafx, engine: BrowserEngine.webkit }
+      { name: BrowserNames.javafx, engine: BrowserEngine.webkit },
     ] as const;
 
     testCases.forEach(({ name, engine }) => {
@@ -88,14 +93,14 @@ describe('getCommonMetricAttributes', () => {
         type: IntegrationType.authoring,
         system: {
           sidebar: {
-            version: '2.0.0'
+            version: '2.0.0',
           },
           browser: {
             name,
             version: '120.0.0',
-            engine
-          } as any
-        }
+            engine,
+          } as any,
+        },
       };
 
       const attributes = getCommonMetricAttributes(integrationDetails);
@@ -103,7 +108,7 @@ describe('getCommonMetricAttributes', () => {
       expect(attributes).to.deep.equal({
         'sidebar-version': '2.0.0',
         'browser-name': name,
-        'browser-engine': engine
+        'browser-engine': engine,
       });
     });
   });
@@ -113,7 +118,7 @@ describe('getCommonMetricAttributes', () => {
       name: 'test-integration',
       version: '1.0.0',
       type: IntegrationType.authoring,
-      system: {}
+      system: {},
     };
 
     const attributes = getCommonMetricAttributes(integrationDetails);
@@ -121,7 +126,7 @@ describe('getCommonMetricAttributes', () => {
     expect(attributes).to.deep.equal({
       'sidebar-version': 'unknown',
       'browser-name': BrowserNames.other,
-      'browser-engine': BrowserEngine.other
+      'browser-engine': BrowserEngine.other,
     });
   });
 });

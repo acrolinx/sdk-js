@@ -54,7 +54,10 @@ export class AcrolinxInstrumentation {
   }
 }
 
-export const getTelemetryInstruments = async (endpointProps: AcrolinxEndpointProps, accessToken: AccessToken): Promise<Instruments | undefined> => {
+export const getTelemetryInstruments = async (
+  endpointProps: AcrolinxEndpointProps,
+  accessToken: AccessToken,
+): Promise<Instruments | undefined> => {
   try {
     const acrolinxInstrumentation = AcrolinxInstrumentation.getInstance({
       endpointProps,

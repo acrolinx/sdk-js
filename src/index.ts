@@ -325,7 +325,7 @@ export class AcrolinxEndpoint {
 
   public async check(accessToken: AccessToken, req: CheckRequest): Promise<CheckResponse> {
     const instruments = await getTelemetryInstruments(this.props, accessToken);
-    instruments?.metrics.defaultCounters.checkRequestCounter.add(1 , {
+    instruments?.metrics.defaultCounters.checkRequestCounter.add(1, {
       ...getCommonMetricAttributes(this.props.client.integrationDetails),
     });
     return post<CheckResponse>('/api/v1/checking/checks', req, {}, this.props, accessToken);
