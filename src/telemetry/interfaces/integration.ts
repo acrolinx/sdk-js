@@ -26,13 +26,10 @@ export interface OperatingSystemInfo {
   family: OperatingSystemFamily;
 }
 
-export type Browser =
-  | { name: BrowserNames.chrome; version: string; engine: BrowserEngine.blink }
-  | { name: BrowserNames.firefox; version: string; engine: BrowserEngine.gecko }
-  | { name: BrowserNames.safari; version: string; engine: BrowserEngine.webkit }
-  | { name: BrowserNames.edge; version: string; engine: BrowserEngine.blink }
-  | { name: BrowserNames.javafx; version: string; engine: BrowserEngine.webkit }
-  | { name: BrowserNames.other; version: string; engine: BrowserEngine.other };
+export type Browser = {
+  name: BrowserNames;
+  version: string;
+};
 
 export enum BrowserNames {
   chrome = 'chrome',
@@ -40,13 +37,6 @@ export enum BrowserNames {
   safari = 'safari',
   edge = 'edge',
   javafx = 'javafx',
-  other = 'other',
-}
-
-export enum BrowserEngine {
-  blink = 'blink',
-  gecko = 'gecko',
-  webkit = 'webkit',
   other = 'other',
 }
 

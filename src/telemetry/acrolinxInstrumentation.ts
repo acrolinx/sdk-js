@@ -6,10 +6,12 @@ import { AccessToken } from '../common-types';
 import { AcrolinxEndpointProps, IntService } from '../index';
 
 export class AcrolinxInstrumentation {
-  private static acrolinxInstrumentation: AcrolinxInstrumentation;
-  public instruments: Instruments | undefined = undefined;
+  private static instance: AcrolinxInstrumentation | null = null;
+  private static instanceConfig: TelemetryConfig | null = null;
+  private instruments: Instruments | undefined = undefined;
   private readonly config: TelemetryConfig;
   private readonly intService: IntService;
+  private instrumentsPromise: Promise<Instruments | undefined> | null = null;
 
   private constructor(config: TelemetryConfig) {
     this.intService = new IntService(config.endpointProps);
@@ -17,40 +19,80 @@ export class AcrolinxInstrumentation {
   }
 
   public static getInstance(config: TelemetryConfig): AcrolinxInstrumentation {
-    if (!AcrolinxInstrumentation.acrolinxInstrumentation) {
-      AcrolinxInstrumentation.acrolinxInstrumentation = new AcrolinxInstrumentation(config);
-      return AcrolinxInstrumentation.acrolinxInstrumentation;
+    if (
+      AcrolinxInstrumentation.instance &&
+      AcrolinxInstrumentation.instanceConfig &&
+      this.configsMatch(AcrolinxInstrumentation.instanceConfig, config)
+    ) {
+      return AcrolinxInstrumentation.instance;
     }
-    return AcrolinxInstrumentation.acrolinxInstrumentation;
+
+    AcrolinxInstrumentation.instance = new AcrolinxInstrumentation(config);
+    AcrolinxInstrumentation.instanceConfig = { ...config };
+    return AcrolinxInstrumentation.instance;
+  }
+
+  public static resetInstance(): void {
+    AcrolinxInstrumentation.instance = null;
+    AcrolinxInstrumentation.instanceConfig = null;
+  }
+
+  private static configsMatch(config1: TelemetryConfig, config2: TelemetryConfig): boolean {
+    return config1.accessToken === config2.accessToken && config1.endpointProps === config2.endpointProps;
   }
 
   public async getInstruments(): Promise<Instruments | undefined> {
-    if (!(await this.isAllowed(this.config.accessToken))) {
+    if (this.instruments) {
+      return this.instruments;
+    }
+
+    if (this.instrumentsPromise) {
+      return this.instrumentsPromise;
+    }
+
+    this.instrumentsPromise = this.createInstruments();
+
+    try {
+      this.instruments = await this.instrumentsPromise;
+      return this.instruments;
+    } finally {
+      this.instrumentsPromise = null;
+    }
+  }
+
+  private async createInstruments(): Promise<Instruments | undefined> {
+    try {
+      if (!(await this.isAllowed(this.config.accessToken))) {
+        return undefined;
+      }
+
+      const meterProvider = setupMetrics(this.config);
+      const defaultCounters = createDefaultMeters(this.config.endpointProps.client.integrationDetails, meterProvider);
+      const logger = setupLogging(this.config);
+
+      return {
+        metrics: {
+          meterProvider,
+          meters: defaultCounters,
+        },
+        logging: {
+          logger,
+        },
+      };
+    } catch (error) {
+      console.error('Failed to create instruments:', error);
       return undefined;
     }
-    const meterProvider = setupMetrics(this.config);
-    const defaultCounters = createDefaultMeters(this.config.endpointProps.client.integrationDetails, meterProvider);
-    const logger = setupLogging(this.config);
-
-    return {
-      metrics: {
-        meterProvider,
-        meters: defaultCounters,
-      },
-      logging: {
-        logger,
-      },
-    };
   }
 
   private async isAllowed(accessToken: AccessToken): Promise<boolean> {
     try {
       const config = await this.intService.getConfig(accessToken);
-      return config?.telemetryEnabled;
-    } catch (e) {
-      console.log(e);
+      return config?.telemetryEnabled ?? false;
+    } catch (error) {
+      console.error('Failed to check if telemetry is allowed:', error);
+      return false;
     }
-    return false;
   }
 }
 
@@ -61,11 +103,11 @@ export const getTelemetryInstruments = async (
   try {
     const acrolinxInstrumentation = AcrolinxInstrumentation.getInstance({
       endpointProps,
-      accessToken: accessToken,
+      accessToken,
     });
     return await acrolinxInstrumentation.getInstruments();
-  } catch (e) {
-    console.log(e);
+  } catch (error) {
+    console.error('Failed to get telemetry instruments:', error);
     return undefined;
   }
 };

@@ -1,5 +1,11 @@
 # @acrolinx/sdk
 
+## 2.0.0-beta.7
+
+### Patch Changes
+
+- DEV-42366 chore remove browser engine
+
 ## 2.0.0-beta.6
 
 ### Patch Changes
