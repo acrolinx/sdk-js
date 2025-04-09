@@ -2,13 +2,13 @@ export interface IntegrationDetails {
   name: string;
   version: string;
   type: IntegrationType;
-  system: SystemInfo;
+  systemInfo: SystemInfo;
 }
 
 export interface SystemInfo {
-  operatingSystem?: OperatingSystem;
-  browser?: Browser;
-  sidebar?: SidebarInfo;
+  operatingSystemInfo?: OperatingSystemInfo;
+  browserInfo?: Browser;
+  sidebarInfo?: SidebarInfo;
 }
 
 export interface SidebarInfo {
@@ -20,7 +20,7 @@ export enum IntegrationType {
   automated = 'automated',
 }
 
-export interface OperatingSystem {
+export interface OperatingSystemInfo {
   name: string;
   version: string;
   family: OperatingSystemFamily;

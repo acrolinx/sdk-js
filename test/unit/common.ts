@@ -32,16 +32,16 @@ export const DUMMY_ENDPOINT_PROPS: AcrolinxEndpointProps = {
       name: 'dev',
       version: 'foo',
       type: IntegrationType.authoring,
-      system: {
-        browser: {
+      systemInfo: {
+        browserInfo: {
           name: BrowserNames.chrome,
           engine: BrowserEngine.blink,
           version: 'foo',
         },
-        sidebar: {
+        sidebarInfo: {
           version: 'foo',
         },
-        operatingSystem: {
+        operatingSystemInfo: {
           family: OperatingSystemFamily.linux,
           name: 'ubuntu',
           version: 'foo',

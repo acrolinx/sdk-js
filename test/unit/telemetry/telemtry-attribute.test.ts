@@ -13,11 +13,11 @@ describe('getCommonMetricAttributes', () => {
       name: 'test-integration',
       version: '1.0.0',
       type: IntegrationType.authoring,
-      system: {
-        sidebar: {
+      systemInfo: {
+        sidebarInfo: {
           version: '2.0.0',
         },
-        browser: {
+        browserInfo: {
           name: BrowserNames.chrome,
           version: '120.0.0',
           engine: BrowserEngine.blink,
@@ -39,8 +39,8 @@ describe('getCommonMetricAttributes', () => {
       name: 'test-integration',
       version: '1.0.0',
       type: IntegrationType.authoring,
-      system: {
-        browser: {
+      systemInfo: {
+        browserInfo: {
           name: BrowserNames.chrome,
           version: '120.0.0',
           engine: BrowserEngine.blink,
@@ -62,8 +62,8 @@ describe('getCommonMetricAttributes', () => {
       name: 'test-integration',
       version: '1.0.0',
       type: IntegrationType.authoring,
-      system: {
-        sidebar: {
+      systemInfo: {
+        sidebarInfo: {
           version: '2.0.0',
         },
       },
@@ -91,11 +91,11 @@ describe('getCommonMetricAttributes', () => {
         name: 'test-integration',
         version: '1.0.0',
         type: IntegrationType.authoring,
-        system: {
-          sidebar: {
+        systemInfo: {
+          sidebarInfo: {
             version: '2.0.0',
           },
-          browser: {
+          browserInfo: {
             name,
             version: '120.0.0',
             engine,
@@ -118,7 +118,7 @@ describe('getCommonMetricAttributes', () => {
       name: 'test-integration',
       version: '1.0.0',
       type: IntegrationType.authoring,
-      system: {},
+      systemInfo: {},
     };
 
     const attributes = getCommonMetricAttributes(integrationDetails);
