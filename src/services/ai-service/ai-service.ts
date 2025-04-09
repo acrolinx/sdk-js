@@ -64,7 +64,7 @@ export class AIService {
     const { targetUuid, count, previousVersion } = params;
 
     const instruments = await getTelemetryInstruments(this.endpointProps, accessToken);
-    instruments?.metrics.defaultCounters.suggestionCounter.add(1, {
+    instruments?.metrics.meters.suggestionCounter.add(1, {
       ...getCommonMetricAttributes(this.endpointProps.client.integrationDetails),
     });
 

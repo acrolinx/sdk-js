@@ -35,7 +35,7 @@ export class AcrolinxInstrumentation {
     return {
       metrics: {
         meterProvider,
-        defaultCounters,
+        meters: defaultCounters,
       },
       logging: {
         logger,
@@ -76,15 +76,15 @@ export type TelemetryConfig = {
 };
 
 export type Instruments = {
-  metrics: MetricInstrumentation;
-  logging: LoggingInstrumentation;
+  metrics: MetricInstruments;
+  logging: LoggingInstruments;
 };
 
-export type MetricInstrumentation = {
+export type MetricInstruments = {
   meterProvider: MeterProvider;
-  defaultCounters: Meters;
+  meters: Meters;
 };
 
-export type LoggingInstrumentation = {
+export type LoggingInstruments = {
   logger: Logger;
 };
