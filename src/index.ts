@@ -84,7 +84,9 @@ import {
   SigninSuccessData,
   SigninSuccessResult,
 } from './signin';
-import { AcrolinxInstrumentation, Instruments } from './telemetry/acrolinxInstrumentation';
+import { getTelemetryInstruments } from './telemetry/acrolinxInstrumentation';
+import { IntegrationDetails } from './telemetry/interfaces/integration';
+import { getCommonMetricAttributes } from './telemetry/metrics/attribute-utils';
 
 import { User } from './user';
 import {
@@ -181,10 +183,9 @@ export interface AcrolinxEndpointProps {
 
 export interface ClientInformation {
   /**
-   * The name of the app.
-   * @example: 'acrolinx-for-chrome'
+   * The details of the integration
    */
-  appName?: string;
+  integrationDetails: IntegrationDetails;
   signature: string;
   /**
    * The version of the client.
@@ -223,21 +224,6 @@ export class AcrolinxEndpoint {
       ...props,
       acrolinxUrl: props.acrolinxUrl.trim().replace(/\/$/, ''),
     };
-  }
-
-  public async getTelemetryInstruments(accessToken: AccessToken): Promise<Instruments | undefined> {
-    try {
-      const acrolinxInstrumentation = AcrolinxInstrumentation.getInstance(this.props, {
-        accessToken: accessToken,
-        acrolinxUrl: this.props.acrolinxUrl,
-        serviceName: this.props.client.appName ?? 'sdk-js',
-        serviceVersion: this.props.client.version,
-      });
-      return await acrolinxInstrumentation.getInstruments();
-    } catch (e) {
-      console.log(e);
-      return undefined;
-    }
   }
 
   public setClientLocale(clientLocale: string) {
@@ -325,9 +311,20 @@ export class AcrolinxEndpoint {
   }
 
   public async check(accessToken: AccessToken, req: CheckRequest): Promise<CheckResponse> {
-    const instruments = await this.getTelemetryInstruments(accessToken);
-    instruments?.metrics.defaultCounters.check.add(1);
-    return post<CheckResponse>('/api/v1/checking/checks', req, {}, this.props, accessToken);
+    const instruments = await getTelemetryInstruments(this.props, accessToken);
+    instruments?.metrics.meters.checkRequestCounter.add(1, {
+      ...getCommonMetricAttributes(this.props.client.integrationDetails),
+    });
+
+    const t0 = performance.now();
+    const response = await post<CheckResponse>('/api/v1/checking/checks', req, {}, this.props, accessToken);
+    const t1 = performance.now();
+
+    instruments?.metrics.meters.suggestionResponseTime.record(t1 - t0, {
+      ...getCommonMetricAttributes(this.props.client.integrationDetails),
+    });
+
+    return response;
   }
 
   public async getLiveSuggestions(accessToken: AccessToken, req: LiveSearchRequest): Promise<LiveSearchResponse> {

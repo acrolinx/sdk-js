@@ -56,6 +56,7 @@ import {
   SSO_GENERIC_TOKEN,
 } from './env-config';
 import { getJsonFromPath, getJsonFromUrl } from 'src/utils/fetch';
+import { DUMMY_ENDPOINT_PROPS } from 'test/unit/common';
 
 dotenv.config();
 
@@ -66,6 +67,7 @@ function createEndpoint(acrolinxUrl: string) {
     acrolinxUrl,
     enableHttpLogging: true,
     client: {
+      integrationDetails: DUMMY_ENDPOINT_PROPS.client.integrationDetails,
       signature: ACROLINX_DEV_SIGNATURE ?? DEVELOPMENT_SIGNATURE,
       version: '1.2.3.666',
     },

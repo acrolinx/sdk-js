@@ -1,5 +1,5 @@
 import { setupLogging } from './logs/logs-setup';
-import { Counters, createDefaultCounters, setupMetrics } from './metrics/metrics-setup';
+import { Meters, createDefaultMeters, setupMetrics } from './metrics/metrics-setup';
 import { MeterProvider } from '@opentelemetry/sdk-metrics';
 import { Logger } from '@opentelemetry/api-logs';
 import { AccessToken } from '../common-types';
@@ -11,14 +11,14 @@ export class AcrolinxInstrumentation {
   private readonly config: TelemetryConfig;
   private readonly intService: IntService;
 
-  private constructor(endpointProps: AcrolinxEndpointProps, config: TelemetryConfig) {
-    this.intService = new IntService(endpointProps);
+  private constructor(config: TelemetryConfig) {
+    this.intService = new IntService(config.endpointProps);
     this.config = config;
   }
 
-  public static getInstance(endpointProps: AcrolinxEndpointProps, config: TelemetryConfig): AcrolinxInstrumentation {
+  public static getInstance(config: TelemetryConfig): AcrolinxInstrumentation {
     if (!AcrolinxInstrumentation.acrolinxInstrumentation) {
-      AcrolinxInstrumentation.acrolinxInstrumentation = new AcrolinxInstrumentation(endpointProps, config);
+      AcrolinxInstrumentation.acrolinxInstrumentation = new AcrolinxInstrumentation(config);
       return AcrolinxInstrumentation.acrolinxInstrumentation;
     }
     return AcrolinxInstrumentation.acrolinxInstrumentation;
@@ -29,13 +29,13 @@ export class AcrolinxInstrumentation {
       return undefined;
     }
     const meterProvider = setupMetrics(this.config);
-    const defaultCounters = createDefaultCounters(meterProvider);
+    const defaultCounters = createDefaultMeters(this.config.endpointProps.client.integrationDetails, meterProvider);
     const logger = setupLogging(this.config);
 
     return {
       metrics: {
         meterProvider,
-        defaultCounters,
+        meters: defaultCounters,
       },
       logging: {
         logger,
@@ -54,23 +54,37 @@ export class AcrolinxInstrumentation {
   }
 }
 
+export const getTelemetryInstruments = async (
+  endpointProps: AcrolinxEndpointProps,
+  accessToken: AccessToken,
+): Promise<Instruments | undefined> => {
+  try {
+    const acrolinxInstrumentation = AcrolinxInstrumentation.getInstance({
+      endpointProps,
+      accessToken: accessToken,
+    });
+    return await acrolinxInstrumentation.getInstruments();
+  } catch (e) {
+    console.log(e);
+    return undefined;
+  }
+};
+
 export type TelemetryConfig = {
-  acrolinxUrl: string;
+  endpointProps: AcrolinxEndpointProps;
   accessToken: AccessToken;
-  serviceName: string;
-  serviceVersion: string;
 };
 
 export type Instruments = {
-  metrics: MetricInstrumentation;
-  logging: LoggingInstrumentation;
+  metrics: MetricInstruments;
+  logging: LoggingInstruments;
 };
 
-export type MetricInstrumentation = {
+export type MetricInstruments = {
   meterProvider: MeterProvider;
-  defaultCounters: Counters;
+  meters: Meters;
 };
 
-export type LoggingInstrumentation = {
+export type LoggingInstruments = {
   logger: Logger;
 };

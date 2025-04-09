@@ -7,6 +7,7 @@ import { IntService } from '../../src/services/int-service/int-service';
 import { describe, beforeEach, expect, test } from 'vitest';
 import { LogBufferEntry, LogEntryType } from 'src/utils/logging-buffer';
 import { IntegrationServiceResponse } from 'src/services/int-service/int-service.types';
+import { DUMMY_ENDPOINT_PROPS } from 'test/unit/common';
 
 dotenv.config();
 
@@ -20,6 +21,7 @@ function createEndpoint(acrolinxUrl: string) {
     acrolinxUrl,
     enableHttpLogging: true,
     client: {
+      integrationDetails: DUMMY_ENDPOINT_PROPS.client.integrationDetails,
       signature: ACROLINX_DEV_SIGNATURE ?? DEVELOPMENT_SIGNATURE,
       version: '1.2.3.666',
     },
