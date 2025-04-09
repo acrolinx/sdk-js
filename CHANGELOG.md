@@ -1,5 +1,11 @@
 # @acrolinx/sdk
 
+## 2.0.0-beta.6
+
+### Patch Changes
+
+- DEV-42366 feat: add telemetry interfaces
+
 ## 2.0.0-beta.5
 
 ### Patch Changes
