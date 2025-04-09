@@ -2,12 +2,7 @@ import { AcrolinxEndpoint } from '../../../src/index';
 import { AcrolinxInstrumentation, TelemetryConfig } from '../../../src/telemetry/acrolinxInstrumentation';
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
 import { FetchMocker, MockServer } from 'mentoss';
-import {
-  BrowserEngine,
-  BrowserNames,
-  IntegrationType,
-  OperatingSystemFamily,
-} from '../../../src/telemetry/interfaces/integration';
+import { BrowserNames, IntegrationType, OperatingSystemFamily } from '../../../src/telemetry/interfaces/integration';
 
 describe('Telemtry initialization', () => {
   const acrolinxUrl = 'https://tenant.acrolinx.cloud';
@@ -22,7 +17,6 @@ describe('Telemtry initialization', () => {
         systemInfo: {
           browserInfo: {
             name: BrowserNames.chrome,
-            engine: BrowserEngine.blink,
             version: 'foo',
           },
           sidebarInfo: {

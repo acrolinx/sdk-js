@@ -1,11 +1,6 @@
 import { expect, describe, it } from 'vitest';
 import { getCommonMetricAttributes } from '../../../src/telemetry/metrics/attribute-utils';
-import {
-  BrowserEngine,
-  BrowserNames,
-  IntegrationDetails,
-  IntegrationType,
-} from '../../../src/telemetry/interfaces/integration';
+import { BrowserNames, IntegrationDetails, IntegrationType } from '../../../src/telemetry/interfaces/integration';
 
 describe('getCommonMetricAttributes', () => {
   it('should return correct attributes when all information is provided', () => {
@@ -20,7 +15,6 @@ describe('getCommonMetricAttributes', () => {
         browserInfo: {
           name: BrowserNames.chrome,
           version: '120.0.0',
-          engine: BrowserEngine.blink,
         },
       },
     };
@@ -30,7 +24,6 @@ describe('getCommonMetricAttributes', () => {
     expect(attributes).to.deep.equal({
       'sidebar-version': '2.0.0',
       'browser-name': BrowserNames.chrome,
-      'browser-engine': BrowserEngine.blink,
     });
   });
 
@@ -43,7 +36,6 @@ describe('getCommonMetricAttributes', () => {
         browserInfo: {
           name: BrowserNames.chrome,
           version: '120.0.0',
-          engine: BrowserEngine.blink,
         },
       },
     };
@@ -53,7 +45,6 @@ describe('getCommonMetricAttributes', () => {
     expect(attributes).to.deep.equal({
       'sidebar-version': 'unknown',
       'browser-name': BrowserNames.chrome,
-      'browser-engine': BrowserEngine.blink,
     });
   });
 
@@ -74,19 +65,18 @@ describe('getCommonMetricAttributes', () => {
     expect(attributes).to.deep.equal({
       'sidebar-version': '2.0.0',
       'browser-name': BrowserNames.other,
-      'browser-engine': BrowserEngine.other,
     });
   });
 
   it('should handle different browser types correctly', () => {
     const testCases = [
-      { name: BrowserNames.firefox, engine: BrowserEngine.gecko },
-      { name: BrowserNames.safari, engine: BrowserEngine.webkit },
-      { name: BrowserNames.edge, engine: BrowserEngine.blink },
-      { name: BrowserNames.javafx, engine: BrowserEngine.webkit },
+      { name: BrowserNames.firefox },
+      { name: BrowserNames.safari },
+      { name: BrowserNames.edge },
+      { name: BrowserNames.javafx },
     ] as const;
 
-    testCases.forEach(({ name, engine }) => {
+    testCases.forEach(({ name }) => {
       const integrationDetails: IntegrationDetails = {
         name: 'test-integration',
         version: '1.0.0',
@@ -98,7 +88,6 @@ describe('getCommonMetricAttributes', () => {
           browserInfo: {
             name,
             version: '120.0.0',
-            engine,
           } as any,
         },
       };
@@ -108,7 +97,6 @@ describe('getCommonMetricAttributes', () => {
       expect(attributes).to.deep.equal({
         'sidebar-version': '2.0.0',
         'browser-name': name,
-        'browser-engine': engine,
       });
     });
   });
@@ -126,7 +114,6 @@ describe('getCommonMetricAttributes', () => {
     expect(attributes).to.deep.equal({
       'sidebar-version': 'unknown',
       'browser-name': BrowserNames.other,
-      'browser-engine': BrowserEngine.other,
     });
   });
 });

@@ -1,5 +1,11 @@
 # @acrolinx/sdk
 
+## 2.0.0-beta.7
+
+### Patch Changes
+
+- NONE chore: remove browser engine details
+
 ## 2.0.0-beta.6
 
 ### Patch Changes
