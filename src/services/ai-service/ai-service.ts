@@ -68,7 +68,9 @@ export class AIService {
       ...getCommonMetricAttributes(this.endpointProps.client.integrationDetails),
     });
 
-    return postJsonToPath<WriteResponse>(
+    const t0 = performance.now();
+
+    const response = await postJsonToPath<WriteResponse>(
       this.constructFullPath('/ai/chat-completions'),
       {
         prompt,
@@ -81,6 +83,14 @@ export class AIService {
       accessToken,
       { serviceType: ServiceType.ACROLINX_ONE },
     );
+
+    const t1 = performance.now();
+
+    instruments?.metrics.meters.suggestionResponseTime.record(t1 - t0, {
+      ...getCommonMetricAttributes(this.endpointProps.client.integrationDetails),
+    });
+
+    return response;
   }
   private constructFullPath(path: string): string {
     return this.aiServiceBasePath + path;

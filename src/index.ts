@@ -328,7 +328,16 @@ export class AcrolinxEndpoint {
     instruments?.metrics.meters.checkRequestCounter.add(1, {
       ...getCommonMetricAttributes(this.props.client.integrationDetails),
     });
-    return post<CheckResponse>('/api/v1/checking/checks', req, {}, this.props, accessToken);
+
+    const t0 = performance.now();
+    const response = await post<CheckResponse>('/api/v1/checking/checks', req, {}, this.props, accessToken);
+    const t1 = performance.now();
+
+    instruments?.metrics.meters.suggestionResponseTime.record(t1 - t0, {
+      ...getCommonMetricAttributes(this.props.client.integrationDetails),
+    });
+
+    return response;
   }
 
   public async getLiveSuggestions(accessToken: AccessToken, req: LiveSearchRequest): Promise<LiveSearchResponse> {
