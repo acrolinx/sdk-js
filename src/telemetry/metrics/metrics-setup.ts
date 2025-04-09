@@ -5,15 +5,16 @@ import { resourceFromAttributes } from '@opentelemetry/resources';
 import { Counter, Histogram } from '@opentelemetry/api';
 import { TelemetryConfig } from '../acrolinxInstrumentation';
 import { IntegrationDetails } from '../interfaces/integration';
-import { checkRequestMetric, metricPrefix, suggestionMetric } from './metric-constants';
+import { checkRequestMetric, EXPORT_INTERVAL_MS, metricPrefix, suggestionMetric } from './metric-constants';
 
-export const setupMetrics = (config: TelemetryConfig) => {
+export const setupMetrics = (config: TelemetryConfig): MeterProvider => {
   const collectorOptions = {
     url: `${config.endpointProps.acrolinxUrl}/otlp/metrics`,
     headers: {
       Authorization: `Bearer ${config.accessToken}`,
     },
   };
+  
   const metricExporter = new OTLPMetricExporter(collectorOptions);
 
   const resource = resourceFromAttributes({
@@ -21,42 +22,38 @@ export const setupMetrics = (config: TelemetryConfig) => {
     [ATTR_SERVICE_VERSION]: config.endpointProps.client.integrationDetails.version,
   });
 
-  const meterProvider = new MeterProvider({
+  return new MeterProvider({
     readers: [
       new PeriodicExportingMetricReader({
         exporter: metricExporter,
-        exportIntervalMillis: 60000, // Every 60 seconds
+        exportIntervalMillis: EXPORT_INTERVAL_MS,
       }),
     ],
     resource,
   });
-
-  return meterProvider;
 };
 
-export const createDefaultMeters = (integrationDetails: IntegrationDetails, meterProvider: MeterProvider): Meters => {
+export const createDefaultMeters = (
+  integrationDetails: IntegrationDetails, 
+  meterProvider: MeterProvider
+): Meters => {
+  const { type: integrationType, name: integrationName } = integrationDetails;
   const defaultMeter = meterProvider.getMeter(metricPrefix);
-  const integrationType = integrationDetails.type;
-  const integrationName = integrationDetails.name;
-
+  
   const prefix = `${metricPrefix}.${integrationType}.${integrationName}`;
+  
+  const checkRequestCounterName = `${prefix}.${checkRequestMetric}.counter`;
+  const checkRequestPollingTimeName = `${prefix}.${checkRequestMetric}.polling-time`;
+  const checkRequestSubmitTimeName = `${prefix}.${checkRequestMetric}.submit-time`;
+  const suggestionCounterName = `${prefix}.${suggestionMetric}.counter`;
+  const suggestionResponseTimeName = `${prefix}.${suggestionMetric}.response-time`;
 
   return {
-    checkRequestCounter: defaultMeter.createCounter(
-      `${prefix}.${checkRequestMetric}.counter`,
-    ),
-    checkRequestPollingTime: defaultMeter.createHistogram(
-      `${prefix}.${checkRequestMetric}.polling-time`,
-    ),
-    checkRequestSubmitTime: defaultMeter.createHistogram(
-      `${prefix}.${checkRequestMetric}.submit-time`,
-    ),
-    suggestionCounter: defaultMeter.createCounter(
-      `${prefix}.${suggestionMetric}.counter`,
-    ),
-    suggestionResponseTime: defaultMeter.createHistogram(
-      `${prefix}.${suggestionMetric}.response-time`,
-    ),
+    checkRequestCounter: defaultMeter.createCounter(checkRequestCounterName),
+    checkRequestPollingTime: defaultMeter.createHistogram(checkRequestPollingTimeName),
+    checkRequestSubmitTime: defaultMeter.createHistogram(checkRequestSubmitTimeName),
+    suggestionCounter: defaultMeter.createCounter(suggestionCounterName),
+    suggestionResponseTime: defaultMeter.createHistogram(suggestionResponseTimeName),
   };
 };
 
