@@ -7,6 +7,7 @@ import { AcrolinxEndpointProps, IntService } from '../index';
 
 export class AcrolinxInstrumentation {
   private static instance: AcrolinxInstrumentation | null = null;
+  private static instanceConfig: TelemetryConfig | null = null;
   private instruments: Instruments | undefined = undefined;
   private readonly config: TelemetryConfig;
   private readonly intService: IntService;
@@ -18,10 +19,25 @@ export class AcrolinxInstrumentation {
   }
 
   public static getInstance(config: TelemetryConfig): AcrolinxInstrumentation {
-    if (!AcrolinxInstrumentation.instance) {
-      AcrolinxInstrumentation.instance = new AcrolinxInstrumentation(config);
+    if (AcrolinxInstrumentation.instance && 
+        AcrolinxInstrumentation.instanceConfig && 
+        this.configsMatch(AcrolinxInstrumentation.instanceConfig, config)) {
+      return AcrolinxInstrumentation.instance;
     }
+    
+    AcrolinxInstrumentation.instance = new AcrolinxInstrumentation(config);
+    AcrolinxInstrumentation.instanceConfig = { ...config };
     return AcrolinxInstrumentation.instance;
+  }
+  
+  public static resetInstance(): void {
+    AcrolinxInstrumentation.instance = null;
+    AcrolinxInstrumentation.instanceConfig = null;
+  }
+
+  private static configsMatch(config1: TelemetryConfig, config2: TelemetryConfig): boolean {
+    return config1.accessToken === config2.accessToken && 
+           config1.endpointProps === config2.endpointProps;
   }
 
   public async getInstruments(): Promise<Instruments | undefined> {
