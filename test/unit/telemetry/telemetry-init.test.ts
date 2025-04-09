@@ -74,14 +74,14 @@ describe('Telemetry initialization', () => {
 
     it('should create a new instance when called with different configuration', () => {
       const instance1 = AcrolinxInstrumentation.getInstance(defaultProps);
-      
+
       const differentProps: TelemetryConfig = {
         ...defaultProps,
         accessToken: 'different-token',
       };
-      
+
       const instance2 = AcrolinxInstrumentation.getInstance(differentProps);
-      
+
       expect(instance1).not.toBe(instance2);
     });
 
@@ -89,7 +89,7 @@ describe('Telemetry initialization', () => {
       const instance1 = AcrolinxInstrumentation.getInstance(defaultProps);
       AcrolinxInstrumentation.resetInstance();
       const instance2 = AcrolinxInstrumentation.getInstance(defaultProps);
-      
+
       expect(instance1).not.toBe(instance2);
     });
   });
@@ -106,7 +106,7 @@ describe('Telemetry initialization', () => {
 
       const acrolinxInstrumentation = AcrolinxInstrumentation.getInstance(defaultProps);
       const instruments = await acrolinxInstrumentation.getInstruments();
-      
+
       expect(instruments?.metrics).toBeDefined();
       expect(instruments?.metrics.meterProvider).toBeDefined();
       expect(instruments?.logging).toBeDefined();
@@ -124,7 +124,7 @@ describe('Telemetry initialization', () => {
 
       const acrolinxInstrumentation = AcrolinxInstrumentation.getInstance(defaultProps);
       const instruments = await acrolinxInstrumentation.getInstruments();
-      
+
       expect(instruments).toBeUndefined();
     });
 
@@ -135,7 +135,7 @@ describe('Telemetry initialization', () => {
 
       const acrolinxInstrumentation = AcrolinxInstrumentation.getInstance(defaultProps);
       const instruments = await acrolinxInstrumentation.getInstruments();
-      
+
       expect(instruments).toBeUndefined();
     });
 
@@ -149,7 +149,7 @@ describe('Telemetry initialization', () => {
 
       const acrolinxInstrumentation = AcrolinxInstrumentation.getInstance(defaultProps);
       const instruments = await acrolinxInstrumentation.getInstruments();
-      
+
       expect(instruments).toBeUndefined();
     });
 
@@ -164,7 +164,7 @@ describe('Telemetry initialization', () => {
 
       const acrolinxInstrumentation = AcrolinxInstrumentation.getInstance(defaultProps);
       const instruments = await acrolinxInstrumentation.getInstruments();
-      
+
       expect(instruments?.metrics).toBeDefined();
       expect(instruments?.metrics.meterProvider).toBeDefined();
       expect(instruments?.logging).toBeDefined();
@@ -183,18 +183,18 @@ describe('Telemetry initialization', () => {
       });
 
       const acrolinxInstrumentation = AcrolinxInstrumentation.getInstance(defaultProps);
-      
+
       // First call should make an API request
       const instruments1 = await acrolinxInstrumentation.getInstruments();
       expect(instruments1).toBeDefined();
-      
+
       // Clear the mock to verify no additional requests are made
       mocker.clearAll();
-      
+
       // Second call should use cached instruments
       const instruments2 = await acrolinxInstrumentation.getInstruments();
       expect(instruments2).toBeDefined();
-      
+
       // Verify the instruments are the same instance
       expect(instruments1).toBe(instruments2);
     });
@@ -202,7 +202,7 @@ describe('Telemetry initialization', () => {
     it('should handle concurrent calls to getInstruments', async () => {
       // Set up a mock that will be called only once
       let requestCount = 0;
-      
+
       // First, set up the mock with a counter
       server.get('/int-service/api/v1/config', {
         status: 200,
@@ -211,7 +211,7 @@ describe('Telemetry initialization', () => {
           telemetryEnabled: true,
         },
       });
-      
+
       // Then, override the fetch to count requests
       const originalFetch = global.fetch;
       global.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
@@ -220,22 +220,22 @@ describe('Telemetry initialization', () => {
         }
         return originalFetch(input, init);
       };
-      
+
       try {
         const acrolinxInstrumentation = AcrolinxInstrumentation.getInstance(defaultProps);
-        
+
         // Make concurrent calls
         const [instruments1, instruments2, instruments3] = await Promise.all([
           acrolinxInstrumentation.getInstruments(),
           acrolinxInstrumentation.getInstruments(),
           acrolinxInstrumentation.getInstruments(),
         ]);
-        
+
         // Verify all calls returned the same instruments
         expect(instruments1).toBeDefined();
         expect(instruments1).toBe(instruments2);
         expect(instruments1).toBe(instruments3);
-        
+
         // Verify only one API request was made
         expect(requestCount).toBe(1);
       } finally {

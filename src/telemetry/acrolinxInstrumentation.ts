@@ -19,38 +19,39 @@ export class AcrolinxInstrumentation {
   }
 
   public static getInstance(config: TelemetryConfig): AcrolinxInstrumentation {
-    if (AcrolinxInstrumentation.instance && 
-        AcrolinxInstrumentation.instanceConfig && 
-        this.configsMatch(AcrolinxInstrumentation.instanceConfig, config)) {
+    if (
+      AcrolinxInstrumentation.instance &&
+      AcrolinxInstrumentation.instanceConfig &&
+      this.configsMatch(AcrolinxInstrumentation.instanceConfig, config)
+    ) {
       return AcrolinxInstrumentation.instance;
     }
-    
+
     AcrolinxInstrumentation.instance = new AcrolinxInstrumentation(config);
     AcrolinxInstrumentation.instanceConfig = { ...config };
     return AcrolinxInstrumentation.instance;
   }
-  
+
   public static resetInstance(): void {
     AcrolinxInstrumentation.instance = null;
     AcrolinxInstrumentation.instanceConfig = null;
   }
 
   private static configsMatch(config1: TelemetryConfig, config2: TelemetryConfig): boolean {
-    return config1.accessToken === config2.accessToken && 
-           config1.endpointProps === config2.endpointProps;
+    return config1.accessToken === config2.accessToken && config1.endpointProps === config2.endpointProps;
   }
 
   public async getInstruments(): Promise<Instruments | undefined> {
     if (this.instruments) {
       return this.instruments;
     }
-    
+
     if (this.instrumentsPromise) {
       return this.instrumentsPromise;
     }
-    
+
     this.instrumentsPromise = this.createInstruments();
-    
+
     try {
       this.instruments = await this.instrumentsPromise;
       return this.instruments;
@@ -64,12 +65,9 @@ export class AcrolinxInstrumentation {
       if (!(await this.isAllowed(this.config.accessToken))) {
         return undefined;
       }
-      
+
       const meterProvider = setupMetrics(this.config);
-      const defaultCounters = createDefaultMeters(
-        this.config.endpointProps.client.integrationDetails, 
-        meterProvider
-      );
+      const defaultCounters = createDefaultMeters(this.config.endpointProps.client.integrationDetails, meterProvider);
       const logger = setupLogging(this.config);
 
       return {

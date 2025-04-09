@@ -14,7 +14,7 @@ export const setupMetrics = (config: TelemetryConfig): MeterProvider => {
       Authorization: `Bearer ${config.accessToken}`,
     },
   };
-  
+
   const metricExporter = new OTLPMetricExporter(collectorOptions);
 
   const resource = resourceFromAttributes({
@@ -33,15 +33,12 @@ export const setupMetrics = (config: TelemetryConfig): MeterProvider => {
   });
 };
 
-export const createDefaultMeters = (
-  integrationDetails: IntegrationDetails, 
-  meterProvider: MeterProvider
-): Meters => {
+export const createDefaultMeters = (integrationDetails: IntegrationDetails, meterProvider: MeterProvider): Meters => {
   const { type: integrationType, name: integrationName } = integrationDetails;
   const defaultMeter = meterProvider.getMeter(metricPrefix);
-  
+
   const prefix = `${metricPrefix}.${integrationType}.${integrationName}`;
-  
+
   const checkRequestCounterName = `${prefix}.${checkRequestMetric}.counter`;
   const checkRequestPollingTimeName = `${prefix}.${checkRequestMetric}.polling-time`;
   const checkRequestSubmitTimeName = `${prefix}.${checkRequestMetric}.submit-time`;
