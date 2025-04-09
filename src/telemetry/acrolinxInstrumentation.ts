@@ -55,7 +55,7 @@ export class AcrolinxInstrumentation {
 }
 
 export type TelemetryConfig = {
-  endpointProps: AcrolinxEndpointProps
+  endpointProps: AcrolinxEndpointProps;
   accessToken: AccessToken;
 };
 

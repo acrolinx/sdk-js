@@ -14,7 +14,12 @@
  * limitations under the License.
  */
 
-import { IntegrationType, BrowserNames, BrowserEngine, OperatingSystemFamily } from 'src/telemetry/interfaces/integration';
+import {
+  IntegrationType,
+  BrowserNames,
+  BrowserEngine,
+  OperatingSystemFamily,
+} from 'src/telemetry/interfaces/integration';
 import { AcrolinxEndpointProps, DEVELOPMENT_SIGNATURE } from '../../src';
 
 export const DUMMY_SERVER_URL = 'http://dummy-server';

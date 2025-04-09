@@ -194,7 +194,6 @@ export interface ClientInformation {
   version: string;
 }
 
-
 export interface CheckAndGetResultOptions {
   onProgress?(progress: Progress): void;
 }

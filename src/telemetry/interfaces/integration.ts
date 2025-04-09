@@ -8,7 +8,7 @@ export interface IntegrationDetails {
 export interface SystemInfo {
   operatingSystem?: OperatingSystem;
   browser?: Browser;
-  sidebar? : SidebarInfo
+  sidebar?: SidebarInfo;
 }
 
 export interface SidebarInfo {
@@ -30,7 +30,7 @@ export type Browser =
   | { name: BrowserNames.chrome; version: string; engine: BrowserEngine.blink }
   | { name: BrowserNames.firefox; version: string; engine: BrowserEngine.gecko }
   | { name: BrowserNames.safari; version: string; engine: BrowserEngine.webkit }
-  | { name: BrowserNames.edge; version: string; engine: BrowserEngine.blink; }
+  | { name: BrowserNames.edge; version: string; engine: BrowserEngine.blink }
   | { name: BrowserNames.javafx; version: string; engine: BrowserEngine.webkit }
   | { name: BrowserNames.other; version: string; engine: BrowserEngine.other };
 
@@ -40,7 +40,7 @@ export enum BrowserNames {
   safari = 'safari',
   edge = 'edge',
   javafx = 'javafx',
-  other = 'other'
+  other = 'other',
 }
 
 export enum BrowserEngine {
