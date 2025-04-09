@@ -11,14 +11,14 @@ export class AcrolinxInstrumentation {
   private readonly config: TelemetryConfig;
   private readonly intService: IntService;
 
-  private constructor(endpointProps: AcrolinxEndpointProps, config: TelemetryConfig) {
-    this.intService = new IntService(endpointProps);
+  private constructor(config: TelemetryConfig) {
+    this.intService = new IntService(config.endpointProps);
     this.config = config;
   }
 
-  public static getInstance(endpointProps: AcrolinxEndpointProps, config: TelemetryConfig): AcrolinxInstrumentation {
+  public static getInstance(config: TelemetryConfig): AcrolinxInstrumentation {
     if (!AcrolinxInstrumentation.acrolinxInstrumentation) {
-      AcrolinxInstrumentation.acrolinxInstrumentation = new AcrolinxInstrumentation(endpointProps, config);
+      AcrolinxInstrumentation.acrolinxInstrumentation = new AcrolinxInstrumentation(config);
       return AcrolinxInstrumentation.acrolinxInstrumentation;
     }
     return AcrolinxInstrumentation.acrolinxInstrumentation;
@@ -55,10 +55,8 @@ export class AcrolinxInstrumentation {
 }
 
 export type TelemetryConfig = {
-  acrolinxUrl: string;
+  endpointProps: AcrolinxEndpointProps
   accessToken: AccessToken;
-  serviceName: string;
-  serviceVersion: string;
 };
 
 export type Instruments = {

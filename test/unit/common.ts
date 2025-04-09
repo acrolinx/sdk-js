@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import { IntegrationType, BrowserNames, BrowserEngine, OperatingSystemFamily } from 'src/telemetry/interfaces/integration';
 import { AcrolinxEndpointProps, DEVELOPMENT_SIGNATURE } from '../../src';
 
 export const DUMMY_SERVER_URL = 'http://dummy-server';
@@ -22,6 +23,26 @@ export const DUMMY_ENDPOINT_PROPS: AcrolinxEndpointProps = {
   client: {
     signature: DEVELOPMENT_SIGNATURE,
     version: '1.2.3.666',
+    integrationDetails: {
+      name: 'dev',
+      version: 'foo',
+      type: IntegrationType.authoring,
+      system: {
+        browser: {
+          name: BrowserNames.chrome,
+          engine: BrowserEngine.blink,
+          version: 'foo',
+        },
+        sidebar: {
+          version: 'foo',
+        },
+        operatingSystem: {
+          family: OperatingSystemFamily.linux,
+          name: 'ubuntu',
+          version: 'foo',
+        },
+      },
+    },
   },
   acrolinxUrl: DUMMY_SERVER_URL,
 };

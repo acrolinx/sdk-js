@@ -7,7 +7,7 @@ import { TelemetryConfig } from '../acrolinxInstrumentation';
 
 export const setupMetrics = (config: TelemetryConfig) => {
   const collectorOptions = {
-    url: `${config.acrolinxUrl}/otlp/metrics`,
+    url: `${config.endpointProps.acrolinxUrl}/otlp/metrics`,
     headers: {
       Authorization: `Bearer ${config.accessToken}`,
     },
@@ -15,8 +15,8 @@ export const setupMetrics = (config: TelemetryConfig) => {
   const metricExporter = new OTLPMetricExporter(collectorOptions);
 
   const resource = resourceFromAttributes({
-    [ATTR_SERVICE_NAME]: config.serviceName,
-    [ATTR_SERVICE_VERSION]: config.serviceVersion,
+    [ATTR_SERVICE_NAME]: config.endpointProps.client.integrationDetails.name,
+    [ATTR_SERVICE_VERSION]: config.endpointProps.client.integrationDetails.version,
   });
 
   const meterProvider = new MeterProvider({

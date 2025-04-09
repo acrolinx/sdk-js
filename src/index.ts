@@ -50,7 +50,6 @@ import {
   ApiResponse,
   AsyncApiResponse,
   AsyncStartedProcess,
-  IntegrationDetails,
   isProgressResponse,
   Progress,
   ServiceType,
@@ -86,6 +85,7 @@ import {
   SigninSuccessResult,
 } from './signin';
 import { AcrolinxInstrumentation, Instruments } from './telemetry/acrolinxInstrumentation';
+import { IntegrationDetails } from './telemetry/interfaces/integration';
 
 import { User } from './user';
 import {
@@ -184,7 +184,7 @@ export interface ClientInformation {
   /**
    * The details of the integration
    */
-  integrationDetails?: IntegrationDetails;
+  integrationDetails: IntegrationDetails;
   signature: string;
   /**
    * The version of the client.
@@ -228,11 +228,9 @@ export class AcrolinxEndpoint {
 
   public async getTelemetryInstruments(accessToken: AccessToken): Promise<Instruments | undefined> {
     try {
-      const acrolinxInstrumentation = AcrolinxInstrumentation.getInstance(this.props, {
+      const acrolinxInstrumentation = AcrolinxInstrumentation.getInstance({
+        endpointProps: this.props,
         accessToken: accessToken,
-        acrolinxUrl: this.props.acrolinxUrl,
-        serviceName: this.props.client.integrationDetails?.name ?? 'sdk-js',
-        serviceVersion: this.props.client.version,
       });
       return await acrolinxInstrumentation.getInstruments();
     } catch (e) {
