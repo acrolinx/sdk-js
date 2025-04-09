@@ -39,21 +39,23 @@ export const createDefaultMeters = (integrationDetails: IntegrationDetails, mete
   const integrationType = integrationDetails.type;
   const integrationName = integrationDetails.name;
 
+  const prefix = `${metricPrefix}.${integrationType}.${integrationName}`;
+
   return {
     checkRequestCounter: defaultMeter.createCounter(
-      `${metricPrefix}.${integrationType}.${integrationName}.${checkRequestMetric}.counter`,
+      `${prefix}.${checkRequestMetric}.counter`,
     ),
     checkRequestPollingTime: defaultMeter.createHistogram(
-      `${metricPrefix}.${integrationType}.${integrationName}.${checkRequestMetric}.polling-time`,
+      `${prefix}.${checkRequestMetric}.polling-time`,
     ),
     checkRequestSubmitTime: defaultMeter.createHistogram(
-      `${metricPrefix}.${integrationType}.${integrationName}.${checkRequestMetric}.submit-time`,
+      `${prefix}.${checkRequestMetric}.submit-time`,
     ),
     suggestionCounter: defaultMeter.createCounter(
-      `${metricPrefix}.${integrationType}.${integrationName}.${suggestionMetric}.counter`,
+      `${prefix}.${suggestionMetric}.counter`,
     ),
     suggestionResponseTime: defaultMeter.createHistogram(
-      `${metricPrefix}.${integrationType}.${integrationName}.${suggestionMetric}.response-time`,
+      `${prefix}.${suggestionMetric}.response-time`,
     ),
   };
 };
