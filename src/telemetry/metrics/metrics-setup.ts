@@ -4,6 +4,8 @@ import { ATTR_SERVICE_NAME, ATTR_SERVICE_VERSION } from '@opentelemetry/semantic
 import { resourceFromAttributes } from '@opentelemetry/resources';
 import { Counter } from '@opentelemetry/api';
 import { TelemetryConfig } from '../acrolinxInstrumentation';
+import { IntegrationDetails } from '../interfaces/integration';
+import { checkRequestMetric, metricPrefix, suggestionMetric } from './metric-constants';
 
 export const setupMetrics = (config: TelemetryConfig) => {
   const collectorOptions = {
@@ -32,14 +34,24 @@ export const setupMetrics = (config: TelemetryConfig) => {
   return meterProvider;
 };
 
-export const createDefaultCounters = (meterProvider: MeterProvider): Counters => {
-  const defaultMeter = meterProvider.getMeter('integrations');
-
+export const createDefaultMeters = (
+  integrationDetails: IntegrationDetails,
+  meterProvider: MeterProvider,
+): Meters => {
+  const defaultMeter = meterProvider.getMeter(metricPrefix);
+  const integrationType = integrationDetails.type;
+  const integrationName = integrationDetails.name;
   return {
-    check: defaultMeter.createCounter('check-requested'),
+    checkRequestCounter: defaultMeter.createCounter(
+      `${metricPrefix}.${integrationType}.${integrationName}.${checkRequestMetric}.counter`,
+    ),
+    suggestionCounter: defaultMeter.createCounter(
+      `${metricPrefix}.${integrationType}.${integrationName}.${suggestionMetric}.counter`,
+    ),
   };
 };
 
-export type Counters = {
-  check: Counter;
+export type Meters = {
+  checkRequestCounter: Counter;
+  suggestionCounter: Counter;
 };

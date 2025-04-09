@@ -84,7 +84,7 @@ import {
   SigninSuccessData,
   SigninSuccessResult,
 } from './signin';
-import { AcrolinxInstrumentation, Instruments } from './telemetry/acrolinxInstrumentation';
+import { AcrolinxInstrumentation, getTelemetryInstruments, Instruments } from './telemetry/acrolinxInstrumentation';
 import { IntegrationDetails } from './telemetry/interfaces/integration';
 import { getCommonMetricAttributes } from './telemetry/metrics/attribute-utils';
 
@@ -324,8 +324,8 @@ export class AcrolinxEndpoint {
   }
 
   public async check(accessToken: AccessToken, req: CheckRequest): Promise<CheckResponse> {
-    const instruments = await this.getTelemetryInstruments(accessToken);
-    instruments?.metrics.defaultCounters.check.add(1 , {
+    const instruments = await getTelemetryInstruments(this.props, accessToken);
+    instruments?.metrics.defaultCounters.checkRequestCounter.add(1 , {
       ...getCommonMetricAttributes(this.props.client.integrationDetails),
     });
     return post<CheckResponse>('/api/v1/checking/checks', req, {}, this.props, accessToken);

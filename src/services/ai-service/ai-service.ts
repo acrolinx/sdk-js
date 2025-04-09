@@ -17,6 +17,8 @@
 import { getJsonFromPath, postJsonToPath } from '../../utils/fetch';
 import { AcrolinxEndpointProps, ServiceType } from '../../index';
 import { AiFeatures, ChatCompletionRequest, IsAIEnabledInformation, WriteResponse } from './ai-service.types';
+import { getTelemetryInstruments } from '../../telemetry/acrolinxInstrumentation';
+import { getCommonMetricAttributes } from '../../telemetry/metrics/attribute-utils';
 
 /**
  * Available in Acrolinx One
@@ -57,9 +59,14 @@ export class AIService {
     }
   }
 
-  public getAIChatCompletion(params: ChatCompletionRequest, accessToken: string): Promise<WriteResponse> {
+  public async getAIChatCompletion(params: ChatCompletionRequest, accessToken: string): Promise<WriteResponse> {
     const { aiRephraseHint: prompt, internalName } = params.issue;
     const { targetUuid, count, previousVersion } = params;
+
+    const instruments = await getTelemetryInstruments(this.endpointProps, accessToken);
+        instruments?.metrics.defaultCounters.suggestionCounter.add(1 , {
+          ...getCommonMetricAttributes(this.endpointProps.client.integrationDetails),
+        });
 
     return postJsonToPath<WriteResponse>(
       this.constructFullPath('/ai/chat-completions'),
@@ -75,7 +82,6 @@ export class AIService {
       { serviceType: ServiceType.ACROLINX_ONE },
     );
   }
-
   private constructFullPath(path: string): string {
     return this.aiServiceBasePath + path;
   }

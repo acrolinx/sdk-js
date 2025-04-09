@@ -1,5 +1,5 @@
 import { setupLogging } from './logs/logs-setup';
-import { Counters, createDefaultCounters, setupMetrics } from './metrics/metrics-setup';
+import { Meters, createDefaultMeters, setupMetrics } from './metrics/metrics-setup';
 import { MeterProvider } from '@opentelemetry/sdk-metrics';
 import { Logger } from '@opentelemetry/api-logs';
 import { AccessToken } from '../common-types';
@@ -29,7 +29,7 @@ export class AcrolinxInstrumentation {
       return undefined;
     }
     const meterProvider = setupMetrics(this.config);
-    const defaultCounters = createDefaultCounters(meterProvider);
+    const defaultCounters = createDefaultMeters(this.config.endpointProps.client.integrationDetails, meterProvider);
     const logger = setupLogging(this.config);
 
     return {
@@ -54,6 +54,19 @@ export class AcrolinxInstrumentation {
   }
 }
 
+export const getTelemetryInstruments = async (endpointProps: AcrolinxEndpointProps, accessToken: AccessToken): Promise<Instruments | undefined> => {
+  try {
+    const acrolinxInstrumentation = AcrolinxInstrumentation.getInstance({
+      endpointProps,
+      accessToken: accessToken,
+    });
+    return await acrolinxInstrumentation.getInstruments();
+  } catch (e) {
+    console.log(e);
+    return undefined;
+  }
+};
+
 export type TelemetryConfig = {
   endpointProps: AcrolinxEndpointProps;
   accessToken: AccessToken;
@@ -66,7 +79,7 @@ export type Instruments = {
 
 export type MetricInstrumentation = {
   meterProvider: MeterProvider;
-  defaultCounters: Counters;
+  defaultCounters: Meters;
 };
 
 export type LoggingInstrumentation = {
