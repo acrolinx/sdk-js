@@ -4,7 +4,7 @@
 
 ### Patch Changes
 
-- NONE chore: remove browser engine details
+- DEV-42366 chore remove browser engine
 
 ## 2.0.0-beta.6
 
