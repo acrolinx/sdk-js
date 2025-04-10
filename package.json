@@ -71,6 +71,6 @@
     "@opentelemetry/instrumentation-fetch": "^0.200.0",
     "@opentelemetry/instrumentation-user-interaction": "^0.45.0",
     "@opentelemetry/resources": "^2.0.0",
-    "@opentelemetry/semantic-conventions": "^1.30.0"
+    "@opentelemetry/semantic-conventions": "^1.31.0"
   }
 }
