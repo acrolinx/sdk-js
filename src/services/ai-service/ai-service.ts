@@ -74,7 +74,6 @@ export class AIService {
       accessToken,
       { serviceType: ServiceType.ACROLINX_ONE },
     );
-
   }
   private constructFullPath(path: string): string {
     return this.aiServiceBasePath + path;

@@ -1,5 +1,11 @@
 # @acrolinx/sdk
 
+## 2.0.0-beta.8
+
+### Patch Changes
+
+- NONE chore: remove metric counters
+
 ## 2.0.0-beta.7
 
 ### Patch Changes
