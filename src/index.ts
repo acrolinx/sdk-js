@@ -84,9 +84,7 @@ import {
   SigninSuccessData,
   SigninSuccessResult,
 } from './signin';
-import { getTelemetryInstruments } from './telemetry/acrolinxInstrumentation';
 import { IntegrationDetails } from './telemetry/interfaces/integration';
-import { getCommonMetricAttributes } from './telemetry/metrics/attribute-utils';
 
 import { User } from './user';
 import {
@@ -311,20 +309,7 @@ export class AcrolinxEndpoint {
   }
 
   public async check(accessToken: AccessToken, req: CheckRequest): Promise<CheckResponse> {
-    const instruments = await getTelemetryInstruments(this.props, accessToken);
-    instruments?.metrics.meters.checkRequestCounter.add(1, {
-      ...getCommonMetricAttributes(this.props.client.integrationDetails),
-    });
-
-    const t0 = performance.now();
-    const response = await post<CheckResponse>('/api/v1/checking/checks', req, {}, this.props, accessToken);
-    const t1 = performance.now();
-
-    instruments?.metrics.meters.suggestionResponseTime.record(t1 - t0, {
-      ...getCommonMetricAttributes(this.props.client.integrationDetails),
-    });
-
-    return response;
+    return await post<CheckResponse>('/api/v1/checking/checks', req, {}, this.props, accessToken);
   }
 
   public async getLiveSuggestions(accessToken: AccessToken, req: LiveSearchRequest): Promise<LiveSearchResponse> {
