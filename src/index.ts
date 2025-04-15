@@ -351,16 +351,11 @@ export class AcrolinxEndpoint {
 
     const recordTelemetry = async (error?: Error) => {
       const t1 = performance.now();
-      try {
-        const instruments = await getTelemetryInstruments(this.props, accessToken);
-        const attributes = {
-          ...getCommonMetricAttributes(this.props.client.integrationDetails),
-          ...(error && { 'response-status': error instanceof AcrolinxError ? error.status : 'unknown' }),
-        };
-        instruments?.metrics.meters.checkRequestPollingTime.record(t1 - t0, attributes);
-      } catch (e) {
-        console.log('Telemetry not initialized', e);
-      }
+      const instruments = await getTelemetryInstruments(this.props, accessToken);
+      instruments?.metrics.meters.checkRequestPollingTime.record(t1 - t0, {
+        ...getCommonMetricAttributes(this.props.client.integrationDetails),
+        ...(error && { 'response-status': error instanceof AcrolinxError ? error.status : 'unknown' }),
+      });
     };
 
     checkResultWrapper.promise
