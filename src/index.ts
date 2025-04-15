@@ -348,37 +348,31 @@ export class AcrolinxEndpoint {
       this.check(accessToken, req),
       opts,
     );
-    checkResultWrapper.promise
-      .then((result: CheckResult) => {
-        const t1 = performance.now();
-        getTelemetryInstruments(this.props, accessToken)
-          .then((instruments) => {
-            instruments?.metrics.meters.checkRequestPollingTime.record(t1 - t0, {
-              ...getCommonMetricAttributes(this.props.client.integrationDetails),
-            });
-          })
-          .catch((e: unknown) => {
-            console.log('Telemetry not initialized', e);
-          });
 
+    const recordTelemetry = async (error?: Error) => {
+      const t1 = performance.now();
+      try {
+        const instruments = await getTelemetryInstruments(this.props, accessToken);
+        const attributes = {
+          ...getCommonMetricAttributes(this.props.client.integrationDetails),
+          ...(error && { 'response-status': error instanceof AcrolinxError ? error.status : 'unknown' }),
+        };
+        instruments?.metrics.meters.checkRequestPollingTime.record(t1 - t0, attributes);
+      } catch (e) {
+        console.log('Telemetry not initialized', e);
+      }
+    };
+
+    checkResultWrapper.promise
+      .then(async (result) => {
+        await recordTelemetry();
         return result;
       })
-      .catch((error) => {
-        const t1 = performance.now();
-        const errorStatus = error instanceof AcrolinxError ? error.status : 'unknown';
-        getTelemetryInstruments(this.props, accessToken)
-          .then((instruments) => {
-            instruments?.metrics.meters.checkRequestPollingTime.record(t1 - t0, {
-              ...getCommonMetricAttributes(this.props.client.integrationDetails),
-              'response-status': errorStatus,
-            });
-          })
-          .catch((e: unknown) => {
-            console.log('Telemetry not initialized', e);
-          });
-
+      .catch(async (error) => {
+        await recordTelemetry(error);
         throw error;
       });
+
     return checkResultWrapper;
   }
 
