@@ -368,9 +368,14 @@ export class AcrolinxEndpoint {
         await recordTelemetry();
         return result;
       })
-      .catch(async (error) => {
-        await recordTelemetry(error);
-        throw error;
+      .catch((error) => {
+        console.error('Caught an error:', error);
+        if (error instanceof Error) {
+          return Promise.reject(error);
+        } else {
+          console.error('Original rejection reason was not an Error:', error);
+          return Promise.reject(new Error('Non-Error rejection'));
+        }
       });
 
     return checkResultWrapper;
