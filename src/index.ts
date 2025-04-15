@@ -367,8 +367,6 @@ export class AcrolinxEndpoint {
           ...getCommonMetricAttributes(this.props.client.integrationDetails),
           'response-status': errorStatus,
         });
-
-        throw error;
       });
     return checkResultWrapper;
   }
