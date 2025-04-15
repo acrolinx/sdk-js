@@ -1,5 +1,11 @@
 # @acrolinx/sdk
 
+## 2.0.0-beta.8
+
+### Patch Changes
+
+- DEV-42366 chore: add polling metric
+
 ## 2.0.0-beta.7
 
 ### Patch Changes

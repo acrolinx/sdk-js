@@ -342,7 +342,35 @@ export class AcrolinxEndpoint {
     req: CheckRequest,
     opts: CheckAndGetResultOptions = {},
   ): CancelablePromiseWrapper<CheckResult> {
-    return this.startCancelablePollLoop(accessToken, this.check(accessToken, req), opts);
+    const t0 = performance.now();
+    const checkResultWrapper = this.startCancelablePollLoop<CheckResult>(
+      accessToken,
+      this.check(accessToken, req),
+      opts,
+    );
+    checkResultWrapper.promise
+      .then(async (result: CheckResult) => {
+        const t1 = performance.now();
+        const instruments = await getTelemetryInstruments(this.props, accessToken);
+        instruments?.metrics.meters.checkRequestPollingTime.record(t1 - t0, {
+          ...getCommonMetricAttributes(this.props.client.integrationDetails),
+        });
+        return result;
+      })
+      .catch(async (error) => {
+        const t1 = performance.now();
+        const instruments = await getTelemetryInstruments(this.props, accessToken);
+
+        const errorStatus = error instanceof AcrolinxError ? error.status : 'unknown';
+
+        instruments?.metrics.meters.checkRequestPollingTime.record(t1 - t0, {
+          ...getCommonMetricAttributes(this.props.client.integrationDetails),
+          'response-status': errorStatus,
+        });
+
+        throw error;
+      });
+    return checkResultWrapper;
   }
 
   public analyzeAndPoll(
