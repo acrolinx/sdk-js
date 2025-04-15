@@ -349,24 +349,35 @@ export class AcrolinxEndpoint {
       opts,
     );
     checkResultWrapper.promise
-      .then(async (result: CheckResult) => {
+      .then((result: CheckResult) => {
         const t1 = performance.now();
-        const instruments = await getTelemetryInstruments(this.props, accessToken);
-        instruments?.metrics.meters.checkRequestPollingTime.record(t1 - t0, {
-          ...getCommonMetricAttributes(this.props.client.integrationDetails),
-        });
+        getTelemetryInstruments(this.props, accessToken)
+          .then((instruments) => {
+            instruments?.metrics.meters.checkRequestPollingTime.record(t1 - t0, {
+              ...getCommonMetricAttributes(this.props.client.integrationDetails),
+            });
+          })
+          .catch((e: unknown) => {
+            console.log('Telemetry not initialized', e);
+          });
+
         return result;
       })
-      .catch(async (error) => {
+      .catch((error) => {
         const t1 = performance.now();
-        const instruments = await getTelemetryInstruments(this.props, accessToken);
-
         const errorStatus = error instanceof AcrolinxError ? error.status : 'unknown';
+        getTelemetryInstruments(this.props, accessToken)
+          .then((instruments) => {
+            instruments?.metrics.meters.checkRequestPollingTime.record(t1 - t0, {
+              ...getCommonMetricAttributes(this.props.client.integrationDetails),
+              'response-status': errorStatus,
+            });
+          })
+          .catch((e: unknown) => {
+            console.log('Telemetry not initialized', e);
+          });
 
-        instruments?.metrics.meters.checkRequestPollingTime.record(t1 - t0, {
-          ...getCommonMetricAttributes(this.props.client.integrationDetails),
-          'response-status': errorStatus,
-        });
+        throw error;
       });
     return checkResultWrapper;
   }
