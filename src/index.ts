@@ -510,7 +510,7 @@ export class AcrolinxEndpoint {
     let canceledByClient = false;
     let requestedCanceledOnServer = false;
     let runningCheck: AsyncStartedProcess | undefined;
-    const t0 = performance.now();
+    let t0: number;
 
     let cancelPromiseReject: (e: Error) => void;
     const cancelPromise = new Promise<never>((_resolve, reject) => {
@@ -539,21 +539,8 @@ export class AcrolinxEndpoint {
       }
     };
 
-    const recordTelemetry = async (error?: Error) => {
-      const t1 = performance.now();
-      try {
-        const instruments = await getTelemetryInstruments(this.props, accessToken);
-        const attributes = {
-          ...getCommonMetricAttributes(this.props.client.integrationDetails),
-          ...(error && { 'response-status': error instanceof AcrolinxError ? error.status : 'unknown' }),
-        };
-        instruments?.metrics.meters.checkRequestPollingTime.record(t1 - t0, attributes);
-      } catch (e) {
-        console.log('Telemetry not initialized', e);
-      }
-    };
-
     const poll = async (): Promise<Result> => {
+      t0 = performance.now();
       runningCheck = await asyncStartedProcessPromise;
       await handlePotentialCancellation();
 
@@ -575,7 +562,21 @@ export class AcrolinxEndpoint {
       return checkResultOrProgress.data;
     };
 
-    const pollPromise = poll()
+    const recordTelemetry = async (error?: Error) => {
+      const t1 = performance.now();
+      try {
+        const instruments = await getTelemetryInstruments(this.props, accessToken);
+        const attributes = {
+          ...getCommonMetricAttributes(this.props.client.integrationDetails),
+          ...(error && { 'response-status': error instanceof AcrolinxError ? error.status : 'unknown' }),
+        };
+        instruments?.metrics.meters.checkRequestPollingTime.record(t1 - t0, attributes);
+      } catch (e) {
+        console.log('Telemetry not initialized', e);
+      }
+    };
+
+    const pollWithTelemetry = poll()
       .then(async (result) => {
         await recordTelemetry();
         return result;
@@ -586,7 +587,7 @@ export class AcrolinxEndpoint {
       });
 
     return {
-      promise: Promise.race([pollPromise, cancelPromise]),
+      promise: Promise.race([pollWithTelemetry, cancelPromise]),
       getId(): string | undefined {
         return runningCheck?.data.id;
       },
