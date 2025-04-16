@@ -6,7 +6,7 @@ import { Counter, Histogram } from '@opentelemetry/api';
 import { TelemetryConfig } from '../acrolinxInstrumentation';
 import { IntegrationDetails } from '../interfaces/integration';
 import { checkRequestMetric, EXPORT_INTERVAL_MS, metricPrefix, suggestionMetric } from './metric-constants';
-import { name, version} from '../../../package.json';
+import { name, version } from '../../../package.json';
 
 export const setupMetrics = (config: TelemetryConfig): MeterProvider => {
   const collectorOptions = {
@@ -35,7 +35,7 @@ export const setupMetrics = (config: TelemetryConfig): MeterProvider => {
 };
 
 export const createDefaultMeters = (integrationDetails: IntegrationDetails, meterProvider: MeterProvider): Meters => {
-  const { type: integrationType} = integrationDetails;
+  const { type: integrationType } = integrationDetails;
   const defaultMeter = meterProvider.getMeter(name, version);
 
   const prefix = `${metricPrefix}.${integrationType}`;
