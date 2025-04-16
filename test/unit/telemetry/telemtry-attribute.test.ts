@@ -24,6 +24,7 @@ describe('getCommonMetricAttributes', () => {
     expect(attributes).to.deep.equal({
       'sidebar-version': '2.0.0',
       'browser-name': BrowserNames.chrome,
+      'integration-name': 'test-integration',
     });
   });
 
@@ -45,6 +46,7 @@ describe('getCommonMetricAttributes', () => {
     expect(attributes).to.deep.equal({
       'sidebar-version': 'unknown',
       'browser-name': BrowserNames.chrome,
+      'integration-name': 'test-integration',
     });
   });
 
@@ -65,6 +67,7 @@ describe('getCommonMetricAttributes', () => {
     expect(attributes).to.deep.equal({
       'sidebar-version': '2.0.0',
       'browser-name': BrowserNames.other,
+      'integration-name': 'test-integration',
     });
   });
 
@@ -97,6 +100,7 @@ describe('getCommonMetricAttributes', () => {
       expect(attributes).to.deep.equal({
         'sidebar-version': '2.0.0',
         'browser-name': name,
+        'integration-name': 'test-integration',
       });
     });
   });
@@ -114,6 +118,7 @@ describe('getCommonMetricAttributes', () => {
     expect(attributes).to.deep.equal({
       'sidebar-version': 'unknown',
       'browser-name': BrowserNames.other,
+      'integration-name': 'test-integration',
     });
   });
 });

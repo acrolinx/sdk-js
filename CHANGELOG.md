@@ -1,5 +1,11 @@
 # @acrolinx/sdk
 
+## 2.0.0-beta.9
+
+### Patch Changes
+
+- DEV-42367 chore: update metric attributes
+
 ## 2.0.0-beta.8
 
 ### Patch Changes
