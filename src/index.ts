@@ -320,7 +320,7 @@ export class AcrolinxEndpoint {
     const response = await post<CheckResponse>('/api/v1/checking/checks', req, {}, this.props, accessToken);
     const t1 = performance.now();
 
-    instruments?.metrics.meters.suggestionResponseTime.record(t1 - t0, {
+    instruments?.metrics.meters.checkRequestSubmitTime.record(t1 - t0, {
       ...getCommonMetricAttributes(this.props.client.integrationDetails),
     });
 
