@@ -2,11 +2,13 @@ import { OTLPMetricExporter } from '@opentelemetry/exporter-metrics-otlp-http';
 import { MeterProvider, PeriodicExportingMetricReader } from '@opentelemetry/sdk-metrics';
 import { ATTR_SERVICE_NAME, ATTR_SERVICE_VERSION } from '@opentelemetry/semantic-conventions';
 import { resourceFromAttributes } from '@opentelemetry/resources';
-import { Counter, Histogram } from '@opentelemetry/api';
+import { Counter, Histogram, ValueType } from '@opentelemetry/api';
 import { TelemetryConfig } from '../acrolinxInstrumentation';
 import { IntegrationDetails } from '../interfaces/integration';
 import {
   checkRequestMetric,
+  counterUnit,
+  durationUnit,
   EXPORT_INTERVAL_MS,
   meterName,
   meterVersion,
@@ -53,11 +55,26 @@ export const createDefaultMeters = (integrationDetails: IntegrationDetails, mete
   const suggestionResponseTimeName = `${prefix}.${suggestionMetric}.response-time`;
 
   return {
-    checkRequestCounter: defaultMeter.createCounter(checkRequestCounterName),
-    checkRequestPollingTime: defaultMeter.createHistogram(checkRequestPollingTimeName),
-    checkRequestSubmitTime: defaultMeter.createHistogram(checkRequestSubmitTimeName),
-    suggestionCounter: defaultMeter.createCounter(suggestionCounterName),
-    suggestionResponseTime: defaultMeter.createHistogram(suggestionResponseTimeName),
+    checkRequestCounter: defaultMeter.createCounter(checkRequestCounterName, {
+      unit: counterUnit,
+      valueType: ValueType.INT,
+    }),
+    checkRequestPollingTime: defaultMeter.createHistogram(checkRequestPollingTimeName, {
+      unit: durationUnit,
+      valueType: ValueType.DOUBLE,
+    }),
+    checkRequestSubmitTime: defaultMeter.createHistogram(checkRequestSubmitTimeName, {
+      unit: durationUnit,
+      valueType: ValueType.DOUBLE,
+    }),
+    suggestionCounter: defaultMeter.createCounter(suggestionCounterName, {
+      unit: counterUnit,
+      valueType: ValueType.INT,
+    }),
+    suggestionResponseTime: defaultMeter.createHistogram(suggestionResponseTimeName, {
+      unit: counterUnit,
+      valueType: ValueType.DOUBLE,
+    }),
   };
 };
 
