@@ -55,7 +55,7 @@
     "fetch-mock": "^11.1.5",
     "lodash": "^4.17.21",
     "markdown-doctest": "^1.1.0",
-    "mentoss": "^0.10.0",
+    "mentoss": "^0.11.0",
     "prettier": "^3.5.3",
     "typedoc": "^0.28.3",
     "typescript": "^5.8.3",
