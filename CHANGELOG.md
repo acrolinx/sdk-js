@@ -1,5 +1,11 @@
 # @acrolinx/sdk
 
+## 2.0.0-beta.11
+
+### Patch Changes
+
+- DEV-42366 chore: add error handling for metric initialization
+
 ## 2.0.0-beta.10
 
 ### Patch Changes
