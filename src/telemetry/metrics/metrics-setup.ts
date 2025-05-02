@@ -42,10 +42,6 @@ export const setupMetrics = (config: TelemetryConfig): MeterProvider => {
       resource,
     });
 
-    metricExporter.shutdown().catch((error) => {
-      console.error('Failed to shutdown metric exporter:', error);
-    });
-
     return meterProvider;
   } catch (error) {
     console.error('Failed to setup metrics:', error);
