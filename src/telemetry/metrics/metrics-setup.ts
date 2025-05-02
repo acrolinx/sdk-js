@@ -24,22 +24,34 @@ export const setupMetrics = (config: TelemetryConfig): MeterProvider => {
     },
   };
 
-  const metricExporter = new OTLPMetricExporter(collectorOptions);
+  try {
+    const metricExporter = new OTLPMetricExporter(collectorOptions);
 
-  const resource = resourceFromAttributes({
-    [ATTR_SERVICE_NAME]: config.endpointProps.client.integrationDetails.name,
-    [ATTR_SERVICE_VERSION]: config.endpointProps.client.integrationDetails.version,
-  });
+    const resource = resourceFromAttributes({
+      [ATTR_SERVICE_NAME]: config.endpointProps.client.integrationDetails.name,
+      [ATTR_SERVICE_VERSION]: config.endpointProps.client.integrationDetails.version,
+    });
 
-  return new MeterProvider({
-    readers: [
-      new PeriodicExportingMetricReader({
-        exporter: metricExporter,
-        exportIntervalMillis: EXPORT_INTERVAL_MS,
-      }),
-    ],
-    resource,
-  });
+    const meterProvider = new MeterProvider({
+      readers: [
+        new PeriodicExportingMetricReader({
+          exporter: metricExporter,
+          exportIntervalMillis: EXPORT_INTERVAL_MS,
+        }),
+      ],
+      resource,
+    });
+
+    // Add error handler for the exporter
+    metricExporter.shutdown().catch((error) => {
+      console.error('Failed to shutdown metric exporter:', error);
+    });
+
+    return meterProvider;
+  } catch (error) {
+    console.error('Failed to setup metrics:', error);
+    throw new Error(`Metrics setup failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+  }
 };
 
 export const createDefaultMeters = (integrationDetails: IntegrationDetails, meterProvider: MeterProvider): Meters => {
@@ -58,22 +70,27 @@ export const createDefaultMeters = (integrationDetails: IntegrationDetails, mete
     checkRequestCounter: defaultMeter.createCounter(checkRequestCounterName, {
       unit: counterUnit,
       valueType: ValueType.INT,
+      description: 'Counts the number of check requests made to the Acrolinx platform',
     }),
     checkRequestPollingTime: defaultMeter.createHistogram(checkRequestPollingTimeName, {
       unit: durationUnit,
       valueType: ValueType.DOUBLE,
+      description: 'Measures the time taken to poll for check results from the Acrolinx platform',
     }),
     checkRequestSubmitTime: defaultMeter.createHistogram(checkRequestSubmitTimeName, {
       unit: durationUnit,
       valueType: ValueType.DOUBLE,
+      description: 'Measures the time taken to submit a check request to the Acrolinx platform',
     }),
     suggestionCounter: defaultMeter.createCounter(suggestionCounterName, {
       unit: counterUnit,
       valueType: ValueType.INT,
+      description: 'Counts the number of suggestions requested from the Acrolinx platform',
     }),
     suggestionResponseTime: defaultMeter.createHistogram(suggestionResponseTimeName, {
       unit: counterUnit,
       valueType: ValueType.DOUBLE,
+      description: 'Measures the time taken to receive suggestions from the Acrolinx platform',
     }),
   };
 };
