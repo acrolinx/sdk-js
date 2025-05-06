@@ -1,5 +1,11 @@
 # @acrolinx/sdk
 
+## 2.0.0-beta.12
+
+### Patch Changes
+
+- DEV-42366 chore: fallback to console exporter if OTEL collector is not present
+
 ## 2.0.0-beta.11
 
 ### Patch Changes
