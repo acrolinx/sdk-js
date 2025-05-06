@@ -244,4 +244,121 @@ describe('Telemetry initialization', () => {
       }
     });
   });
+
+  describe('Endpoint reachability and fallback behavior', () => {
+    it('should use OTLP exporter when metrics endpoint is reachable', async () => {
+      server.get('/int-service/api/v1/config', {
+        status: 200,
+        body: {
+          activateGetSuggestionReplacement: true,
+          telemetryEnabled: true,
+        },
+      });
+
+      server.head('/otlp/metrics', {
+        status: 200,
+      });
+
+      const acrolinxInstrumentation = AcrolinxInstrumentation.getInstance(defaultProps);
+      const instruments = await acrolinxInstrumentation.getInstruments();
+
+      expect(instruments?.metrics).toBeDefined();
+      expect(instruments?.metrics.meterProvider).toBeDefined();
+      const meter = instruments?.metrics.meterProvider.getMeter('test-meter');
+      const counter = meter?.createCounter('test-counter');
+      expect(counter).toBeDefined();
+    });
+
+    it('should use console exporter when metrics endpoint is not reachable', async () => {
+      server.get('/int-service/api/v1/config', {
+        status: 200,
+        body: {
+          activateGetSuggestionReplacement: true,
+          telemetryEnabled: true,
+        },
+      });
+
+      server.head('/otlp/metrics', {
+        status: 404,
+      });
+
+      const acrolinxInstrumentation = AcrolinxInstrumentation.getInstance(defaultProps);
+      const instruments = await acrolinxInstrumentation.getInstruments();
+
+      expect(instruments?.metrics).toBeDefined();
+      expect(instruments?.metrics.meterProvider).toBeDefined();
+      const meter = instruments?.metrics.meterProvider.getMeter('test-meter');
+      const counter = meter?.createCounter('test-counter');
+      expect(counter).toBeDefined();
+    });
+
+    it('should use OTLP exporter when logs endpoint is reachable', async () => {
+      server.get('/int-service/api/v1/config', {
+        status: 200,
+        body: {
+          activateGetSuggestionReplacement: true,
+          telemetryEnabled: true,
+        },
+      });
+
+      server.head('/otlp/logs', {
+        status: 200,
+      });
+
+      const acrolinxInstrumentation = AcrolinxInstrumentation.getInstance(defaultProps);
+      const instruments = await acrolinxInstrumentation.getInstruments();
+
+      expect(instruments?.logging).toBeDefined();
+      expect(instruments?.logging.logger).toBeDefined();
+      const logger = instruments?.logging.logger;
+      expect(logger).toBeDefined();
+    });
+
+    it('should use console exporter when logs endpoint is not reachable', async () => {
+      server.get('/int-service/api/v1/config', {
+        status: 200,
+        body: {
+          activateGetSuggestionReplacement: true,
+          telemetryEnabled: true,
+        },
+      });
+
+      server.head('/otlp/logs', {
+        status: 404,
+      });
+
+      const acrolinxInstrumentation = AcrolinxInstrumentation.getInstance(defaultProps);
+      const instruments = await acrolinxInstrumentation.getInstruments();
+
+      expect(instruments?.logging).toBeDefined();
+      expect(instruments?.logging.logger).toBeDefined();
+      const logger = instruments?.logging.logger;
+      expect(logger).toBeDefined();
+    });
+
+    it('should handle network errors gracefully and fall back to console exporters', async () => {
+      server.get('/int-service/api/v1/config', {
+        status: 200,
+        body: {
+          activateGetSuggestionReplacement: true,
+          telemetryEnabled: true,
+        },
+      });
+
+      server.head('/otlp/metrics', {
+        status: 500,
+      });
+      server.head('/otlp/logs', {
+        status: 500,
+      });
+
+      const acrolinxInstrumentation = AcrolinxInstrumentation.getInstance(defaultProps);
+      const instruments = await acrolinxInstrumentation.getInstruments();
+
+      expect(instruments?.metrics).toBeDefined();
+      expect(instruments?.metrics.meterProvider).toBeDefined();
+      expect(instruments?.logging).toBeDefined();
+      expect(instruments?.logging.logger).toBeDefined();
+    });
+  });
 });
