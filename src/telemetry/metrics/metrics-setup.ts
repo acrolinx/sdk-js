@@ -1,6 +1,5 @@
 import { OTLPMetricExporter } from '@opentelemetry/exporter-metrics-otlp-http';
-import { ConsoleMetricExporter } from '@opentelemetry/sdk-metrics';
-import { MeterProvider, PeriodicExportingMetricReader } from '@opentelemetry/sdk-metrics';
+import { MeterProvider, PeriodicExportingMetricReader, ConsoleMetricExporter } from '@opentelemetry/sdk-metrics';
 import { ATTR_SERVICE_NAME, ATTR_SERVICE_VERSION } from '@opentelemetry/semantic-conventions';
 import { resourceFromAttributes } from '@opentelemetry/resources';
 import { Counter, Histogram, ValueType } from '@opentelemetry/api';
