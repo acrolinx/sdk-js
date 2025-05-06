@@ -1,5 +1,5 @@
 import { AcrolinxEndpoint } from '../../../src/index';
-import { AcrolinxInstrumentation, TelemetryConfig } from '../../../src/telemetry/acrolinxInstrumentation';
+import { AcrolinxInstrumentation, TelemetryConfig, Instruments } from '../../../src/telemetry/acrolinxInstrumentation';
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
 import { FetchMocker, MockServer } from 'mentoss';
 import { BrowserNames, IntegrationType, OperatingSystemFamily } from '../../../src/telemetry/interfaces/integration';
@@ -246,7 +246,7 @@ describe('Telemetry initialization', () => {
   });
 
   describe('Endpoint reachability and fallback behavior', () => {
-    it('should use OTLP exporter when metrics endpoint is reachable', async () => {
+    const setupConfig = () => {
       server.get('/int-service/api/v1/config', {
         status: 200,
         body: {
@@ -254,111 +254,72 @@ describe('Telemetry initialization', () => {
           telemetryEnabled: true,
         },
       });
+    };
 
-      server.head('/otlp/metrics', {
-        status: 200,
-      });
+    const setupEndpointMock = (endpoint: string, status: number) => {
+      server.head(endpoint, { status });
+    };
 
-      const acrolinxInstrumentation = AcrolinxInstrumentation.getInstance(defaultProps);
-      const instruments = await acrolinxInstrumentation.getInstruments();
-
+    const verifyMetricsWorking = async (instruments: Instruments | undefined) => {
       expect(instruments?.metrics).toBeDefined();
       expect(instruments?.metrics.meterProvider).toBeDefined();
       const meter = instruments?.metrics.meterProvider.getMeter('test-meter');
       const counter = meter?.createCounter('test-counter');
       expect(counter).toBeDefined();
+    };
+
+    const verifyLoggingWorking = async (instruments: Instruments | undefined) => {
+      expect(instruments?.logging).toBeDefined();
+      expect(instruments?.logging.logger).toBeDefined();
+      const logger = instruments?.logging.logger;
+      expect(logger).toBeDefined();
+    };
+
+    it('should use OTLP exporter when metrics endpoint is reachable', async () => {
+      setupConfig();
+      setupEndpointMock('/otlp/metrics', 200);
+
+      const acrolinxInstrumentation = AcrolinxInstrumentation.getInstance(defaultProps);
+      const instruments = await acrolinxInstrumentation.getInstruments();
+      await verifyMetricsWorking(instruments);
     });
 
     it('should use console exporter when metrics endpoint is not reachable', async () => {
-      server.get('/int-service/api/v1/config', {
-        status: 200,
-        body: {
-          activateGetSuggestionReplacement: true,
-          telemetryEnabled: true,
-        },
-      });
-
-      server.head('/otlp/metrics', {
-        status: 404,
-      });
+      setupConfig();
+      setupEndpointMock('/otlp/metrics', 404);
 
       const acrolinxInstrumentation = AcrolinxInstrumentation.getInstance(defaultProps);
       const instruments = await acrolinxInstrumentation.getInstruments();
-
-      expect(instruments?.metrics).toBeDefined();
-      expect(instruments?.metrics.meterProvider).toBeDefined();
-      const meter = instruments?.metrics.meterProvider.getMeter('test-meter');
-      const counter = meter?.createCounter('test-counter');
-      expect(counter).toBeDefined();
+      await verifyMetricsWorking(instruments);
     });
 
     it('should use OTLP exporter when logs endpoint is reachable', async () => {
-      server.get('/int-service/api/v1/config', {
-        status: 200,
-        body: {
-          activateGetSuggestionReplacement: true,
-          telemetryEnabled: true,
-        },
-      });
-
-      server.head('/otlp/logs', {
-        status: 200,
-      });
+      setupConfig();
+      setupEndpointMock('/otlp/logs', 200);
 
       const acrolinxInstrumentation = AcrolinxInstrumentation.getInstance(defaultProps);
       const instruments = await acrolinxInstrumentation.getInstruments();
-
-      expect(instruments?.logging).toBeDefined();
-      expect(instruments?.logging.logger).toBeDefined();
-      const logger = instruments?.logging.logger;
-      expect(logger).toBeDefined();
+      await verifyLoggingWorking(instruments);
     });
 
     it('should use console exporter when logs endpoint is not reachable', async () => {
-      server.get('/int-service/api/v1/config', {
-        status: 200,
-        body: {
-          activateGetSuggestionReplacement: true,
-          telemetryEnabled: true,
-        },
-      });
-
-      server.head('/otlp/logs', {
-        status: 404,
-      });
+      setupConfig();
+      setupEndpointMock('/otlp/logs', 404);
 
       const acrolinxInstrumentation = AcrolinxInstrumentation.getInstance(defaultProps);
       const instruments = await acrolinxInstrumentation.getInstruments();
-
-      expect(instruments?.logging).toBeDefined();
-      expect(instruments?.logging.logger).toBeDefined();
-      const logger = instruments?.logging.logger;
-      expect(logger).toBeDefined();
+      await verifyLoggingWorking(instruments);
     });
 
     it('should handle network errors gracefully and fall back to console exporters', async () => {
-      server.get('/int-service/api/v1/config', {
-        status: 200,
-        body: {
-          activateGetSuggestionReplacement: true,
-          telemetryEnabled: true,
-        },
-      });
-
-      server.head('/otlp/metrics', {
-        status: 500,
-      });
-      server.head('/otlp/logs', {
-        status: 500,
-      });
+      setupConfig();
+      setupEndpointMock('/otlp/metrics', 500);
+      setupEndpointMock('/otlp/logs', 500);
 
       const acrolinxInstrumentation = AcrolinxInstrumentation.getInstance(defaultProps);
       const instruments = await acrolinxInstrumentation.getInstruments();
-
-      expect(instruments?.metrics).toBeDefined();
-      expect(instruments?.metrics.meterProvider).toBeDefined();
-      expect(instruments?.logging).toBeDefined();
-      expect(instruments?.logging.logger).toBeDefined();
+      await verifyMetricsWorking(instruments);
+      await verifyLoggingWorking(instruments);
     });
   });
 });
