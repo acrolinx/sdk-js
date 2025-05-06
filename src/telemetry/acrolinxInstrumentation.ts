@@ -66,9 +66,9 @@ export class AcrolinxInstrumentation {
         return undefined;
       }
 
-      const meterProvider = setupMetrics(this.config);
+      const meterProvider = await setupMetrics(this.config);
       const defaultCounters = createDefaultMeters(this.config.endpointProps.client.integrationDetails, meterProvider);
-      const logger = setupLogging(this.config);
+      const logger = await setupLogging(this.config);
 
       return {
         metrics: {

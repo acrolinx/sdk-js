@@ -1,10 +1,12 @@
 import { OTLPMetricExporter } from '@opentelemetry/exporter-metrics-otlp-http';
+import { ConsoleMetricExporter } from '@opentelemetry/sdk-metrics';
 import { MeterProvider, PeriodicExportingMetricReader } from '@opentelemetry/sdk-metrics';
 import { ATTR_SERVICE_NAME, ATTR_SERVICE_VERSION } from '@opentelemetry/semantic-conventions';
 import { resourceFromAttributes } from '@opentelemetry/resources';
 import { Counter, Histogram, ValueType } from '@opentelemetry/api';
 import { TelemetryConfig } from '../acrolinxInstrumentation';
 import { IntegrationDetails } from '../interfaces/integration';
+import { checkEndpointReachable } from '../utils/telemetry-util';
 import {
   checkRequestMetric,
   counterUnit,
@@ -16,7 +18,7 @@ import {
   suggestionMetric,
 } from './metric-constants';
 
-export const setupMetrics = (config: TelemetryConfig): MeterProvider => {
+export const setupMetrics = async (config: TelemetryConfig): Promise<MeterProvider> => {
   const collectorOptions = {
     url: `${config.endpointProps.acrolinxUrl}/otlp/metrics`,
     headers: {
@@ -25,7 +27,8 @@ export const setupMetrics = (config: TelemetryConfig): MeterProvider => {
   };
 
   try {
-    const metricExporter = new OTLPMetricExporter(collectorOptions);
+    const isEndpointReachable = await checkEndpointReachable(collectorOptions.url, collectorOptions.headers);
+    const metricExporter = isEndpointReachable ? new OTLPMetricExporter(collectorOptions) : new ConsoleMetricExporter();
 
     const resource = resourceFromAttributes({
       [ATTR_SERVICE_NAME]: config.endpointProps.client.integrationDetails.name,
