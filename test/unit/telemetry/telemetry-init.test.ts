@@ -3,6 +3,10 @@ import { AcrolinxInstrumentation, TelemetryConfig, Instruments } from '../../../
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
 import { FetchMocker, MockServer } from 'mentoss';
 import { BrowserNames, IntegrationType, OperatingSystemFamily } from '../../../src/telemetry/interfaces/integration';
+import { ConsoleMetricExporter } from '@opentelemetry/sdk-metrics';
+import { ConsoleLogRecordExporter } from '@opentelemetry/sdk-logs';
+import { OTLPMetricExporter } from '@opentelemetry/exporter-metrics-otlp-http';
+import { OTLPLogExporter } from '@opentelemetry/exporter-logs-otlp-http';
 
 describe('Telemetry initialization', () => {
   const acrolinxUrl = 'https://tenant.acrolinx.cloud';
@@ -260,18 +264,37 @@ describe('Telemetry initialization', () => {
       server.head(endpoint, { status });
     };
 
-    const verifyMetricsWorking = async (instruments: Instruments | undefined) => {
+    const verifyMetricsWorking = async (instruments: Instruments | undefined, shouldUseOTLP: boolean) => {
       expect(instruments?.metrics).toBeDefined();
       expect(instruments?.metrics.meterProvider).toBeDefined();
+
+      const meterProvider = instruments?.metrics.meterProvider as any;
+      const exporter = meterProvider._sharedState.metricCollectors[0]._metricReader._exporter;
+      expect(exporter).toBeDefined();
+      if (shouldUseOTLP) {
+        expect(exporter).toBeInstanceOf(OTLPMetricExporter);
+      } else {
+        expect(exporter).toBeInstanceOf(ConsoleMetricExporter);
+      }
+
       const meter = instruments?.metrics.meterProvider.getMeter('test-meter');
       const counter = meter?.createCounter('test-counter');
       expect(counter).toBeDefined();
     };
 
-    const verifyLoggingWorking = async (instruments: Instruments | undefined) => {
+    const verifyLoggingWorking = async (instruments: Instruments | undefined, shouldUseOTLP: boolean) => {
       expect(instruments?.logging).toBeDefined();
       expect(instruments?.logging.logger).toBeDefined();
-      const logger = instruments?.logging.logger;
+
+      const logger = instruments?.logging.logger as any;
+      const exporter = logger._sharedState.activeProcessor.processors[0]._exporter;
+      expect(exporter).toBeDefined();
+      if (shouldUseOTLP) {
+        expect(exporter).toBeInstanceOf(OTLPLogExporter);
+      } else {
+        expect(exporter).toBeInstanceOf(ConsoleLogRecordExporter);
+      }
+
       expect(logger).toBeDefined();
     };
 
@@ -281,7 +304,7 @@ describe('Telemetry initialization', () => {
 
       const acrolinxInstrumentation = AcrolinxInstrumentation.getInstance(defaultProps);
       const instruments = await acrolinxInstrumentation.getInstruments();
-      await verifyMetricsWorking(instruments);
+      await verifyMetricsWorking(instruments, true);
     });
 
     it('should use console exporter when metrics endpoint is not reachable', async () => {
@@ -290,7 +313,7 @@ describe('Telemetry initialization', () => {
 
       const acrolinxInstrumentation = AcrolinxInstrumentation.getInstance(defaultProps);
       const instruments = await acrolinxInstrumentation.getInstruments();
-      await verifyMetricsWorking(instruments);
+      await verifyMetricsWorking(instruments, false);
     });
 
     it('should use OTLP exporter when logs endpoint is reachable', async () => {
@@ -299,7 +322,7 @@ describe('Telemetry initialization', () => {
 
       const acrolinxInstrumentation = AcrolinxInstrumentation.getInstance(defaultProps);
       const instruments = await acrolinxInstrumentation.getInstruments();
-      await verifyLoggingWorking(instruments);
+      await verifyLoggingWorking(instruments, true);
     });
 
     it('should use console exporter when logs endpoint is not reachable', async () => {
@@ -308,7 +331,7 @@ describe('Telemetry initialization', () => {
 
       const acrolinxInstrumentation = AcrolinxInstrumentation.getInstance(defaultProps);
       const instruments = await acrolinxInstrumentation.getInstruments();
-      await verifyLoggingWorking(instruments);
+      await verifyLoggingWorking(instruments, false);
     });
 
     it('should handle network errors gracefully and fall back to console exporters', async () => {
@@ -318,8 +341,8 @@ describe('Telemetry initialization', () => {
 
       const acrolinxInstrumentation = AcrolinxInstrumentation.getInstance(defaultProps);
       const instruments = await acrolinxInstrumentation.getInstruments();
-      await verifyMetricsWorking(instruments);
-      await verifyLoggingWorking(instruments);
+      await verifyMetricsWorking(instruments, false);
+      await verifyLoggingWorking(instruments, false);
     });
   });
 });
