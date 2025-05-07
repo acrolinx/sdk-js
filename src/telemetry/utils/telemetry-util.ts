@@ -6,6 +6,7 @@ export const checkEndpointReachable = async (url: string, headers: Record<string
         ...headers,
         'Content-Type': 'application/x-protobuf',
       },
+      body: '',
     });
     return response.ok;
   } catch (error) {
