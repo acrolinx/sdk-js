@@ -1,8 +1,11 @@
 export const checkEndpointReachable = async (url: string, headers: Record<string, string>): Promise<boolean> => {
   try {
     const response = await fetch(url, {
-      method: 'HEAD',
-      headers,
+      method: 'POST',
+      headers: {
+        ...headers,
+        'Content-Type': 'application/x-protobuf',
+      },
     });
     return response.ok;
   } catch (error) {
