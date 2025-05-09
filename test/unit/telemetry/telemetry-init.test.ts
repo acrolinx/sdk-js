@@ -261,7 +261,7 @@ describe('Telemetry initialization', () => {
     };
 
     const setupEndpointMock = (endpoint: string, status: number) => {
-      server.head(endpoint, { status });
+      server.post(endpoint, { status });
     };
 
     const verifyMetricsWorking = async (instruments: Instruments | undefined, shouldUseOTLP: boolean) => {

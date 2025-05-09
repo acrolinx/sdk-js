@@ -73,41 +73,6 @@ describe('Acrolinx One E2E Tests', () => {
       expect(aiResult.response).toBeDefined();
       expect(aiResult.intermediateResponse).toBeDefined();
     }, 100000);
-
-    // Run this case manually after running the case for multiple times AI-Service starts giving same response.
-    test('get a chat completion from the ai service & validate previous version too', async () => {
-      const aiService = new AIService(endpoint.props);
-      const aiResult = await aiService.getAIChatCompletion(
-        {
-          issue: {
-            aiRephraseHint:
-              '{"documentId":"ef71d706-b9ef-4b04-95d3-d49c21b2e8e7","aiRephraseHint":[{"role":"system","content":"You are a writing assistant designed to rewrite text as instructed. You write clear, grammatically correct and simple text."},{"role":"system","content":"You will be given an instruction followed by text between triple quotes, like this: ```Text```. Return only rewritten text without the triple quotes."},{"role":"system","content":"Make sure to preserve all markup and hyperscript references."},{"role":"system","content":"Do not provide any copyrighted content. You must not violate any copyrights under any circumstances."},{"role":"system","content":"Use simple language. Split up sentences into shorter ones. Rewrite passive into active voice!"},{"role":"user","content":"Rewrite this sentence to make it less complex. In particular, apply the following changes: Avoid complex coordination. Avoid the passive voice."},{"role":"user","content":"```When you click on Design and select a new Theme, the pictures, charts, and SmartArt graphics will automatically change to match your chosen theme.```"},{"role":"assistant","content":"Sure! Here\'s your new text, with active voice and short, simple sentences:"}]}',
-            internalName: 'clarity_issue',
-          } as unknown as CommonIssue,
-          count: 1,
-          targetUuid: '2755ce18-fa33-4744-a16e-655bd6ce412e',
-        },
-        ACROLINX_API_TOKEN,
-      );
-      expect(aiResult.response).toBeDefined();
-      expect(aiResult.intermediateResponse).toBeDefined();
-      const aiResultSecondTime = await aiService.getAIChatCompletion(
-        {
-          issue: {
-            aiRephraseHint:
-              '{"documentId":"ef71d706-b9ef-4b04-95d3-d49c21b2e8e7","aiRephraseHint":[{"role":"system","content":"You are a writing assistant designed to rewrite text as instructed. You write clear, grammatically correct and simple text."},{"role":"system","content":"You will be given an instruction followed by text between triple quotes, like this: ```Text```. Return only rewritten text without the triple quotes."},{"role":"system","content":"Make sure to preserve all markup and hyperscript references."},{"role":"system","content":"Do not provide any copyrighted content. You must not violate any copyrights under any circumstances."},{"role":"system","content":"Use simple language. Split up sentences into shorter ones. Rewrite passive into active voice!"},{"role":"user","content":"Rewrite this sentence to make it less complex. In particular, apply the following changes: Avoid complex coordination. Avoid the passive voice."},{"role":"user","content":"```When you click on Design and select a new Theme, the pictures, charts, and SmartArt graphics will automatically change to match your chosen theme.```"},{"role":"assistant","content":"Sure! Here\'s your new text, with active voice and short, simple sentences:"}]}',
-            internalName: 'clarity_issue',
-          } as unknown as CommonIssue,
-          count: 2,
-          previousVersion: aiResult.intermediateResponse,
-          targetUuid: '2755ce18-fa33-4744-a16e-655bd6ce412e',
-        },
-        ACROLINX_API_TOKEN,
-      );
-      expect(aiResultSecondTime.response).toBeDefined();
-      expect(aiResultSecondTime.intermediateResponse).toBeDefined();
-      expect(aiResultSecondTime.intermediateResponse).not.equal(aiResultSecondTime.response);
-    }, 100000);
   });
 
   describe('Integrations Service Integration Tests', () => {

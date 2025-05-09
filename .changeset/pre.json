@@ -5,6 +5,7 @@
     "@acrolinx/sdk": "2.0.0-beta.3"
   },
   "changesets": [
+    "cold-hotels-bow",
     "curly-bars-start",
     "eager-glasses-battle",
     "every-pillows-share",
