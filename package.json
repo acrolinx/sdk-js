@@ -11,9 +11,6 @@
   "engines": {
     "node": ">=22"
   },
-  "publishConfig": {
-    "tag": "beta"
-  },
   "scripts": {
     "ci": "npm run build && npm run lint && npm run testCoverage",
     "clean": "rm -rf dist",
