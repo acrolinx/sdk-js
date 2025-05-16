@@ -61,7 +61,7 @@
     "vitest": "^3.1.1"
   },
   "dependencies": {
-    "@opentelemetry/context-zone": "^2.0.0",
+    "@opentelemetry/context-zone": "^2.0.1",
     "@opentelemetry/exporter-logs-otlp-http": "^0.200.0",
     "@opentelemetry/exporter-metrics-otlp-http": "^0.200.0",
     "@opentelemetry/instrumentation": "^0.200.0",
