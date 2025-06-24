@@ -4,6 +4,13 @@ import { afterEach, describe, expect, it } from 'vitest';
 import { http, HttpResponse } from 'msw';
 import { server } from '../../test-utils/msw-setup';
 import { BrowserNames, IntegrationType, OperatingSystemFamily } from '../../../src/telemetry/interfaces/integration';
+import {
+  mockTelemetryEnabled,
+  mockTelemetryDisabled,
+  mockTelemetryEnabledString,
+  mockTelemetryConfigMissing,
+  mockTelemetryConfigError,
+} from '../../test-utils/msw-test-helpers';
 
 describe('Telemetry initialization', () => {
   const acrolinxUrl = 'https://tenant.acrolinx.cloud';
@@ -84,14 +91,7 @@ describe('Telemetry initialization', () => {
 
   describe('getInstruments method', () => {
     it('should return telemetry instruments when telemetry is enabled', async () => {
-      server.use(
-        http.get(`${acrolinxUrl}/int-service/api/v1/config`, () => {
-          return HttpResponse.json({
-            activateGetSuggestionReplacement: true,
-            telemetryEnabled: true,
-          });
-        }),
-      );
+      mockTelemetryEnabled(acrolinxUrl);
 
       const acrolinxInstrumentation = AcrolinxInstrumentation.getInstance(defaultProps);
       const instruments = await acrolinxInstrumentation.getInstruments();
@@ -103,14 +103,7 @@ describe('Telemetry initialization', () => {
     });
 
     it('should return undefined when telemetry is disabled', async () => {
-      server.use(
-        http.get(`${acrolinxUrl}/int-service/api/v1/config`, () => {
-          return HttpResponse.json({
-            activateGetSuggestionReplacement: true,
-            telemetryEnabled: false,
-          });
-        }),
-      );
+      mockTelemetryDisabled(acrolinxUrl);
 
       const acrolinxInstrumentation = AcrolinxInstrumentation.getInstance(defaultProps);
       const instruments = await acrolinxInstrumentation.getInstruments();
@@ -119,11 +112,7 @@ describe('Telemetry initialization', () => {
     });
 
     it('should return undefined when config API returns 500', async () => {
-      server.use(
-        http.get(`${acrolinxUrl}/int-service/api/v1/config`, () => {
-          return HttpResponse.json({}, { status: 500 });
-        }),
-      );
+      mockTelemetryConfigError(acrolinxUrl);
 
       const acrolinxInstrumentation = AcrolinxInstrumentation.getInstance(defaultProps);
       const instruments = await acrolinxInstrumentation.getInstruments();
@@ -132,13 +121,7 @@ describe('Telemetry initialization', () => {
     });
 
     it('should return undefined when telemetry config is missing', async () => {
-      server.use(
-        http.get(`${acrolinxUrl}/int-service/api/v1/config`, () => {
-          return HttpResponse.json({
-            activateGetSuggestionReplacement: true,
-          });
-        }),
-      );
+      mockTelemetryConfigMissing(acrolinxUrl);
 
       const acrolinxInstrumentation = AcrolinxInstrumentation.getInstance(defaultProps);
       const instruments = await acrolinxInstrumentation.getInstruments();
@@ -147,14 +130,7 @@ describe('Telemetry initialization', () => {
     });
 
     it('should return telemetry instruments when telemetry config is type string', async () => {
-      server.use(
-        http.get(`${acrolinxUrl}/int-service/api/v1/config`, () => {
-          return HttpResponse.json({
-            activateGetSuggestionReplacement: true,
-            telemetryEnabled: 'true',
-          });
-        }),
-      );
+      mockTelemetryEnabledString(acrolinxUrl);
 
       const acrolinxInstrumentation = AcrolinxInstrumentation.getInstance(defaultProps);
       const instruments = await acrolinxInstrumentation.getInstruments();
@@ -168,14 +144,7 @@ describe('Telemetry initialization', () => {
 
   describe('Caching behavior', () => {
     it('should cache instruments after first successful retrieval', async () => {
-      server.use(
-        http.get(`${acrolinxUrl}/int-service/api/v1/config`, () => {
-          return HttpResponse.json({
-            activateGetSuggestionReplacement: true,
-            telemetryEnabled: true,
-          });
-        }),
-      );
+      mockTelemetryEnabled(acrolinxUrl);
 
       const acrolinxInstrumentation = AcrolinxInstrumentation.getInstance(defaultProps);
 
@@ -227,14 +196,7 @@ describe('Telemetry initialization', () => {
 
   describe('Telemetry configuration', () => {
     it('should use console exporters when telemetry endpoint is not available', async () => {
-      server.use(
-        http.get(`${acrolinxUrl}/int-service/api/v1/config`, () => {
-          return HttpResponse.json({
-            activateGetSuggestionReplacement: true,
-            telemetryEnabled: true,
-          });
-        }),
-      );
+      mockTelemetryEnabled(acrolinxUrl);
 
       const acrolinxInstrumentation = AcrolinxInstrumentation.getInstance(defaultProps);
       const instruments = await acrolinxInstrumentation.getInstruments();
@@ -245,15 +207,7 @@ describe('Telemetry initialization', () => {
     });
 
     it('should use OTLP exporters when telemetry endpoint is available', async () => {
-      server.use(
-        http.get(`${acrolinxUrl}/int-service/api/v1/config`, () => {
-          return HttpResponse.json({
-            activateGetSuggestionReplacement: true,
-            telemetryEnabled: true,
-            telemetryEndpoint: 'https://telemetry.acrolinx.cloud',
-          });
-        }),
-      );
+      mockTelemetryEnabled(acrolinxUrl, 'https://telemetry.acrolinx.cloud');
 
       const acrolinxInstrumentation = AcrolinxInstrumentation.getInstance(defaultProps);
       const instruments = await acrolinxInstrumentation.getInstruments();
@@ -264,15 +218,7 @@ describe('Telemetry initialization', () => {
     });
 
     it('should handle telemetry endpoint configuration errors', async () => {
-      server.use(
-        http.get(`${acrolinxUrl}/int-service/api/v1/config`, () => {
-          return HttpResponse.json({
-            activateGetSuggestionReplacement: true,
-            telemetryEnabled: true,
-            telemetryEndpoint: 'invalid-url',
-          });
-        }),
-      );
+      mockTelemetryEnabled(acrolinxUrl, 'invalid-url');
 
       const acrolinxInstrumentation = AcrolinxInstrumentation.getInstance(defaultProps);
       const instruments = await acrolinxInstrumentation.getInstruments();

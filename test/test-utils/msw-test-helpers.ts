@@ -186,3 +186,67 @@ export function mockWithBodyValidation(
   server.use(handler);
   return handler;
 }
+
+// Telemetry-specific helpers to eliminate duplication in telemetry tests
+export function mockTelemetryConfig(
+  acrolinxUrl: string,
+  config: {
+    telemetryEnabled?: boolean | string;
+    telemetryEndpoint?: string;
+    activateGetSuggestionReplacement?: boolean;
+    status?: number;
+  } = {},
+) {
+  const { telemetryEnabled = true, telemetryEndpoint, activateGetSuggestionReplacement = true, status = 200 } = config;
+
+  const response: any = {
+    activateGetSuggestionReplacement,
+  };
+
+  if (telemetryEnabled !== undefined) {
+    response.telemetryEnabled = telemetryEnabled;
+  }
+
+  if (telemetryEndpoint !== undefined) {
+    response.telemetryEndpoint = telemetryEndpoint;
+  }
+
+  return mockGet(`${acrolinxUrl}/int-service/api/v1/config`, response, status);
+}
+
+// Helper to create telemetry config with enabled telemetry
+export function mockTelemetryEnabled(acrolinxUrl: string, telemetryEndpoint?: string) {
+  return mockTelemetryConfig(acrolinxUrl, {
+    telemetryEnabled: true,
+    telemetryEndpoint,
+  });
+}
+
+// Helper to create telemetry config with disabled telemetry
+export function mockTelemetryDisabled(acrolinxUrl: string) {
+  return mockTelemetryConfig(acrolinxUrl, {
+    telemetryEnabled: false,
+  });
+}
+
+// Helper to create telemetry config with string telemetry enabled
+export function mockTelemetryEnabledString(acrolinxUrl: string) {
+  return mockTelemetryConfig(acrolinxUrl, {
+    telemetryEnabled: 'true',
+  });
+}
+
+// Helper to create telemetry config with missing telemetry config
+export function mockTelemetryConfigMissing(acrolinxUrl: string) {
+  return mockGet(`${acrolinxUrl}/int-service/api/v1/config`, {
+    activateGetSuggestionReplacement: true,
+    // telemetryEnabled is intentionally omitted
+  });
+}
+
+// Helper to create telemetry config with server error
+export function mockTelemetryConfigError(acrolinxUrl: string) {
+  return mockTelemetryConfig(acrolinxUrl, {
+    status: 500,
+  });
+}

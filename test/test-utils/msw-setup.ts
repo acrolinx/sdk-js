@@ -57,3 +57,9 @@ export function createNetworkError() {
 export type RequestHandler = ReturnType<
   typeof http.get | typeof http.post | typeof http.put | typeof http.delete | typeof http.patch
 >;
+
+// Add generic handlers for telemetry endpoints to suppress MSW warnings
+server.use(
+  http.post(/\/otlp\/metrics$/, () => new Response(null, { status: 200 })),
+  http.post(/\/otlp\/logs$/, () => new Response(null, { status: 200 })),
+);
