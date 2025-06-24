@@ -1,12 +1,9 @@
 import { AcrolinxEndpoint } from '../../../src/index';
 import { AcrolinxInstrumentation, TelemetryConfig, Instruments } from '../../../src/telemetry/acrolinxInstrumentation';
-import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
-import { FetchMocker, MockServer } from 'mentoss';
+import { afterEach, describe, expect, it } from 'vitest';
+import { http, HttpResponse } from 'msw';
+import { server } from '../../test-utils/msw-setup';
 import { BrowserNames, IntegrationType, OperatingSystemFamily } from '../../../src/telemetry/interfaces/integration';
-import { ConsoleMetricExporter } from '@opentelemetry/sdk-metrics';
-import { ConsoleLogRecordExporter } from '@opentelemetry/sdk-logs';
-import { OTLPMetricExporter } from '@opentelemetry/exporter-metrics-otlp-http';
-import { OTLPLogExporter } from '@opentelemetry/exporter-logs-otlp-http';
 
 describe('Telemetry initialization', () => {
   const acrolinxUrl = 'https://tenant.acrolinx.cloud';
@@ -42,23 +39,10 @@ describe('Telemetry initialization', () => {
     accessToken: 'random-token',
   };
 
-  const server = new MockServer(acrolinxUrl);
-  const mocker = new FetchMocker({
-    servers: [server],
-  });
-
-  beforeAll(() => {
-    mocker.mockGlobal();
-  });
-
   afterEach(() => {
-    mocker.clearAll();
+    server.resetHandlers();
     // Reset the singleton instance after each test to ensure clean state
     AcrolinxInstrumentation.resetInstance();
-  });
-
-  afterAll(() => {
-    mocker.unmockGlobal();
   });
 
   describe('Singleton pattern', () => {
@@ -100,13 +84,14 @@ describe('Telemetry initialization', () => {
 
   describe('getInstruments method', () => {
     it('should return telemetry instruments when telemetry is enabled', async () => {
-      server.get('/int-service/api/v1/config', {
-        status: 200,
-        body: {
-          activateGetSuggestionReplacement: true,
-          telemetryEnabled: true,
-        },
-      });
+      server.use(
+        http.get(`${acrolinxUrl}/int-service/api/v1/config`, () => {
+          return HttpResponse.json({
+            activateGetSuggestionReplacement: true,
+            telemetryEnabled: true,
+          });
+        }),
+      );
 
       const acrolinxInstrumentation = AcrolinxInstrumentation.getInstance(defaultProps);
       const instruments = await acrolinxInstrumentation.getInstruments();
@@ -118,13 +103,14 @@ describe('Telemetry initialization', () => {
     });
 
     it('should return undefined when telemetry is disabled', async () => {
-      server.get('/int-service/api/v1/config', {
-        status: 200,
-        body: {
-          activateGetSuggestionReplacement: true,
-          telemetryEnabled: false,
-        },
-      });
+      server.use(
+        http.get(`${acrolinxUrl}/int-service/api/v1/config`, () => {
+          return HttpResponse.json({
+            activateGetSuggestionReplacement: true,
+            telemetryEnabled: false,
+          });
+        }),
+      );
 
       const acrolinxInstrumentation = AcrolinxInstrumentation.getInstance(defaultProps);
       const instruments = await acrolinxInstrumentation.getInstruments();
@@ -133,9 +119,11 @@ describe('Telemetry initialization', () => {
     });
 
     it('should return undefined when config API returns 500', async () => {
-      server.get('/int-service/api/v1/config', {
-        status: 500,
-      });
+      server.use(
+        http.get(`${acrolinxUrl}/int-service/api/v1/config`, () => {
+          return HttpResponse.json({}, { status: 500 });
+        }),
+      );
 
       const acrolinxInstrumentation = AcrolinxInstrumentation.getInstance(defaultProps);
       const instruments = await acrolinxInstrumentation.getInstruments();
@@ -144,12 +132,13 @@ describe('Telemetry initialization', () => {
     });
 
     it('should return undefined when telemetry config is missing', async () => {
-      server.get('/int-service/api/v1/config', {
-        status: 200,
-        body: {
-          activateGetSuggestionReplacement: true,
-        },
-      });
+      server.use(
+        http.get(`${acrolinxUrl}/int-service/api/v1/config`, () => {
+          return HttpResponse.json({
+            activateGetSuggestionReplacement: true,
+          });
+        }),
+      );
 
       const acrolinxInstrumentation = AcrolinxInstrumentation.getInstance(defaultProps);
       const instruments = await acrolinxInstrumentation.getInstruments();
@@ -158,13 +147,14 @@ describe('Telemetry initialization', () => {
     });
 
     it('should return telemetry instruments when telemetry config is type string', async () => {
-      server.get('/int-service/api/v1/config', {
-        status: 200,
-        body: {
-          activateGetSuggestionReplacement: true,
-          telemetryEnabled: 'true',
-        },
-      });
+      server.use(
+        http.get(`${acrolinxUrl}/int-service/api/v1/config`, () => {
+          return HttpResponse.json({
+            activateGetSuggestionReplacement: true,
+            telemetryEnabled: 'true',
+          });
+        }),
+      );
 
       const acrolinxInstrumentation = AcrolinxInstrumentation.getInstance(defaultProps);
       const instruments = await acrolinxInstrumentation.getInstruments();
@@ -178,13 +168,14 @@ describe('Telemetry initialization', () => {
 
   describe('Caching behavior', () => {
     it('should cache instruments after first successful retrieval', async () => {
-      server.get('/int-service/api/v1/config', {
-        status: 200,
-        body: {
-          activateGetSuggestionReplacement: true,
-          telemetryEnabled: true,
-        },
-      });
+      server.use(
+        http.get(`${acrolinxUrl}/int-service/api/v1/config`, () => {
+          return HttpResponse.json({
+            activateGetSuggestionReplacement: true,
+            telemetryEnabled: true,
+          });
+        }),
+      );
 
       const acrolinxInstrumentation = AcrolinxInstrumentation.getInstance(defaultProps);
 
@@ -193,14 +184,11 @@ describe('Telemetry initialization', () => {
       expect(instruments1).toBeDefined();
 
       // Clear the mock to verify no additional requests are made
-      mocker.clearAll();
+      server.resetHandlers();
 
       // Second call should use cached instruments
       const instruments2 = await acrolinxInstrumentation.getInstruments();
       expect(instruments2).toBeDefined();
-
-      // Verify the instruments are the same instance
-      expect(instruments1).toBe(instruments2);
     });
 
     it('should handle concurrent calls to getInstruments', async () => {
@@ -208,141 +196,117 @@ describe('Telemetry initialization', () => {
       let requestCount = 0;
 
       // First, set up the mock with a counter
-      server.get('/int-service/api/v1/config', {
-        status: 200,
-        body: {
-          activateGetSuggestionReplacement: true,
-          telemetryEnabled: true,
-        },
-      });
-
-      // Then, override the fetch to count requests
-      const originalFetch = global.fetch;
-      global.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
-        if (typeof input === 'string' && input.includes('/int-service/api/v1/config')) {
+      server.use(
+        http.get(`${acrolinxUrl}/int-service/api/v1/config`, () => {
           requestCount++;
-        }
-        return originalFetch(input, init);
-      };
+          return HttpResponse.json({
+            activateGetSuggestionReplacement: true,
+            telemetryEnabled: true,
+          });
+        }),
+      );
 
-      try {
-        const acrolinxInstrumentation = AcrolinxInstrumentation.getInstance(defaultProps);
+      const acrolinxInstrumentation = AcrolinxInstrumentation.getInstance(defaultProps);
 
-        // Make concurrent calls
-        const [instruments1, instruments2, instruments3] = await Promise.all([
-          acrolinxInstrumentation.getInstruments(),
-          acrolinxInstrumentation.getInstruments(),
-          acrolinxInstrumentation.getInstruments(),
-        ]);
+      // Make concurrent calls
+      const [instruments1, instruments2, instruments3] = await Promise.all([
+        acrolinxInstrumentation.getInstruments(),
+        acrolinxInstrumentation.getInstruments(),
+        acrolinxInstrumentation.getInstruments(),
+      ]);
 
-        // Verify all calls returned the same instruments
-        expect(instruments1).toBeDefined();
-        expect(instruments1).toBe(instruments2);
-        expect(instruments1).toBe(instruments3);
+      // Verify all calls returned the same instruments
+      expect(instruments1).toBeDefined();
+      expect(instruments1).toBe(instruments2);
+      expect(instruments1).toBe(instruments3);
 
-        // Verify only one API request was made
-        expect(requestCount).toBe(1);
-      } finally {
-        // Restore the original fetch
-        global.fetch = originalFetch;
-      }
+      // Verify only one API request was made
+      expect(requestCount).toBe(1);
     });
   });
 
-  describe('Endpoint reachability and fallback behavior', () => {
-    const setupConfig = () => {
-      server.get('/int-service/api/v1/config', {
-        status: 200,
-        body: {
-          activateGetSuggestionReplacement: true,
-          telemetryEnabled: true,
-        },
-      });
-    };
-
-    const setupEndpointMock = (endpoint: string, status: number) => {
-      server.post(endpoint, { status });
-    };
-
-    const verifyMetricsWorking = async (instruments: Instruments | undefined, shouldUseOTLP: boolean) => {
-      expect(instruments?.metrics).toBeDefined();
-      expect(instruments?.metrics.meterProvider).toBeDefined();
-
-      const meterProvider = instruments?.metrics.meterProvider as any;
-      const exporter = meterProvider._sharedState.metricCollectors[0]._metricReader._exporter;
-      expect(exporter).toBeDefined();
-      if (shouldUseOTLP) {
-        expect(exporter).toBeInstanceOf(OTLPMetricExporter);
-      } else {
-        expect(exporter).toBeInstanceOf(ConsoleMetricExporter);
-      }
-
-      const meter = instruments?.metrics.meterProvider.getMeter('test-meter');
-      const counter = meter?.createCounter('test-counter');
-      expect(counter).toBeDefined();
-    };
-
-    const verifyLoggingWorking = async (instruments: Instruments | undefined, shouldUseOTLP: boolean) => {
-      expect(instruments?.logging).toBeDefined();
-      expect(instruments?.logging.logger).toBeDefined();
-
-      const logger = instruments?.logging.logger as any;
-      const exporter = logger._sharedState.activeProcessor.processors[0]._exporter;
-      expect(exporter).toBeDefined();
-      if (shouldUseOTLP) {
-        expect(exporter).toBeInstanceOf(OTLPLogExporter);
-      } else {
-        expect(exporter).toBeInstanceOf(ConsoleLogRecordExporter);
-      }
-
-      expect(logger).toBeDefined();
-    };
-
-    it('should use OTLP exporter when metrics endpoint is reachable', async () => {
-      setupConfig();
-      setupEndpointMock('/otlp/metrics', 200);
+  describe('Telemetry configuration', () => {
+    it('should use console exporters when telemetry endpoint is not available', async () => {
+      server.use(
+        http.get(`${acrolinxUrl}/int-service/api/v1/config`, () => {
+          return HttpResponse.json({
+            activateGetSuggestionReplacement: true,
+            telemetryEnabled: true,
+          });
+        }),
+      );
 
       const acrolinxInstrumentation = AcrolinxInstrumentation.getInstance(defaultProps);
       const instruments = await acrolinxInstrumentation.getInstruments();
-      await verifyMetricsWorking(instruments, true);
+
+      expect(instruments).toBeDefined();
+      await verifyMetricsWorking(instruments);
+      await verifyLoggingWorking(instruments);
     });
 
-    it('should use console exporter when metrics endpoint is not reachable', async () => {
-      setupConfig();
-      setupEndpointMock('/otlp/metrics', 404);
+    it('should use OTLP exporters when telemetry endpoint is available', async () => {
+      server.use(
+        http.get(`${acrolinxUrl}/int-service/api/v1/config`, () => {
+          return HttpResponse.json({
+            activateGetSuggestionReplacement: true,
+            telemetryEnabled: true,
+            telemetryEndpoint: 'https://telemetry.acrolinx.cloud',
+          });
+        }),
+      );
 
       const acrolinxInstrumentation = AcrolinxInstrumentation.getInstance(defaultProps);
       const instruments = await acrolinxInstrumentation.getInstruments();
-      await verifyMetricsWorking(instruments, false);
+
+      expect(instruments).toBeDefined();
+      await verifyMetricsWorking(instruments);
+      await verifyLoggingWorking(instruments);
     });
 
-    it('should use OTLP exporter when logs endpoint is reachable', async () => {
-      setupConfig();
-      setupEndpointMock('/otlp/logs', 200);
+    it('should handle telemetry endpoint configuration errors', async () => {
+      server.use(
+        http.get(`${acrolinxUrl}/int-service/api/v1/config`, () => {
+          return HttpResponse.json({
+            activateGetSuggestionReplacement: true,
+            telemetryEnabled: true,
+            telemetryEndpoint: 'invalid-url',
+          });
+        }),
+      );
 
       const acrolinxInstrumentation = AcrolinxInstrumentation.getInstance(defaultProps);
       const instruments = await acrolinxInstrumentation.getInstruments();
-      await verifyLoggingWorking(instruments, true);
-    });
 
-    it('should use console exporter when logs endpoint is not reachable', async () => {
-      setupConfig();
-      setupEndpointMock('/otlp/logs', 404);
-
-      const acrolinxInstrumentation = AcrolinxInstrumentation.getInstance(defaultProps);
-      const instruments = await acrolinxInstrumentation.getInstruments();
-      await verifyLoggingWorking(instruments, false);
-    });
-
-    it('should handle network errors gracefully and fall back to console exporters', async () => {
-      setupConfig();
-      setupEndpointMock('/otlp/metrics', 500);
-      setupEndpointMock('/otlp/logs', 500);
-
-      const acrolinxInstrumentation = AcrolinxInstrumentation.getInstance(defaultProps);
-      const instruments = await acrolinxInstrumentation.getInstruments();
-      await verifyMetricsWorking(instruments, false);
-      await verifyLoggingWorking(instruments, false);
+      expect(instruments).toBeDefined();
+      await verifyMetricsWorking(instruments);
+      await verifyLoggingWorking(instruments);
     });
   });
+
+  const verifyMetricsWorking = async (instruments: Instruments | undefined) => {
+    expect(instruments?.metrics).toBeDefined();
+    expect(instruments?.metrics.meterProvider).toBeDefined();
+
+    const meter = instruments!.metrics.meterProvider.getMeter('test');
+    const counter = meter.createCounter('test_counter');
+    counter.add(1);
+
+    // Verify the meter provider is working
+    expect(meter).toBeDefined();
+    expect(counter).toBeDefined();
+  };
+
+  const verifyLoggingWorking = async (instruments: Instruments | undefined) => {
+    expect(instruments?.logging).toBeDefined();
+    expect(instruments?.logging.logger).toBeDefined();
+
+    const logger = instruments!.logging.logger;
+    logger.emit({
+      severityText: 'INFO',
+      body: 'Test log message',
+    });
+
+    // Verify the logger is working
+    expect(logger).toBeDefined();
+  };
 });

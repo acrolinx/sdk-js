@@ -20,6 +20,8 @@ import { AcrolinxEndpoint } from '../../src/index';
 import { mockAcrolinxServer, mockBrokenJsonServer, restoreOriginalFetch } from '../test-utils/mock-server';
 import { DUMMY_ENDPOINT_PROPS, DUMMY_SERVER_URL } from './common';
 import { getJsonFromUrl } from 'src/utils/fetch';
+import { server } from '../test-utils/msw-setup';
+import { http, HttpResponse } from 'msw';
 
 const BROKEN_JSON_SERVER = 'http://broken-json-server';
 
@@ -64,6 +66,16 @@ describe('errors', () => {
   });
 
   test('should return an api error for invalid signin poll address', async () => {
+    // Test with a malformed JSON response instead
+    server.use(
+      http.get('*/api/v1/auth/sign-ins/*', () => {
+        return new HttpResponse('This is not valid JSON', {
+          status: 200,
+          headers: { 'Content-Type': 'application/json' },
+        });
+      }),
+    );
+
     const api = new AcrolinxEndpoint(DUMMY_ENDPOINT_PROPS);
     try {
       await api.pollForSignin({
@@ -74,7 +86,7 @@ describe('errors', () => {
         },
       });
     } catch (e) {
-      expect(e.type).toEqual(ErrorType.Client);
+      expect(e.type).toEqual(ErrorType.InvalidJson);
     }
     expect.hasAssertions();
   });

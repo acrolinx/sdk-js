@@ -16,11 +16,12 @@
 
 import * as parse from 'co-body';
 import * as http from 'http';
-import { AcrolinxServerMock, StringMap } from './mock-server';
+import { AcrolinxServerMock } from './msw-acrolinx-server';
 
 const PORT = 3000;
 const serverMock = new AcrolinxServerMock('http://0.0.0.0:' + PORT);
 
+// Create a simple HTTP server that mimics the MSW handlers
 http
   .createServer(async (req, res) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -34,35 +35,54 @@ http
       return;
     }
 
-    const body = await parse.json(req);
+    try {
+      const body = req.method !== 'GET' ? await parse.json(req) : undefined;
 
-    const mockResponse = serverMock.handleFetchRequest(req.url!, {
-      method: req.method,
-      headers: req.headers as StringMap,
-      body: JSON.stringify(body),
-    });
+      // Simple routing based on the MSW handlers
+      const url = req.url || '';
 
-    res.statusCode = mockResponse.status || 200;
-
-    if (mockResponse.body) {
-      const headers = mockResponse.headers;
-      const contentType = (headers && headers['Content-Type']) || 'application/json';
-
-      // TODO: Headers, retryAfter
-      res.setHeader('Content-Type', contentType);
-
-      if (contentType === 'application/json') {
-        res.write(JSON.stringify(mockResponse.body, null, 2));
+      if (req.method === 'POST' && url === '/api/v1/auth/sign-ins') {
+        const response = serverMock.signin();
+        res.statusCode = 200;
+        res.setHeader('Content-Type', 'application/json');
+        res.write(JSON.stringify(response));
+      } else if (req.method === 'GET' && url.match(/\/api\/v1\/auth\/sign-ins\/[^\/]+/)) {
+        const signinId = url.split('/').pop() || '';
+        const response = serverMock.pollForSignin(signinId, {});
+        res.statusCode = 200;
+        res.setHeader('Content-Type', 'application/json');
+        res.write(JSON.stringify(response));
+      } else if (req.method === 'GET' && url.match(/\/api\/v1\/checking\/capabilities/)) {
+        const response = serverMock.checkService.getCheckingCapabilities();
+        res.statusCode = 200;
+        res.setHeader('Content-Type', 'application/json');
+        res.write(JSON.stringify(response));
+      } else if (req.method === 'POST' && url === '/api/v1/checking/checks') {
+        const check = serverMock.checkService.submitCheck({ body: JSON.stringify(body) });
+        res.statusCode = 200;
+        res.setHeader('Content-Type', 'application/json');
+        res.write(JSON.stringify(check));
+      } else if (req.method === 'GET' && url.match(/\/api\/v1\/checking\/checks\/[^\/]+/)) {
+        const checkId = url.split('/').pop() || '';
+        const response = serverMock.checkService.getCheckResult(checkId);
+        res.statusCode = 200;
+        res.setHeader('Content-Type', 'application/json');
+        res.write(JSON.stringify(response));
       } else {
-        res.write(mockResponse.body);
+        // Default response for unknown routes
+        res.statusCode = 404;
+        res.setHeader('Content-Type', 'application/json');
+        res.write(JSON.stringify({ error: 'Not found', url }));
       }
-    } else {
-      res.write(JSON.stringify(mockResponse));
+    } catch (error) {
+      res.statusCode = 500;
+      res.setHeader('Content-Type', 'application/json');
+      res.write(JSON.stringify({ error: 'Internal server error' }));
     }
 
     res.end();
   })
   .listen(PORT, () => {
     console.log(`server start at port ${PORT}`);
-    console.log(`Try "http://localhost:${PORT}/iq/services/v3/rest/core/serverVersion"`);
+    console.log(`Try "http://localhost:${PORT}/api/v1/checking/capabilities"`);
   });

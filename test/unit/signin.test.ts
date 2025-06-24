@@ -97,7 +97,10 @@ describe('signin', () => {
     expect(isSigninSuccessResult(pollResult1)).toBeFalsy();
     expect(pollResult1.progress.retryAfter).toEqual(DUMMY_RETRY_AFTER);
 
-    mockedAcrolinxServer.fakeSignIn();
+    // Extract signinId from poll URL
+    const pollUrl = signinLinks.links.poll;
+    const signinId = pollUrl.substring(pollUrl.lastIndexOf('/') + 1);
+    mockedAcrolinxServer.fakeSignIn(undefined, signinId);
 
     const signinSuccess = (await endpoint.pollForSignin(signinLinks)) as SigninSuccessResult;
     expect(isSigninSuccessResult(signinSuccess)).toBeTruthy();
@@ -132,9 +135,14 @@ describe('signin', () => {
 
     test('polling', async () => {
       const onSignInUrl = vi.fn();
+      const signinLinks = (await endpoint.signin()) as SigninLinksResult;
+      const pollUrl = signinLinks.links.poll;
+      const signinId = pollUrl.substring(pollUrl.lastIndexOf('/') + 1);
       const singInInteractivePromise = endpoint.singInInteractive({ onSignInUrl });
 
-      mockedAcrolinxServer.fakeSignIn();
+      // Wait a tick to ensure polling starts
+      await waitMs(10);
+      mockedAcrolinxServer.fakeSignIn(undefined, signinId);
 
       const result = await singInInteractivePromise;
 
