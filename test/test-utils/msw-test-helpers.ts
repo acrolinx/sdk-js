@@ -17,11 +17,11 @@
 import { http, HttpResponse } from 'msw';
 import { server } from './msw-setup';
 
-// Helper to create a simple GET mock
-export function mockGet(path: string, response: any, status = 200) {
+// Helper to create a simple HTTP mock for any method
+function mockHttp(method: 'get' | 'post' | 'put' | 'delete', path: string, response: any, status = 200) {
   // Strip query parameters from path for MSW pattern matching
   const pathWithoutQuery = path.split('?')[0];
-  const handler = http.get(`*${pathWithoutQuery}`, ({ request }) => {
+  const handler = http[method](`*${pathWithoutQuery}`, ({ request }) => {
     // If the original path had query parameters, validate them
     if (path.includes('?')) {
       const url = new URL(request.url);
@@ -38,75 +38,26 @@ export function mockGet(path: string, response: any, status = 200) {
   });
   server.use(handler);
   return handler;
+}
+
+// Helper to create a simple GET mock
+export function mockGet(path: string, response: any, status = 200) {
+  return mockHttp('get', path, response, status);
 }
 
 // Helper to create a simple POST mock
 export function mockPost(path: string, response: any, status = 200) {
-  // Strip query parameters from path for MSW pattern matching
-  const pathWithoutQuery = path.split('?')[0];
-  const handler = http.post(`*${pathWithoutQuery}`, ({ request }) => {
-    // If the original path had query parameters, validate them
-    if (path.includes('?')) {
-      const url = new URL(request.url);
-      const originalUrl = new URL(`http://dummy${path}`);
-
-      // Check if all query parameters match
-      for (const [key, value] of originalUrl.searchParams.entries()) {
-        if (url.searchParams.get(key) !== value) {
-          return HttpResponse.json({ error: 'Query parameter mismatch' }, { status: 400 });
-        }
-      }
-    }
-    return HttpResponse.json(response, { status });
-  });
-  server.use(handler);
-  return handler;
+  return mockHttp('post', path, response, status);
 }
 
 // Helper to create a simple PUT mock
 export function mockPut(path: string, response: any, status = 200) {
-  // Strip query parameters from path for MSW pattern matching
-  const pathWithoutQuery = path.split('?')[0];
-  const handler = http.put(`*${pathWithoutQuery}`, ({ request }) => {
-    // If the original path had query parameters, validate them
-    if (path.includes('?')) {
-      const url = new URL(request.url);
-      const originalUrl = new URL(`http://dummy${path}`);
-
-      // Check if all query parameters match
-      for (const [key, value] of originalUrl.searchParams.entries()) {
-        if (url.searchParams.get(key) !== value) {
-          return HttpResponse.json({ error: 'Query parameter mismatch' }, { status: 400 });
-        }
-      }
-    }
-    return HttpResponse.json(response, { status });
-  });
-  server.use(handler);
-  return handler;
+  return mockHttp('put', path, response, status);
 }
 
 // Helper to create a simple DELETE mock
 export function mockDelete(path: string, response: any, status = 200) {
-  // Strip query parameters from path for MSW pattern matching
-  const pathWithoutQuery = path.split('?')[0];
-  const handler = http.delete(`*${pathWithoutQuery}`, ({ request }) => {
-    // If the original path had query parameters, validate them
-    if (path.includes('?')) {
-      const url = new URL(request.url);
-      const originalUrl = new URL(`http://dummy${path}`);
-
-      // Check if all query parameters match
-      for (const [key, value] of originalUrl.searchParams.entries()) {
-        if (url.searchParams.get(key) !== value) {
-          return HttpResponse.json({ error: 'Query parameter mismatch' }, { status: 400 });
-        }
-      }
-    }
-    return HttpResponse.json(response, { status });
-  });
-  server.use(handler);
-  return handler;
+  return mockHttp('delete', path, response, status);
 }
 
 // Helper to create a mock that throws a network error

@@ -60,6 +60,6 @@ export type RequestHandler = ReturnType<
 
 // Add generic handlers for telemetry endpoints to suppress MSW warnings
 server.use(
-  http.post(/\/otlp\/metrics$/, () => new Response(null, { status: 200 })),
-  http.post(/\/otlp\/logs$/, () => new Response(null, { status: 200 })),
+  http.post('*/otlp/metrics', () => HttpResponse.json({}, { status: 200 })),
+  http.post('*/otlp/logs', () => HttpResponse.json({}, { status: 200 })),
 );

@@ -195,8 +195,9 @@ describe('Telemetry initialization', () => {
   });
 
   describe('Telemetry configuration', () => {
-    it('should use console exporters when telemetry endpoint is not available', async () => {
-      mockTelemetryEnabled(acrolinxUrl);
+    // Helper function to eliminate duplication in telemetry configuration tests
+    const testTelemetryConfiguration = async (telemetryEndpoint?: string) => {
+      mockTelemetryEnabled(acrolinxUrl, telemetryEndpoint);
 
       const acrolinxInstrumentation = AcrolinxInstrumentation.getInstance(defaultProps);
       const instruments = await acrolinxInstrumentation.getInstruments();
@@ -204,28 +205,18 @@ describe('Telemetry initialization', () => {
       expect(instruments).toBeDefined();
       await verifyMetricsWorking(instruments);
       await verifyLoggingWorking(instruments);
+    };
+
+    it('should use console exporters when telemetry endpoint is not available', async () => {
+      await testTelemetryConfiguration();
     });
 
     it('should use OTLP exporters when telemetry endpoint is available', async () => {
-      mockTelemetryEnabled(acrolinxUrl, 'https://telemetry.acrolinx.cloud');
-
-      const acrolinxInstrumentation = AcrolinxInstrumentation.getInstance(defaultProps);
-      const instruments = await acrolinxInstrumentation.getInstruments();
-
-      expect(instruments).toBeDefined();
-      await verifyMetricsWorking(instruments);
-      await verifyLoggingWorking(instruments);
+      await testTelemetryConfiguration('https://telemetry.acrolinx.cloud');
     });
 
     it('should handle telemetry endpoint configuration errors', async () => {
-      mockTelemetryEnabled(acrolinxUrl, 'invalid-url');
-
-      const acrolinxInstrumentation = AcrolinxInstrumentation.getInstance(defaultProps);
-      const instruments = await acrolinxInstrumentation.getInstruments();
-
-      expect(instruments).toBeDefined();
-      await verifyMetricsWorking(instruments);
-      await verifyLoggingWorking(instruments);
+      await testTelemetryConfiguration('invalid-url');
     });
   });
 
