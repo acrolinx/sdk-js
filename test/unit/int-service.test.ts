@@ -1,6 +1,6 @@
 import { http, HttpResponse } from 'msw';
 import { server } from '../test-utils/msw-setup';
-import { mockGet, mockPost, mockNetworkError } from '../test-utils/msw-migration-helpers';
+import { mockGet, mockPost, mockNetworkError } from '../test-utils/msw-test-helpers';
 import { AcrolinxEndpoint, IntService } from '../../src/index';
 import { DUMMY_ACCESS_TOKEN } from '../test-utils/mock-server';
 import { DUMMY_ENDPOINT_PROPS } from './common';

@@ -17,7 +17,7 @@
 import { http, HttpResponse } from 'msw';
 import { server } from './msw-setup';
 
-// Helper to create a simple GET mock (replaces fetchMock.mock('end:/path', response))
+// Helper to create a simple GET mock
 export function mockGet(path: string, response: any, status = 200) {
   // Strip query parameters from path for MSW pattern matching
   const pathWithoutQuery = path.split('?')[0];
@@ -40,7 +40,7 @@ export function mockGet(path: string, response: any, status = 200) {
   return handler;
 }
 
-// Helper to create a simple POST mock (replaces fetchMock.mock('end:/path', response))
+// Helper to create a simple POST mock
 export function mockPost(path: string, response: any, status = 200) {
   // Strip query parameters from path for MSW pattern matching
   const pathWithoutQuery = path.split('?')[0];
@@ -109,7 +109,7 @@ export function mockDelete(path: string, response: any, status = 200) {
   return handler;
 }
 
-// Helper to create a mock that throws a network error (replaces fetchMock.mock('path', { throws: error }))
+// Helper to create a mock that throws a network error
 export function mockNetworkError(path: string) {
   // Strip query parameters from path for MSW pattern matching
   const pathWithoutQuery = path.split('?')[0];
@@ -120,7 +120,7 @@ export function mockNetworkError(path: string) {
   return handler;
 }
 
-// Helper to create a mock with custom logic (replaces fetchMock.mock('path', (url, opts) => { ... }))
+// Helper to create a mock with custom logic
 export function mockWithLogic(
   method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH',
   path: string,
@@ -133,7 +133,7 @@ export function mockWithLogic(
   return mswHandler;
 }
 
-// Helper to get the last request (replaces fetchMock.lastCall())
+// Helper to get the last request
 export function getLastRequest() {
   // Note: MSW doesn't have a direct equivalent to fetchMock.lastCall()
   // You might need to track requests manually or use a different approach
@@ -141,7 +141,7 @@ export function getLastRequest() {
   return null;
 }
 
-// Helper to clear all mocks (replaces fetchMock.restore())
+// Helper to clear all mocks
 export function clearAllMocks() {
   server.resetHandlers();
 }

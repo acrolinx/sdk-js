@@ -15,7 +15,7 @@
  */
 import { http, HttpResponse } from 'msw';
 import { server } from '../test-utils/msw-setup';
-import { mockGet } from '../test-utils/msw-migration-helpers';
+import { mockGet } from '../test-utils/msw-test-helpers';
 import { AcrolinxEndpoint, AcrolinxError, Issue } from '../../src/index';
 import { DUMMY_ACCESS_TOKEN } from '../test-utils/msw-acrolinx-server';
 import { DUMMY_ENDPOINT_PROPS } from './common';
