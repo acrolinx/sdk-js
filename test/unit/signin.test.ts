@@ -139,7 +139,6 @@ describe('signin', () => {
     });
 
     test('polling', async () => {
-      const onSignInUrl = vi.fn();
       const signinLinks = (await endpoint.signin()) as SigninLinksResult;
       const pollUrl = signinLinks.links.poll;
       const signinId = pollUrl.substring(pollUrl.lastIndexOf('/') + 1);
