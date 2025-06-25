@@ -14,14 +14,22 @@
  * limitations under the License.
  */
 
+import { http } from 'msw';
 import * as _ from 'lodash';
 import { CheckingCapabilities } from '../../src';
 import { CheckId, CheckRequest, CheckResponse, CheckResultResponse } from '../../src/check';
 import { SuccessResponse, URL } from '../../src/common-types';
 import { AcrolinxApiError } from '../../src/errors';
-import { Route } from './common-mocking';
 import { DUMMY_CAPABILITIES, DUMMY_CHECK_RESULT } from './dummy-data';
 import { NOT_FOUND_CHECK_ID } from './mocked-errors';
+import { createMockResponse, createErrorResponse } from './msw-setup';
+
+// Define Route type locally since common-mocking.ts was removed
+export interface Route {
+  handler: (args: string[], requestOpts: RequestInit) => any;
+  method: string;
+  path: RegExp;
+}
 
 const CHECK_TIME_MS = 10 * 1000;
 
@@ -64,15 +72,51 @@ export class CheckServiceMock {
         path: /api\/v1\/checking\/capabilities$/,
       },
       {
-        handler: (_args, opts) => this.submitCheck(opts),
+        handler: (_args: string[], opts: RequestInit) => this.submitCheck(opts),
         method: 'POST',
         path: /api\/v1\/checking\/checks$/,
       },
       {
-        handler: (args) => this.getCheckResult(args[1]),
+        handler: (args: string[]) => this.getCheckResult(args[1]),
         method: 'GET',
         path: /api\/v1\/checking\/checks\/(.*)/,
       },
+    ];
+  }
+
+  public getMSWHandlers(baseUrl: string) {
+    return [
+      // Get checking capabilities
+      http.get(`${baseUrl}/api/v1/checking/capabilities`, () => {
+        return createMockResponse(this.getCheckingCapabilities());
+      }),
+
+      // Submit check
+      http.post(`${baseUrl}/api/v1/checking/checks`, async ({ request }) => {
+        const body = (await request.json()) as CheckRequest;
+        const check = new Check(body);
+        this.checks.push(check);
+        return createMockResponse({
+          data: { id: check.id },
+          links: {
+            result: baseUrl + `/api/v1/checking/checks/${check.id}`,
+            cancel: baseUrl + `/api/v1/checking/checks/${check.id}`,
+          },
+        });
+      }),
+
+      // Get check result
+      http.get(`${baseUrl}/api/v1/checking/checks/:checkId`, ({ params }) => {
+        const checkId = params.checkId as string;
+        const result = this.getCheckResult(checkId);
+
+        if ('status' in result) {
+          // It's an error response
+          return createErrorResponse(result.status, result);
+        }
+
+        return createMockResponse(result);
+      }),
     ];
   }
 
@@ -88,7 +132,7 @@ export class CheckServiceMock {
     return check.getCheckingResult(this.acrolinxUrl);
   }
 
-  private submitCheck(opts: RequestInit): CheckResponse {
+  public submitCheck(opts: RequestInit): CheckResponse {
     const check = new Check(JSON.parse(opts.body as string));
     this.checks.push(check);
     return {

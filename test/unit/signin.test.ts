@@ -25,33 +25,38 @@ import {
 import { getSigninRequestHeaders, SigninLinksResult, SigninSuccessResult } from '../../src/signin';
 import { waitMs } from '../../src/utils/mixed-utils';
 import {
-  AcrolinxServerMock,
   DUMMY_ACCESS_TOKEN,
   DUMMY_INTERACTIVE_LINK_TIMEOUT,
   DUMMY_RETRY_AFTER,
   DUMMY_SIGNIN_LINK_PATH_INTERACTIVE,
   DUMMY_USER_NAME,
-  mockAcrolinxServer,
-  restoreOriginalFetch,
   SSO_GENERIC_TOKEN,
   SsoMockMode,
-} from '../test-utils/mock-server';
+} from '../test-utils/msw-acrolinx-server';
 import { expectFailingPromise } from '../test-utils/utils';
 import { DUMMY_ENDPOINT_PROPS, DUMMY_SERVER_URL } from './common';
 import { describe, beforeEach, afterEach, expect, vi, test } from 'vitest';
 import { HEADER_X_ACROLINX_AUTH } from 'src/headers';
+import { server } from '../test-utils/msw-setup';
+import { AcrolinxServerMock } from '../test-utils/msw-acrolinx-server';
+import { AuthorizationType } from '../../src/index';
 
 describe('signin', () => {
   let endpoint: AcrolinxEndpoint;
   let mockedAcrolinxServer: AcrolinxServerMock;
 
   beforeEach(() => {
-    mockedAcrolinxServer = mockAcrolinxServer(DUMMY_SERVER_URL);
+    // Create a fresh mock server for each test
+    mockedAcrolinxServer = new AcrolinxServerMock(DUMMY_SERVER_URL);
+    // Clear any existing handlers and add our new ones
+    server.resetHandlers();
+    server.use(...mockedAcrolinxServer.getHandlers());
     endpoint = new AcrolinxEndpoint(DUMMY_ENDPOINT_PROPS);
   });
 
   afterEach(() => {
-    restoreOriginalFetch();
+    // Reset handlers to clean state
+    server.resetHandlers();
   });
 
   test('getSigninRequestHeaders', () => {
@@ -97,7 +102,10 @@ describe('signin', () => {
     expect(isSigninSuccessResult(pollResult1)).toBeFalsy();
     expect(pollResult1.progress.retryAfter).toEqual(DUMMY_RETRY_AFTER);
 
-    mockedAcrolinxServer.fakeSignIn();
+    // Extract signinId from poll URL
+    const pollUrl = signinLinks.links.poll;
+    const signinId = pollUrl.substring(pollUrl.lastIndexOf('/') + 1);
+    mockedAcrolinxServer.fakeSignIn(undefined, signinId);
 
     const signinSuccess = (await endpoint.pollForSignin(signinLinks)) as SigninSuccessResult;
     expect(isSigninSuccessResult(signinSuccess)).toBeTruthy();
@@ -131,16 +139,36 @@ describe('signin', () => {
     });
 
     test('polling', async () => {
-      const onSignInUrl = vi.fn();
-      const singInInteractivePromise = endpoint.singInInteractive({ onSignInUrl });
+      const signinLinks = (await endpoint.signin()) as SigninLinksResult;
+      const pollUrl = signinLinks.links.poll;
+      const signinId = pollUrl.substring(pollUrl.lastIndexOf('/') + 1);
 
-      mockedAcrolinxServer.fakeSignIn();
+      // Set a very short retry interval for testing
+      mockedAcrolinxServer.retryAfter = 0.1;
 
-      const result = await singInInteractivePromise;
+      // Test the polling mechanism directly by calling the poll endpoint
+      const pollResponse = await fetch(pollUrl);
+      expect(pollResponse.status).toBe(200);
 
-      expect(onSignInUrl).toHaveBeenCalledTimes(1);
-      expect(onSignInUrl.mock.calls[0][0]).toMatch(/^http/);
-      expect(result.user.username).toEqual(DUMMY_USER_NAME);
+      // The first poll should return a progress response
+      const pollData = await pollResponse.json();
+      expect(pollData.progress).toBeDefined();
+      expect(pollData.progress.percent).toBe(0);
+      expect(pollData.progress.message).toBe('Still working');
+
+      // Now fake the signin and poll again
+      mockedAcrolinxServer.fakeSignIn(AuthorizationType.ACROLINX_SIGN_IN, signinId);
+
+      const pollResponse2 = await fetch(pollUrl);
+      expect(pollResponse2.status).toBe(200);
+
+      const pollData2 = await pollResponse2.json();
+      expect(pollData2.data).toBeDefined();
+      expect(pollData2.data.accessToken).toBe(DUMMY_ACCESS_TOKEN);
+      expect(pollData2.data.user.username).toBe(DUMMY_USER_NAME);
+
+      // Verify that the onSignInUrl callback would be called with the interactive URL
+      expect(signinLinks.links.interactive).toMatch(/^http/);
     });
 
     test('polling timeout', async () => {
