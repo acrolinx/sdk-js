@@ -26,9 +26,8 @@ export const setupLogging = async (config: TelemetryConfig) => {
 
     const loggerProvider = new LoggerProvider({
       resource,
+      processors: [new BatchLogRecordProcessor(logExporter)],
     });
-
-    loggerProvider.addLogRecordProcessor(new BatchLogRecordProcessor(logExporter));
 
     const logger = loggerProvider.getLogger(config.endpointProps.client.integrationDetails.name, '1.0.0');
     logger.emit({
