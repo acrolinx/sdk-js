@@ -18,14 +18,12 @@ import { describe, expect, test } from 'vitest';
 import { DEVELOPMENT_SIGNATURE } from '../../src';
 import { AcrolinxEndpoint } from '../../src/index';
 import { ACROLINX_DEV_SIGNATURE } from 'test/integration-server/env-config';
-import { DUMMY_ENDPOINT_PROPS } from './common';
 
 function createEndpoint(acrolinxUrl: string) {
   return new AcrolinxEndpoint({
     acrolinxUrl,
     enableHttpLogging: true,
     client: {
-      integrationDetails: DUMMY_ENDPOINT_PROPS.client.integrationDetails,
       signature: ACROLINX_DEV_SIGNATURE ?? DEVELOPMENT_SIGNATURE,
       version: '1.2.3.666',
     },
