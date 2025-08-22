@@ -271,24 +271,10 @@ export class AcrolinxServerMock {
         return createMockResponse(this.getPlatformNotifications('', {}));
       }),
 
-      // Telemetry endpoints - add handlers for OTLP endpoints
-      http.post(`${this.acrolinxUrl}/otlp/logs`, ({ request }) => {
-        this.logRequest(request);
-        return createMockResponse({ success: true });
-      }),
-
-      http.post(`${this.acrolinxUrl}/otlp/metrics`, ({ request }) => {
-        this.logRequest(request);
-        return createMockResponse({ success: true });
-      }),
-
       // Int-service config endpoint
       http.get(`${this.acrolinxUrl}/int-service/api/v1/config`, ({ request }) => {
         this.logRequest(request);
-        return createMockResponse({
-          activateGetSuggestionReplacement: true,
-          telemetryEnabled: true,
-        });
+        return createMockResponse({ activateGetSuggestionReplacement: true });
       }),
 
       // Check service handlers
