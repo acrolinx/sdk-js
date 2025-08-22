@@ -84,9 +84,6 @@ import {
   SigninSuccessData,
   SigninSuccessResult,
 } from './signin';
-import { getTelemetryInstruments } from './telemetry/acrolinxInstrumentation';
-import { IntegrationDetails } from './telemetry/interfaces/integration';
-import { getCommonMetricAttributes } from './telemetry/metrics/attribute-utils';
 
 import { User } from './user';
 import {
@@ -182,10 +179,6 @@ export interface AcrolinxEndpointProps {
 }
 
 export interface ClientInformation {
-  /**
-   * The details of the integration
-   */
-  integrationDetails: IntegrationDetails;
   signature: string;
   /**
    * The version of the client.
@@ -311,20 +304,7 @@ export class AcrolinxEndpoint {
   }
 
   public async check(accessToken: AccessToken, req: CheckRequest): Promise<CheckResponse> {
-    const instruments = await getTelemetryInstruments(this.props, accessToken);
-    instruments?.metrics.meters.checkRequestCounter.add(1, {
-      ...getCommonMetricAttributes(this.props.client.integrationDetails),
-    });
-
-    const t0 = performance.now();
-    const response = await post<CheckResponse>('/api/v1/checking/checks', req, {}, this.props, accessToken);
-    const t1 = performance.now();
-
-    instruments?.metrics.meters.checkRequestSubmitTime.record(t1 - t0, {
-      ...getCommonMetricAttributes(this.props.client.integrationDetails),
-    });
-
-    return response;
+    return post<CheckResponse>('/api/v1/checking/checks', req, {}, this.props, accessToken);
   }
 
   public async getLiveSuggestions(accessToken: AccessToken, req: LiveSearchRequest): Promise<LiveSearchResponse> {
@@ -510,7 +490,6 @@ export class AcrolinxEndpoint {
     let canceledByClient = false;
     let requestedCanceledOnServer = false;
     let runningCheck: AsyncStartedProcess | undefined;
-    let t0: number;
 
     let cancelPromiseReject: (e: Error) => void;
     const cancelPromise = new Promise<never>((_resolve, reject) => {
@@ -540,7 +519,6 @@ export class AcrolinxEndpoint {
     };
 
     const poll = async (): Promise<Result> => {
-      t0 = performance.now();
       runningCheck = await asyncStartedProcessPromise;
       await handlePotentialCancellation();
 
@@ -562,28 +540,8 @@ export class AcrolinxEndpoint {
       return checkResultOrProgress.data;
     };
 
-    const recordTelemetry = async (error?: Error) => {
-      const t1 = performance.now();
-      const instruments = await getTelemetryInstruments(this.props, accessToken);
-      const attributes = {
-        ...getCommonMetricAttributes(this.props.client.integrationDetails),
-        ...(error && { 'response-status': error instanceof AcrolinxError ? error.status : 'unknown' }),
-      };
-      instruments?.metrics.meters.checkRequestPollingTime.record(t1 - t0, attributes);
-    };
-
-    const pollWithTelemetry = poll()
-      .then(async (result) => {
-        await recordTelemetry();
-        return result;
-      })
-      .catch(async (error) => {
-        await recordTelemetry(error);
-        throw error;
-      });
-
     return {
-      promise: Promise.race([pollWithTelemetry, cancelPromise]),
+      promise: Promise.race([poll(), cancelPromise]),
       getId(): string | undefined {
         return runningCheck?.data.id;
       },
