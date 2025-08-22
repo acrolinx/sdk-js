@@ -37,7 +37,6 @@ describe('AI-service', () => {
       http.get('*/int-service/api/v1/config', () => {
         return HttpResponse.json({
           activateGetSuggestionReplacement: true,
-          telemetryEnabled: true,
         });
       }),
     );
