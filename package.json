@@ -55,7 +55,7 @@
     "prettier": "^3.6.2",
     "typedoc": "^0.28.13",
     "typescript": "^5.9.3",
-    "typescript-eslint": "^8.45.0",
+    "typescript-eslint": "^8.46.0",
     "typescript-json-schema": "^0.65.1",
     "vitest": "^3.2.4"
   }
