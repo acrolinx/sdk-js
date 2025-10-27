@@ -1,4 +1,4 @@
-import { waitMs } from 'src/utils/mixed-utils';
+import { waitMs } from '../../src/utils/mixed-utils';
 import { LogBuffer, LogBufferEntry, LogEntryType, LoggingConfig } from '../../src/utils/logging-buffer';
 
 const TEST_LOG_MESSAGE = 'Test log message';

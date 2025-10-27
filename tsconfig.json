@@ -20,7 +20,7 @@
     "outDir": "dist",
     "baseUrl": "."
   },
-  "include": ["src", "test"],
+  "include": ["src"],
   "typedocOptions": {
     "theme": "default",
     "readme": "none",

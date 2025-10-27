@@ -15,8 +15,11 @@
  */
 
 import * as _ from 'lodash';
+import { HEADER_X_ACROLINX_AUTH } from '../../src/headers';
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import {
   AcrolinxEndpoint,
+  AuthorizationType,
   ErrorType,
   isSigninLinksResult,
   isSigninSuccessResult,
@@ -25,6 +28,7 @@ import {
 import { getSigninRequestHeaders, SigninLinksResult, SigninSuccessResult } from '../../src/signin';
 import { waitMs } from '../../src/utils/mixed-utils';
 import {
+  AcrolinxServerMock,
   DUMMY_ACCESS_TOKEN,
   DUMMY_INTERACTIVE_LINK_TIMEOUT,
   DUMMY_RETRY_AFTER,
@@ -33,13 +37,9 @@ import {
   SSO_GENERIC_TOKEN,
   SsoMockMode,
 } from '../test-utils/msw-acrolinx-server';
+import { server } from '../test-utils/msw-setup';
 import { expectFailingPromise } from '../test-utils/utils';
 import { DUMMY_ENDPOINT_PROPS, DUMMY_SERVER_URL } from './common';
-import { describe, beforeEach, afterEach, expect, vi, test } from 'vitest';
-import { HEADER_X_ACROLINX_AUTH } from 'src/headers';
-import { server } from '../test-utils/msw-setup';
-import { AcrolinxServerMock } from '../test-utils/msw-acrolinx-server';
-import { AuthorizationType } from '../../src/index';
 
 describe('signin', () => {
   let endpoint: AcrolinxEndpoint;
