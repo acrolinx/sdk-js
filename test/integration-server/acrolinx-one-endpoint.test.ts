@@ -5,8 +5,8 @@ import { AIService } from '../../src/services/ai-service/ai-service';
 import { IntService } from '../../src/services/int-service/int-service';
 
 import { describe, beforeEach, expect, test } from 'vitest';
-import { LogBufferEntry, LogEntryType } from 'src/utils/logging-buffer';
-import { IntegrationServiceResponse } from 'src/services/int-service/int-service.types';
+import { LogBufferEntry, LogEntryType } from '../../src/utils/logging-buffer';
+import { IntegrationServiceResponse } from '../../src/services/int-service/int-service.types';
 
 dotenv.config();
 

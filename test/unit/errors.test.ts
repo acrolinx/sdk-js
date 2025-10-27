@@ -19,7 +19,7 @@ import { AcrolinxError, CheckCanceledByClientError, ErrorType } from '../../src/
 import { AcrolinxEndpoint } from '../../src/index';
 import { mockAcrolinxServer, mockBrokenJsonServer, restoreOriginalFetch } from '../test-utils/mock-server';
 import { DUMMY_ENDPOINT_PROPS, DUMMY_SERVER_URL } from './common';
-import { getJsonFromUrl } from 'src/utils/fetch';
+import { getJsonFromUrl } from '../../src/utils/fetch';
 import { server } from '../test-utils/msw-setup';
 import { http, HttpResponse } from 'msw';
 

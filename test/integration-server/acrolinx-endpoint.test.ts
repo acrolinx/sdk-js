@@ -55,7 +55,7 @@ import {
   ACROLINX_API_USERNAME,
   SSO_GENERIC_TOKEN,
 } from './env-config';
-import { getJsonFromPath, getJsonFromUrl } from 'src/utils/fetch';
+import { getJsonFromPath, getJsonFromUrl } from '../../src/utils/fetch';
 
 dotenv.config();
 
