@@ -51,7 +51,7 @@
     "lodash": "4.17.21",
     "markdown-doctest": "1.1.0",
     "msw": "2.12.7",
-    "prettier": "3.8.0",
+    "prettier": "3.8.1",
     "typedoc": "0.28.16",
     "typescript": "5.9.3",
     "typescript-eslint": "8.53.1",
