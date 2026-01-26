@@ -42,7 +42,7 @@
     "@types/lodash": "4.17.23",
     "@types/node": "25.0.10",
     "@typescript-eslint/eslint-plugin": "8.53.1",
-    "@vitest/coverage-v8": "4.0.17",
+    "@vitest/coverage-v8": "4.0.18",
     "ajv": "8.17.1",
     "co-body": "6.2.0",
     "cross-fetch": "4.1.0",
@@ -56,6 +56,6 @@
     "typescript": "5.9.3",
     "typescript-eslint": "8.53.1",
     "typescript-json-schema": "0.67.1",
-    "vitest": "4.0.17"
+    "vitest": "4.0.18"
   }
 }
