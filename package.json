@@ -46,7 +46,7 @@
     "ajv": "8.17.1",
     "co-body": "6.2.0",
     "cross-fetch": "4.1.0",
-    "dotenv": "17.2.3",
+    "dotenv": "17.2.4",
     "eslint": "9.39.2",
     "lodash": "4.17.23",
     "markdown-doctest": "1.1.0",
