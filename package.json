@@ -52,7 +52,7 @@
     "markdown-doctest": "1.1.0",
     "msw": "2.13.2",
     "prettier": "3.8.2",
-    "typedoc": "0.28.18",
+    "typedoc": "0.28.19",
     "typescript": "5.9.3",
     "typescript-eslint": "8.58.1",
     "typescript-json-schema": "0.67.1",
